@@ -12,7 +12,9 @@ import java.util.Map;
  */
 public enum RateLimitType {
     IP(AuthExcepFactor.E_IP_RATE_LIMIT),
+    IPMETHOD(AuthExcepFactor.E_IP_RATE_LIMIT),
     USER(AuthExcepFactor.E_USER_RATE_LIMIT),
+    USERMETHOD(AuthExcepFactor.E_USER_RATE_LIMIT),
     PARAM(AuthExcepFactor.E_API_RATE_LIMIT);
 
     ExcepFactor excepFactor;
@@ -29,8 +31,12 @@ public enum RateLimitType {
         switch (this) {
             case IP:
                 return "i_" + rc.getIp();
+            case IPMETHOD:
+                return "i_" + rc.getOriginRequest().getRequestURI() + rc.getIp();
             case USER:
                 return "u_" + rc.getCurrentUid();
+            case USERMETHOD:
+                return "u_" + rc.getOriginRequest().getRequestURI() + rc.getCurrentUid();
             case PARAM:
                 return "p_" + getRequestParamString(rc.getOriginRequest().getParameterMap());
             default:

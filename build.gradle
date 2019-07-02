@@ -102,5 +102,5 @@ subprojects {
 
 //执行gradle wrapper自动生成gradlew脚本及配置
 task wrapper(type: Wrapper) {
-    gradleVersion = '4.0.1'
+    gradleVersion = '4.10.2'
 }
