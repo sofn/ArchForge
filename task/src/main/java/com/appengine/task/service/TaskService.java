@@ -18,7 +18,7 @@ public class TaskService {
     private TaskDao taskDao;
 
     public Task getTask(Long id) {
-        return taskDao.findOne(id);
+        return taskDao.findById(id).orElse(null);
     }
 
     public void saveTask(Task entity) {
@@ -30,7 +30,7 @@ public class TaskService {
         if (task == null) {
             return false;
         }
-        taskDao.delete(id);
+        taskDao.deleteById(id);
         return true;
     }
 

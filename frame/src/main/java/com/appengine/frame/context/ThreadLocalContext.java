@@ -3,7 +3,7 @@ package com.appengine.frame.context;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * @author jolestar
+ * @author sofn
  */
 public class ThreadLocalContext extends InheritableThreadLocal<RequestContext> {
 

@@ -7,7 +7,7 @@ import com.appengine.frame.utils.log.ApiLogger;
 import javax.annotation.Resource;
 
 /**
- * @author jolestar@gmail.com
+ * @author sofn
  */
 public abstract class AbstractAuthSpi implements AuthSpi {
 

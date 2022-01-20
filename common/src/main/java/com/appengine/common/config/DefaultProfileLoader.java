@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * @author jolestar
+ * @author sofn
  */
 public class DefaultProfileLoader extends ProfileLoader {
 

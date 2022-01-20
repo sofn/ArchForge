@@ -1,7 +1,7 @@
 dependencies {
     //保证spring配置文件不报错,注意使用版本号需和全工程保持一直，放置包混乱
-    compile "org.springframework.boot:spring-boot-starter-data-redis:$springBootVersion"
-    compile "com.alibaba:druid:$druidVersion"
+    api "org.springframework.boot:spring-boot-starter-data-redis:$springBootVersion"
+    api "com.alibaba:druid:$druidVersion"
 }
 
 //环境变量只对配置文件有效

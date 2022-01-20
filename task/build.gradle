@@ -1,4 +1,4 @@
 dependencies {
-    compile project(":frame")
-    compile project(":user")
+    api project(":frame")
+    api project(":user")
 }

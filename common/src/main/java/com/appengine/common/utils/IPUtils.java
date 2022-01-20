@@ -11,7 +11,7 @@ import java.util.*;
 import java.util.regex.Pattern;
 
 /**
- * @author jolestar
+ * @author sofn
  */
 public class IPUtils {
 

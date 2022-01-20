@@ -8,30 +8,24 @@ allprojects {
 subprojects {
     apply plugin: 'idea'
     apply plugin: 'java'
-    apply plugin: 'maven'
-    apply plugin: 'checkstyle'
-    apply plugin: 'findbugs'
-    apply plugin: 'jacoco'
+    apply plugin: 'java-library'
 
-    sourceCompatibility = 1.8
-    targetCompatibility = 1.8
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
 
     buildscript {
         repositories {
+            maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
+            maven { url 'https://maven.aliyun.com/repository/spring-plugin' }
             mavenLocal()
-            maven { url "http://maven.aliyun.com/nexus/content/groups/public/" }
             mavenCentral()
-            maven { url "http://repo.spring.io/milestone" }
-            maven { url 'http://repo.spring.io/libs-release' }
         }
     }
 
     repositories {
+        maven { url 'https://maven.aliyun.com/repository/public/' }
         mavenLocal()
-        maven { url "http://maven.aliyun.com/nexus/content/groups/public/" }
         mavenCentral()
-        maven { url "http://repo.spring.io/milestone" }
-        maven { url 'http://repo.spring.io/libs-release' }
     }
 
     //idea插件会默认下载source和doc文件
@@ -45,62 +39,21 @@ subprojects {
     }
 
     dependencies {
-        testCompile "org.assertj:assertj-core:$assertjVersion"
-        testCompile "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
-    }
-
-    checkstyle {
-        configFile = file("$rootDir/configs/checkstyle/checkstyle.xml")
-        configProperties = ['projectDir': projectDir, 'rootDir': rootDir]
-        toolVersion = '6.10.1'
-    }
-
-    findbugs {
-        ignoreFailures = false
-        sourceSets = [sourceSets.main]
-        if (JavaVersion.current().compareTo(JavaVersion.VERSION_1_7) >= 0) {
-            findbugs.toolVersion = '3.0.1'
-        } else {
-            findbugs.toolVersion = '2.0.3'
-        }
-    }
-
-    //覆盖率检查 自动绑定在task test上，报告路径:build/reports/tests
-    jacoco {
-        toolVersion = '0.7.5.201505241946'
-    }
-
-    jacocoTestReport {
-        reports {
-            xml.enabled false
-            csv.enabled false
-        }
-    }
-
-    uploadArchives {
-        repositories {
-            mavenDeployer {
-                repository(url: 'http://your.repository.path/') {
-                    authentication(userName: "username", password: "password")
-                }
-                pom.groupId = project.group
-                pom.artifactId = project.name
-                pom.version = project.version
-            }
-        }
+        compileOnly "org.projectlombok:lombok:1.18.22"
+        annotationProcessor "org.projectlombok:lombok:1.18.22"
+        testImplementation "org.assertj:assertj-core:$assertjVersion"
+        testImplementation "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
+        testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.8.2"
+        testImplementation "org.junit.jupiter:junit-jupiter-api:5.8.2"
+        testImplementation "org.apache.logging.log4j:log4j-core:2.17.0"
     }
 
     task sourcesJar(type: Jar) {
         classifier = 'sources'
         from sourceSets.main.allSource
     }
-    //添加source jar
-    artifacts {
-        archives sourcesJar
-    }
-}
 
-//执行gradle wrapper自动生成gradlew脚本及配置
-task wrapper(type: Wrapper) {
-    gradleVersion = '4.10.2'
+    test {
+        useJUnitPlatform()
+    }
 }

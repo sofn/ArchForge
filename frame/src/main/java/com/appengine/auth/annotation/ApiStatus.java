@@ -2,7 +2,7 @@ package com.appengine.auth.annotation;
 
 /**
  * @author x-spirit
- * @author jolestar
+ * @author sofn
  */
 public enum ApiStatus {
     DEV(1, "开发中"),

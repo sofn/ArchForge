@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @author jolestar@gmail.com
+ * @author sofn
  */
 public class EngineException extends RuntimeException {
 

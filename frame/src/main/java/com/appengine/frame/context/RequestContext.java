@@ -12,9 +12,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @author jolestar
+ * @author sofn
  */
-@Component
 public class RequestContext implements Serializable, JSONAware {
 
     private static final long serialVersionUID = -402232948972687045L;

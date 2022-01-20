@@ -4,7 +4,7 @@ import java.net.UnknownHostException;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * @author jolestar
+ * @author sofn
  */
 public class RequestIDGenerator {
 

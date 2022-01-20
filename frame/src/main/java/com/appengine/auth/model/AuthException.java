@@ -1,6 +1,3 @@
-/**
- *
- */
 package com.appengine.auth.model;
 
 
@@ -8,7 +5,7 @@ import com.appengine.common.exception.ExcepFactor;
 import com.appengine.common.exception.EngineException;
 
 /**
- * @author jolestar@gmail.com
+ * @author sofn
  */
 public class AuthException extends EngineException {
 

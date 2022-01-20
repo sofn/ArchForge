@@ -4,7 +4,7 @@ import com.appengine.auth.model.AuthRequest;
 import org.springframework.stereotype.Service;
 
 /**
- * @author lishaofeng
+ * @author sofn
  * @version 1.0 Created at: 2017-07-26 14:54
  */
 @Service

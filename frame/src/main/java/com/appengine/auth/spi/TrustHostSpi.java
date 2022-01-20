@@ -9,7 +9,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.stereotype.Component;
 
 /**
- * @author jolestar@gmail.com
+ * @author sofn
  */
 @Component("TrustHostSpi")
 public class TrustHostSpi extends AbstractAuthSpi {

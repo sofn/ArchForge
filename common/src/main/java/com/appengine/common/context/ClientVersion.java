@@ -10,13 +10,13 @@ import java.io.Serializable;
 /**
  * 客户端版本号解析类
  *
- * @author jolestar
+ * @author sofn
  */
 public class ClientVersion implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    public static final String VERSION_HEADER = "X-WVersion";
+    public static final String VERSION_HEADER = "X-Version";
 
     public static final String SPLIT = "-";
 

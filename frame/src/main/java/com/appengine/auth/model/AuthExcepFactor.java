@@ -6,7 +6,7 @@ import com.appengine.common.utils.GlobalConstants;
 import org.springframework.http.HttpStatus;
 
 /**
- * @author jolestar@gmail.com
+ * @author sofn
  */
 public class AuthExcepFactor extends ExcepFactor {
 

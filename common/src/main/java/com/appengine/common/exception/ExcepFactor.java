@@ -65,7 +65,7 @@ public class ExcepFactor implements Serializable {
      */
     public static final ExcepFactor E_API_DEPRECATED_ERROR = new ExcepFactor(
             ERROR_LEVEL_SYSTEM, 0, HttpStatus.SERVICE_UNAVAILABLE, 12,
-            "api is deprecated.", "该接口已经废弃");
+            "implementation is deprecated.", "该接口已经废弃");
 
     // http协议以及参数类错误
     public static final ExcepFactor E_UNSUPPORT_MEDIATYPE_ERROR = new ExcepFactor(

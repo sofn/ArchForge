@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * @author jolestar@gmail.com
+ * @author sofn
  */
 @Component("BasicAuthSpi")
 public class BasicAuthSpi extends AbstractAuthSpi {

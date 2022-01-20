@@ -1,31 +1,33 @@
+apply plugin: 'java'
+
 dependencies {
     //common
-    compile "commons-codec:commons-codec:$commonsCodecVersion"
-    compile "com.google.guava:guava:$guavaVersion"
-    compile "org.apache.commons:commons-lang3:$commonsLangVersion"
-    compile "commons-io:commons-io:$commonsIOVersion"
+    api "commons-codec:commons-codec:$commonsCodecVersion"
+    api "com.google.guava:guava:$guavaVersion"
+    api "org.apache.commons:commons-lang3:$commonsLangVersion"
+    api "commons-io:commons-io:$commonsIOVersion"
 
     //DB
-    compile "org.springframework.boot:spring-boot-starter-data-jpa:$springBootVersion"
-    compile "org.springframework.boot:spring-boot-starter-data-redis:$springBootVersion"
-    compile "com.alibaba:druid:$druidVersion"
-    compile "mysql:mysql-connector-java:$mysqlConnectorVersion"
-    compile 'com.h2database:h2:1.4.189'
+    api "org.springframework.boot:spring-boot-starter-data-jpa:$springBootVersion"
+    api "org.springframework.boot:spring-boot-starter-data-redis:$springBootVersion"
+    api "com.alibaba:druid:$druidVersion"
+    api "mysql:mysql-connector-java:$mysqlConnectorVersion"
+    api 'com.h2database:h2:1.4.189'
 
     //util
-    compile "com.alibaba:fastjson:$fastjsonVersion"
-    compile "org.javatuples:javatuples:$javatuplesVersion"
-    compile "org.projectlombok:lombok:$lombokVersion"
+    api "com.alibaba:fastjson:$fastjsonVersion"
+    api "org.javatuples:javatuples:$javatuplesVersion"
+    api "org.projectlombok:lombok:$lombokVersion"
 
     //web
-    compile "org.springframework.boot:spring-boot-starter-web:$springBootVersion"
-    compile "org.springframework.boot:spring-boot-starter-aop:$springBootVersion"
-    compile "io.springfox:springfox-swagger-ui:$springfoxVersion"
-    compile "io.springfox:springfox-swagger2:$springfoxVersion"
+    api "org.springframework.boot:spring-boot-starter-web:$springBootVersion"
+    api "org.springframework.boot:spring-boot-starter-aop:$springBootVersion"
+    api "io.springfox:springfox-swagger-ui:$springfoxVersion"
+    api "io.springfox:springfox-swagger2:$springfoxVersion"
 
     if (JavaVersion.current().compareTo(JavaVersion.VERSION_1_7) >= 0) {
-        compile 'com.google.code.findbugs:annotations:3.0.0'
+        api 'com.google.code.findbugs:annotations:3.0.0'
     } else {
-        compile 'com.google.code.findbugs:annotations:2.0.3'
+        api 'com.google.code.findbugs:annotations:2.0.3'
     }
 }

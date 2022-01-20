@@ -2,13 +2,15 @@ package com.juneix.frame.context;
 
 import com.appengine.frame.context.RequestContext;
 import com.appengine.frame.context.ThreadLocalContext;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 
 /**
  * Authors: sofn
@@ -23,7 +25,7 @@ public class ThreadLocalContextTest {
         ThreadLocalContext.clear();
         RequestContext context2 = ThreadLocalContext.getRequestContext();
         System.out.println(context2.getRequestId());
-        Assert.assertNotSame(context.getRequestId(), context2.getRequestId());
+        assertNotSame(context.getRequestId(), context2.getRequestId());
     }
 
     @Test
@@ -33,7 +35,7 @@ public class ThreadLocalContextTest {
         Thread thread = new Thread(() -> {
             RequestContext context2 = ThreadLocalContext.getRequestContext();
             System.out.println(context2.getRequestId());
-            Assert.assertEquals(context.getRequestId(), context2.getRequestId());
+            assertEquals(context.getRequestId(), context2.getRequestId());
         });
         thread.start();
         try {

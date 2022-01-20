@@ -6,7 +6,7 @@ import com.appengine.auth.model.AuthRequest;
 import org.springframework.stereotype.Component;
 
 /**
- * @author jolestar
+ * @author sofn
  */
 @Component("NullSpi")
 public class NullAuthSpi extends AbstractAuthSpi {

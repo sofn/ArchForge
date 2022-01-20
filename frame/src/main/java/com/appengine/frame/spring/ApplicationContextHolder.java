@@ -15,7 +15,7 @@ import java.util.List;
  * ServletContext servletContext = request.getSession().getServletContext();
  * ApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(servletContext);
  *
- * @author jolestar
+ * @author sofn
  */
 @Service
 @Lazy(false)

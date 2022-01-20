@@ -1,11 +1,11 @@
 dependencies {
-    compile project(":common")
+    api project(":common")
 
-    compile "org.springframework.boot:spring-boot-starter-web:$springBootVersion"
-    compile "org.springframework.boot:spring-boot-starter-aop:$springBootVersion"
-    compile "org.springframework.boot:spring-boot-starter-actuator:$springBootVersion"
+    api "org.springframework.boot:spring-boot-starter-web:$springBootVersion"
+    api "org.springframework.boot:spring-boot-starter-aop:$springBootVersion"
+    api "org.springframework.boot:spring-boot-starter-actuator:$springBootVersion"
 
     //monitor
-    compile "org.javasimon:javasimon-spring:$javasimonVersion"
-    compile "org.javasimon:javasimon-console-embed:$javasimonVersion"
+    api "org.javasimon:javasimon-spring:$javasimonVersion"
+    api "org.javasimon:javasimon-console-embed:$javasimonVersion"
 }

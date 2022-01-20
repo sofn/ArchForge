@@ -1,7 +1,7 @@
 package com.appengine.auth.annotation;
 
 /**
- * @author jolestar@gmail.com
+ * @author sofn
  */
 public enum AuthType {
     // 可选 如果有用户信息则验证，验证失败不报错

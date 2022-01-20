@@ -36,7 +36,7 @@ public class UserService {
     }
 
     public User get(long id) {
-        return dao.findOne(id);
+        return dao.findById(id).orElse(null);
     }
 
     /**

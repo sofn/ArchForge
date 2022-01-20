@@ -1,7 +1,7 @@
 package com.juneix.auth;
 
 import com.appengine.auth.spi.MAuthSpi;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Authors: sofn

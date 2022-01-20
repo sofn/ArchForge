@@ -34,7 +34,7 @@ public class TaskController {
             @RequestParam(required = false, defaultValue = "1") int page,
             @RequestParam(value = "pagesize", required = false, defaultValue = "10") int pageSize
     ) {
-        PageRequest request = new PageRequest(page - 1, pageSize);
+        PageRequest request = PageRequest.of(page - 1, pageSize);
         return taskService.getTasksByPage(rc.getCurrentUid(), request);
     }
 

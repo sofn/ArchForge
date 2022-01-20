@@ -7,7 +7,7 @@ import com.appengine.common.utils.GlobalConstants;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.autoconfigure.web.ErrorController;
+import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,11 +25,6 @@ public class ErrorHandlerResource implements ErrorController {
     private static final Logger log = LoggerFactory.getLogger(ErrorHandlerResource.class);
 
     public static final String ERROR_PATH = "/error";
-
-    @Override
-    public String getErrorPath() {
-        return ERROR_PATH;
-    }
 
     @RequestMapping(value = ERROR_PATH)
     @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
