@@ -1,19 +1,15 @@
 package com.appengine.frame.help.resources;
 
 import com.alibaba.fastjson.JSONObject;
-import com.appengine.auth.annotation.*;
-import com.appengine.common.config.DefaultProfileLoader;
+import com.appengine.auth.annotation.ApiStatus;
+import com.appengine.auth.annotation.AuthType;
+import com.appengine.auth.annotation.BaseInfo;
 import com.appengine.frame.context.RequestContext;
-import org.apache.commons.lang3.RandomUtils;
 import org.javasimon.aop.Monitored;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author sofn
@@ -24,15 +20,7 @@ import java.util.concurrent.TimeUnit;
 @RequestMapping("/help")
 public class HelpResource {
 
-    private static final Logger logger = LoggerFactory.getLogger(HelpResource.class);
-
     @BaseInfo(desc = "help-ping", status = ApiStatus.PUBLIC, needAuth = AuthType.OPTION)
-    @RateLimit({
-            @RateLimitTypeConfig(value = RateLimitType.IP, rates = {@RateLimitRateConfig(100)}),
-            @RateLimitTypeConfig(value = RateLimitType.USER, rates = {
-                    @RateLimitRateConfig(value = 100, time = TimeUnit.MINUTES),
-                    @RateLimitRateConfig(value = 10000, time = TimeUnit.HOURS)})
-    })
     @RequestMapping(value = "/ping")
     public JSONObject ping(RequestContext rc) {
         JSONObject result = new JSONObject();
@@ -42,19 +30,10 @@ public class HelpResource {
         return result;
     }
 
-    @RequestMapping(value = "/echo", method = RequestMethod.POST)
+    @PostMapping(value = "/echo")
     public JSONObject echo(@RequestParam String msg) {
-        if (!DefaultProfileLoader.isProd()) {
-            try {
-                Thread.sleep(RandomUtils.nextInt(1, 100));
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-
         JSONObject msgJson = new JSONObject();
         msgJson.put("msg", msg);
-
         return msgJson;
     }
 }

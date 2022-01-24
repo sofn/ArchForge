@@ -1,12 +1,10 @@
 package com.appengine.frame.filters;
 
 import com.appengine.auth.annotation.BaseInfo;
-import com.appengine.auth.annotation.RateLimit;
 import com.appengine.auth.model.AuthException;
 import com.appengine.auth.model.AuthRequest;
 import com.appengine.auth.model.AuthResponse;
 import com.appengine.auth.service.AuthService;
-import com.appengine.auth.service.RateLimitAuthService;
 import com.appengine.common.context.ClientVersion;
 import com.appengine.common.utils.GlobalConstants;
 import com.appengine.frame.context.RequestContext;
@@ -36,8 +34,6 @@ public class AuthResourceFilter extends RequestMappingHandlerAdapter {
 
     @Resource(name = "defaultAuthService")
     private AuthService authService;
-    @Resource
-    private RateLimitAuthService rateLimitAuthService;
     @Value("${profile}")
     private String profile;
 
@@ -61,10 +57,6 @@ public class AuthResourceFilter extends RequestMappingHandlerAdapter {
         if (method.isAnnotationPresent(BaseInfo.class)) {
             baseInfo = method.getAnnotation(BaseInfo.class);
         }
-        RateLimit rateLimit = null;
-        if (method.isAnnotationPresent(RateLimit.class)) {
-            rateLimit = method.getAnnotation(RateLimit.class);
-        }
 
         AuthResponse authResponse;
         try {
@@ -81,10 +73,6 @@ public class AuthResourceFilter extends RequestMappingHandlerAdapter {
         context.setPlatform(authResponse.getPlatform());
         context.setAttribute("auth_type", authResponse.getAuthedBy());
         context.setClientVersion(authResponse.getClientVersion());
-
-        if (rateLimit != null && (authRequest.getFrom() != AuthRequest.RequestFrom.INNER || !rateLimit.internalIgnore())) {
-            rateLimitAuthService.auth(context, rateLimit);
-        }
 
         return super.handleInternal(request, response, handlerMethod);
     }

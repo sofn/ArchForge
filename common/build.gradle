@@ -9,7 +9,6 @@ dependencies {
 
     //DB
     api "org.springframework.boot:spring-boot-starter-data-jpa:$springBootVersion"
-    api "org.springframework.boot:spring-boot-starter-data-redis:$springBootVersion"
     api "com.alibaba:druid:$druidVersion"
     api "mysql:mysql-connector-java:$mysqlConnectorVersion"
     api 'com.h2database:h2:1.4.189'
@@ -22,8 +21,8 @@ dependencies {
     //web
     api "org.springframework.boot:spring-boot-starter-web:$springBootVersion"
     api "org.springframework.boot:spring-boot-starter-aop:$springBootVersion"
-    api "io.springfox:springfox-swagger-ui:$springfoxVersion"
-    api "io.springfox:springfox-swagger2:$springfoxVersion"
+
+    api group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.6.4'
 
     if (JavaVersion.current().compareTo(JavaVersion.VERSION_1_7) >= 0) {
         api 'com.google.code.findbugs:annotations:3.0.0'

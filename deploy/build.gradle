@@ -7,10 +7,13 @@ configurations {
     providedRuntime
 }
 
-//fully executable applications for Unix systems
-/*springBoot {
-    executable = true
-}*/
+bootJar {
+    enabled = false
+}
+
+jar {
+    enabled = true
+}
 
 //只对gradle spring-boot:run 有效
 ext {
@@ -24,7 +27,6 @@ dependencies {
     api project(":task")
 
     api "org.springframework.boot:spring-boot-starter-web:$springBootVersion"
-    api "org.springframework.boot:spring-boot-starter-tomcat:$springBootVersion"
     api "org.jolokia:jolokia-core:$jolokiaVersion" //JMX
 
     //web

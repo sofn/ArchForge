@@ -25,11 +25,6 @@ app-engine 是一个分布式的App服务端快速开发框架,包含了基本�
 > 2. Spring环境变量: application.yaml或application.properties里配置spring.profiles.active
 > 3. 应用内获取环境变量: spring注入: @Autowired Environment env 或手动解析spring配置文件（不依赖Spring）
 
-#### 数据源配置
-> 1. 如果安装了docker，直接执行 deploy/bin/init_redis.sh脚本
-> 2. 手动安装:
->     redis: ip:127.0.0.1 port:6379 password:无
-
 #### 可执行jar包
 运行 gradle clean jar assemble 会自动打可执行jar包，运行：
 > 1. java -jar deploy/build/libs/deploy-${version}.jar
@@ -55,7 +50,7 @@ app-engine 是一个分布式的App服务端快速开发框架,包含了基本�
 > * Tomcat监控： http://localhost:7002/jolokia/read/Tomcat:type=Connector,port=8080
 
 #### 接口文档
-> * swagger: http://localhost:8080/swagger-ui.html
+> * swagger: http://localhost:8080/swagger-ui/index.html
 
 #### TODO
 > * 完善注释

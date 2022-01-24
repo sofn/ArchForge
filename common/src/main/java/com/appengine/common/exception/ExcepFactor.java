@@ -220,10 +220,6 @@ public class ExcepFactor implements Serializable {
                 errorCode, errorMsg, errorMsgCn);
     }
 
-    public static void main(String[] args) {
-        printException(new PrintWriter(System.out));
-    }
-
     public static void printException(PrintWriter out) {
         List<ExcepFactor> excepList = new ArrayList<ExcepFactor>(excepFactors);
         Collections.sort(excepList, new Comparator<ExcepFactor>() {

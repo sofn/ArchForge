@@ -38,7 +38,7 @@
         <property name="maxPoolPreparedStatementPerConnectionSize" value="20"/>
 
         <!-- 配置监控统计拦截的filters wall防止sql注入-->
-        <property name="filters" value="stat,log4j"/>
+        <property name="filters" value="stat"/>
         <property name="proxyFilters">
             <list>
                 <ref bean="stat-filter"/>

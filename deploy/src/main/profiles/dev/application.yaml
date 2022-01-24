@@ -13,5 +13,9 @@ spring:
         view:
             prefix: /WEB-INF/jsp/
             suffix: .jsp
+        pathmatch:
+            matching-strategy: ant_path_matcher
     profiles:
         active: dev
+    main:
+        allow-bean-definition-overriding: true

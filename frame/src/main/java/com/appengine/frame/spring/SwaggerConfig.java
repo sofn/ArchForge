@@ -1,16 +1,9 @@
 package com.appengine.frame.spring;
 
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Info;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.context.request.async.DeferredResult;
-import springfox.documentation.builders.PathSelectors;
-import springfox.documentation.builders.RequestHandlerSelectors;
-import springfox.documentation.service.ApiInfo;
-import springfox.documentation.service.Contact;
-import springfox.documentation.spi.DocumentationType;
-import springfox.documentation.spring.web.plugins.Docket;
-
-import java.util.Collections;
 
 /**
  * @author sofn
@@ -18,10 +11,18 @@ import java.util.Collections;
  */
 @Configuration
 public class SwaggerConfig {
+
     @Bean
+    public OpenAPI initOpenAPI() {
+        return new OpenAPI().info(
+                new Info().title("APP-ENGINE接口文档").description("文档说明").version("v1.0")
+        );
+    }
+
+    /*@Bean
     public Docket merchantStoreApi() {
-        return new Docket(DocumentationType.SWAGGER_2)
-                .groupName("internal-api")
+        return new Docket(DocumentationType.OAS_30)
+                .groupName("api")
                 .genericModelSubstitutes(DeferredResult.class)
                 .useDefaultResponseMessages(false)
                 .forCodeGeneration(true)
@@ -30,18 +31,15 @@ public class SwaggerConfig {
                 .apis(RequestHandlerSelectors.any()) // 对所有api进行监控
                 .paths(PathSelectors.any()) // 对所有路径进行监控
                 .build()
-                .apiInfo(testApiInfo());
+                .apiInfo(apiInfo());
     }
 
-    private ApiInfo testApiInfo() {
-        return new ApiInfo("APP-ENGINE接口文档",
-                "文档说明",
-                "0.1",
-                "NO terms of service",
-                new Contact("sofn", "https://github.com/sofn", "lesofn@gmail.com"),
-                "The Apache License, Version 2.0",
-                "https://www.apache.org/licenses/LICENSE-2.0.html",
-                Collections.emptyList()
-        );
-    }
+    private ApiInfo apiInfo() {
+        return new ApiInfoBuilder()
+                .title("APP-ENGINE接口文档")
+                .description("文档说明")
+                .contact(new Contact("sofn", "https://github.com/sofn", "lesofn@gmail.com"))
+                .version("1.0")
+                .build();
+    }*/
 }

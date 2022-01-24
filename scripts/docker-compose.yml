@@ -5,13 +5,10 @@ services:
     environment:
       MYSQL_DATABASE: appengine
       MYSQL_ROOT_PASSWORD: 123
-  redisdb:
-    image: redis
   appEngine:
     image: com.appengine/deploy:prod-0.1.RELEASE
     links:
       - mysqldb:mysql_host
-      - redisdb:redis_host
     ports:
       - 8080:8080
     volumes:

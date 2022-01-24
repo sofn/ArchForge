@@ -96,7 +96,6 @@
     <logger name="org.springframework" level="WARN"/>
     <logger name="org.hibernate" level="ERROR"/>
     <logger name="druid" level="ERROR"/>
-    <logger name="springfox" level="WARN"/>
     <logger name="org.apache.catalina" level="OFF"/>
 
     <logger name="com.appengine" level="DEBUG"/>

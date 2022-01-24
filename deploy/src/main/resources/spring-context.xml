@@ -30,7 +30,8 @@
         </property>
     </bean>
 
-    <import resource="classpath*:spring/*.xml"/>
+    <import resource="classpath*:spring/user-mysql.xml"/>
+    <import resource="classpath*:spring/task-mysql.xml"/>
 
     <context:component-scan base-package="com.appengine"/>
     <aop:aspectj-autoproxy/>

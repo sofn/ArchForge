@@ -10,7 +10,8 @@ import com.appengine.auth.spi.MAuthSpi;
 import com.appengine.frame.context.RequestContext;
 import com.appengine.user.domain.User;
 import com.appengine.user.service.UserService;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -27,6 +28,7 @@ import java.util.concurrent.TimeUnit;
  */
 @RestController
 @RequestMapping("/users")
+@Tag(name = "用户接口", description = "用户相关CRUD接口")
 public class UserController {
 
     @Resource
@@ -38,9 +40,9 @@ public class UserController {
         return userService.save(new User(username, password));
     }
 
+    @Operation(summary = "测试接口1")
     @BaseInfo(desc = "登陆", needAuth = AuthType.OPTION)
     @RequestMapping(value = "/login", method = RequestMethod.POST)
-    @ApiOperation(value = "测试接口1", notes = "简单接口描述 userName必填", code = 200, produces = "application/json")
     public JSONObject login(
             HttpServletResponse response,
             @RequestParam String username,
@@ -63,7 +65,7 @@ public class UserController {
 
     @RequestMapping(value = "/show")
     @BaseInfo(desc = "显示用户信息", status = ApiStatus.PUBLIC, needAuth = AuthType.REQUIRED)
-    @ApiOperation(value = "测试接口2", notes = "简单接口描述", code = 200, produces = "application/json")
+    @Operation(summary = "测试接口2")
     public User show(RequestContext rc, @RequestParam(required = false, defaultValue = "0") long uid) {
         if (uid <= 0) {
             uid = rc.getCurrentUid();

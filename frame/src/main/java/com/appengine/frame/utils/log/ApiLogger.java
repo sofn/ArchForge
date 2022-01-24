@@ -15,8 +15,6 @@ public class ApiLogger {
 
     public static long DB_FIRE_TIME = 500; // DB操作超时
 
-    public static long REDIS_FIRE_TIME = 300; // Redis操作超时
-
     private static Logger log = LoggerFactory.getLogger("debug");
     private static Logger infoLog = LoggerFactory.getLogger("info");
     private static Logger warnLog = LoggerFactory.getLogger("warn");

@@ -1,6 +1,7 @@
 package com.appengine.common.config;
 
 import com.appengine.common.utils.collection.GlobalCollectionUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -17,9 +18,9 @@ import java.util.Optional;
 /**
  * @author sofn
  */
+@Slf4j
 public class DefaultProfileLoader extends ProfileLoader {
 
-    public static final Logger LOGGER = LoggerFactory.getLogger(DefaultProfileLoader.class);
     public static final String APP_ENV_VAR = "profile";
 
     public static DefaultProfileLoader loader = new DefaultProfileLoader();
@@ -57,8 +58,7 @@ public class DefaultProfileLoader extends ProfileLoader {
                 }
                 System.setProperty(APP_ENV_VAR, envVar.name());
 
-                System.out.println("AppEnv :" + envVar);
-                LOGGER.info("AppEnv :" + envVar);
+                log.info("AppEnv {}", envVar);
             }
         }
         return envVar;
@@ -70,7 +70,7 @@ public class DefaultProfileLoader extends ProfileLoader {
             env = PropertiesLoaderUtils.loadAllProperties("application.properties").getProperty("profile");
             env = StringUtils.strip(env);
         } catch (IOException e) {
-            LOGGER.error(e.getMessage());
+            log.error(e.getMessage());
         }
         return Optional.ofNullable(env);
     }

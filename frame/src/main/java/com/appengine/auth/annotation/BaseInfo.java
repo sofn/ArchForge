@@ -6,7 +6,6 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * @author x-spirit
  * @author sofn
  */
 @Retention(RetentionPolicy.RUNTIME)
