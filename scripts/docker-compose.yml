@@ -6,7 +6,7 @@ services:
       MYSQL_DATABASE: appengine
       MYSQL_ROOT_PASSWORD: 123
   appEngine:
-    image: com.appengine/deploy:prod-0.1.RELEASE
+    image: com.lesofn.appengine/deploy:prod-0.1.RELEASE
     links:
       - mysqldb:mysql_host
     ports:

@@ -98,7 +98,7 @@
     <logger name="druid" level="ERROR"/>
     <logger name="org.apache.catalina" level="OFF"/>
 
-    <logger name="com.appengine" level="DEBUG"/>
+    <logger name="com.lesofn.appengine" level="DEBUG"/>
 
     <root level="DEBUG">
         <appender-ref ref="console"/>

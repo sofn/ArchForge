@@ -8,11 +8,11 @@
 
     <context:property-placeholder location="classpath*:*.properties" ignore-unresolvable="true"/>
 
-    <bean class="com.appengine.frame.filters.AuthResourceFilter">
+    <bean class="com.lesofn.appengine.frame.filters.AuthResourceFilter">
         <property name="synchronizeOnSession" value="true"/>
         <property name="customArgumentResolvers">
             <list>
-                <bean class="com.appengine.frame.spring.context.RequestContextMethodArgumentResolver"/>
+                <bean class="com.lesofn.appengine.frame.spring.context.RequestContextMethodArgumentResolver"/>
             </list>
         </property>
         <property name="messageConverters">
@@ -33,7 +33,7 @@
     <import resource="classpath*:spring/user-mysql.xml"/>
     <import resource="classpath*:spring/task-mysql.xml"/>
 
-    <context:component-scan base-package="com.appengine"/>
+    <context:component-scan base-package="com.lesofn.appengine"/>
     <aop:aspectj-autoproxy/>
 
 </beans>

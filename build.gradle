@@ -1,7 +1,7 @@
 apply plugin: 'idea'
 
 allprojects {
-    group = "com.appengine"
+    group = "com.lesofn.appengine"
     version = "0.1.RELEASE"
 }
 
