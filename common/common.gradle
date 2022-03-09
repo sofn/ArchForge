@@ -1,0 +1,27 @@
+apply plugin: 'java'
+
+dependencies {
+    //common
+    api libraries.guava
+    api libraries.commons_io
+    api libraries.commons_lang3
+    api libraries.commons_codec
+
+    //DB
+    api libraries.springboot_starter_jpa
+    api libraries.druid
+    api libraries.mysql
+    api libraries.h2
+
+    //util
+    api libraries.fastjson
+    api libraries.javatuples
+
+    //web
+    api libraries.springboot_starter_web
+    api libraries.springboot_starter_aop
+
+    api libraries.springdoc
+
+    api libraries.findbugs
+}

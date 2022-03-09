@@ -1,7 +1,19 @@
-rootProject.name = 'app-engine'
-
 include 'common'
 include 'frame'
-include 'deploy'
-include 'user'
-include 'task'
+
+include 'example-deploy'
+project(':example-deploy').projectDir = new File(rootProject.projectDir, "example/example-deploy")
+
+include 'example-task'
+project(':example-task').projectDir = new File(rootProject.projectDir, "example/example-task")
+
+include 'example-user'
+project(':example-user').projectDir = new File(rootProject.projectDir, "example/example-user")
+
+rootProject.name = 'app-engine'
+rootProject.children.each { project ->
+    project.buildFileName = "${project.name}.gradle"
+    assert project.projectDir.isDirectory()
+    assert project.buildFile.exists()
+    assert project.buildFile.isFile()
+}

@@ -1,3 +1,4 @@
 dependencies {
     api project(":frame")
+    api project(":example-user")
 }

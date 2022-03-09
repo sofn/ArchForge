@@ -1,5 +1,5 @@
 plugins {
-    id 'org.springframework.boot' version '2.6.2'
+    id 'org.springframework.boot' version "$springBootVersion"
 }
 
 //构建可执行jar/war包
@@ -23,11 +23,11 @@ ext {
 dependencies {
     api project(":common")
     api project(":frame")
-    api project(":user")
-    api project(":task")
+    api project(":example-user")
+    api project(":example-task")
 
-    api "org.springframework.boot:spring-boot-starter-web:$springBootVersion"
-    api "org.jolokia:jolokia-core:$jolokiaVersion" //JMX
+    api libraries.springboot_starter_web
+    api libraries.jolokia
 
     //web
     api "org.sitemesh:sitemesh:$sitemeshVersion"

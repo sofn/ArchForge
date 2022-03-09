@@ -1,5 +1,11 @@
 server:
     port: 8080
+    servlet:
+        encoding:
+            force: true
+            enabled: true
+            charset: UTF-8
+
 management:
     port: 7002
 spring:

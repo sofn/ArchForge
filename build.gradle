@@ -1,26 +1,23 @@
-apply plugin: 'idea'
-
-allprojects {
-    group = "com.lesofn.appengine"
-    version = "0.1.RELEASE"
+buildscript {
+    repositories {
+        maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
+        maven { url 'https://maven.aliyun.com/repository/spring-plugin' }
+        mavenLocal()
+        mavenCentral()
+    }
 }
+
+group = "com.lesofn.appengine"
+version = "0.1.RELEASE"
 
 subprojects {
     apply plugin: 'idea'
     apply plugin: 'java'
     apply plugin: 'java-library'
+    apply from: rootProject.file( 'gradle/libraries.gradle' )
 
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
-
-    buildscript {
-        repositories {
-            maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
-            maven { url 'https://maven.aliyun.com/repository/spring-plugin' }
-            mavenLocal()
-            mavenCentral()
-        }
-    }
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 
     repositories {
         maven { url 'https://maven.aliyun.com/repository/public/' }
@@ -39,18 +36,17 @@ subprojects {
     }
 
     dependencies {
-        compileOnly "org.projectlombok:lombok:1.18.22"
-        annotationProcessor "org.projectlombok:lombok:1.18.22"
-        testImplementation "org.assertj:assertj-core:$assertjVersion"
-        testImplementation "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
-        testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.8.2"
-        testImplementation "org.junit.jupiter:junit-jupiter-api:5.8.2"
-        testImplementation "org.apache.logging.log4j:log4j-core:2.17.0"
-    }
+        //compile
+        compileOnly libraries.lombok
+        annotationProcessor libraries.lombok
 
-    task sourcesJar(type: Jar) {
-        classifier = 'sources'
-        from sourceSets.main.allSource
+        //log
+        api libraries.slf4j
+
+        //test
+        testImplementation libraries.log4j2
+        testRuntimeOnly libraries.junit5_jupiter
+        testImplementation libraries.junit5_api
     }
 
     test {

@@ -1,4 +1,0 @@
-dependencies {
-    api project(":frame")
-    api project(":user")
-}
