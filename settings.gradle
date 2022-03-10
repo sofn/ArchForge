@@ -1,4 +1,4 @@
-include 'common'
+include 'common-core'
 include 'frame'
 
 include 'example-deploy'
@@ -17,3 +17,5 @@ rootProject.children.each { project ->
     assert project.buildFile.exists()
     assert project.buildFile.isFile()
 }
+include 'common-error'
+

@@ -21,7 +21,7 @@ ext {
 }
 
 dependencies {
-    api project(":common")
+    api project(":common-core")
     api project(":frame")
     api project(":example-user")
     api project(":example-task")

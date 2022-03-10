@@ -1,5 +1,5 @@
 dependencies {
-    api project(":common")
+    api project(":common-core")
 
     api libraries.springboot_starter_web
     api libraries.springboot_starter_aop

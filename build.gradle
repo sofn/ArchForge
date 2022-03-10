@@ -39,6 +39,8 @@ subprojects {
         //compile
         compileOnly libraries.lombok
         annotationProcessor libraries.lombok
+        testCompileOnly libraries.lombok
+        testAnnotationProcessor libraries.lombok
 
         //log
         api libraries.slf4j
