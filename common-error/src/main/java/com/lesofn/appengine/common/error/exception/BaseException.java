@@ -5,7 +5,7 @@ import com.lesofn.appengine.common.error.IErrorCode;
 import com.lesofn.appengine.common.error.IProjectModule;
 
 /**
- * @author lishaofeng
+ * @author sofn
  * @version 1.0 Created at: 2022-03-09 16:41
  */
 public abstract class BaseException extends Exception {

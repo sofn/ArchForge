@@ -6,7 +6,7 @@ import com.lesofn.appengine.common.error.system.SystemProjectModule;
 /**
  * 项目和模块的编码
  *
- * @author lishaofeng
+ * @author sofn
  * @version 1.0 Created at: 2022-03-09 16:21
  */
 public interface IProjectModule {

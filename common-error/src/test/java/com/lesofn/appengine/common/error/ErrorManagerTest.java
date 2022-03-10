@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 /**
- * @author lishaofeng
+ * @author sofn
  * @version 1.0 Created at: 2022-03-10 12:28
  */
 class ErrorManagerTest {

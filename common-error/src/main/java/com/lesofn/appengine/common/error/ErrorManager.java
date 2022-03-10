@@ -13,7 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
- * @author lishaofeng
+ * @author sofn
  * @version 1.0 Created at: 2022-03-10 10:34
  */
 public class ErrorManager {

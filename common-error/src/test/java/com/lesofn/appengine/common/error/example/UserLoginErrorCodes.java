@@ -5,7 +5,7 @@ import com.lesofn.appengine.common.error.IErrorCode;
 import lombok.Getter;
 
 /**
- * @author lishaofeng
+ * @author sofn
  * @version 1.0 Created at: 2022-03-09 16:19
  */
 @Getter
