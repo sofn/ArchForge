@@ -1,11 +1,11 @@
 package com.lesofn.appengine.common.utils;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -14,25 +14,17 @@ import java.util.Map;
 /**
  * @author sofn
  */
+@Slf4j
 public class URLUtils {
 
-    public static final String DEFAULT_CHARSET = "utf-8";
-    public static final Logger LOGGER = LoggerFactory.getLogger(URLUtils.class);
-
+    @SneakyThrows
     public static String encode(String src) {
-        try {
-            return URLEncoder.encode(src, DEFAULT_CHARSET);
-        } catch (UnsupportedEncodingException e) {
-            return src;
-        }
+        return URLEncoder.encode(src, StandardCharsets.UTF_8.name());
     }
 
+    @SneakyThrows
     public static String decode(String src) {
-        try {
-            return URLDecoder.decode(src, DEFAULT_CHARSET);
-        } catch (UnsupportedEncodingException e) {
-            return src;
-        }
+        return URLDecoder.decode(src, StandardCharsets.UTF_8.name());
     }
 
     public static Map<String, List<String>> parseQuery(String uri) {
@@ -41,9 +33,12 @@ public class URLUtils {
 
         Map<String, List<String>> params = new LinkedHashMap<String, List<String>>();
         String name = null;
-        int pos = 0; // Beginning of the unprocessed region
-        int i; // End of the unprocessed region
-        char c = 0; // Current character
+        // Beginning of the unprocessed region
+        int pos = 0;
+        // End of the unprocessed region
+        int i;
+        // Current character
+        char c = 0;
         for (i = 0; i < s.length(); i++) {
             c = s.charAt(i);
             if (c == '=' && name == null) {
@@ -65,13 +60,19 @@ public class URLUtils {
             }
         }
 
-        if (pos != i) { // Are there characters we haven't dealt with?
-            if (name == null) { // Yes and we haven't seen any `='.
+        // Are there characters we haven't dealt with?
+        if (pos != i) {
+            // Yes and we haven't seen any `='.
+            if (name == null) {
                 addParam(params, decode(s.substring(pos, i)), "");
-            } else { // Yes and this must be the last value.
+            }
+            // Yes and this must be the last value.
+            else {
                 addParam(params, name, decode(s.substring(pos, i)));
             }
-        } else if (name != null) { // Have we seen a name without value?
+        }
+        // Have we seen a name without value?
+        else if (name != null) {
             addParam(params, name, "");
         }
 
@@ -79,20 +80,8 @@ public class URLUtils {
     }
 
     private static void addParam(Map<String, List<String>> params, String name, String value) {
-        List<String> values = params.get(name);
-        if (values == null) {
-            values = new ArrayList<>(1); // Often there's only 1 value.
-            params.put(name, values);
-        }
+        List<String> values = params.computeIfAbsent(name, it -> new ArrayList<>(1));
         values.add(value);
     }
 
-    public static final String encodeURL(String str) {
-        try {
-            return URLEncoder.encode(str, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            LOGGER.error("encodeUrl", e);
-        }
-        return str;
-    }
 }

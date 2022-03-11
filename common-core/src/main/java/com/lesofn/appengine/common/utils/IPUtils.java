@@ -1,8 +1,7 @@
 package com.lesofn.appengine.common.utils;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -13,14 +12,13 @@ import java.util.regex.Pattern;
 /**
  * @author sofn
  */
+@Slf4j
 public class IPUtils {
 
-    public static String ipRegix = "((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)";
-    public static Pattern ipPattern = Pattern.compile(ipRegix);
-    public static final Logger LOGGER = LoggerFactory.getLogger(IPUtils.class);
+    public static final Pattern IP_PATTERN = Pattern.compile("((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)");
 
     public static boolean isIp(String in) {
-        return in != null && ipPattern.matcher(in).matches();
+        return in != null && IP_PATTERN.matcher(in).matches();
     }
 
     /**
@@ -48,7 +46,7 @@ public class IPUtils {
             }
             return result;
         } catch (SocketException e) {
-            LOGGER.error("getLocalIP error", e);
+            log.error("getLocalIP error", e);
             return Collections.emptyMap();
         }
     }
@@ -157,7 +155,7 @@ public class IPUtils {
         if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
             ip = request.getRemoteAddr();
         }
-        LOGGER.debug("x-forwarded-for:" + request.getHeader("x-forwarded-for") +
+        log.debug("x-forwarded-for:" + request.getHeader("x-forwarded-for") +
                 ",Proxy-Client-IP:" + request.getHeader("Proxy-Client-IP") +
                 ",WL-Proxy-Client-IP:" + request.getHeader("WL-Proxy-Client-IP") +
                 ",ip:" + ip);
@@ -219,7 +217,7 @@ public class IPUtils {
                     ip |= Integer.parseInt(addressBytes[3]);
                 }
             } catch (Exception e) {
-                LOGGER.warn("Warn ipToInt address is wrong: address=" + address);
+                log.warn("Warn ipToInt address is wrong: address=" + address);
             }
         }
 

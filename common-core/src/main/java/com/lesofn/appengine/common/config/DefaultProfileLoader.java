@@ -1,6 +1,6 @@
 package com.lesofn.appengine.common.config;
 
-import com.lesofn.appengine.common.utils.collection.GlobalCollectionUtils;
+import com.lesofn.appengine.common.utils.collection.CollectionUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -90,7 +90,7 @@ public class DefaultProfileLoader extends ProfileLoader {
                     return Optional.empty();
                 }
 
-                List<String> profiles = GlobalCollectionUtils.strListSplitter(active);
+                List<String> profiles = CollectionUtils.strListSplitter(active);
                 for (String profile : profiles) {
                     if (Env.valueOf(profile) != null) {
                         return Optional.of(profile);
