@@ -9,7 +9,7 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * @author lishaofeng
+ * @author sofn
  * @version 1.0 Created at: 2022-03-11 13:10
  */
 class URLUtilsTest {

@@ -1,7 +1,7 @@
 package com.lesofn.appengine.frame.utils.log;
 
 import com.alibaba.fastjson.JSONObject;
-import com.lesofn.appengine.common.config.DefaultProfileLoader;
+import com.lesofn.appengine.common.profile.DefaultProfileLoader;
 import com.lesofn.appengine.frame.context.ThreadLocalContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

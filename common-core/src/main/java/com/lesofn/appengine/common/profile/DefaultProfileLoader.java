@@ -1,4 +1,4 @@
-package com.lesofn.appengine.common.config;
+package com.lesofn.appengine.common.profile;
 
 import com.lesofn.appengine.common.utils.collection.CollectionUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +17,11 @@ import java.util.Optional;
  * @author sofn
  */
 @Slf4j
-public class DefaultProfileLoader extends ProfileLoader {
+public class DefaultProfileLoader {
+    /**
+     * 默认线上环境，防止线上bug
+     */
+    static final  Env DEFAULT_DEV = Env.prod;
 
     public static final String APP_ENV_VAR = "profile";
 
@@ -29,7 +33,6 @@ public class DefaultProfileLoader extends ProfileLoader {
         return loader;
     }
 
-    @Override
     public Env getEnv() {
         if (envVar != null) {
             return envVar;

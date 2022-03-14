@@ -1,6 +1,6 @@
 package com.lesofn.appengine.deploy;
 
-import com.lesofn.appengine.common.config.DefaultProfileLoader;
+import com.lesofn.appengine.common.profile.DefaultProfileLoader;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;

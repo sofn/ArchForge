@@ -1,5 +1,6 @@
-package com.lesofn.appengine.common.config;
+package com.lesofn.appengine.common.profile;
 
+import com.lesofn.appengine.common.profile.Env;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
@@ -8,14 +9,13 @@ import org.springframework.stereotype.Service;
  * @author sofn
  */
 @Service
-public class SpringProfileLoader extends ProfileLoader {
+public class SpringProfileLoader  {
 
     @Autowired
     private Environment env;
 
     private Env envVar;
 
-    @Override
     public Env getEnv() {
         if (envVar == null) {
             String[] profiles = env.getActiveProfiles();
@@ -25,7 +25,7 @@ public class SpringProfileLoader extends ProfileLoader {
                 }
             }
             if (envVar == null) {
-                envVar = DEFAULT_DEV;
+                envVar = DefaultProfileLoader.DEFAULT_DEV;
             }
         }
         return envVar;
