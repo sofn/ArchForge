@@ -1,8 +1,8 @@
 package com.lesofn.appengine.common.error.system;
 
-import com.lesofn.appengine.common.error.ErrorInfo;
-import com.lesofn.appengine.common.error.IErrorCode;
-import com.lesofn.appengine.common.error.IProjectModule;
+import com.lesofn.appengine.common.error.manager.ErrorInfo;
+import com.lesofn.appengine.common.error.api.ErrorCode;
+import com.lesofn.appengine.common.error.api.ProjectModule;
 import com.lesofn.appengine.common.error.exception.BaseException;
 
 /**
@@ -27,16 +27,16 @@ public class SystemException extends BaseException {
         super(errorInfo);
     }
 
-    public SystemException(IErrorCode errorCode) {
+    public SystemException(ErrorCode errorCode) {
         super(errorCode);
     }
 
-    public SystemException(IErrorCode errorCode, Object... args) {
+    public SystemException(ErrorCode errorCode, Object... args) {
         super(errorCode, args);
     }
 
     @Override
-    protected IProjectModule projectModule() {
+    protected ProjectModule projectModule() {
         return SystemProjectModule.INSTANCE;
     }
 }

@@ -1,10 +1,12 @@
-package com.lesofn.appengine.common.error;
+package com.lesofn.appengine.common.error.api;
+
+import com.lesofn.appengine.common.error.manager.ErrorManager;
 
 /**
  * @author sofn
  * @version 1.0 Created at: 2022-03-09 16:21
  */
-public interface IErrorCode {
+public interface ErrorCode {
 
     /**
      * 最细粒度 Code
@@ -23,7 +25,7 @@ public interface IErrorCode {
         return ErrorManager.genCode(this);
     }
 
-    default IProjectModule projectModule(){
+    default ProjectModule projectModule(){
         return ErrorManager.projectModule(this);
     }
 }

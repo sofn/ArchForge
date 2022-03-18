@@ -1,12 +1,15 @@
 package com.lesofn.appengine.common.error;
 
 import com.lesofn.appengine.common.error.example.UserLoginErrorCodes;
-import com.lesofn.appengine.common.error.model.TreeNode;
+import com.lesofn.appengine.common.error.manager.ErrorManager;
+import com.lesofn.appengine.common.error.manager.TreeNode;
 import com.lesofn.appengine.common.error.system.HttpCodes;
 import com.lesofn.appengine.common.error.system.SystemErrorCodes;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author sofn
@@ -21,6 +24,7 @@ class ErrorManagerTest {
         UserLoginErrorCodes.values();
         List<TreeNode> allErrorCodes = ErrorManager.getAllErrorCodes();
         System.out.println(allErrorCodes);
+        assertEquals(2, allErrorCodes.size());
 
         for (TreeNode treeNode : allErrorCodes) {
             System.out.println("1." + treeNode);

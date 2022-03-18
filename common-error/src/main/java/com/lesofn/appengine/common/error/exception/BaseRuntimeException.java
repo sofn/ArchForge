@@ -1,8 +1,8 @@
 package com.lesofn.appengine.common.error.exception;
 
-import com.lesofn.appengine.common.error.ErrorInfo;
-import com.lesofn.appengine.common.error.IErrorCode;
-import com.lesofn.appengine.common.error.IProjectModule;
+import com.lesofn.appengine.common.error.manager.ErrorInfo;
+import com.lesofn.appengine.common.error.api.ErrorCode;
+import com.lesofn.appengine.common.error.api.ProjectModule;
 import lombok.Getter;
 
 /**
@@ -34,15 +34,15 @@ public abstract class BaseRuntimeException extends RuntimeException {
         this.errorInfo = errorInfo;
     }
 
-    protected BaseRuntimeException(IErrorCode errorCode) {
+    protected BaseRuntimeException(ErrorCode errorCode) {
         this(ErrorInfo.parse(errorCode));
-        IProjectModule.check(projectModule(), errorCode.projectModule());
+        ProjectModule.check(projectModule(), errorCode.projectModule());
     }
 
-    protected BaseRuntimeException(IErrorCode errorCode, Object... args) {
+    protected BaseRuntimeException(ErrorCode errorCode, Object... args) {
         this(ErrorInfo.parse(errorCode, args));
-        IProjectModule.check(projectModule(), errorCode.projectModule());
+        ProjectModule.check(projectModule(), errorCode.projectModule());
     }
 
-    protected abstract IProjectModule projectModule();
+    protected abstract ProjectModule projectModule();
 }

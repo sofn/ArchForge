@@ -1,6 +1,6 @@
 package com.lesofn.appengine.common.error.response;
 
-import com.lesofn.appengine.common.error.ErrorInfo;
+import com.lesofn.appengine.common.error.manager.ErrorInfo;
 
 /**
  * @author sofn

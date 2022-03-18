@@ -1,5 +1,6 @@
-package com.lesofn.appengine.common.error;
+package com.lesofn.appengine.common.error.manager;
 
+import com.lesofn.appengine.common.error.api.ErrorCode;
 import com.lesofn.appengine.common.error.system.SystemErrorCodes;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -32,12 +33,12 @@ public class ErrorInfo {
         return ERROR_MSG_CODES_MAP.computeIfAbsent(message, it -> new ErrorInfo(SystemErrorCodes.SYSTEM_ERROR.getCode(), message));
     }
 
-    public static ErrorInfo parse(IErrorCode errorCode) {
+    public static ErrorInfo parse(ErrorCode errorCode) {
         int code = errorCode.getCode();
         return NO_PARAM_CODES_MAP.computeIfAbsent(code, it -> new ErrorInfo(it, errorCode.getMsg()));
     }
 
-    public static ErrorInfo parse(IErrorCode errorCode, Object... args) {
+    public static ErrorInfo parse(ErrorCode errorCode, Object... args) {
         String msg = MessageFormatter.arrayFormat(errorCode.getMsg(), args).getMessage();
         return new ErrorInfo(errorCode.getCode(), msg);
     }

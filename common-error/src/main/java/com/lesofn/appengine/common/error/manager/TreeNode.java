@@ -1,4 +1,4 @@
-package com.lesofn.appengine.common.error.model;
+package com.lesofn.appengine.common.error.manager;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;

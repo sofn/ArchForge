@@ -1,8 +1,8 @@
 package com.lesofn.appengine.common.error.exception;
 
-import com.lesofn.appengine.common.error.ErrorInfo;
-import com.lesofn.appengine.common.error.IErrorCode;
-import com.lesofn.appengine.common.error.IProjectModule;
+import com.lesofn.appengine.common.error.manager.ErrorInfo;
+import com.lesofn.appengine.common.error.api.ErrorCode;
+import com.lesofn.appengine.common.error.api.ProjectModule;
 
 /**
  * @author sofn
@@ -32,15 +32,15 @@ public abstract class BaseException extends Exception {
         this.errorInfo = errorInfo;
     }
 
-    protected BaseException(IErrorCode errorCode) {
+    protected BaseException(ErrorCode errorCode) {
         this(ErrorInfo.parse(errorCode));
-        IProjectModule.check(projectModule(), errorCode.projectModule());
+        ProjectModule.check(projectModule(), errorCode.projectModule());
     }
 
-    protected BaseException(IErrorCode errorCode, Object... args) {
+    protected BaseException(ErrorCode errorCode, Object... args) {
         this(ErrorInfo.parse(errorCode, args));
-        IProjectModule.check(projectModule(), errorCode.projectModule());
+        ProjectModule.check(projectModule(), errorCode.projectModule());
     }
 
-    protected abstract IProjectModule projectModule();
+    protected abstract ProjectModule projectModule();
 }

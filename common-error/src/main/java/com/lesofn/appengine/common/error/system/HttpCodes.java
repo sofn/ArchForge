@@ -1,7 +1,7 @@
 package com.lesofn.appengine.common.error.system;
 
-import com.lesofn.appengine.common.error.ErrorManager;
-import com.lesofn.appengine.common.error.IErrorCode;
+import com.lesofn.appengine.common.error.manager.ErrorManager;
+import com.lesofn.appengine.common.error.api.ErrorCode;
 import lombok.Getter;
 
 /**
@@ -11,7 +11,7 @@ import lombok.Getter;
  * @version 1.0 Created at: 2022-03-09 16:16
  */
 @Getter
-public enum HttpCodes implements IErrorCode {
+public enum HttpCodes implements ErrorCode {
 
     CONTINUE(100, "Continue"),
     SWITCHING_PROTOCOLS(101, "Switching Protocols"),

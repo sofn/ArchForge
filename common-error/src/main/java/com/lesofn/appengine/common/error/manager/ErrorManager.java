@@ -1,9 +1,10 @@
-package com.lesofn.appengine.common.error;
+package com.lesofn.appengine.common.error.manager;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
-import com.lesofn.appengine.common.error.model.TreeNode;
+import com.lesofn.appengine.common.error.api.ErrorCode;
+import com.lesofn.appengine.common.error.api.ProjectModule;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -17,14 +18,14 @@ import java.util.stream.Collectors;
  * @version 1.0 Created at: 2022-03-10 10:34
  */
 public class ErrorManager {
-    private static final BiMap<Integer, IErrorCode> GLOBAL_ERROR_CODE_MAP = HashBiMap.create();
-    private static final Map<IErrorCode, IProjectModule> ERROR_PROJECT_MODULE_MAP = new ConcurrentHashMap<>();
+    private static final BiMap<Integer, ErrorCode> GLOBAL_ERROR_CODE_MAP = HashBiMap.create();
+    private static final Map<ErrorCode, ProjectModule> ERROR_PROJECT_MODULE_MAP = new ConcurrentHashMap<>();
 
-    private static final Comparator<IProjectModule> PROJECT_MODULE_COMPARATOR = Comparator.comparingInt(IProjectModule::getProjectCode)
-            .thenComparingInt(IProjectModule::getModuleCode);
-    private static final Comparator<IErrorCode> ERROR_CODE_COMPARATOR = Comparator.comparingInt(IErrorCode::getNodeNum);
+    private static final Comparator<ProjectModule> PROJECT_MODULE_COMPARATOR = Comparator.comparingInt(ProjectModule::getProjectCode)
+            .thenComparingInt(ProjectModule::getModuleCode);
+    private static final Comparator<ErrorCode> ERROR_CODE_COMPARATOR = Comparator.comparingInt(ErrorCode::getNodeNum);
 
-    public static void register(IProjectModule projectModule, IErrorCode errorCode) {
+    public static void register(ProjectModule projectModule, ErrorCode errorCode) {
         Preconditions.checkNotNull(projectModule);
         Preconditions.checkArgument(projectModule.getProjectCode() >= 0);
         Preconditions.checkArgument(projectModule.getModuleCode() >= 0);
@@ -74,15 +75,15 @@ public class ErrorManager {
                 .collect(Collectors.toList());
     }
 
-    private static int genCode(IProjectModule projectModule, IErrorCode errorCode) {
+    private static int genCode(ProjectModule projectModule, ErrorCode errorCode) {
         return projectModule.getProjectCode() * 10000 + projectModule.getModuleCode() * 100 + errorCode.getNodeNum();
     }
 
-    static int genCode(IErrorCode errorCode) {
+    public static int genCode(ErrorCode errorCode) {
         return GLOBAL_ERROR_CODE_MAP.inverse().get(errorCode);
     }
 
-    public static IProjectModule projectModule(IErrorCode errorCode) {
+    public static ProjectModule projectModule(ErrorCode errorCode) {
         return ERROR_PROJECT_MODULE_MAP.get(errorCode);
     }
 }

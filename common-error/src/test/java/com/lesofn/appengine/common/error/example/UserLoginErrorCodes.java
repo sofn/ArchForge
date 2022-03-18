@@ -1,7 +1,7 @@
 package com.lesofn.appengine.common.error.example;
 
-import com.lesofn.appengine.common.error.ErrorManager;
-import com.lesofn.appengine.common.error.IErrorCode;
+import com.lesofn.appengine.common.error.manager.ErrorManager;
+import com.lesofn.appengine.common.error.api.ErrorCode;
 import lombok.Getter;
 
 /**
@@ -9,7 +9,7 @@ import lombok.Getter;
  * @version 1.0 Created at: 2022-03-09 16:19
  */
 @Getter
-public enum UserLoginErrorCodes implements IErrorCode {
+public enum UserLoginErrorCodes implements ErrorCode {
 
     PARAM_INVALID(0, "ok");
 

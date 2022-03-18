@@ -1,7 +1,7 @@
 package com.lesofn.appengine.common.error.system;
 
-import com.lesofn.appengine.common.error.ErrorManager;
-import com.lesofn.appengine.common.error.IErrorCode;
+import com.lesofn.appengine.common.error.manager.ErrorManager;
+import com.lesofn.appengine.common.error.api.ErrorCode;
 import lombok.Getter;
 
 /**
@@ -11,7 +11,7 @@ import lombok.Getter;
  * @date 2018/8/3
  */
 @Getter
-public enum SystemErrorCodes implements IErrorCode {
+public enum SystemErrorCodes implements ErrorCode {
 
     SUCCESS(0, "ok"),
     SYSTEM_ERROR(1, "system error");

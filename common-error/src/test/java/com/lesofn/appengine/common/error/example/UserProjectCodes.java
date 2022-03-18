@@ -1,6 +1,6 @@
 package com.lesofn.appengine.common.error.example;
 
-import com.lesofn.appengine.common.error.IProjectModule;
+import com.lesofn.appengine.common.error.api.ProjectModule;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -10,7 +10,7 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-public enum UserProjectCodes implements IProjectModule {
+public enum UserProjectCodes implements ProjectModule {
 
     LOGIN(1, 1, "登录模块");
 

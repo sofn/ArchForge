@@ -1,4 +1,4 @@
-package com.lesofn.appengine.common.error;
+package com.lesofn.appengine.common.error.api;
 
 import com.google.common.base.Preconditions;
 import com.lesofn.appengine.common.error.system.SystemProjectModule;
@@ -9,7 +9,7 @@ import com.lesofn.appengine.common.error.system.SystemProjectModule;
  * @author sofn
  * @version 1.0 Created at: 2022-03-09 16:21
  */
-public interface IProjectModule {
+public interface ProjectModule {
 
     /**
      * 项目编码
@@ -31,7 +31,7 @@ public interface IProjectModule {
      */
     String getModuleName();
 
-    static void check(IProjectModule required, IProjectModule input) {
+    static void check(ProjectModule required, ProjectModule input) {
         Preconditions.checkNotNull(required);
         if (input != SystemProjectModule.INSTANCE) {
             Preconditions.checkState(required == input,

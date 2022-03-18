@@ -1,8 +1,8 @@
 package com.lesofn.appengine.common.error.example;
 
-import com.lesofn.appengine.common.error.ErrorInfo;
-import com.lesofn.appengine.common.error.IErrorCode;
-import com.lesofn.appengine.common.error.IProjectModule;
+import com.lesofn.appengine.common.error.manager.ErrorInfo;
+import com.lesofn.appengine.common.error.api.ErrorCode;
+import com.lesofn.appengine.common.error.api.ProjectModule;
 import com.lesofn.appengine.common.error.exception.BaseException;
 
 /**
@@ -27,16 +27,16 @@ public class UserLoginException extends BaseException {
         super(errorInfo);
     }
 
-    protected UserLoginException(IErrorCode errorCode) {
+    protected UserLoginException(ErrorCode errorCode) {
         super(errorCode);
     }
 
-    protected UserLoginException(IErrorCode errorCode, Object... args) {
+    protected UserLoginException(ErrorCode errorCode, Object... args) {
         super(errorCode, args);
     }
 
     @Override
-    public IProjectModule projectModule() {
+    public ProjectModule projectModule() {
         return UserProjectCodes.LOGIN;
     }
 }
