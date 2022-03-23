@@ -14,7 +14,7 @@ import java.io.PrintWriter;
 public class ResponseWrapper extends HttpServletResponseWrapper {
 
     private final ByteArrayOutputStream bos = new ByteArrayOutputStream();
-    private PrintWriter writer = new PrintWriter(bos);
+    private final PrintWriter writer = new PrintWriter(bos);
 
     public ResponseWrapper(HttpServletResponse response) {
         super(response);
@@ -28,7 +28,7 @@ public class ResponseWrapper extends HttpServletResponseWrapper {
     @Override
     public ServletOutputStream getOutputStream() throws IOException {
         return new ServletOutputStream() {
-            private TeeOutputStream tee = new TeeOutputStream(ResponseWrapper.super.getOutputStream(), bos);
+            private final TeeOutputStream tee = new TeeOutputStream(ResponseWrapper.super.getOutputStream(), bos);
 
             @Override
             public boolean isReady() {
@@ -56,7 +56,7 @@ public class ResponseWrapper extends HttpServletResponseWrapper {
     }
 
 
-    private class TeePrintWriter extends PrintWriter{
+    private static class TeePrintWriter extends PrintWriter{
 
         PrintWriter branch;
 

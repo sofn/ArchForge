@@ -18,7 +18,7 @@ public class RequestLogRecord {
 
     private String requestId;
 
-    private Date date = new Date();
+    private final Date date = new Date();
 
     private String api;
 
@@ -221,9 +221,9 @@ public class RequestLogRecord {
         buf.append(this.ip);
         buf.append(SPLIT);
         if (this.clientVersion != null) {
-            buf.append(this.clientVersion.toString());
+            buf.append(this.clientVersion);
         } else {
-            buf.append(ClientVersion.NULL.toString());
+            buf.append(ClientVersion.NULL);
         }
         buf.append(SPLIT);
         buf.append(this.userAgent);

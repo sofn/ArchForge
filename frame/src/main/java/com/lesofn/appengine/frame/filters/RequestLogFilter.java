@@ -6,9 +6,8 @@ import com.lesofn.appengine.frame.context.RequestContext;
 import com.lesofn.appengine.frame.context.ThreadLocalContext;
 import com.lesofn.appengine.frame.utils.RequestLogRecord;
 import com.lesofn.appengine.frame.utils.ResponseWrapper;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
 import javax.servlet.*;
@@ -16,9 +15,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+@Slf4j
 public class RequestLogFilter implements Filter {
-
-    protected static final Logger logger = LoggerFactory.getLogger(RequestLogFilter.class);
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
@@ -41,11 +39,11 @@ public class RequestLogFilter implements Filter {
         } catch (Exception e) {
             //此处拦截也必须抛出，否则不执行ErrorHandlerResource
             if (e instanceof EngineException) {
-                logger.error("EngineException error", e.getMessage() + " " + ((EngineException) e).getErrorMsgCn());
+                log.error("EngineException error", e.getMessage() + " " + ((EngineException) e).getErrorMsgCn());
             } else if (e.getCause() instanceof EngineException) {
-                logger.error("EngineException error", e.getCause().getMessage() + " " + ((EngineException) e.getCause()).getErrorMsgCn());
+                log.error("EngineException error", e.getCause().getMessage() + " " + ((EngineException) e.getCause()).getErrorMsgCn());
             } else {
-                logger.error("filterChain.doFilter error", e);
+                log.error("filterChain.doFilter error", e);
             }
             throw e;
         } finally {
@@ -70,7 +68,7 @@ public class RequestLogFilter implements Filter {
                     record.setWriteBody(false);
                 }
                 MDC.put("CUSTOM_LOG", "request");
-                logger.info(record.toString());
+                log.info(record.toString());
                 MDC.remove("CUSTOM_LOG");
                 ThreadLocalContext.clear();
             }

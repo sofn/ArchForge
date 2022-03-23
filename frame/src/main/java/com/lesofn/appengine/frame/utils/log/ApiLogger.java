@@ -11,10 +11,6 @@ import org.slf4j.LoggerFactory;
  * Version: 1.0  Created at 15-6-7 21:00.
  */
 public class ApiLogger {
-    public static long MC_FIRE_TIME = 200; // MC操作超时
-
-    public static long DB_FIRE_TIME = 500; // DB操作超时
-
     private static Logger log = LoggerFactory.getLogger("debug");
     private static Logger infoLog = LoggerFactory.getLogger("info");
     private static Logger warnLog = LoggerFactory.getLogger("warn");
