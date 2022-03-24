@@ -36,7 +36,7 @@ public class SystemException extends BaseException {
     }
 
     @Override
-    protected ProjectModule projectModule() {
+    public ProjectModule projectModule() {
         return SystemProjectModule.INSTANCE;
     }
 }

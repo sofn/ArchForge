@@ -1,5 +1,6 @@
 ext {
     springBootVersion = "2.6.2"
+    springVersion = "5.3.14"
 
     //db
     druidVersion = "1.1.2"
@@ -9,6 +10,7 @@ ext {
     springfoxVersion = "3.0.0"
     webBootstrapVersion = "3.3.5"
     webJqueryVersion = "2.1.4"
+    servletVersion = "3.1.0"
 
     //util
     jolokiaVersion = "1.3.7"
@@ -35,6 +37,10 @@ ext {
             springboot_starter_web     : "org.springframework.boot:spring-boot-starter-web:$springBootVersion",
             springboot_starter_aop     : "org.springframework.boot:spring-boot-starter-aop:$springBootVersion",
             springboot_starter_actuator: "org.springframework.boot:spring-boot-starter-actuator:$springBootVersion",
+            spring_web                 : "org.springframework:spring-web:$springVersion",
+            spring_context             : "org.springframework:spring-context:$springVersion",
+            spring_webmvc              : "org.springframework:spring-webmvc:$springVersion",
+            servlet                    : "javax.servlet:javax.servlet-api:$servletVersion",
 
             //web
             springdoc                  : "org.springdoc:springdoc-openapi-ui:1.6.4",

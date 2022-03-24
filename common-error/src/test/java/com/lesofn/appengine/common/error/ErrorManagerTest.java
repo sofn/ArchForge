@@ -1,6 +1,6 @@
 package com.lesofn.appengine.common.error;
 
-import com.lesofn.appengine.common.error.example.UserLoginErrorCodes;
+import com.lesofn.appengine.common.error.example.LoginErrorCodes;
 import com.lesofn.appengine.common.error.manager.ErrorManager;
 import com.lesofn.appengine.common.error.manager.TreeNode;
 import com.lesofn.appengine.common.error.system.HttpCodes;
@@ -21,7 +21,7 @@ class ErrorManagerTest {
     void getAllErrorCodes() {
         SystemErrorCodes.values();
         HttpCodes.values();
-        UserLoginErrorCodes.values();
+        LoginErrorCodes.values();
         List<TreeNode> allErrorCodes = ErrorManager.getAllErrorCodes();
         System.out.println(allErrorCodes);
         assertEquals(2, allErrorCodes.size());

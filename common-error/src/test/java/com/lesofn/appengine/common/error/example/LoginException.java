@@ -9,29 +9,29 @@ import com.lesofn.appengine.common.error.exception.BaseException;
  * @author sofn
  * @version 1.0 Created at: 2022-03-09 18:18
  */
-public class UserLoginException extends BaseException {
+public class LoginException extends BaseException {
 
-    protected UserLoginException(String message) {
+    protected LoginException(String message) {
         super(message);
     }
 
-    protected UserLoginException(String message, Throwable cause) {
+    protected LoginException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    protected UserLoginException(Throwable cause) {
+    protected LoginException(Throwable cause) {
         super(cause);
     }
 
-    protected UserLoginException(ErrorInfo errorInfo) {
+    protected LoginException(ErrorInfo errorInfo) {
         super(errorInfo);
     }
 
-    protected UserLoginException(ErrorCode errorCode) {
+    protected LoginException(ErrorCode errorCode) {
         super(errorCode);
     }
 
-    protected UserLoginException(ErrorCode errorCode, Object... args) {
+    protected LoginException(ErrorCode errorCode, Object... args) {
         super(errorCode, args);
     }
 

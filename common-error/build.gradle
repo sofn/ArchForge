@@ -3,4 +3,9 @@ targetCompatibility = JavaVersion.VERSION_1_8
 
 dependencies {
     api libraries.guava
+    api libraries.commons_lang3
+    compileOnlyApi libraries.spring_web
+    compileOnlyApi libraries.spring_context
+    compileOnlyApi libraries.spring_webmvc
+    compileOnlyApi libraries.servlet
 }

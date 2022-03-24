@@ -10,7 +10,7 @@ import lombok.Getter;
  * @version 1.0 Created at: 2021-05-27 11:34
  */
 @Getter
-public abstract class BaseRuntimeException extends RuntimeException {
+public abstract class BaseRuntimeException extends RuntimeException implements IErrorCodeException{
 
     final ErrorInfo errorInfo;
 
@@ -44,5 +44,8 @@ public abstract class BaseRuntimeException extends RuntimeException {
         ProjectModule.check(projectModule(), errorCode.projectModule());
     }
 
-    protected abstract ProjectModule projectModule();
+    @Override
+    public ErrorInfo getErrorInfo() {
+        return errorInfo;
+    }
 }

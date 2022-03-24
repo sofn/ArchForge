@@ -8,7 +8,7 @@ import com.lesofn.appengine.common.error.api.ProjectModule;
  * @author sofn
  * @version 1.0 Created at: 2022-03-09 16:41
  */
-public abstract class BaseException extends Exception {
+public abstract class BaseException extends Exception implements IErrorCodeException {
 
     final ErrorInfo errorInfo;
 
@@ -42,5 +42,8 @@ public abstract class BaseException extends Exception {
         ProjectModule.check(projectModule(), errorCode.projectModule());
     }
 
-    protected abstract ProjectModule projectModule();
+    @Override
+    public ErrorInfo getErrorInfo() {
+        return errorInfo;
+    }
 }

@@ -1,6 +1,8 @@
 package com.lesofn.appengine.common.error.response;
 
+import com.lesofn.appengine.common.error.api.ErrorCode;
 import com.lesofn.appengine.common.error.manager.ErrorInfo;
+import com.lesofn.appengine.common.error.system.SystemErrorCodes;
 
 /**
  * @author sofn
@@ -13,4 +15,20 @@ public class Result<T> extends ErrorInfo {
     public Result(int code, String msg) {
         super(code, msg);
     }
+
+
+    public static <T> Result<T> success(T data) {
+        Result<T> result = new Result<>(SystemErrorCodes.SUCCESS.getCode(), SystemErrorCodes.SUCCESS.getMsg());
+        result.data = data;
+        return result;
+    }
+
+    public static  <T> Result<T> error(ErrorCode errorCode) {
+        return new Result<>(errorCode.getCode(), errorCode.getMsg());
+    }
+
+    public static Result<String> error(Integer code, String msg) {
+        return new Result<>(code, msg);
+    }
+
 }
