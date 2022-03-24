@@ -37,7 +37,7 @@ public class ResultValueWrapper implements ResponseBodyAdvice<Object> {
         }
 
         if (body instanceof CustomResult) {
-            return body;
+            return ((CustomResult<?>) body).getData();
         }
 
         if (StringUtils.equals(((ServletServerHttpRequest) request).getServletRequest().getServletPath(), "/error")) {
