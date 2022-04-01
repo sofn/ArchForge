@@ -3,11 +3,13 @@ package com.lesofn.appengine.common.error.response;
 import com.lesofn.appengine.common.error.api.ErrorCode;
 import com.lesofn.appengine.common.error.manager.ErrorInfo;
 import com.lesofn.appengine.common.error.system.SystemErrorCodes;
+import lombok.Getter;
 
 /**
  * @author sofn
  * @version 1.0 Created at: 2022-03-09 18:34
  */
+@Getter
 public class Result<T> extends ErrorInfo {
 
     private T data;
@@ -23,7 +25,7 @@ public class Result<T> extends ErrorInfo {
         return result;
     }
 
-    public static  <T> Result<T> error(ErrorCode errorCode) {
+    public static <T> Result<T> error(ErrorCode errorCode) {
         return new Result<>(errorCode.getCode(), errorCode.getMsg());
     }
 

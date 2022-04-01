@@ -35,8 +35,10 @@ public interface ProjectModule {
         Preconditions.checkNotNull(required);
         if (input != SystemProjectModule.INSTANCE) {
             Preconditions.checkState(required == input,
-                    "module not match, need: " + required.getClass().getSimpleName()
-                            + " but input: " + input.getClass().getSimpleName());
+                    "module not match, need: " + required.getProjectName() + "-" + required.getModuleName()
+                            + "(" + required.getProjectCode() + "-" + required.getModuleCode() + ")"
+                            + " but input: " + input.getProjectName() + "-" + input.getModuleName()
+                            + "(" + input.getProjectCode() + "-" + input.getModuleCode() + ")");
         }
     }
 }

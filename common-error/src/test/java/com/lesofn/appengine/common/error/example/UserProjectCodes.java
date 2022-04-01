@@ -12,15 +12,12 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum UserProjectCodes implements ProjectModule {
 
-    LOGIN(1, 1, "登录模块"),
-    USER(1, 2, "用户模块");
+    LOGIN(1, 1, "用户中心", "登录模块"),
+    USER(1, 2, "用户中心", "用户模块");
 
     private int projectCode;
     private int moduleCode;
+    private String projectName;
     private String moduleName;
 
-    @Override
-    public String getProjectName() {
-        return "用户";
-    }
 }
