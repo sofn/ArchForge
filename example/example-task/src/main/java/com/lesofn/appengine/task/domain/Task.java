@@ -2,7 +2,7 @@ package com.lesofn.appengine.task.domain;
 
 import lombok.*;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 /**
  * Authors: sofn

@@ -1,27 +1,71 @@
 server:
-    port: 8080
-    servlet:
-        encoding:
-            force: true
-            enabled: true
-            charset: UTF-8
+  port: 8080
+  servlet:
+    encoding:
+      force: true
+      enabled: true
+      charset: UTF-8
 
 management:
-    port: 7002
+  port: 7002
 spring:
-    jpa:
-        hibernate:
-            naming_strategy: org.hibernate.cfg.EJB3NamingStrategy
-    datasource:
-        initialize: true
-        sqlScriptEncoding: UTF-8
-    mvc:
-        view:
-            prefix: /WEB-INF/jsp/
-            suffix: .jsp
-        pathmatch:
-            matching-strategy: ant_path_matcher
-    profiles:
-        active: dev
-    main:
-        allow-bean-definition-overriding: true
+  jpa:
+    hibernate:
+      naming_strategy: org.hibernate.cfg.EJB3NamingStrategy
+  datasource:
+    initialize: true
+    druid:
+      stat-view-servlet:
+        enabled: true
+        url-pattern: /druid/*
+        reset-enable: false
+      web-stat-filter:
+        enabled: true
+        url-pattern: /*
+        exclusions: '*.js,*.gif,*.jpg,*.png,*.css,*.ico,/druid/*'
+    h2:
+      console: # H2 控制台配置
+        enabled: true  # 启用控制台
+        path: /h2-console  # 访问路径
+        settings:
+          trace: false  # 关闭跟踪日志（生产环境建议禁用）
+          web-allow-others: false  # 禁止远程访问（安全）
+  mvc:
+    view:
+      prefix: /WEB-INF/jsp/
+      suffix: .jsp
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  profiles:
+    active: dev
+  main:
+    allow-bean-definition-overriding: true
+  sql:
+    init:
+      encoding: UTF-8
+
+# Database configuration
+task:
+  jdbc:
+    master:
+      driver: org.h2.Driver
+      url: jdbc:h2:file:~/.h2/task;AUTO_SERVER=TRUE
+      username: sa
+      password: ""
+    slave:
+      driver: org.h2.Driver
+      url: jdbc:h2:file:~/.h2/task;AUTO_SERVER=TRUE
+      username: sa
+      password: ""
+user:
+  jdbc:
+    master:
+      driver: org.h2.Driver
+      url: jdbc:h2:file:~/.h2/user;AUTO_SERVER=TRUE
+      username: sa
+      password: ""
+    slave:
+      driver: org.h2.Driver
+      url: jdbc:h2:file:~/.h2/user;AUTO_SERVER=TRUE
+      username: sa
+      password: ""

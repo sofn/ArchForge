@@ -3,7 +3,7 @@ package com.lesofn.appengine.user.domain;
 import com.alibaba.fastjson.annotation.JSONField;
 import lombok.*;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.io.Serializable;
 
 @Setter

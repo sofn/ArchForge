@@ -48,7 +48,7 @@
             <DefaultValue>info</DefaultValue>
         </discriminator>
         <sift>
-            <appender class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <appender name="SIFT_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
                 <file>${logback.logs.path}/${CUSTOM_LOG}.log</file>
                 <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
                     <FileNamePattern>${logback.logs.path}/${CUSTOM_LOG}.%d{yyyyMMdd-HH}.log</FileNamePattern>

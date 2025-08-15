@@ -5,7 +5,7 @@ import com.alibaba.fastjson.JSONAware;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.lesofn.appengine.common.context.ClientVersion;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;

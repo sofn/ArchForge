@@ -2,8 +2,8 @@ package com.lesofn.appengine.frame.filters;
 
 import com.lesofn.appengine.frame.context.ThreadLocalContext;
 
-import javax.servlet.*;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.*;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**

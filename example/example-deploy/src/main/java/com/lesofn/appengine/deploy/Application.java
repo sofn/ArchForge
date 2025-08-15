@@ -15,7 +15,6 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
  * @version 1.0 Created at: 2015-04-29 16:17
  */
 @EnableWebMvc
-@ImportResource("classpath:spring-context.xml")
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class, HibernateJpaAutoConfiguration.class,
         DataSourceTransactionManagerAutoConfiguration.class})
 @EnableTransactionManagement

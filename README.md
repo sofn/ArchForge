@@ -2,9 +2,9 @@ app-engine 是一个分布式的App服务端快速开发框架,包含了基本�
 此框架围绕分布式服务系统构建，能够快速扩容，迎合微服务化，提供App服务端常用必备功能。
 
 ### 技术栈：
-> 1. Spring Boot / Spring MVC / Spring Data Jpa
-> 2. Gradle
-> 3. Java8
+> 1. Spring Boot3
+> 2. Gradle8
+> 3. Java17
 > 4. Logback
 > 5. Lombok
 
@@ -45,14 +45,8 @@ app-engine 是一个分布式的App服务端快速开发框架,包含了基本�
 > * APP信息： http://localhost:7002/info
 > * dump信息： http://localhost:7002/dump
 > * 环境信息： http://localhost:7002/env
-> * 性能监控： http://localhost:8080/javasimon
 > * 数据库监控： http://localhost:8080/druid
 > * Tomcat监控： http://localhost:7002/jolokia/read/Tomcat:type=Connector,port=8080
 
 #### 接口文档
 > * swagger: http://localhost:8080/swagger-ui/index.html
-
-#### TODO
-> * 完善注释
-> * 完善文档
-> * 添加单元测试、集成测试、压力测试

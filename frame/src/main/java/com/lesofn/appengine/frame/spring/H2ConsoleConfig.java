@@ -1,20 +1,20 @@
 package com.lesofn.appengine.frame.spring;
 
-import org.springframework.boot.web.servlet.ServletContextInitializer;
+import jakarta.servlet.Servlet;
+import org.h2.server.web.JakartaWebServlet;
+import org.springframework.boot.web.servlet.ServletRegistrationBean;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRegistration;
-
 @Configuration
-public class H2ConsoleConfig implements ServletContextInitializer {
+public class H2ConsoleConfig   {
 
-    @Override
-    public void onStartup(ServletContext servletContext) throws ServletException {
-        ServletRegistration.Dynamic h2ConsoleServlet = servletContext.addServlet("H2Console", new org.h2.server.web.WebServlet());
-        h2ConsoleServlet.addMapping("/h2/*");
-        h2ConsoleServlet.setInitParameter("-dev", "src/main/resources");
-        h2ConsoleServlet.setLoadOnStartup(1);
+    @Bean
+    public ServletRegistrationBean<Servlet> h2ConsoleServlet() {
+        JakartaWebServlet servlet = new JakartaWebServlet();
+        ServletRegistrationBean<Servlet> registrationBean = new ServletRegistrationBean<>(servlet, "/h2/*");
+        registrationBean.setLoadOnStartup(1);
+        return registrationBean;
     }
+
 }

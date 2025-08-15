@@ -8,12 +8,11 @@ import com.lesofn.appengine.common.exception.EngineExceptionHelper;
 import com.lesofn.appengine.user.domain.User;
 import com.lesofn.appengine.user.service.UserService;
 import com.lesofn.appengine.user.utils.UserExcepFactor;
+import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.annotation.Resource;
 
 /**
  * Authors: sofn

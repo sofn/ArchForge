@@ -1,12 +1,3 @@
-buildscript {
-    repositories {
-        maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
-        maven { url 'https://maven.aliyun.com/repository/spring-plugin' }
-        mavenLocal()
-        mavenCentral()
-    }
-}
-
 group = "com.lesofn.appengine"
 version = "0.1.RELEASE"
 

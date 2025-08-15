@@ -28,12 +28,6 @@ dependencies {
 
     api libraries.springboot_starter_web
     api libraries.jolokia
-
-    //web
-    api "org.sitemesh:sitemesh:$sitemeshVersion"
-    api "org.webjars:bootstrap:$webBootstrapVersion"
-    api "org.webjars:jquery:$webJqueryVersion"
-
 }
 
 //profile环境配置文件

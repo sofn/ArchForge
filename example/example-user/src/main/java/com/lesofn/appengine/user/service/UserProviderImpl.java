@@ -5,7 +5,7 @@ import com.lesofn.appengine.auth.provider.UserProvider;
 import com.lesofn.appengine.user.domain.User;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 /**
  * Authors: sofn

@@ -1,6 +1,6 @@
 package com.lesofn.appengine.frame.context;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * @author sofn

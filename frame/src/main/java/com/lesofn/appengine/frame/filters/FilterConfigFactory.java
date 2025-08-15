@@ -3,10 +3,10 @@ package com.lesofn.appengine.frame.filters;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import javax.servlet.DispatcherType;
-import javax.servlet.Filter;
+import jakarta.servlet.DispatcherType;
+import jakarta.servlet.Filter;
 import java.util.EnumSet;
 
 /**
@@ -14,7 +14,7 @@ import java.util.EnumSet;
  * Version: 1.0  Created at 15-6-8 23:15.
  */
 @Configuration
-public class FilterConfigFactory extends WebMvcConfigurerAdapter {
+public class FilterConfigFactory implements WebMvcConfigurer {
 
     @Bean
     public FilterRegistrationBean requestLogChain() {

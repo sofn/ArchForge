@@ -1,5 +1,4 @@
-sourceCompatibility = JavaVersion.VERSION_1_8
-targetCompatibility = JavaVersion.VERSION_1_8
+// Java version inherited from parent build.gradle (Java 17)
 
 dependencies {
     api libraries.guava

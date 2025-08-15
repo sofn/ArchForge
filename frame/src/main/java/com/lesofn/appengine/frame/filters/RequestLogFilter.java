@@ -10,9 +10,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.MDC;
 
-import javax.servlet.*;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.*;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @Slf4j
@@ -56,7 +56,7 @@ public class RequestLogFilter implements Filter {
                 record.setUid(context.getCurrentUid());
                 record.setSource(context.getAppId() + "");
                 record.setUseTime(endTime - startTime);
-                Object requestUri = request.getAttribute("javax.servlet.error.request_uri");
+                Object requestUri = request.getAttribute("jakarta.servlet.error.request_uri");
                 record.setApi(requestUri != null ? (String) requestUri : path);
                 record.setMethod(request.getMethod());
                 record.setParameters(request.getParameterMap());

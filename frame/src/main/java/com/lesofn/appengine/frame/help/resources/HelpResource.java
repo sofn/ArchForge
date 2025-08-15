@@ -5,7 +5,6 @@ import com.lesofn.appengine.auth.annotation.ApiStatus;
 import com.lesofn.appengine.auth.annotation.AuthType;
 import com.lesofn.appengine.auth.annotation.BaseInfo;
 import com.lesofn.appengine.frame.context.RequestContext;
-import org.javasimon.aop.Monitored;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -15,7 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
  * @author sofn
  * @version 1.0 Created at: 2015-04-29 16:19
  */
-@Monitored
 @RestController
 @RequestMapping("/help")
 public class HelpResource {

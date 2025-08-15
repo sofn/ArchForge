@@ -12,7 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * 404处理
@@ -29,14 +29,14 @@ public class ErrorHandlerResource implements ErrorController {
     @RequestMapping(value = ERROR_PATH)
     @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
     public String error(HttpServletRequest request) {
-        String path = (String) request.getAttribute("javax.servlet.error.request_uri");
-        String errorMsg = (String) request.getAttribute("javax.servlet.error.message");
+        String path = (String) request.getAttribute("jakarta.servlet.error.request_uri");
+        String errorMsg = (String) request.getAttribute("jakarta.servlet.error.message");
         MediaType mediaType = (MediaType) request.getAttribute("org.springframework.web.servlet.View.selectedContentType");
-        int status = (int) request.getAttribute("javax.servlet.error.status_code");
+        int status = (int) request.getAttribute("jakarta.servlet.error.status_code");
 
         Exception exception = (Exception) request.getAttribute(GlobalExceptionHandler.GlobalExceptionAttribute);
         if (exception == null) {
-            exception = (Exception) request.getAttribute("javax.servlet.error.exception");
+            exception = (Exception) request.getAttribute("jakarta.servlet.error.exception");
         }
         EngineException apiException;
         String pageError = "500 - System error.";
