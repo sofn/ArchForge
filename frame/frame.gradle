@@ -1,8 +1,0 @@
-dependencies {
-    api project(":common-core")
-
-    api libraries.springboot_starter_web
-    api libraries.springboot_starter_aop
-    api libraries.springboot_starter_actuator
-
-}

@@ -1,5 +1,0 @@
-dependencies {
-    api project(":frame")
-
-    testImplementation libraries.springboot_test
-}

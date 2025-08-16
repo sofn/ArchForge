@@ -19,6 +19,16 @@ app-engine 是一个分布式的App服务端快速开发框架,包含了基本�
 > 8. 热部署
 > 9. 自动生成接口文档
 
+#### 依赖管理
+本项目使用 Spring Boot dependencies 和自定义依赖管理机制来统一管理依赖版本：
+- 根据 Spring Boot dependencies 自动管理 Spring Boot 相关依赖的版本
+- 通过 `gradle/dependencies.gradle.kts` 文件集中管理其他依赖的版本
+- 子项目中引用依赖时无需指定版本号，例如：
+  ```kotlin
+  implementation("org.springframework.boot:spring-boot-starter-web")
+  testImplementation("org.junit.jupiter:junit-jupiter-api")
+  ```
+
 #### 环境配置
 区分有三种环境dev、test、prod，不同环境会加载不同的配置文件
 > 1. Gradle环境配置: gradle.properties里设置profile
