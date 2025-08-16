@@ -1,4 +1,4 @@
-rootProject.name = "app-engine"
+rootProject.name = "MatrixBoot"
 
 include("common-core")
 include("common-error")

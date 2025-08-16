@@ -20,9 +20,9 @@
         <property name="password" value="${user.jdbc.slave.password}"/>
     </bean>
 
-    <bean id="userDataSource" class="com.lesofn.appengine.frame.database.ReadWriteDataSourceRouter">
+    <bean id="userDataSource" class="com.lesofn.matrixboot.frame.database.ReadWriteDataSourceRouter">
         <property name="targetDataSources">
-            <map key-type="com.lesofn.appengine.frame.database.DataBaseType" value-type="javax.sql.DataSource">
+            <map key-type="com.lesofn.matrixboot.frame.database.DataBaseType" value-type="javax.sql.DataSource">
                 <entry key="Master" value-ref="userDataSourceMaster"/>
                 <entry key="Slave" value-ref="userDataSourceSlave"/>
             </map>

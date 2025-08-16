@@ -1,4 +1,4 @@
-group = "com.lesofn.appengine"
+group = "com.lesofn.matrixboot"
 version = "0.1.RELEASE"
 
 allprojects {

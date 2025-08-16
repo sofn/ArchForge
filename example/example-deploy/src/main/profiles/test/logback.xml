@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration error="true">
 
-    <contextName>APP-ENGINE</contextName>
+    <contextName>MATRIXBOOT</contextName>
     <!--路径-->
     <property name="logback.logs.path" value="../logs"/>
     <!--日志模块名-->
@@ -77,7 +77,7 @@
     <logger name="druid" level="ERROR"/>
     <logger name="org.apache.catalina" level="OFF"/>
 
-    <logger name="com.lesofn.appengine" level="INFO"/>
+    <logger name="com.lesofn.matrixboot" level="INFO"/>
 
     <root level="INFO">
         <appender-ref ref="debugfile"/>

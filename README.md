@@ -1,4 +1,4 @@
-app-engine 是一个分布式的App服务端快速开发框架,包含了基本的权限认证、日志处理、接口防刷、系统监控等基本功能。
+MatrixBoot 是一个分布式的App服务端快速开发框架,包含了基本的权限认证、日志处理、接口防刷、系统监控等基本功能。
 此框架围绕分布式服务系统构建，能够快速扩容，迎合微服务化，提供App服务端常用必备功能。
 
 ### 技术栈：
@@ -37,8 +37,8 @@ app-engine 是一个分布式的App服务端快速开发框架,包含了基本�
 
 #### 可执行jar包
 运行 gradle clean jar assemble 会自动打可执行jar包，运行：
-> 1. java -jar deploy/build/libs/deploy-${version}.jar
-> 2. ./deploy/build/libs/deploy-${version}.jar 如需配置JVM等参数请修复deploy/config/deploy-${version}.conf并拷贝到可执行jar包相同目录，并修改${version}
+> 1. java -jar example/example-deploy/build/libs/example-deploy-${version}.jar
+> 2. ./example/example-deploy/build/libs/example-deploy-${version}.jar 如需配置JVM等参数请修复deploy/config/deploy-${version}.conf并拷贝到可执行jar包相同目录，并修改${version}
 
 #### 发布jar/war包到私有仓库
 > 1. 修改build.gradle里uploadArchives的私有仓库地址、用户名、密码
