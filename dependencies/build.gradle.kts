@@ -28,12 +28,16 @@ dependencies {
         // 实用工具
         api("org.javatuples:javatuples:1.2")
         
+        // HTTP客户端
+        api("com.konghq:unirest-java-core:4.5.0")
+        
         // Web相关
         api("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0")
         api("org.jolokia:jolokia-core:1.7.2")
         
         // 其他
         api("com.google.code.findbugs:annotations:3.0.1")
+        api("org.lionsoul:ip2region:2.7.0")
         
         // Lombok and SLF4J
         api("org.projectlombok:lombok:1.18.36")

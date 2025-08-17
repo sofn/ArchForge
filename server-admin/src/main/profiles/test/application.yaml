@@ -1,17 +1,20 @@
 server:
     port: 8080
 management:
-    port: 7002
+    server:
+        port: 7002
+    endpoints:
+        web:
+            exposure:
+                include: "*"
 spring:
     jpa:
         hibernate:
-            naming_strategy: org.hibernate.cfg.EJB3NamingStrategy
+            naming:
+                physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+                implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl
     datasource:
         initialize: true
         sqlScriptEncoding: UTF-8
-    mvc:
-        view:
-            prefix: /WEB-INF/jsp/
-            suffix: .jsp
     profiles:
         active: test

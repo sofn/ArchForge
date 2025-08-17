@@ -7,13 +7,19 @@ server:
       charset: UTF-8
 
 management:
-  port: 7002
+  server:
+    port: 7002
+  endpoints:
+    web:
+      exposure:
+        include: "*"
 spring:
   jpa:
     hibernate:
-      naming_strategy: org.hibernate.cfg.EJB3NamingStrategy
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+        implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl
   datasource:
-    initialize: true
     druid:
       stat-view-servlet:
         enabled: true
@@ -30,12 +36,6 @@ spring:
         settings:
           trace: false  # 关闭跟踪日志（生产环境建议禁用）
           web-allow-others: false  # 禁止远程访问（安全）
-  mvc:
-    view:
-      prefix: /WEB-INF/jsp/
-      suffix: .jsp
-    pathmatch:
-      matching-strategy: ant_path_matcher
   profiles:
     active: dev
   main:
@@ -43,6 +43,7 @@ spring:
   sql:
     init:
       encoding: UTF-8
+      mode: always
 
 # Database configuration
 task:

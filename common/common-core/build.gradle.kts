@@ -1,4 +1,4 @@
-// Java version inherited from parent build.gradle.kts (Java 17)
+apply(plugin = "groovy")
 
 dependencies {
     // common (使用自定义 BOM 管理的版本)
@@ -16,6 +16,9 @@ dependencies {
     // util (使用自定义 BOM 管理的版本)
     api("org.javatuples:javatuples")
 
+    // HTTP客户端
+    api("com.konghq:unirest-java-core")
+
     // Jackson for JSON processing (Spring Boot BOM 管理的版本)
     api("com.fasterxml.jackson.core:jackson-databind")
     api("com.fasterxml.jackson.core:jackson-annotations")
@@ -29,6 +32,7 @@ dependencies {
 
     // other (使用自定义 BOM 管理的版本)
     api("com.google.code.findbugs:annotations")
+    api("org.lionsoul:ip2region")
     
     // Lombok
     compileOnly("org.projectlombok:lombok")
@@ -36,4 +40,11 @@ dependencies {
     // JUnit for tests
     testImplementation("org.junit.jupiter:junit-jupiter-api")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
+    
+    // Spock for tests
+    testImplementation("org.spockframework:spock-core:2.3-groovy-3.0")
+    testImplementation("org.spockframework:spock-spring:2.3-groovy-3.0")
+    
+    // Groovy for Spock
+    testImplementation("org.codehaus.groovy:groovy:3.0.17")
 }

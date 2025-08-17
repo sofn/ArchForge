@@ -1,13 +1,16 @@
 package com.lesofn.matrixboot.auth.model;
 
-import com.lesofn.matrixboot.common.utils.IPUtils;
+import com.lesofn.matrixboot.common.utils.ip.IpUtil;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.javatuples.KeyValue;
 
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Authors: sofn
@@ -141,7 +144,7 @@ public class AuthRequest {
     }
 
     public String getRemoteIp() {
-        return IPUtils.getRealIpAddr(this.request);
+        return IpUtil.getRealIpAddr(this.request);
     }
 
     public String getApiPath() {

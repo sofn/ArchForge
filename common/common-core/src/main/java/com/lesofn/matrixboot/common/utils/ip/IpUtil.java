@@ -1,24 +1,64 @@
-package com.lesofn.matrixboot.common.utils;
+package com.lesofn.matrixboot.common.utils.ip;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
-import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.net.*;
 import java.util.*;
 import java.util.regex.Pattern;
 
 /**
+ * IP工具类
+ *
  * @author sofn
  */
 @Slf4j
-public class IPUtils {
+public class IpUtil {
 
-    public static final Pattern IP_PATTERN = Pattern.compile("((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)");
+    public static final String INNER_IP_REGEX = "^(127\\.0\\.0\\.\\d{1,3})|(localhost)|(10\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})|(172\\.((1[6-9])|(2\\d)|(3[01]))\\.\\d{1,3}\\.\\d{1,3})|(192\\.168\\.\\d{1,3}\\.\\d{1,3})$";
+    public static final Pattern INNER_IP_PATTERN = Pattern.compile(INNER_IP_REGEX);
+    public static final String IPV4 = "^(25[0-5]|2[0-4]\\d|[0-1]?\\d?\\d)\\.(25[0-5]|2[0-4]\\d|[0-1]?\\d?\\d)\\.(25[0-5]|2[0-4]\\d|[0-1]?\\d?\\d)\\.(25[0-5]|2[0-4]\\d|[0-1]?\\d?\\d)$";
+    public static final Pattern IPV4_PATTERN = Pattern.compile(IPV4);
+    public static final String IPV6 = "(([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]+|::(ffff(:0{1,4})?:)?((25[0-5]|(2[0-4]|1?[0-9])?[0-9])\\.){3}(25[0-5]|(2[0-4]|1?[0-9])?[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1?[0-9])?[0-9])\\.){3}(25[0-5]|(2[0-4]|1?[0-9])?[0-9]))";
+    public static final Pattern IPV6_PATTERN = Pattern.compile(IPV6);
 
-    public static boolean isIp(String in) {
-        return in != null && IP_PATTERN.matcher(in).matches();
+
+    private static long[][] INTRANET_IP_RANGES = new long[][]{
+            {ipToInt("10.0.0.0"), ipToInt("10.255.255.255")},
+            {ipToInt("172.16.0.0"), ipToInt("172.31.255.255")},
+            {ipToInt("192.168.0.0"), ipToInt("192.168.255.255")}
+    };
+
+
+    public static boolean isInnerIp(String ip) {
+        return INNER_IP_PATTERN.matcher(ip).matches() || isLocalHost(ip);
+    }
+
+    public static boolean isLocalHost(String ipAddress) {
+        InetAddress ia = null;
+        try {
+            InetAddress ad = InetAddress.getByName(ipAddress);
+            byte[] ip = ad.getAddress();
+            ia = InetAddress.getByAddress(ip);
+        } catch (UnknownHostException e) {
+            log.error("解析Ip失败", e);
+            e.printStackTrace();
+        }
+        if (ia == null) {
+            return false;
+        }
+        return ia.isSiteLocalAddress() || ia.isLoopbackAddress();
+    }
+
+
+    public static boolean isValidIpv4(String inetAddress) {
+        return IPV4_PATTERN.matcher(inetAddress).matches();
+    }
+
+    public static boolean isValidIpv6(String inetAddress) {
+        return IPV6_PATTERN.matcher(inetAddress).matches();
     }
 
     /**
@@ -169,12 +209,6 @@ public class IPUtils {
         return ip != null ? ip.trim() : "127.0.0.1";
     }
 
-    private static long[][] intranet_ip_ranges = new long[][]{
-            {ipToInt("10.0.0.0"), ipToInt("10.255.255.255")},
-            {ipToInt("172.16.0.0"), ipToInt("172.31.255.255")},
-            {ipToInt("192.168.0.0"), ipToInt("192.168.255.255")}
-    };
-
     /**
      * 是否为内网ip A类 10.0.0.0-10.255.255.255 B类 172.16.0.0-172.31.255.255 C类
      * 192.168.0.0-192.168.255.255 不包括回环ip
@@ -183,11 +217,11 @@ public class IPUtils {
      * @return 是否是内网ip
      */
     public static boolean isIntranetIP(String ip) {
-        if (!isIp(ip)) {
+        if (!isValidIpv4(ip) && !isValidIpv6(ip)) {
             return false;
         }
         long ipNum = ipToInt(ip);
-        for (long[] range : intranet_ip_ranges) {
+        for (long[] range : INTRANET_IP_RANGES) {
             if (ipNum >= range[0] && ipNum <= range[1]) {
                 return true;
             }
@@ -234,4 +268,5 @@ public class IPUtils {
     public static int ipToInt(final String addr) {
         return ipToInt(addr, false);
     }
+
 }
