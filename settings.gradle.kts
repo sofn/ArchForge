@@ -1,7 +1,7 @@
 rootProject.name = "MatrixBoot"
 
-include("common-core")
-include("common-error")
+include(":common:common-core")
+include(":common:common-error")
 include("frame")
 include("dependencies")
 

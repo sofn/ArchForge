@@ -1,7 +1,6 @@
 package com.lesofn.matrixboot.auth.annotation;
 
 /**
- * @author x-spirit
  * @author sofn
  */
 public enum ApiStatus {

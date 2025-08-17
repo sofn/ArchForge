@@ -16,7 +16,7 @@ tasks.jar {
 }
 
 dependencies {
-    api(project(":common-core"))
+    api(project(":common:common-core"))
     api(project(":frame"))
     api(project(":example:example-user"))
     api(project(":example:example-task"))

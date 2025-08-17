@@ -2,7 +2,7 @@
 
 dependencies {
     // 依赖 common-core 模块
-    api(project(":common-core"))
+    api(project(":common:common-core"))
     
     // 核心框架依赖 (Spring Boot BOM 管理的版本)
     api("org.springframework.boot:spring-boot-starter-web")
