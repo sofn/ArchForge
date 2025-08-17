@@ -4,8 +4,8 @@ include(":common:common-core")
 include(":common:common-error")
 include("infrastructure")
 include("dependencies")
+include("server-admin")
 
-include("example:example-deploy")
 include("example:example-task")
 include("example:example-user")
 

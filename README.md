@@ -37,8 +37,8 @@ MatrixBoot 是一个分布式的App服务端快速开发框架,包含了基本�
 
 #### 可执行jar包
 运行 gradle clean jar assemble 会自动打可执行jar包，运行：
-> 1. java -jar example/example-deploy/build/libs/example-deploy-${version}.jar
-> 2. ./example/example-deploy/build/libs/example-deploy-${version}.jar 如需配置JVM等参数请修复deploy/config/deploy-${version}.conf并拷贝到可执行jar包相同目录，并修改${version}
+> 1. java -jar server-admin/build/libs/admin-${version}.jar
+> 2. ./server-admin/build/libs/admin-${version}.jar 如需配置JVM等参数请修复deploy/config/deploy-${version}.conf并拷贝到可执行jar包相同目录，并修改${version}
 
 #### 发布jar/war包到私有仓库
 > 1. 修改build.gradle里uploadArchives的私有仓库地址、用户名、密码
