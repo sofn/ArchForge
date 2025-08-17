@@ -27,12 +27,12 @@ subprojects {
         
         dependencies {
             // 引入 Spring Boot dependencies
-            add("implementation", platform("org.springframework.boot:spring-boot-dependencies:3.3.2"))
+            add("implementation", platform("org.springframework.boot:spring-boot-dependencies:3.5.4"))
             // 引入自定义 dependencies
             add("implementation", platform(project(":dependencies")))
 
             // compile - Lombok配置
-            val lombokVersion = "1.18.30"
+            val lombokVersion = "1.18.36"
             add("annotationProcessor", "org.projectlombok:lombok:$lombokVersion")
             add("testAnnotationProcessor", "org.projectlombok:lombok:$lombokVersion")
 
