@@ -1,5 +1,5 @@
 dependencies {
-    api(project(":frame"))
+    api(project(":infrastructure"))
     api(project(":example:example-user"))
     
     // Lombok

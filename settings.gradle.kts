@@ -2,7 +2,7 @@ rootProject.name = "MatrixBoot"
 
 include(":common:common-core")
 include(":common:common-error")
-include("frame")
+include("infrastructure")
 include("dependencies")
 
 include("example:example-deploy")
