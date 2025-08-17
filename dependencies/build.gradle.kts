@@ -26,7 +26,6 @@ dependencies {
         api("commons-codec:commons-codec:1.17.1")
         
         // 实用工具
-        api("com.alibaba:fastjson:1.2.83")
         api("org.javatuples:javatuples:1.2")
         
         // Web相关

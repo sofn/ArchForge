@@ -1,6 +1,6 @@
 package com.lesofn.matrixboot.user.domain;
 
-import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import jakarta.persistence.*;
@@ -19,9 +19,9 @@ public class User implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
     private String username;
-    @JSONField(serialize = false)
+    @JsonIgnore
     private String password;
-    @JSONField(serialize = false)
+    @JsonIgnore
     private String salt;
 
     public User(String username, String password) {

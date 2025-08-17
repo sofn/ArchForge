@@ -1,6 +1,7 @@
 package com.lesofn.matrixboot.frame.utils.log;
 
-import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.lesofn.matrixboot.common.profile.DefaultProfileLoader;
 import com.lesofn.matrixboot.frame.context.ThreadLocalContext;
 import org.slf4j.Logger;
@@ -67,8 +68,17 @@ public class ApiLogger {
         fireSlow(resourceType, resourceId, useTime, null);
     }
 
-    public static void fireSlow(String resourceType, String resourceId, long useTime, JSONObject ext) {
-        fireLog.warn(String.format("%s\t%s\t%s\t%s\t%s\t%s", ThreadLocalContext.getRequestContext().getRequestId(), resourceType, resourceId, "slow", useTime, ext == null ? "" : ext.toJSONString()));
+    public static void fireSlow(String resourceType, String resourceId, long useTime, ObjectNode ext) {
+        String extStr = "";
+        if (ext != null) {
+            try {
+                ObjectMapper mapper = new ObjectMapper();
+                extStr = mapper.writeValueAsString(ext);
+            } catch (Exception e) {
+                // Ignore serialization errors
+            }
+        }
+        fireLog.warn(String.format("%s\t%s\t%s\t%s\t%s\t%s", ThreadLocalContext.getRequestContext().getRequestId(), resourceType, resourceId, "slow", useTime, extStr));
     }
 
     /**

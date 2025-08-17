@@ -1,7 +1,8 @@
 package com.lesofn.matrixboot.frame.utils;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.lesofn.matrixboot.common.context.ClientVersion;
 import org.apache.commons.lang3.StringUtils;
 
@@ -191,8 +192,9 @@ public class RequestLogRecord {
         this.writeBody = writeBody;
     }
 
-    public JSONObject toJSONObject() {
-        return new JSONObject();
+    public ObjectNode toJSONObject() {
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper.createObjectNode();
     }
 
     public String toString() {
@@ -233,7 +235,12 @@ public class RequestLogRecord {
     }
 
     public String toJsonString() {
-        return JSON.toJSONString(this);
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            return mapper.writeValueAsString(this);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Failed to serialize RequestLogRecord to JSON", e);
+        }
     }
 
     private String getParameterString() {

@@ -1,8 +1,10 @@
 package com.lesofn.matrixboot.frame.context;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONAware;
-import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.lesofn.matrixboot.common.context.ClientVersion;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,22 +15,28 @@ import java.util.Map;
 /**
  * @author sofn
  */
-public class RequestContext implements Serializable, JSONAware {
+public class RequestContext implements Serializable {
 
-    private static final long serialVersionUID = -402232948972687045L;
-    @JSONField(name = "request_id")
+    @JsonProperty("request_id")
     private String requestId;
-    @JSONField(name = "current_uid")
+    
+    @JsonProperty("current_uid")
     private long currentUid;
+    
     private String ip;
-    @JSONField(name = "app_id")
+    
+    @JsonProperty("app_id")
     private int appId;
-    @JSONField(name = "is_official_app")
+    
+    @JsonProperty("is_official_app")
     private boolean isOfficialApp;
-    @JSONField(name = "platform")
+    
+    @JsonProperty("platform")
     private String platform;
-    @JSONField(name = "client_version")
+    
+    @JsonProperty("client_version")
     private ClientVersion clientVersion;
+    
     private Map<String, Object> attribute;
 
     private transient HttpServletRequest originRequest;
@@ -94,7 +102,7 @@ public class RequestContext implements Serializable, JSONAware {
     }
 
     // 貌似是jackson的bug,transient 变量的 annotation必须加到方法上才起作用
-    @JSONField(serialize = false)
+    @JsonIgnore
     public HttpServletRequest getOriginRequest() {
         return originRequest;
     }
@@ -170,9 +178,13 @@ public class RequestContext implements Serializable, JSONAware {
         return true;
     }
 
-    @Override
     public String toJSONString() {
-        return JSON.toJSONString(this);
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            return mapper.writeValueAsString(this);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Failed to serialize RequestContext to JSON", e);
+        }
     }
 
     public String getPlatform() {

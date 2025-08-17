@@ -14,8 +14,11 @@ dependencies {
     api("com.h2database:h2")
 
     // util (使用自定义 BOM 管理的版本)
-    api("com.alibaba:fastjson")
     api("org.javatuples:javatuples")
+
+    // Jackson for JSON processing (Spring Boot BOM 管理的版本)
+    api("com.fasterxml.jackson.core:jackson-databind")
+    api("com.fasterxml.jackson.core:jackson-annotations")
 
     // web (Spring Boot BOM 管理的版本)
     api("org.springframework.boot:spring-boot-starter-web")

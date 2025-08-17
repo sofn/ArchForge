@@ -1,6 +1,5 @@
 package com.lesofn.matrixboot.deploy;
 
-import com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter;
 import com.lesofn.matrixboot.frame.filters.AuthResourceFilter;
 import com.lesofn.matrixboot.frame.spring.context.RequestContextMethodArgumentResolver;
 import org.springframework.context.annotation.Bean;
@@ -10,6 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.ResourceHttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -40,7 +40,7 @@ public class ApplicationConfig implements WebMvcConfigurer {
         
         // Set message converters
         filter.setMessageConverters(Arrays.asList(
-            fastJsonHttpMessageConverter(),
+            jackson2HttpMessageConverter(),
             new StringHttpMessageConverter(),
             new ResourceHttpMessageConverter()
         ));
@@ -49,11 +49,11 @@ public class ApplicationConfig implements WebMvcConfigurer {
     }
 
     /**
-     * Configure FastJSON message converter
+     * Configure Jackson message converter
      */
     @Bean
-    public FastJsonHttpMessageConverter fastJsonHttpMessageConverter() {
-        FastJsonHttpMessageConverter converter = new FastJsonHttpMessageConverter();
+    public MappingJackson2HttpMessageConverter jackson2HttpMessageConverter() {
+        MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
         converter.setSupportedMediaTypes(Arrays.asList(MediaType.APPLICATION_JSON));
         return converter;
     }
@@ -71,7 +71,7 @@ public class ApplicationConfig implements WebMvcConfigurer {
      */
     @Override
     public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-        converters.add(fastJsonHttpMessageConverter());
+        converters.add(jackson2HttpMessageConverter());
         converters.add(new StringHttpMessageConverter());
         converters.add(new ResourceHttpMessageConverter());
     }

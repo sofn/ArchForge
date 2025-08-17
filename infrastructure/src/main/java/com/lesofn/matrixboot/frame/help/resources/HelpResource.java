@@ -1,6 +1,7 @@
 package com.lesofn.matrixboot.frame.help.resources;
 
-import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lesofn.matrixboot.auth.annotation.ApiStatus;
 import com.lesofn.matrixboot.auth.annotation.AuthType;
 import com.lesofn.matrixboot.auth.annotation.BaseInfo;
@@ -18,10 +19,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/help")
 public class HelpResource {
 
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
     @BaseInfo(desc = "help-ping", status = ApiStatus.PUBLIC, needAuth = AuthType.OPTION)
     @RequestMapping(value = "/ping")
-    public JSONObject ping(RequestContext rc) {
-        JSONObject result = new JSONObject();
+    public ObjectNode ping(RequestContext rc) {
+        ObjectNode result = objectMapper.createObjectNode();
         result.put("uid", rc.getCurrentUid());
         result.put("app_id", rc.getAppId());
         result.put("remote_ip", rc.getIp());
@@ -29,8 +32,8 @@ public class HelpResource {
     }
 
     @PostMapping(value = "/echo")
-    public JSONObject echo(@RequestParam String msg) {
-        JSONObject msgJson = new JSONObject();
+    public ObjectNode echo(@RequestParam String msg) {
+        ObjectNode msgJson = objectMapper.createObjectNode();
         msgJson.put("msg", msg);
         return msgJson;
     }

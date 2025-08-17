@@ -1,7 +1,7 @@
 package com.lesofn.matrixboot.user.rest;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.lesofn.matrixboot.auth.annotation.ApiStatus;
 import com.lesofn.matrixboot.auth.annotation.AuthType;
 import com.lesofn.matrixboot.auth.annotation.BaseInfo;
@@ -33,6 +33,8 @@ public class UserController {
 
     @Resource
     private UserService userService;
+    
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @BaseInfo(desc = "注册用户", needAuth = AuthType.OPTION)
     @RequestMapping(value = "/register", method = RequestMethod.POST)
@@ -43,14 +45,14 @@ public class UserController {
     @Operation(summary = "测试接口1")
     @BaseInfo(desc = "登陆", needAuth = AuthType.OPTION)
     @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public JSONObject login(
+    public ObjectNode login(
             HttpServletResponse response,
             @RequestParam String username,
             @RequestParam String password,
             @RequestParam(required = false, defaultValue = "false") boolean cookie
     ) {
         User user = userService.login(username, password);
-        JSONObject result = (JSONObject) JSON.toJSON(user);
+        ObjectNode result = objectMapper.valueToTree(user);
         if (cookie) {
             String cookieValue = CookieAuthSpi.generateCookie(user.getUid());
             Cookie authCookie = new Cookie(CookieAuthSpi.COOKIE_NAME, cookieValue);

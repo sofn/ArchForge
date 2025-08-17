@@ -17,8 +17,8 @@ import java.util.EnumSet;
 public class FilterConfigFactory implements WebMvcConfigurer {
 
     @Bean
-    public FilterRegistrationBean requestLogChain() {
-        FilterRegistrationBean registration = new FilterRegistrationBean();
+    public FilterRegistrationBean<Filter> requestLogChain() {
+        FilterRegistrationBean<Filter> registration = new FilterRegistrationBean<>();
         Filter headerFilter = new RequestLogFilter();
         registration.setFilter(headerFilter);
         registration.setOrder(Integer.MAX_VALUE);
@@ -28,8 +28,8 @@ public class FilterConfigFactory implements WebMvcConfigurer {
     }
 
     @Bean
-    public FilterRegistrationBean headerFilterChain() {
-        FilterRegistrationBean registration = new FilterRegistrationBean();
+    public FilterRegistrationBean<Filter> headerFilterChain() {
+        FilterRegistrationBean<Filter> registration = new FilterRegistrationBean<>();
         Filter headerFilter = new HeaderResponseFilter();
         registration.setFilter(headerFilter);
         registration.setOrder(Integer.MAX_VALUE);

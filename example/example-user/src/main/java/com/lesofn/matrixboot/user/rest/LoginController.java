@@ -1,6 +1,7 @@
 package com.lesofn.matrixboot.user.rest;
 
-import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.lesofn.matrixboot.auth.annotation.AuthType;
 import com.lesofn.matrixboot.auth.annotation.BaseInfo;
 import com.lesofn.matrixboot.auth.spi.MAuthSpi;
@@ -24,16 +25,18 @@ public class LoginController {
 
     @Resource
     private UserService userService;
+    
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @RequestMapping(value = "", method = RequestMethod.POST)
     @BaseInfo(needAuth = AuthType.OPTION)
-    public JSONObject add(@RequestParam String username, @RequestParam String password) {
-        JSONObject result = new JSONObject(true);
+    public ObjectNode add(@RequestParam String username, @RequestParam String password) {
+        ObjectNode result = objectMapper.createObjectNode();
         User user = userService.login(username, password);
         if (user == null) {
             throw EngineExceptionHelper.localException(UserExcepFactor.USERPASS_ERROR);
         }
-        result.put("user", user);
+        result.set("user", objectMapper.valueToTree(user));
         result.put("mauth", MAuthSpi.generateMauth(user.getUid()));
         return result;
     }

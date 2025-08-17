@@ -1,12 +1,12 @@
 package com.lesofn.matrixboot.frame.spring;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter4;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.MediaType;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.http.server.ServletServerHttpRequest;
@@ -23,31 +23,42 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 @ControllerAdvice(basePackages = "com.lesofn.matrixboot")
 public class JsonResultValueHandler implements ResponseBodyAdvice<Object> {
 
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
     @Override
     public boolean supports(MethodParameter returnType, Class converterType) {
-        return FastJsonHttpMessageConverter4.class.isAssignableFrom(converterType);
+        return MappingJackson2HttpMessageConverter.class.isAssignableFrom(converterType);
     }
 
     @Override
     public Object beforeBodyWrite(Object body, MethodParameter returnType, MediaType selectedContentType, Class selectedConverterType, ServerHttpRequest request, ServerHttpResponse response) {
         //json保证apistatus在最前面
-        JSONObject result = new JSONObject(true);
+        ObjectNode result = objectMapper.createObjectNode();
 
         if (body == null) {
-            body = new JSONObject();
+            body = objectMapper.createObjectNode();
         }
 
         if (StringUtils.equals(((ServletServerHttpRequest) request).getServletRequest().getServletPath(), "/error")) {
             result.put("apistatus", 0);
             if (body instanceof String) {
-                body = JSON.parse((String) body);
+                try {
+                    body = objectMapper.readTree((String) body);
+                } catch (Exception e) {
+                    // If parsing fails, keep the original string
+                }
             } else {
-                body = JSON.parse(body.toString());
+                try {
+                    body = objectMapper.readTree(body.toString());
+                } catch (Exception e) {
+                    // If parsing fails, convert to string
+                    body = body.toString();
+                }
             }
         } else {
             result.put("apistatus", 1);
         }
-        result.put("result", body);
+        result.set("result", objectMapper.valueToTree(body));
         return result;
     }
 }
