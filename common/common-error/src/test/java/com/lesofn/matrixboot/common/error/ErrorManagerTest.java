@@ -4,7 +4,7 @@ import com.lesofn.matrixboot.common.error.example.LoginErrorCodes;
 import com.lesofn.matrixboot.common.error.manager.ErrorManager;
 import com.lesofn.matrixboot.common.error.manager.TreeNode;
 import com.lesofn.matrixboot.common.error.system.HttpCodes;
-import com.lesofn.matrixboot.common.error.system.SystemErrorCodes;
+import com.lesofn.matrixboot.common.error.system.SystemErrorCode;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -19,7 +19,7 @@ class ErrorManagerTest {
 
     @Test
     void getAllErrorCodes() {
-        SystemErrorCodes.values();
+        SystemErrorCode.values();
         HttpCodes.values();
         LoginErrorCodes.values();
         List<TreeNode> allErrorCodes = ErrorManager.getAllErrorCodes();

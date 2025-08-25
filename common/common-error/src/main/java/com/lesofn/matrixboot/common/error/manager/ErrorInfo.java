@@ -1,7 +1,7 @@
 package com.lesofn.matrixboot.common.error.manager;
 
 import com.lesofn.matrixboot.common.error.api.ErrorCode;
-import com.lesofn.matrixboot.common.error.system.SystemErrorCodes;
+import com.lesofn.matrixboot.common.error.system.SystemErrorCode;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.slf4j.helpers.MessageFormatter;
@@ -30,7 +30,7 @@ public class ErrorInfo {
 
 
     public static ErrorInfo parse(String message) {
-        return ERROR_MSG_CODES_MAP.computeIfAbsent(message, it -> new ErrorInfo(SystemErrorCodes.SYSTEM_ERROR.getCode(), message));
+        return ERROR_MSG_CODES_MAP.computeIfAbsent(message, it -> new ErrorInfo(SystemErrorCode.SYSTEM_ERROR.getCode(), message));
     }
 
     public static ErrorInfo parse(ErrorCode errorCode) {

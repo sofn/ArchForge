@@ -2,7 +2,7 @@ package com.lesofn.matrixboot.common.error.springmvc;
 
 import com.lesofn.matrixboot.common.error.response.CustomResult;
 import com.lesofn.matrixboot.common.error.response.Result;
-import com.lesofn.matrixboot.common.error.system.SystemErrorCodes;
+import com.lesofn.matrixboot.common.error.system.SystemErrorCode;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.annotation.Order;
@@ -41,7 +41,7 @@ public class ResultValueWrapper implements ResponseBodyAdvice<Object> {
         }
 
         if (StringUtils.equals(((ServletServerHttpRequest) request).getServletRequest().getServletPath(), "/error")) {
-            return Result.error(SystemErrorCodes.SYSTEM_ERROR.getCode(), body.toString());
+            return Result.error(SystemErrorCode.SYSTEM_ERROR.getCode(), body.toString());
         } else {
             return Result.success(body);
         }

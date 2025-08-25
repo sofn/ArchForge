@@ -1,6 +1,9 @@
 apply(plugin = "groovy")
 
 dependencies {
+    // 项目内依赖
+    api(project(":common:common-error"))
+
     // common (使用自定义 BOM 管理的版本)
     api("com.google.guava:guava")
     api("commons-io:commons-io")
@@ -33,6 +36,7 @@ dependencies {
     // other (使用自定义 BOM 管理的版本)
     api("com.google.code.findbugs:annotations")
     api("org.lionsoul:ip2region")
+    api("eu.bitwalker:UserAgentUtils")
     
     // Lombok
     compileOnly("org.projectlombok:lombok")
@@ -42,9 +46,9 @@ dependencies {
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
     
     // Spock for tests
-    testImplementation("org.spockframework:spock-core:2.3-groovy-3.0")
-    testImplementation("org.spockframework:spock-spring:2.3-groovy-3.0")
+    testImplementation("org.spockframework:spock-core")
+    testImplementation("org.spockframework:spock-spring")
     
     // Groovy for Spock
-    testImplementation("org.codehaus.groovy:groovy:3.0.17")
+    testImplementation("org.codehaus.groovy:groovy")
 }

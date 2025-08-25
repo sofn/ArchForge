@@ -1,15 +1,15 @@
 package com.lesofn.matrixboot.common.error.system;
 
-import com.lesofn.matrixboot.common.error.manager.ErrorInfo;
 import com.lesofn.matrixboot.common.error.api.ErrorCode;
 import com.lesofn.matrixboot.common.error.api.ProjectModule;
-import com.lesofn.matrixboot.common.error.exception.BaseException;
+import com.lesofn.matrixboot.common.error.exception.BaseRuntimeException;
+import com.lesofn.matrixboot.common.error.manager.ErrorInfo;
 
 /**
  * @author sofn
  * @version 1.0 Created at: 2022-03-09 16:41
  */
-public class SystemException extends BaseException {
+public class SystemException extends BaseRuntimeException {
 
     public SystemException(String message) {
         super(message);

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+						http://www.springframework.org/schema/beans/spring-beans-4.1.xsd">
+
+    <import resource="classpath*:spring/base-mysql.xml"/>
+
+    <bean id="userDataSourceMaster" parent="baseDataSourceConfig">
+        <property name="driverClassName" value="${user.jdbc.master.driver}"/>
+        <property name="url" value="${user.jdbc.master.url}"/>
+        <property name="username" value="${user.jdbc.master.username}"/>
+        <property name="password" value="${user.jdbc.master.password}"/>
+    </bean>
+
+    <bean id="userDataSourceSlave" parent="baseDataSourceConfig">
+        <property name="driverClassName" value="${user.jdbc.slave.driver}"/>
+        <property name="url" value="${user.jdbc.slave.url}"/>
+        <property name="username" value="${user.jdbc.slave.username}"/>
+        <property name="password" value="${user.jdbc.slave.password}"/>
+    </bean>
+
+    <bean id="userDataSource" class="com.lesofn.matrixboot.infrastructure.frame.database.ReadWriteDataSourceRouter">
+        <property name="targetDataSources">
+            <map key-type="com.lesofn.matrixboot.infrastructure.frame.database.DataBaseType" value-type="javax.sql.DataSource">
+                <entry key="Master" value-ref="userDataSourceMaster"/>
+                <entry key="Slave" value-ref="userDataSourceSlave"/>
+            </map>
+        </property>
+        <property name="defaultTargetDataSource" ref="userDataSourceMaster"/>
+    </bean>
+
+
+</beans>

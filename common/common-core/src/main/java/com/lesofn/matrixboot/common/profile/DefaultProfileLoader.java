@@ -9,6 +9,7 @@ import org.yaml.snakeyaml.Yaml;
 
 import java.io.IOException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -21,7 +22,7 @@ public class DefaultProfileLoader {
     /**
      * 默认线上环境，防止线上bug
      */
-    static final  Env DEFAULT_DEV = Env.prod;
+    static final Env DEFAULT_DEV = Env.prod;
 
     public static final String APP_ENV_VAR = "profile";
 
@@ -84,10 +85,10 @@ public class DefaultProfileLoader {
             if (url == null) {
                 return Optional.empty();
             }
-            String fileContent = IOUtils.toString(url, "UTF-8");
-            Map map = (Map) ya.load(fileContent);
-            if (map.get("spring") != null && ((Map) map.get("spring")).get("profiles") != null) {
-                String active = (String) ((Map) ((Map) map.get("spring")).get("profiles")).get("active");
+            String fileContent = IOUtils.toString(url, StandardCharsets.UTF_8);
+            Map<?, ?> map = ya.load(fileContent);
+            if (map.get("spring") != null && ((Map<?, ?>) map.get("spring")).get("profiles") != null) {
+                String active = (String) ((Map<?, ?>) ((Map<?, ?>) map.get("spring")).get("profiles")).get("active");
 
                 if (StringUtils.isEmpty(active)) {
                     return Optional.empty();
@@ -101,7 +102,7 @@ public class DefaultProfileLoader {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("readFromYaml error", e);
         }
         return Optional.empty();
     }

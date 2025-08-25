@@ -2,7 +2,7 @@ package com.lesofn.matrixboot.common.error.response;
 
 import com.lesofn.matrixboot.common.error.api.ErrorCode;
 import com.lesofn.matrixboot.common.error.manager.ErrorInfo;
-import com.lesofn.matrixboot.common.error.system.SystemErrorCodes;
+import com.lesofn.matrixboot.common.error.system.SystemErrorCode;
 import lombok.Getter;
 
 /**
@@ -20,7 +20,7 @@ public class Result<T> extends ErrorInfo {
 
 
     public static <T> Result<T> success(T data) {
-        Result<T> result = new Result<>(SystemErrorCodes.SUCCESS.getCode(), SystemErrorCodes.SUCCESS.getMsg());
+        Result<T> result = new Result<>(SystemErrorCode.SUCCESS.getCode(), SystemErrorCode.SUCCESS.getMsg());
         result.data = data;
         return result;
     }

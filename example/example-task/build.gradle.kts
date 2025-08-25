@@ -1,6 +1,6 @@
 dependencies {
     api(project(":infrastructure"))
-    api(project(":example:example-user"))
+    api(project(":domain:admin-user"))
     
     // Lombok
     compileOnly("org.projectlombok:lombok")

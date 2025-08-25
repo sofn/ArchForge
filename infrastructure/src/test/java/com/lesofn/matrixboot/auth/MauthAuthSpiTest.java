@@ -1,6 +1,6 @@
 package com.lesofn.matrixboot.auth;
 
-import com.lesofn.matrixboot.auth.spi.MAuthSpi;
+import com.lesofn.matrixboot.infrastructure.auth.spi.MAuthSpi;
 import org.junit.jupiter.api.Test;
 
 /**

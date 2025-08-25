@@ -1,7 +1,7 @@
 package com.lesofn.matrixboot.task.utils;
 
 
-import com.lesofn.matrixboot.common.exception.ExcepFactor;
+import com.lesofn.matrixboot.common.errors.ExcepFactor;
 import com.lesofn.matrixboot.common.utils.GlobalConstants;
 import org.springframework.http.HttpStatus;
 

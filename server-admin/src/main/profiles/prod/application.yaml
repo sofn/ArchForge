@@ -18,3 +18,14 @@ spring:
         sqlScriptEncoding: UTF-8
     profiles:
         active: prod
+
+# JWT配置
+jwt:
+  secret: myProdSecretKey
+  autoRefreshTime: 20
+
+# Token配置
+token:
+  header: Authorization
+  secret: myProdSecretKey
+  autoRefreshTime: 20

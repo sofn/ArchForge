@@ -5,7 +5,7 @@ import com.lesofn.matrixboot.common.error.exception.IErrorCodeException;
 import com.lesofn.matrixboot.common.error.manager.ErrorInfo;
 import com.lesofn.matrixboot.common.error.response.Result;
 import com.lesofn.matrixboot.common.error.system.HttpCodes;
-import com.lesofn.matrixboot.common.error.system.SystemErrorCodes;
+import com.lesofn.matrixboot.common.error.system.SystemErrorCode;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -45,14 +45,14 @@ public class ErrorExceptionHandle {
             ErrorInfo errorInfo = ((IErrorCodeException) e).getErrorInfo();
             Result<?> apiResult;
             if (errorInfo == null) {
-                apiResult = Result.error(SystemErrorCodes.SYSTEM_ERROR.getCode(), pair.getRight());
+                apiResult = Result.error(SystemErrorCode.SYSTEM_ERROR.getCode(), pair.getRight());
             } else {
                 apiResult = Result.error(errorInfo.getCode(), errorInfo.getMsg());
             }
             return new ResponseEntity<>(apiResult, HttpStatus.OK);
         }
         log.error("error, request: {}", parseParam(request), e);
-        Result<String> errorResult = Result.error(SystemErrorCodes.SYSTEM_ERROR.getCode(), pair.getLeft().getClass().getSimpleName() + ": " + pair.getRight());
+        Result<String> errorResult = Result.error(SystemErrorCode.SYSTEM_ERROR.getCode(), pair.getLeft().getClass().getSimpleName() + ": " + pair.getRight());
         return new ResponseEntity<>(errorResult, HttpStatus.OK);
     }
 

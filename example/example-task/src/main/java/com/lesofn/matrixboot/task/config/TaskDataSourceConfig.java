@@ -2,8 +2,8 @@ package com.lesofn.matrixboot.task.config;
 
 import com.alibaba.druid.filter.stat.StatFilter;
 import com.alibaba.druid.pool.DruidDataSource;
-import com.lesofn.matrixboot.frame.database.DataBaseType;
-import com.lesofn.matrixboot.frame.database.ReadWriteDataSourceRouter;
+import com.lesofn.matrixboot.infrastructure.frame.database.DataBaseType;
+import com.lesofn.matrixboot.infrastructure.frame.database.ReadWriteDataSourceRouter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

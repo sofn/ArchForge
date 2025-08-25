@@ -1,6 +1,6 @@
 package com.lesofn.matrixboot.auth;
 
-import com.lesofn.matrixboot.auth.spi.CookieAuthSpi;
+import com.lesofn.matrixboot.infrastructure.auth.spi.CookieAuthSpi;
 import org.junit.jupiter.api.Test;
 
 /**

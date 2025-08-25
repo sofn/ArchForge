@@ -1,7 +1,7 @@
 package com.lesofn.matrixboot.common.encrypt;
 
-import com.lesofn.matrixboot.common.exception.ExcepFactor;
-import com.lesofn.matrixboot.common.exception.EngineExceptionHelper;
+import com.lesofn.matrixboot.common.errors.ExcepFactor;
+import com.lesofn.matrixboot.common.errors.EngineExceptionHelper;
 import org.apache.commons.lang3.Validate;
 
 import java.io.IOException;

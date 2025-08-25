@@ -8,6 +8,7 @@ dependencies {
     api("org.springframework.boot:spring-boot-starter-web")
     api("org.springframework.boot:spring-boot-starter-aop")
     api("org.springframework.boot:spring-boot-starter-actuator")
+    api("org.springframework.boot:spring-boot-starter-security")
     
     // 日志依赖 (Spring Boot BOM 管理的版本)
     api("org.slf4j:slf4j-api")

@@ -31,10 +31,9 @@ subprojects {
             // 引入自定义 dependencies
             add("implementation", platform(project(":dependencies")))
 
-            // compile - Lombok配置
-            val lombokVersion = "1.18.36"
-            add("annotationProcessor", "org.projectlombok:lombok:$lombokVersion")
-            add("testAnnotationProcessor", "org.projectlombok:lombok:$lombokVersion")
+            // compile - Lombok配置 (版本由 dependencies 模块管理)
+            add("annotationProcessor", "org.projectlombok:lombok:1.18.36")
+            add("testAnnotationProcessor", "org.projectlombok:lombok:1.18.36")
 
         }
     }

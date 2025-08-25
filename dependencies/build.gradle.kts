@@ -35,9 +35,20 @@ dependencies {
         api("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0")
         api("org.jolokia:jolokia-core:1.7.2")
         
+        // JWT
+        api("io.jsonwebtoken:jjwt-api:0.11.5")
+        api("io.jsonwebtoken:jjwt-impl:0.11.5")
+        api("io.jsonwebtoken:jjwt-jackson:0.11.5")
+        
+        // QueryDSL
+        api("com.querydsl:querydsl-jpa:5.0.0")
+        api("com.querydsl:querydsl-apt:5.0.0")
+        api("jakarta.persistence:jakarta.persistence-api:3.1.0")
+        
         // 其他
         api("com.google.code.findbugs:annotations:3.0.1")
         api("org.lionsoul:ip2region:2.7.0")
+        api("eu.bitwalker:UserAgentUtils:1.21")
         
         // Lombok and SLF4J
         api("org.projectlombok:lombok:1.18.36")
@@ -50,6 +61,12 @@ dependencies {
         api("org.testcontainers:testcontainers:1.20.4")
         api("org.testcontainers:junit-jupiter:1.20.4")
         api("org.testcontainers:mysql:1.20.4")
+        api("org.spockframework:spock-core:2.3-groovy-3.0")
+        api("org.spockframework:spock-spring:2.3-groovy-3.0")
+        api("org.codehaus.groovy:groovy:3.0.17")
+
+        // Redis Mock for Dev environment
+        api("com.github.fppt:jedis-mock:1.1.11")
 
     }
 }

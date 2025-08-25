@@ -1,7 +1,7 @@
 package com.lesofn.matrixboot.frame.context;
 
-import com.lesofn.matrixboot.frame.context.RequestContext;
-import com.lesofn.matrixboot.frame.context.ThreadLocalContext;
+import com.lesofn.matrixboot.infrastructure.frame.context.RequestContext;
+import com.lesofn.matrixboot.infrastructure.frame.context.ThreadLocalContext;
 import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.ExecutionException;

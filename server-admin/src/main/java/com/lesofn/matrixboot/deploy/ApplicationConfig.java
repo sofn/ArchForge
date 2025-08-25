@@ -1,7 +1,7 @@
 package com.lesofn.matrixboot.deploy;
 
-import com.lesofn.matrixboot.frame.filters.AuthResourceFilter;
-import com.lesofn.matrixboot.frame.spring.context.RequestContextMethodArgumentResolver;
+import com.lesofn.matrixboot.infrastructure.frame.filters.AuthResourceFilter;
+import com.lesofn.matrixboot.infrastructure.frame.spring.context.RequestContextMethodArgumentResolver;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;

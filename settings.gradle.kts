@@ -1,13 +1,14 @@
 rootProject.name = "MatrixBoot"
 
-include(":common:common-core")
-include(":common:common-error")
+include("common:common-core")
+include("common:common-error")
 include("infrastructure")
 include("dependencies")
 include("server-admin")
 
+include("domain:admin-user")
+
 include("example:example-task")
-include("example:example-user")
 
 // Configure build file names for subprojects
 rootProject.children.forEach { project ->
