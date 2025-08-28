@@ -2,7 +2,7 @@ package com.lesofn.matrixboot.common.enums.dictionary;
 
 /**
  * Css 样式
- * @author valarchie
+ * @author sofn
  */
 public class CssTag {
 

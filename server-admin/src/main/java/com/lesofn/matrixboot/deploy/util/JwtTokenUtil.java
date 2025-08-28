@@ -20,10 +20,10 @@ import java.util.function.Function;
 @Component
 public class JwtTokenUtil {
 
-    public static final long JWT_TOKEN_VALIDITY = 24 * 60 * 60; // 24小时
-
     @Value("${jwt.secret}")
     private String secret;
+    @Value("${jwt.expire-seconds:86400}")  // 默认24小时
+    private long jwtExpireSeconds;
 
     /**
      * 从token中获取用户名
@@ -78,7 +78,7 @@ public class JwtTokenUtil {
                 .setClaims(claims)
                 .setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 1000))
+                .setExpiration(new Date(System.currentTimeMillis() + jwtExpireSeconds * 1000))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS512)
                 .compact();
     }

@@ -4,7 +4,7 @@ import com.lesofn.matrixboot.common.enums.BasicEnum;
 
 /**
  * Http Method
- * @author valarchie
+ * @author sofn
  */
 public enum RequestMethodEnum implements BasicEnum<Integer> {
 

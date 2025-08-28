@@ -3,7 +3,7 @@ package com.lesofn.matrixboot.infrastructure.user.base;
 import lombok.Data;
 
 /**
- * @author valarchie
+ * @author sofn
  */
 @Data
 public class LoginInfo {

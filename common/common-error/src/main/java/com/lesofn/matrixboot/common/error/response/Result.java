@@ -25,6 +25,10 @@ public class Result<T> extends ErrorInfo {
         return result;
     }
 
+    public static <T> Result<T> ok(T data) {
+        return success(data);
+    }
+
     public static <T> Result<T> error(ErrorCode errorCode) {
         return new Result<>(errorCode.getCode(), errorCode.getMsg());
     }

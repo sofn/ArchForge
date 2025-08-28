@@ -41,8 +41,8 @@ dependencies {
         api("io.jsonwebtoken:jjwt-jackson:0.11.5")
         
         // QueryDSL
-        api("com.querydsl:querydsl-jpa:5.0.0")
-        api("com.querydsl:querydsl-apt:5.0.0")
+        api("com.querydsl:querydsl-jpa:5.1.0")
+        api("com.querydsl:querydsl-apt:5.1.0")
         api("jakarta.persistence:jakarta.persistence-api:3.1.0")
         
         // 其他
@@ -67,6 +67,9 @@ dependencies {
 
         // Redis Mock for Dev environment
         api("com.github.fppt:jedis-mock:1.1.11")
+        
+        // Kaptcha 验证码
+        api("com.github.penggle:kaptcha:2.3.2")
 
     }
 }

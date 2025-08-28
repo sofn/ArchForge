@@ -6,7 +6,7 @@ import com.lesofn.matrixboot.common.enums.dictionary.Dictionary;
 
 /**
  * 系统内代表是与否的枚举
- * @author valarchie
+ * @author sofn
  */
 @Dictionary(name = "common.yesOrNo")
 public enum YesOrNoEnum implements DictionaryEnum<Integer> {

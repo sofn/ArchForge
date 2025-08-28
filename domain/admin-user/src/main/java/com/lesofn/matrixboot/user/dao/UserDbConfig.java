@@ -37,6 +37,7 @@ public class UserDbConfig {
 
         factoryBean.setDataSource(dataSource);
         factoryBean.setJpaVendorAdapter(jpaVendorAdapter);
+        factoryBean.setPersistenceUnitName("user");
         //此处应包含当前模块的domain类
         factoryBean.setPackagesToScan("com.lesofn.matrixboot.user.domain");
 

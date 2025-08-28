@@ -6,7 +6,7 @@ import com.lesofn.matrixboot.common.enums.dictionary.Dictionary;
 
 /**
  * 用户状态
- * @author valarchie
+ * @author sofn
  */
 @Dictionary(name = "sysLoginLog.status")
 public enum LoginStatusEnum implements DictionaryEnum<Integer> {

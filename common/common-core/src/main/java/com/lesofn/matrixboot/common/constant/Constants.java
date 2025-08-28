@@ -4,7 +4,7 @@ package com.lesofn.matrixboot.common.constant;
 /**
  * 通用常量信息
  *
- * @author valarchie
+ * @author sofn
  */
 public class Constants {
     private Constants() {

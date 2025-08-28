@@ -1,59 +1,53 @@
 package com.lesofn.matrixboot.deploy.service.cache;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.stereotype.Service;
 
-import java.util.concurrent.TimeUnit;
+import com.lesofn.matrixboot.infrastructure.auth.model.SystemLoginUser;
+import com.lesofn.matrixboot.infrastructure.db.redis.RedisUtil;
+import com.lesofn.matrixboot.user.domain.SysRole;
+import com.lesofn.matrixboot.user.domain.SysUser;
+import com.lesofn.matrixboot.user.service.SysRoleService;
+import com.lesofn.matrixboot.user.service.SysUserService;
+import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
+
+import java.io.Serializable;
 
 /**
- * Redis缓存服务类
- * 
- * @author lesofn
+ * @author sofn
  */
-@Service
+@Component
+@RequiredArgsConstructor
 public class RedisCacheService {
 
-    @Autowired
-    private RedisTemplate<String, Object> redisTemplate;
+    private final RedisUtil redisUtil;
+    private final SysUserService sysUserService;
+    private final SysRoleService sysRoleService;
 
-    public final LoginUserCache loginUserCache = new LoginUserCache();
+    public RedisCacheTemplate<String> captchaCache;
+    public RedisCacheTemplate<SystemLoginUser> loginUserCache;
+    public RedisCacheTemplate<SysUser> userCache;
+    public RedisCacheTemplate<SysRole> roleCache;
 
-    /**
-     * 登录用户缓存类
-     */
-    public class LoginUserCache {
-        
-        private static final String LOGIN_USER_KEY_PREFIX = "login_user:";
-        private static final long LOGIN_USER_EXPIRE_TIME = 30; // 30分钟
+    @PostConstruct
+    public void init() {
 
-        /**
-         * 设置登录用户缓存
-         * 
-         * @param key 缓存key
-         * @param loginUser 登录用户信息
-         */
-        public void set(String key, Object loginUser) {
-            redisTemplate.opsForValue().set(LOGIN_USER_KEY_PREFIX + key, loginUser, LOGIN_USER_EXPIRE_TIME, TimeUnit.MINUTES);
-        }
+        captchaCache = new RedisCacheTemplate<>(redisUtil, CacheKeyEnum.CAPTCHAT);
 
-        /**
-         * 根据key获取登录用户缓存
-         * 
-         * @param key 缓存key
-         * @return 登录用户信息
-         */
-        public Object getObjectOnlyInCacheById(String key) {
-            return redisTemplate.opsForValue().get(LOGIN_USER_KEY_PREFIX + key);
-        }
+        loginUserCache = new RedisCacheTemplate<>(redisUtil, CacheKeyEnum.LOGIN_USER_KEY);
 
-        /**
-         * 删除登录用户缓存
-         * 
-         * @param key 缓存key
-         */
-        public void delete(String key) {
-            redisTemplate.delete(LOGIN_USER_KEY_PREFIX + key);
-        }
+        userCache = new RedisCacheTemplate<>(redisUtil, CacheKeyEnum.USER_ENTITY_KEY) {
+            @Override
+            public SysUser getObjectFromDb(Object id) {
+                return sysUserService.findById((Long) id).orElse(null);
+            }
+        };
+
+        roleCache = new RedisCacheTemplate<>(redisUtil, CacheKeyEnum.ROLE_ENTITY_KEY) {
+            @Override
+            public SysRole getObjectFromDb(Object id) {
+                return sysRoleService.findById((Long) id).orElse(null);
+            }
+        };
     }
 }

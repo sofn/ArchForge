@@ -5,7 +5,7 @@ import com.lesofn.matrixboot.common.enums.BasicEnum;
 
 /**
  * 对应sys_role表的data_scope字段
- * @author valarchie
+ * @author sofn
  */
 public enum DataScopeEnum implements BasicEnum<Integer> {
 

@@ -11,9 +11,13 @@ import org.springframework.http.converter.ResourceHttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
+import org.springframework.web.multipart.MultipartResolver;
+import org.springframework.web.multipart.support.StandardServletMultipartResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import jakarta.servlet.MultipartConfigElement;
+import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
@@ -54,8 +58,48 @@ public class ApplicationConfig implements WebMvcConfigurer {
     @Bean
     public MappingJackson2HttpMessageConverter jackson2HttpMessageConverter() {
         MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
-        converter.setSupportedMediaTypes(Arrays.asList(MediaType.APPLICATION_JSON));
+        converter.setSupportedMediaTypes(Arrays.asList(
+            MediaType.APPLICATION_JSON,
+            MediaType.MULTIPART_FORM_DATA
+        ));
         return converter;
+    }
+
+    /**
+     * Configure multipart resolver for file uploads
+     */
+    @Bean
+    public MultipartResolver multipartResolver() {
+        StandardServletMultipartResolver resolver = new StandardServletMultipartResolver();
+        resolver.setResolveLazily(true);
+        return resolver;
+    }
+
+    /**
+     * Configure MultipartConfigElement with proper limits
+     */
+    @Bean
+    public MultipartConfigElement multipartConfigElement() {
+        // Define upload parameters
+        String uploadTempDir = System.getProperty("java.io.tmpdir");
+        File uploadDirectory = new File(uploadTempDir);
+        
+        // Ensure temp directory exists
+        if (!uploadDirectory.exists()) {
+            uploadDirectory.mkdirs();
+        }
+        
+        // 10MB max file size, 20MB max request size
+        long maxFileSize = 10 * 1024 * 1024; 
+        long maxRequestSize = 20 * 1024 * 1024;
+        int fileSizeThreshold = 0;
+        
+        return new MultipartConfigElement(
+            uploadTempDir, 
+            maxFileSize, 
+            maxRequestSize, 
+            fileSizeThreshold
+        );
     }
 
     /**

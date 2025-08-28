@@ -5,7 +5,7 @@ import lombok.Data;
 
 /**
  * 字典模型类
- * @author valarchie
+ * @author sofn
  */
 @Data
 public class DictionaryData {

@@ -14,6 +14,9 @@ management:
       exposure:
         include: "*"
 spring:
+  application:
+    name: MatrixBoot
+    version: 1.0.0
   devtools:
     restart:
       enabled: true  # 启用自动重启
@@ -100,10 +103,14 @@ user:
 
 # JWT配置
 jwt:
-  secret: EchnL391Qtxki4cqV20S8n8wMlzWuN7pKj9Hx2Bp6Qm8Rt4Yz3Fw7Cv5Ng1Ae0pj
+  secret: 5/jDAWs7a63GRgjS+uF2mP7dcLwI6GAgxf+Z0+fOAbgMR/jksG5r0v10nDOkrM0btxtb2FAuol8fSzSJis8gIA==
+  expire-seconds: 604800  # JWT有效期（秒），7天
 
 # Token配置
 token:
   header: Authorization
-  secret: EchnL391Qtxki4cqV20S8n8wMlzWuN7pKj9Hx2Bp6Qm8Rt4Yz3Fw7Cv5Ng1Ae0pj
   autoRefreshTime: 20
+
+# 验证码配置
+captcha:
+  enabled: false  # 开发环境关闭验证码，方便测试

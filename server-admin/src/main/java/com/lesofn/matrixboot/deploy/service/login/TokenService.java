@@ -1,15 +1,13 @@
 package com.lesofn.matrixboot.deploy.service.login;
 
 
-
 import com.google.common.collect.ImmutableMap;
 import com.lesofn.matrixboot.common.constant.Constants;
 import com.lesofn.matrixboot.common.exception.ApiException;
 import com.lesofn.matrixboot.common.exception.ErrorCode;
-import com.lesofn.matrixboot.infrastructure.auth.model.SystemLoginUser;
 import com.lesofn.matrixboot.deploy.service.cache.RedisCacheService;
+import com.lesofn.matrixboot.infrastructure.auth.model.SystemLoginUser;
 import io.jsonwebtoken.*;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -24,7 +23,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * token验证处理
  *
- * @author valarchie
+ * @author sofn
  */
 @Component
 @Slf4j
@@ -41,7 +40,7 @@ public class TokenService {
     /**
      * 令牌秘钥
      */
-    @Value("${token.secret}")
+    @Value("${secret.secret}")
     private String secret;
 
     /**
@@ -52,7 +51,8 @@ public class TokenService {
     @Value("${token.autoRefreshTime}")
     private long autoRefreshTime;
 
-    private final RedisCacheService redisCache;
+    private final RedisCacheService redisCacheService;
+
 
     /**
      * 获取用户身份信息
@@ -68,9 +68,8 @@ public class TokenService {
                 // 解析对应的权限以及用户信息
                 String uuid = (String) claims.get(Constants.Token.LOGIN_USER_KEY);
 
-                Object userObject = redisCache.loginUserCache.getObjectOnlyInCacheById(uuid);
-                return (SystemLoginUser) userObject;
-            } catch (SignatureException | MalformedJwtException | UnsupportedJwtException | IllegalArgumentException jwtException) {
+                return redisCacheService.loginUserCache.getObjectById(uuid);
+            } catch (MalformedJwtException | UnsupportedJwtException | IllegalArgumentException jwtException) {
                 log.error("parse token failed.", jwtException);
                 throw new ApiException(jwtException, ErrorCode.Client.INVALID_TOKEN);
             } catch (Exception e) {
@@ -91,7 +90,7 @@ public class TokenService {
     public String createTokenAndPutUserInCache(SystemLoginUser loginUser) {
         loginUser.setCachedKey(UUID.randomUUID().toString().replace("-", ""));
 
-        redisCache.loginUserCache.set(loginUser.getCachedKey(), loginUser);
+        redisCacheService.loginUserCache.set(loginUser.getCachedKey(), loginUser);
 
         return generateToken(ImmutableMap.of(Constants.Token.LOGIN_USER_KEY, loginUser.getCachedKey()));
     }
@@ -105,7 +104,7 @@ public class TokenService {
         if (currentTime > loginUser.getAutoRefreshCacheTime()) {
             loginUser.setAutoRefreshCacheTime(currentTime + TimeUnit.MINUTES.toMillis(autoRefreshTime));
             // 根据uuid将loginUser存入缓存
-            redisCache.loginUserCache.set(loginUser.getCachedKey(), loginUser);
+            redisCacheService.loginUserCache.set(loginUser.getCachedKey(), loginUser);
         }
     }
 
@@ -118,8 +117,8 @@ public class TokenService {
      */
     private String generateToken(Map<String, Object> claims) {
         return Jwts.builder()
-            .setClaims(claims)
-            .signWith(SignatureAlgorithm.HS512, secret).compact();
+                .setClaims(claims)
+                .signWith(SignatureAlgorithm.HS512, secret).compact();
     }
 
     /**
@@ -130,9 +129,9 @@ public class TokenService {
      */
     private Claims parseToken(String token) {
         return Jwts.parser()
-            .setSigningKey(secret)
-            .parseClaimsJws(token)
-            .getBody();
+                .setSigningKey(secret)
+                .parseClaimsJws(token)
+                .getBody();
     }
 
     /**

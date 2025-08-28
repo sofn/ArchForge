@@ -2,7 +2,7 @@ package com.lesofn.matrixboot.common.enums;
 
 /**
  * 字典类型 接口
- * @author valarchie
+ * @author sofn
  */
 public interface DictionaryEnum<T> extends BasicEnum<T> {
 

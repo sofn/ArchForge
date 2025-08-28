@@ -7,7 +7,7 @@ import org.apache.commons.lang3.BooleanUtils;
 import java.util.Objects;
 
 /**
- * @author valarchie
+ * @author sofn
  */
 public class BasicEnumUtil {
 

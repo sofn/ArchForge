@@ -1,7 +1,7 @@
 package com.lesofn.matrixboot.common.enums;
 
 /**
- * @author valarchie
+ * @author sofn
  * 普通的枚举 接口
  * @param <T>
  */

@@ -6,7 +6,7 @@ import com.lesofn.matrixboot.common.enums.dictionary.Dictionary;
 
 /**
  * 对应sys_operation_log的status字段
- * @author valarchie
+ * @author sofn
  */
 @Dictionary(name = "sysOperationLog.status")
 public enum OperationStatusEnum implements DictionaryEnum<Integer> {
