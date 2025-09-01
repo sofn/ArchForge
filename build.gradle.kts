@@ -1,5 +1,5 @@
-group = "com.lesofn.matrixboot"
-version = "0.1.RELEASE"
+group = "com.lesofn.appboot"
+version = "0.1.SNAPSHOT"
 
 allprojects {
     repositories {

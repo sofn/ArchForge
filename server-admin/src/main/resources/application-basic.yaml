@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: AppBoot
+    version: 1.0.0
+
+# 项目相关配置
+app-boot:
+  # 名称
+  name: AppBoot
+  # 版本
+  version: 1.0.0
+  # 版权年份
+  copyright-year: 2025
+  # 验证码类型 math 数组计算 char 字符验证
+  captcha-type: math

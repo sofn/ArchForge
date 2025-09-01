@@ -3,10 +3,10 @@ services:
   mysqldb:
     image: mysql
     environment:
-      MYSQL_DATABASE: matrixboot
+      MYSQL_DATABASE: appboot
       MYSQL_ROOT_PASSWORD: 123
-  matrixboot:
-    image: com.lesofn.matrixboot/deploy:prod-0.1.RELEASE
+  appboot:
+    image: com.lesofn.appboot/deploy:prod-0.1.RELEASE
     links:
       - mysqldb:mysql_host
     ports:

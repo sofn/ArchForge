@@ -3,8 +3,8 @@ plugins {
     `maven-publish`
 }
 
-group = "com.lesofn.matrixboot"
-version = "0.1.RELEASE"
+group = "com.lesofn.appboot"
+version = "0.1.SNAPSHOT"
 
 // 配置平台，允许定义依赖约束
 javaPlatform {
@@ -78,7 +78,7 @@ publishing {
     publications {
         create<MavenPublication>("bom") {
             from(components["javaPlatform"])
-            artifactId = "matrixboot-dependencies"
+            artifactId = "appboot-dependencies"
         }
     }
 }

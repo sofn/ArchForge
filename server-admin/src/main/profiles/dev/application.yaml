@@ -14,9 +14,8 @@ management:
       exposure:
         include: "*"
 spring:
-  application:
-    name: MatrixBoot
-    version: 1.0.0
+  profiles:
+    active: basic,dev
   devtools:
     restart:
       enabled: true  # 启用自动重启
@@ -47,8 +46,6 @@ spring:
         settings:
           trace: false  # 关闭跟踪日志（生产环境建议禁用）
           web-allow-others: false  # 禁止远程访问（安全）
-  profiles:
-    active: dev
   main:
     allow-bean-definition-overriding: true
   sql:
