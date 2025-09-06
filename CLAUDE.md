@@ -52,6 +52,7 @@ This is a multi-module Spring Boot 3 project with clean architecture principles:
 - Follow Alibaba Java coding guidelines: https://github.com/alibaba/Alibaba-Java-Coding-Guidelines
 - Do not import `cn.hutool:hutool-all` - use standard JDK, Apache Commons, Guava, or Spring utilities instead
 - Lombok annotations used throughout for reducing boilerplate
+- Use Lombok annotations actively (@Data, @Getter, @Setter, @Builder, @RequiredArgsConstructor, etc.) but DO NOT use `var` keyword - always specify explicit types
 
 ## Configuration
 
