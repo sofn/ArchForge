@@ -1,4 +1,4 @@
-package com.lesofn.appboot.infrastructure.frame.spring;
+package com.lesofn.appboot.infrastructure.config;
 
 import jakarta.servlet.Servlet;
 import org.h2.server.web.JakartaWebServlet;

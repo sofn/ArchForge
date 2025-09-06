@@ -1,8 +1,8 @@
 package com.lesofn.appboot.server.admin.util;
 
+import com.lesofn.appboot.infrastructure.config.AppBootConfig;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -20,10 +20,11 @@ import java.util.function.Function;
 @Component
 public class JwtTokenUtil {
 
-    @Value("${jwt.secret}")
-    private String secret;
-    @Value("${jwt.expire-seconds:86400}")  // 默认24小时
-    private long jwtExpireSeconds;
+    private final AppBootConfig appBootConfig;
+    
+    public JwtTokenUtil(AppBootConfig appBootConfig) {
+        this.appBootConfig = appBootConfig;
+    }
 
     /**
      * 从token中获取用户名
@@ -78,7 +79,7 @@ public class JwtTokenUtil {
                 .setClaims(claims)
                 .setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + jwtExpireSeconds * 1000))
+                .setExpiration(new Date(System.currentTimeMillis() + appBootConfig.getJwt().getExpireSeconds() * 1000))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS512)
                 .compact();
     }
@@ -95,6 +96,6 @@ public class JwtTokenUtil {
      * 获取签名密钥
      */
     private SecretKey getSigningKey() {
-        return Keys.hmacShaKeyFor(secret.getBytes());
+        return Keys.hmacShaKeyFor(appBootConfig.getJwt().getSecret().getBytes());
     }
 }

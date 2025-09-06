@@ -1,4 +1,4 @@
-package com.lesofn.appboot.infrastructure.frame.spring;
+package com.lesofn.appboot.infrastructure.config;
 
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;

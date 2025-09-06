@@ -1,31 +1,57 @@
-server:
-    port: 8080
-management:
-    server:
-        port: 7002
-    endpoints:
-        web:
-            exposure:
-                include: "*"
+# Test environment specific configuration
 spring:
-    jpa:
-        hibernate:
-            naming:
-                physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
-                implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl
-    datasource:
-        initialize: true
-        sqlScriptEncoding: UTF-8
-    profiles:
-        active: test
+  profiles:
+    active: basic,test
+  datasource:
+    initialize: true
+    sqlScriptEncoding: UTF-8
+  data:
+    # redis 配置 - 测试环境
+    redis:
+      host: 127.0.0.1
+      port: 6379
+      database: 1
+      password: testpassword
+      timeout: 10s
+      lettuce:
+        pool:
+          min-idle: 0
+          max-idle: 8
+          max-active: 8
+          max-wait: -1ms
 
-# JWT配置
-jwt:
-  secret: myTestSecretKey
-  autoRefreshTime: 20
+# Database configuration - Test environment
+task:
+  jdbc:
+    master:
+      driver: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://localhost:3306/task_test?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
+      username: test
+      password: test123
+    slave:
+      driver: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://localhost:3306/task_test?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
+      username: test
+      password: test123
+user:
+  jdbc:
+    master:
+      driver: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://localhost:3306/user_test?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
+      username: test
+      password: test123
+    slave:
+      driver: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://localhost:3306/user_test?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
+      username: test
+      password: test123
 
-# Token配置
-token:
-  header: Authorization
-  secret: myTestSecretKey
-  autoRefreshTime: 20
+# 项目配置 - 测试环境
+app-boot:
+  # JWT配置
+  jwt:
+    secret: myTestSecretKey+2024TestEnvironment/SecureKey=
+    expire-seconds: 86400  # JWT有效期（秒），1天
+  # 验证码配置
+  captcha:
+    enabled: true  # 测试环境启用验证码

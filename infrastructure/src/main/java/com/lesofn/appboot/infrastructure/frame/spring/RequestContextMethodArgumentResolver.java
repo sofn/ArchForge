@@ -1,4 +1,4 @@
-package com.lesofn.appboot.infrastructure.frame.spring.context;
+package com.lesofn.appboot.infrastructure.frame.spring;
 
 import com.lesofn.appboot.infrastructure.frame.context.RequestContext;
 import com.lesofn.appboot.infrastructure.frame.context.ThreadLocalContext;

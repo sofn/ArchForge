@@ -1,11 +1,9 @@
 package com.lesofn.appboot.server.admin.config;
 
 import com.lesofn.appboot.server.admin.filter.JwtAuthenticationFilter;
-import com.lesofn.appboot.server.admin.service.login.AdminUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -44,17 +42,6 @@ public class SecurityConfig {
     }
 
     /**
-     * 配置DaoAuthenticationProvider
-     */
-    @Bean
-    public DaoAuthenticationProvider authenticationProvider(AdminUserDetailsService userDetailsService) {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userDetailsService);
-        authProvider.setPasswordEncoder(passwordEncoder());
-        return authProvider;
-    }
-
-    /**
      * 配置安全过滤链
      */
     @Bean
@@ -83,7 +70,7 @@ public class SecurityConfig {
                 // 允许访问健康检查端点
                 .requestMatchers("/actuator/**").permitAll()
                 // 允许访问登录端点
-                .requestMatchers("/login").permitAll()
+                .requestMatchers("/login", "/captchaImage", "/getConfig").permitAll()
                 // 其他所有请求都需要认证
                 .anyRequest().authenticated()
             );

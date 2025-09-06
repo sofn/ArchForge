@@ -1,18 +1,6 @@
+# Development environment specific configuration
 server:
-  port: 8080
-  servlet:
-    encoding:
-      force: true
-      enabled: true
-      charset: UTF-8
-
-management:
-  server:
-    port: 7002
-  endpoints:
-    web:
-      exposure:
-        include: "*"
+  port: 8081
 spring:
   profiles:
     active: basic,dev
@@ -24,21 +12,7 @@ spring:
     livereload:
       enabled: true  # 启用LiveReload
       port: 35729   # LiveReload端口
-  jpa:
-    hibernate:
-      naming:
-        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
-        implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl
   datasource:
-    druid:
-      stat-view-servlet:
-        enabled: true
-        url-pattern: /druid/*
-        reset-enable: false
-      web-stat-filter:
-        enabled: true
-        url-pattern: /*
-        exclusions: '*.js,*.gif,*.jpg,*.png,*.css,*.ico,/druid/*'
     h2:
       console: # H2 控制台配置
         enabled: true  # 启用控制台
@@ -46,17 +20,11 @@ spring:
         settings:
           trace: false  # 关闭跟踪日志（生产环境建议禁用）
           web-allow-others: false  # 禁止远程访问（安全）
-  main:
-    allow-bean-definition-overriding: true
-  sql:
-    init:
-      encoding: UTF-8
-      mode: always
   data:
-    # redis 配置
+    # redis 配置 - 开发环境mock
     redis:
       host: 127.0.0.1 # 地址
-      port: 6380 # 端口
+      port: 6379 # 端口
       database: 0 # 数据库索引
       # password: # 开发环境使用 mock server，不需要密码
       # 连接超时时间
@@ -72,7 +40,7 @@ spring:
           # #连接池最大阻塞等待时间（使用负值表示没有限制）
           max-wait: -1ms
 
-# Database configuration
+# Database configuration - H2 for development
 task:
   jdbc:
     master:
@@ -98,16 +66,12 @@ user:
       username: sa
       password: ""
 
-# JWT配置
-jwt:
-  secret: 5/jDAWs7a63GRgjS+uF2mP7dcLwI6GAgxf+Z0+fOAbgMR/jksG5r0v10nDOkrM0btxtb2FAuol8fSzSJis8gIA==
-  expire-seconds: 604800  # JWT有效期（秒），7天
-
-# Token配置
-token:
-  header: Authorization
-  autoRefreshTime: 20
-
-# 验证码配置
-captcha:
-  enabled: false  # 开发环境关闭验证码，方便测试
+# 项目配置 - 开发环境
+app-boot:
+  # JWT配置
+  jwt:
+    secret: 5/jDAWs7a63GRgjS+uF2mP7dcLwI6GAgxf+Z0+fOAbgMR/jksG5r0v10nDOkrM0btxtb2FAuol8fSzSJis8gIA==
+    expire-seconds: 604800  # JWT有效期（秒），7天
+  # 验证码配置
+  captcha:
+    enabled: true  # 开发环境关闭验证码，方便测试

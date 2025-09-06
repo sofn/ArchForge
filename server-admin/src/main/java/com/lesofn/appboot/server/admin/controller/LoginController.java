@@ -2,7 +2,6 @@ package com.lesofn.appboot.server.admin.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.lesofn.appboot.common.error.response.Result;
 import com.lesofn.appboot.common.errors.EngineExceptionHelper;
 import com.lesofn.appboot.server.admin.dto.*;
 import com.lesofn.appboot.server.admin.service.login.LoginService;
@@ -70,7 +69,6 @@ public class LoginController {
     /**
      * 生成验证码
      */
-    @Operation(summary = "验证码")
     @GetMapping("/captchaImage")
     public CaptchaDTO getCaptchaImg() {
         return loginService.generateCaptchaImg();
@@ -135,15 +133,6 @@ public class LoginController {
         SystemLoginUser loginUser = getLoginUser();
         // 暂时返回空列表，因为MenuService不存在
         return new ArrayList<>();
-    }
-
-    /**
-     * 注册接口
-     */
-    @Operation(summary = "注册接口", description = "暂未实现")
-    @PostMapping("/register")
-    public Result<Void> register(@RequestBody SysUser command) {
-        return Result.ok(null);
     }
 
     /**

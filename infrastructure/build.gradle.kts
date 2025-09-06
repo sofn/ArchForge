@@ -10,7 +10,10 @@ dependencies {
     api("org.springframework.boot:spring-boot-starter-actuator")
     api("org.springframework.boot:spring-boot-starter-security")
     api("org.springframework.boot:spring-boot-starter-data-redis")
-    
+
+    // Kaptcha 验证码
+    api("com.github.penggle:kaptcha")
+
     // 日志依赖 (Spring Boot BOM 管理的版本)
     api("org.slf4j:slf4j-api")
     

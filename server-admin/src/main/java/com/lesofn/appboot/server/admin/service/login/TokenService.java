@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableMap;
 import com.lesofn.appboot.common.constant.Constants;
 import com.lesofn.appboot.common.exception.ApiException;
 import com.lesofn.appboot.common.exception.ErrorCode;
+import com.lesofn.appboot.infrastructure.config.AppBootConfig;
 import com.lesofn.appboot.server.admin.service.cache.RedisCacheService;
 import com.lesofn.appboot.infrastructure.auth.model.SystemLoginUser;
 import io.jsonwebtoken.*;
@@ -12,7 +13,6 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
@@ -31,26 +31,7 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class TokenService {
 
-    /**
-     * 自定义令牌标识
-     */
-    @Value("${token.header}")
-    private String header;
-
-    /**
-     * 令牌秘钥
-     */
-    @Value("${secret.secret}")
-    private String secret;
-
-    /**
-     * 自动刷新token的时间，当过期时间不足autoRefreshTime的值的时候，会触发刷新用户登录缓存的时间
-     * 比如这个值是20,   用户是8点登录的， 8点半缓存会过期， 当过8.10分的时候，就少于20分钟了，便触发
-     * 刷新登录用户的缓存时间
-     */
-    @Value("${token.autoRefreshTime}")
-    private long autoRefreshTime;
-
+    private final AppBootConfig appBootConfig;
     private final RedisCacheService redisCacheService;
 
 
@@ -102,7 +83,7 @@ public class TokenService {
     public void refreshToken(SystemLoginUser loginUser) {
         long currentTime = System.currentTimeMillis();
         if (currentTime > loginUser.getAutoRefreshCacheTime()) {
-            loginUser.setAutoRefreshCacheTime(currentTime + TimeUnit.MINUTES.toMillis(autoRefreshTime));
+            loginUser.setAutoRefreshCacheTime(currentTime + TimeUnit.MINUTES.toMillis(appBootConfig.getToken().getAutoRefreshTime()));
             // 根据uuid将loginUser存入缓存
             redisCacheService.loginUserCache.set(loginUser.getCachedKey(), loginUser);
         }
@@ -118,7 +99,7 @@ public class TokenService {
     private String generateToken(Map<String, Object> claims) {
         return Jwts.builder()
                 .setClaims(claims)
-                .signWith(SignatureAlgorithm.HS512, secret).compact();
+                .signWith(SignatureAlgorithm.HS512, appBootConfig.getJwt().getSecret()).compact();
     }
 
     /**
@@ -129,7 +110,7 @@ public class TokenService {
      */
     private Claims parseToken(String token) {
         return Jwts.parser()
-                .setSigningKey(secret)
+                .setSigningKey(appBootConfig.getJwt().getSecret())
                 .parseClaimsJws(token)
                 .getBody();
     }
@@ -151,7 +132,7 @@ public class TokenService {
      * @return token
      */
     private String getTokenFromRequest(HttpServletRequest request) {
-        String token = request.getHeader(header);
+        String token = request.getHeader(appBootConfig.getToken().getHeader());
         if (StringUtils.isNotEmpty(token) && token.startsWith(Constants.Token.PREFIX)) {
             token = StringUtils.strip(token, Constants.Token.PREFIX);
         }

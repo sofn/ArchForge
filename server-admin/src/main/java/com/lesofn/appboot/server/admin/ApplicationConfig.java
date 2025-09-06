@@ -1,7 +1,7 @@
 package com.lesofn.appboot.server.admin;
 
 import com.lesofn.appboot.infrastructure.frame.filters.AuthResourceFilter;
-import com.lesofn.appboot.infrastructure.frame.spring.context.RequestContextMethodArgumentResolver;
+import com.lesofn.appboot.infrastructure.frame.spring.RequestContextMethodArgumentResolver;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;

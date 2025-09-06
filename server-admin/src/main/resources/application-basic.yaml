@@ -1,7 +1,44 @@
+# Common configurations shared across all environments
+server:
+  servlet:
+    encoding:
+      force: true
+      enabled: true
+      charset: UTF-8
+
+#management:
+#  server:
+#    port: 7002
+#  endpoints:
+#    web:
+#      exposure:
+#        include: "*"
+
 spring:
   application:
     name: AppBoot
     version: 1.0.0
+  jpa:
+    hibernate:
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+        implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl
+  datasource:
+    druid:
+      stat-view-servlet:
+        enabled: true
+        url-pattern: /druid/*
+        reset-enable: false
+      web-stat-filter:
+        enabled: true
+        url-pattern: /*
+        exclusions: '*.js,*.gif,*.jpg,*.png,*.css,*.ico,/druid/*'
+  main:
+    allow-bean-definition-overriding: true
+  sql:
+    init:
+      encoding: UTF-8
+      mode: always
 
 # 项目相关配置
 app-boot:
@@ -13,3 +50,7 @@ app-boot:
   copyright-year: 2025
   # 验证码类型 math 数组计算 char 字符验证
   captcha-type: math
+  # Token配置
+  token:
+    header: Authorization
+    auto-refresh-time: 20

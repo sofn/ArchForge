@@ -21,47 +21,47 @@ import java.util.List;
 @Lazy(false)
 public class ApplicationContextHolder implements ApplicationContextAware {
 
-    private static ApplicationContext _context;
+    private static ApplicationContext context;
 
-    public static ApplicationContext getApplicatioinContext() {
-        return _context;
+    public static ApplicationContext getApplicationContext() {
+        return context;
     }
 
     /**
      * 将该对象中的带有Autowired annotation的属性自动注入
      */
     public static void autowireBean(Object obj) {
-        if (_context != null) {
-            AutowireCapableBeanFactory factory = _context.getAutowireCapableBeanFactory();
+        if (context != null) {
+            AutowireCapableBeanFactory factory = context.getAutowireCapableBeanFactory();
             factory.autowireBean(obj);
         }
     }
 
     @SuppressWarnings("unchecked")
     public static <T> T getBean(String name) {
-        return (T) _context.getBean(name);
+        return (T) context.getBean(name);
     }
 
     @SuppressWarnings("unchecked")
     public static <T> T getBean(Class<T> clazz) {
-        String[] names = _context.getBeanNamesForType(clazz);
+        String[] names = context.getBeanNamesForType(clazz);
         if (names == null || names.length == 0) {
             return null;
         }
-        return (T) _context.getBean(names[0]);
+        return (T) context.getBean(names[0]);
     }
 
     @SuppressWarnings("unchecked")
     public static <T> List<T> getBeans(Class<T> clazz) {
         List<T> ret = new ArrayList<>();
-        if (_context == null)
+        if (context == null)
             return ret;
-        String[] names = _context.getBeanNamesForType(clazz);
+        String[] names = context.getBeanNamesForType(clazz);
         if (names == null || names.length == 0) {
             return ret;
         }
         for (String name : names) {
-            ret.add((T) _context.getBean(name));
+            ret.add((T) context.getBean(name));
         }
         return ret;
     }
@@ -69,6 +69,6 @@ public class ApplicationContextHolder implements ApplicationContextAware {
     @Override
     public void setApplicationContext(ApplicationContext applicationContext)
             throws BeansException {
-        _context = applicationContext;
+        context = applicationContext;
     }
 }

@@ -4,6 +4,7 @@ import com.lesofn.appboot.common.enums.BasicEnumUtil;
 import com.lesofn.appboot.common.enums.common.UserStatusEnum;
 import com.lesofn.appboot.common.errors.UserErrorCode;
 import com.lesofn.appboot.common.errors.UserException;
+import com.lesofn.appboot.infrastructure.config.AppBootConfig;
 import com.lesofn.appboot.infrastructure.auth.model.SystemLoginUser;
 import com.lesofn.appboot.infrastructure.user.web.DataScopeEnum;
 import com.lesofn.appboot.infrastructure.user.web.RoleInfo;
@@ -43,6 +44,8 @@ public class AdminUserDetailsService implements UserDetailsService {
     private final SysRoleService roleService;
 
     private final TokenService tokenService;
+    
+    private final AppBootConfig appBootConfig;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -62,7 +65,7 @@ public class AdminUserDetailsService implements UserDetailsService {
                 user.getPassword(), roleInfo, user.getDeptId());
         loginUser.fillLoginInfo();
         loginUser.setAutoRefreshCacheTime(loginUser.getLoginInfo().getLoginTime()
-                + TimeUnit.MINUTES.toMillis(tokenService.getAutoRefreshTime()));
+                + TimeUnit.MINUTES.toMillis(appBootConfig.getToken().getAutoRefreshTime()));
         return loginUser;
     }
 

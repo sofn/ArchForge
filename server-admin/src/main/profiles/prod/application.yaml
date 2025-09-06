@@ -1,31 +1,57 @@
-server:
-    port: 8080
-management:
-    server:
-        port: 7002
-    endpoints:
-        web:
-            exposure:
-                include: "*"
+# Production environment specific configuration
 spring:
-    jpa:
-        hibernate:
-            naming:
-                physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
-                implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl
-    datasource:
-        initialize: true
-        sqlScriptEncoding: UTF-8
-    profiles:
-        active: prod
+  profiles:
+    active: basic,prod
+  datasource:
+    initialize: false  # 生产环境不自动初始化
+    sqlScriptEncoding: UTF-8
+  data:
+    # redis 配置 - 生产环境
+    redis:
+      host: redis.production.server
+      port: 6379
+      database: 0
+      password: ${REDIS_PASSWORD:prodRedisPassword}
+      timeout: 10s
+      lettuce:
+        pool:
+          min-idle: 5
+          max-idle: 20
+          max-active: 50
+          max-wait: -1ms
 
-# JWT配置
-jwt:
-  secret: myProdSecretKey
-  autoRefreshTime: 20
+# Database configuration - Production environment
+task:
+  jdbc:
+    master:
+      driver: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://db-master.production.server:3306/task_prod?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
+      username: ${DB_USERNAME:produser}
+      password: ${DB_PASSWORD:prodpassword}
+    slave:
+      driver: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://db-slave.production.server:3306/task_prod?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
+      username: ${DB_USERNAME:produser}
+      password: ${DB_PASSWORD:prodpassword}
+user:
+  jdbc:
+    master:
+      driver: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://db-master.production.server:3306/user_prod?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
+      username: ${DB_USERNAME:produser}
+      password: ${DB_PASSWORD:prodpassword}
+    slave:
+      driver: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://db-slave.production.server:3306/user_prod?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
+      username: ${DB_USERNAME:produser}
+      password: ${DB_PASSWORD:prodpassword}
 
-# Token配置
-token:
-  header: Authorization
-  secret: myProdSecretKey
-  autoRefreshTime: 20
+# 项目配置 - 生产环境
+app-boot:
+  # JWT配置
+  jwt:
+    secret: ${JWT_SECRET:VerySecureProductionKey2024/AppBoot+SecretKey=}
+    expire-seconds: 3600  # JWT有效期（秒），1小时
+  # 验证码配置
+  captcha:
+    enabled: true  # 生产环境启用验证码

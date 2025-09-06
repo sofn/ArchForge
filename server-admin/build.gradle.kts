@@ -39,9 +39,6 @@ dependencies {
     // Redis Mock for Dev environment
     api("com.github.fppt:jedis-mock")
     
-    // Kaptcha 验证码
-    api("com.github.penggle:kaptcha")
-    
     // Lombok注解处理器
     annotationProcessor("org.projectlombok:lombok:1.18.36")
     compileOnly("org.projectlombok:lombok")
