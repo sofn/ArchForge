@@ -23,7 +23,9 @@ public class RedisCacheTemplate<T> {
         T res = redisUtil.getCacheObject(generateKey(id));
         if (res == null) {
             res = getObjectFromDb(id);
-            set(id, res);
+            if (res != null) {
+                set(id, res);
+            }
         }
         return res;
     }

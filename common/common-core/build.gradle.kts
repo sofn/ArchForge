@@ -1,5 +1,9 @@
 apply(plugin = "groovy")
 
+tasks.test {
+    useJUnitPlatform()
+}
+
 dependencies {
     // 项目内依赖
     api(project(":common:common-error"))
@@ -9,6 +13,7 @@ dependencies {
     api("commons-io:commons-io")
     api("org.apache.commons:commons-lang3")
     api("commons-codec:commons-codec")
+    api("org.apache.commons:commons-collections4")
 
     // DB (Spring Boot BOM 和自定义 BOM 管理的版本)
     api("org.springframework.boot:spring-boot-starter-data-jpa") {
@@ -55,6 +60,12 @@ dependencies {
     testImplementation("org.spockframework:spock-core")
     testImplementation("org.spockframework:spock-spring")
     
+    // Spring Test for Spock Spring support
+    testImplementation("org.springframework.boot:spring-boot-starter-test") {
+        exclude(group = "org.springframework.boot", module = "spring-boot-starter-logging")
+    }
+    
     // Groovy for Spock
     testImplementation("org.codehaus.groovy:groovy")
+    testImplementation("org.junit.platform:junit-platform-launcher")
 }

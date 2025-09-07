@@ -3,12 +3,13 @@ package com.lesofn.appboot.server.admin.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.lesofn.appboot.common.errors.EngineExceptionHelper;
+import com.lesofn.appboot.infrastructure.auth.model.SystemLoginUser;
+import com.lesofn.appboot.infrastructure.auth.spi.MAuthSpi;
+import com.lesofn.appboot.infrastructure.config.AppBootConfig;
 import com.lesofn.appboot.server.admin.dto.*;
 import com.lesofn.appboot.server.admin.service.login.LoginService;
 import com.lesofn.appboot.server.admin.service.login.TokenService;
 import com.lesofn.appboot.server.admin.service.user.UserService;
-import com.lesofn.appboot.infrastructure.auth.model.SystemLoginUser;
-import com.lesofn.appboot.infrastructure.auth.spi.MAuthSpi;
 import com.lesofn.appboot.user.domain.SysUser;
 import com.lesofn.appboot.user.service.SysUserService;
 import com.lesofn.appboot.user.utils.UserExcepFactor;
@@ -16,7 +17,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -37,14 +37,9 @@ public class LoginController {
     private final TokenService tokenService;
     private final UserService userService;
     private final SysUserService sysUserService;
+    private final AppBootConfig appBootConfig;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
-
-    @Value("${spring.application.name:AppBoot}")
-    private String applicationName;
-
-    @Value("${spring.application.version:1.0.0}")
-    private String applicationVersion;
 
     /**
      * 访问首页，提示语
@@ -52,7 +47,7 @@ public class LoginController {
     @Operation(summary = "首页")
     @GetMapping("/")
     public String index() {
-        return String.format("欢迎使用%s后台管理框架，当前版本：v%s，请通过前端地址访问。", applicationName, applicationVersion);
+        return String.format("欢迎使用%s后台管理系统，当前版本：v%s，请通过前端地址访问。", appBootConfig.getName(), appBootConfig.getVersion());
     }
 
     /**

@@ -36,6 +36,11 @@ public class AppBootConfig {
     private CaptchaType captchaType;
 
     /**
+     * RSA私钥，用户前后端交互加解密隐私信息
+     */
+    private String rsaPrivateKey;
+
+    /**
      * 上传路径
      */
     private String fileBaseDir;

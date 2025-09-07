@@ -21,5 +21,5 @@ public class TokenDTO {
     /**
      * 当前登录用户信息
      */
-    private CurrentLoginUserDTO userInfo;
+    private CurrentLoginUserDTO currentUser;
 }

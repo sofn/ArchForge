@@ -33,3 +33,4 @@ rebel.xml
 
 # Ignore Gradle build output directory
 build
+.vscode/

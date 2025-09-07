@@ -24,6 +24,7 @@ dependencies {
         api("commons-io:commons-io:2.17.0")
         api("org.apache.commons:commons-lang3:3.17.0")
         api("commons-codec:commons-codec:1.17.1")
+        api("org.apache.commons:commons-collections4:4.5.0")
         
         // 实用工具
         api("org.javatuples:javatuples:1.2")

@@ -1,6 +1,5 @@
 package com.lesofn.appboot.server.admin.service.login;
 
-
 import com.google.common.collect.ImmutableMap;
 import com.lesofn.appboot.common.constant.Constants;
 import com.lesofn.appboot.common.exception.ApiException;
@@ -9,6 +8,7 @@ import com.lesofn.appboot.infrastructure.config.AppBootConfig;
 import com.lesofn.appboot.server.admin.service.cache.RedisCacheService;
 import com.lesofn.appboot.infrastructure.auth.model.SystemLoginUser;
 import io.jsonwebtoken.*;
+import io.jsonwebtoken.security.Keys;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
+import java.security.Key;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -97,9 +98,13 @@ public class TokenService {
      * @return 令牌
      */
     private String generateToken(Map<String, Object> claims) {
+        // 使用新的API：从字符串创建Key对象
+        Key key = Keys.hmacShaKeyFor(appBootConfig.getJwt().getSecret().getBytes());
+        
         return Jwts.builder()
                 .setClaims(claims)
-                .signWith(SignatureAlgorithm.HS512, appBootConfig.getJwt().getSecret()).compact();
+                .signWith(key, SignatureAlgorithm.HS512)
+                .compact();
     }
 
     /**
@@ -109,8 +114,12 @@ public class TokenService {
      * @return 数据声明
      */
     private Claims parseToken(String token) {
-        return Jwts.parser()
-                .setSigningKey(appBootConfig.getJwt().getSecret())
+        // 使用新的API：从字符串创建Key对象
+        Key key = Keys.hmacShaKeyFor(appBootConfig.getJwt().getSecret().getBytes());
+        
+        return Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
                 .parseClaimsJws(token)
                 .getBody();
     }

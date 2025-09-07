@@ -1,6 +1,6 @@
 # Development environment specific configuration
 server:
-  port: 8081
+  port: 8080
 spring:
   profiles:
     active: basic,dev

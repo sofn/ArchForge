@@ -14,7 +14,7 @@ class IpRegionUtilTest extends Specification {
         then:
         result != null
         result.getCountry() == null
-        result.getArea() == null
+        result.getCity() == null
     }
 
     def "test getIpRegion returns empty region for empty ip"() {
@@ -24,7 +24,7 @@ class IpRegionUtilTest extends Specification {
         then:
         result != null
         result.getCountry() == null
-        result.getArea() == null
+        result.getCity() == null
     }
 
     def "test getIpRegion returns inner IP region for inner ip"() {
@@ -36,8 +36,8 @@ class IpRegionUtilTest extends Specification {
 
         then:
         result != null
-        result.getCountry() == ""
-        result.getArea() == "内网IP"
+        result.getProvince() == ""
+        result.getCity() == "内网IP"
     }
 
     def "test getBriefLocationByIp returns brief location for inner ip"() {
@@ -56,6 +56,6 @@ class IpRegionUtilTest extends Specification {
         def result = IpRegionUtil.getBriefLocationByIp(null)
 
         then:
-        result == ""
+        result == "未知 未知"
     }
 }

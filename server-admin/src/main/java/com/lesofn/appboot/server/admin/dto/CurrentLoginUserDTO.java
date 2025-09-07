@@ -1,8 +1,8 @@
 package com.lesofn.appboot.server.admin.dto;
 
+import com.lesofn.appboot.infrastructure.auth.model.SystemLoginUser;
 import lombok.Data;
 
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -11,57 +11,14 @@ import java.util.Set;
  */
 @Data
 public class CurrentLoginUserDTO {
-    
     /**
-     * 用户ID
+     * 当前登录用户信息
      */
-    private Long userId;
-    
-    /**
-     * 用户名
-     */
-    private String username;
-    
-    /**
-     * 用户昵称
-     */
-    private String nickName;
-    
-    /**
-     * 邮箱
-     */
-    private String email;
-    
-    /**
-     * 手机号
-     */
-    private String phoneNumber;
-    
-    /**
-     * 性别
-     */
-    private String sex;
-    
-    /**
-     * 头像
-     */
-    private String avatar;
-    
-    /**
-     * 部门ID
-     */
-    private Long deptId;
-    
-    /**
-     * 部门名称
-     */
-    private String deptName;
-    
+    private SystemLoginUser userInfo;
     /**
      * 角色列表
      */
-    private List<String> roles;
-    
+    private String roleKey;
     /**
      * 权限列表
      */

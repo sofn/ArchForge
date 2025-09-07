@@ -1,13 +1,12 @@
 package com.lesofn.appboot.server.admin.service.user.impl;
 
+import com.lesofn.appboot.infrastructure.auth.model.SystemLoginUser;
 import com.lesofn.appboot.server.admin.dto.CurrentLoginUserDTO;
 import com.lesofn.appboot.server.admin.service.user.UserService;
-import com.lesofn.appboot.infrastructure.auth.model.SystemLoginUser;
 import com.lesofn.appboot.user.service.SysUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 
 /**
@@ -23,18 +22,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public CurrentLoginUserDTO getLoginUserInfo(SystemLoginUser loginUser) {
-        // 这里简化实现，实际应该从loginUser中获取用户信息
         CurrentLoginUserDTO userInfo = new CurrentLoginUserDTO();
-        userInfo.setUserId(1L);
-        userInfo.setUsername("admin");
-        userInfo.setNickName("管理员");
-        userInfo.setEmail("admin@example.com");
-        userInfo.setPhoneNumber("13800138000");
-        userInfo.setSex("男");
-        userInfo.setAvatar("");
-        userInfo.setDeptId(1L);
-        userInfo.setDeptName("系统管理部");
-        userInfo.setRoles(new ArrayList<>());
+        userInfo.setUserInfo(loginUser);
+        userInfo.setRoleKey("");
         userInfo.setPermissions(new HashSet<>());
         return userInfo;
     }

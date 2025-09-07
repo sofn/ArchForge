@@ -12,7 +12,7 @@
                 <ThresholdFilter level="ERROR" onMatch="DENY" onMismatch="NEUTRAL"/>
             </Filters>
         </Console>
-        
+
         <Console name="ErrorConsole" target="SYSTEM_ERR">
             <PatternLayout pattern="${LOG_PATTERN}"/>
             <Filters>
@@ -21,66 +21,122 @@
         </Console>
 
         <RollingFile name="DebugFile" fileName="${LOGS_PATH}/debug.log"
-                     filePattern="${LOGS_PATH}/debug.%d{yyyyMMdd-HH}.log">
+                     filePattern="${LOGS_PATH}/debug.%d{yyyyMMdd-HH}.%i.log.zip"
+                     immediateFlush="false">
             <PatternLayout pattern="${LOG_PATTERN}"/>
             <Filters>
                 <ThresholdFilter level="DEBUG" onMatch="ACCEPT" onMismatch="DENY"/>
             </Filters>
             <Policies>
                 <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+                <SizeBasedTriggeringPolicy size="100MB"/>
             </Policies>
+            <DefaultRolloverStrategy>
+                <Delete basePath="${LOGS_PATH}" maxDepth="1">
+                    <IfFileName glob="debug.*.log.zip"/>
+                    <IfLastModified age="30d"/>
+                </Delete>
+            </DefaultRolloverStrategy>
         </RollingFile>
-        
+
         <RollingFile name="InfoFile" fileName="${LOGS_PATH}/info.log"
-                     filePattern="${LOGS_PATH}/info.%d{yyyyMMdd-HH}.log">
+                     filePattern="${LOGS_PATH}/info.%d{yyyyMMdd-HH}.%i.log.zip"
+                     immediateFlush="false">
             <PatternLayout pattern="${LOG_PATTERN}"/>
             <Filters>
                 <ThresholdFilter level="INFO" onMatch="ACCEPT" onMismatch="DENY"/>
             </Filters>
             <Policies>
                 <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+                <SizeBasedTriggeringPolicy size="100MB"/>
             </Policies>
+            <DefaultRolloverStrategy>
+                <Delete basePath="${LOGS_PATH}" maxDepth="1">
+                    <IfFileName glob="info.*.log.zip"/>
+                    <IfLastModified age="30d"/>
+                </Delete>
+            </DefaultRolloverStrategy>
         </RollingFile>
-        
+
         <RollingFile name="WarnFile" fileName="${LOGS_PATH}/warn.log"
-                     filePattern="${LOGS_PATH}/warn.%d{yyyyMMdd}.log">
+                     filePattern="${LOGS_PATH}/warn.%d{yyyyMMdd}.%i.log.zip"
+                     immediateFlush="false">
             <PatternLayout pattern="${LOG_PATTERN}"/>
             <Filters>
                 <ThresholdFilter level="WARN" onMatch="ACCEPT" onMismatch="DENY"/>
             </Filters>
             <Policies>
                 <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+                <SizeBasedTriggeringPolicy size="100MB"/>
             </Policies>
+            <DefaultRolloverStrategy>
+                <Delete basePath="${LOGS_PATH}" maxDepth="1">
+                    <IfFileName glob="warn.*.log.zip"/>
+                    <IfLastModified age="30d"/>
+                </Delete>
+            </DefaultRolloverStrategy>
         </RollingFile>
-        
+
         <RollingFile name="ErrorFile" fileName="${LOGS_PATH}/error.log"
-                     filePattern="${LOGS_PATH}/error.%d{yyyyMMdd}.log">
+                     filePattern="${LOGS_PATH}/error.%d{yyyyMMdd}.%i.log.zip"
+                     immediateFlush="false">
             <PatternLayout pattern="${LOG_PATTERN}"/>
             <Filters>
                 <ThresholdFilter level="ERROR" onMatch="ACCEPT" onMismatch="DENY"/>
             </Filters>
             <Policies>
                 <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+                <SizeBasedTriggeringPolicy size="100MB"/>
             </Policies>
+            <DefaultRolloverStrategy>
+                <Delete basePath="${LOGS_PATH}" maxDepth="1">
+                    <IfFileName glob="error.*.log.zip"/>
+                    <IfLastModified age="30d"/>
+                </Delete>
+            </DefaultRolloverStrategy>
         </RollingFile>
+
+        <!-- Async Appenders for better performance -->
+        <Async name="AsyncDebugFile" bufferSize="8192">
+            <AppenderRef ref="DebugFile"/>
+        </Async>
+
+        <Async name="AsyncInfoFile" bufferSize="8192">
+            <AppenderRef ref="InfoFile"/>
+        </Async>
+
+        <Async name="AsyncWarnFile" bufferSize="8192">
+            <AppenderRef ref="WarnFile"/>
+        </Async>
+
+        <Async name="AsyncErrorFile" bufferSize="8192">
+            <AppenderRef ref="ErrorFile"/>
+        </Async>
     </Appenders>
 
     <Loggers>
-        <Logger name="org.springframework" level="WARN" additivity="false"/>
-        <Logger name="org.hibernate" level="ERROR" additivity="false"/>
-        <Logger name="druid" level="ERROR" additivity="false"/>
-        <Logger name="org.apache.catalina" level="OFF" additivity="false"/>
-        <Logger name="io.lettuce" level="INFO" additivity="false"/>
-        <Logger name="io.netty" level="INFO" additivity="false"/>
-        <Logger name="com.lesofn.appboot" level="DEBUG" additivity="false"/>
-        
+        <Logger name="org.springframework" level="WARN"/>
+        <Logger name="org.hibernate" level="ERROR"/>
+        <Logger name="druid" level="ERROR"/>
+        <Logger name="org.apache.catalina" level="OFF"/>
+        <Logger name="io.lettuce" level="INFO"/>
+        <Logger name="io.netty" level="INFO"/>
+        <Logger name="com.alibaba" level="WARN"/>
+        <Logger name="com.github.fppt" level="WARN"/>
+        <Logger name="sun.rmi" level="WARN"/>
+        <Logger name="javax.management" level="WARN"/>
+        <Logger name="org.jboss" level="WARN"/>
+        <Logger name="io.micrometer" level="WARN"/>
+        <Logger name="reactor.util" level="WARN"/>
+        <Logger name="com.lesofn.appboot" level="DEBUG"/>
+
         <Root level="DEBUG">
             <AppenderRef ref="Console"/>
             <AppenderRef ref="ErrorConsole"/>
-            <AppenderRef ref="DebugFile"/>
-            <AppenderRef ref="InfoFile"/>
-            <AppenderRef ref="WarnFile"/>
-            <AppenderRef ref="ErrorFile"/>
+            <AppenderRef ref="AsyncDebugFile"/>
+            <AppenderRef ref="AsyncInfoFile"/>
+            <AppenderRef ref="AsyncWarnFile"/>
+            <AppenderRef ref="AsyncErrorFile"/>
         </Root>
     </Loggers>
 </Configuration>

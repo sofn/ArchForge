@@ -1,10 +1,13 @@
 package com.lesofn.appboot.server.admin.service.login;
 
 import com.google.code.kaptcha.Producer;
+import com.lesofn.appboot.common.encrypt.AESEncrypter;
+import com.lesofn.appboot.common.encrypt.RsaEncrypter;
 import com.lesofn.appboot.common.exception.ApiException;
 import com.lesofn.appboot.infrastructure.auth.model.SystemLoginUser;
 import com.lesofn.appboot.infrastructure.config.AppBootConfig;
 import com.lesofn.appboot.infrastructure.config.CaptchaType;
+import com.lesofn.appboot.infrastructure.frame.utils.MapCache;
 import com.lesofn.appboot.server.admin.dto.CaptchaDTO;
 import com.lesofn.appboot.server.admin.dto.ConfigDTO;
 import com.lesofn.appboot.server.admin.dto.LoginCommand;
@@ -47,8 +50,6 @@ public class LoginService {
     @Resource(name = "captchaProducerMath")
     private Producer captchaProducerMath;
 
-    private static final String CAPTCHA_CODE_KEY = "captcha_codes:";
-
     /**
      * 登录验证
      *
@@ -57,14 +58,14 @@ public class LoginService {
      */
     public String login(LoginCommand loginCommand) {
         // 验证码校验
-        validateCaptcha(loginCommand.getUuid(), loginCommand.getCode());
+        validateCaptcha(loginCommand.getCaptchaCodeKey(), loginCommand.getCaptchaCode());
 
         // 用户验证
         Authentication authentication;
         try {
-            // 该方法会去调用 UserDetailsServiceImpl.loadUserByUsername
+            String decryptedPassword = decryptPassword(loginCommand.getPassword());
             authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(loginCommand.getUsername(), loginCommand.getPassword())
+                    new UsernamePasswordAuthenticationToken(loginCommand.getUsername(), decryptedPassword)
             );
         } catch (BadCredentialsException e) {
             log.info("用户[{}]登录失败，用户名或密码错误", loginCommand.getUsername());
@@ -145,7 +146,7 @@ public class LoginService {
         try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             ImageIO.write(image, "jpg", outputStream);
-            String base64 = "data:image/jpg;base64," + Base64.encodeBase64String(outputStream.toByteArray());
+            String base64 = Base64.encodeBase64String(outputStream.toByteArray());
             return new CaptchaDTO(appBootConfig.getCaptcha().isEnabled(), uuid, base64);
         } catch (Exception e) {
             log.error("生成验证码异常", e);
@@ -159,7 +160,26 @@ public class LoginService {
      * @return 配置信息
      */
     public ConfigDTO getConfig() {
-        return new ConfigDTO(appBootConfig.getCaptcha().isEnabled(), appBootConfig.getRegister().isEnabled());
+        ConfigDTO configDTO = new ConfigDTO();
+        boolean isCaptchaOn = appBootConfig.getCaptcha().isEnabled();
+        configDTO.setIsCaptchaOn(isCaptchaOn);
+        configDTO.setDictionary(MapCache.dictionaryCache());
+        return configDTO;
+    }
+
+    /**
+     * 解密密码
+     *
+     * @param encryptedPassword 加密后的密码
+     * @return 解密后的密码
+     */
+    public String decryptPassword(String encryptedPassword) {
+        try {
+            return RsaEncrypter.decrypt(encryptedPassword, appBootConfig.getRsaPrivateKey());
+        } catch (Exception e) {
+            log.error("密码解密失败: {}", encryptedPassword, e);
+            throw new ApiException(LoginExcepFactor.USERNAME_PASSWORD_ERROR, "密码解密失败");
+        }
     }
 
 }

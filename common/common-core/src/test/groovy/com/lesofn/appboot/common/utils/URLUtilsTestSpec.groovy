@@ -5,7 +5,7 @@ import spock.lang.Specification
 /**
  * @author sofn
  */
-class URLUtilsTest extends Specification {
+class URLUtilsTestSpec extends Specification {
 
     def "test encode encodes string with UTF-8"() {
         given:

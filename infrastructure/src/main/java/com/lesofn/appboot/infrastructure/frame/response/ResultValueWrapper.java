@@ -33,18 +33,13 @@ public class ResultValueWrapper implements ResponseBodyAdvice<Object> {
     @Override
     public Object beforeBodyWrite(@Nullable Object body, @Nullable  MethodParameter returnType, @Nullable MediaType selectedContentType,
                                   @Nullable Class selectedConverterType, @Nonnull ServerHttpRequest request, @Nonnull ServerHttpResponse response) {
-        switch (body) {
-            case null -> {
-                return ResponseResult.success(null);
-            }
-            case ResponseResult<?> result -> {
-                return body;
-            }
-            case Result<?> result -> {
-                return ResponseResult.success(result.getData());
-            }
-            default -> {
-            }
+        if (body == null) {
+            return ResponseResult.success(null);
+        } else if (body instanceof ResponseResult) {
+            return body;
+        } else if (body instanceof Result) {
+            Result<?> result = (Result<?>) body;
+            return ResponseResult.success(result.getData());
         }
 
         if (StringUtils.equals(((ServletServerHttpRequest) request).getServletRequest().getServletPath(), "/error")) {

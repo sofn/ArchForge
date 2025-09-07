@@ -29,10 +29,14 @@ dependencies {
     }
 }
 
+// 配置生成的源文件目录
+val generatedSourcesDir = layout.buildDirectory.dir("generated/sources/annotationProcessor/java/main")
+
 sourceSets {
     main {
         java {
-            srcDirs("src/main/java", "src/main/generated")
+            srcDir("src/main/java")
+            srcDir(generatedSourcesDir)
         }
     }
 }
@@ -44,7 +48,14 @@ tasks.withType<JavaCompile> {
             "-Aquerydsl.entityAccessors=true",
             "-Aquerydsl.useFields=false"
         ))
-        // 禁用增量编译以避免Q类重复生成问题
-        isIncremental = false
+        // 设置生成的源文件输出目录
+        generatedSourceOutputDirectory.set(generatedSourcesDir.get().asFile)
+    }
+}
+
+// 清理任务
+tasks.clean {
+    doLast {
+        delete("src/main/generated")
     }
 }

@@ -16,15 +16,15 @@ public class CaptchaDTO {
     /**
      * 是否开启验证码
      */
-    private boolean captchaEnabled;
+    private Boolean isCaptchaOn;
     
     /**
      * 验证码唯一标识
      */
-    private String uuid;
+    private String captchaCodeKey;
     
     /**
      * 验证码图片 base64
      */
-    private String img;
+    private String captchaCodeImg;
 }

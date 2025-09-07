@@ -26,10 +26,10 @@ public class LoginCommand {
     /**
      * 验证码
      */
-    private String code;
+    private String captchaCode;
     
     /**
      * 验证码唯一标识
      */
-    private String uuid;
+    private String captchaCodeKey;
 }

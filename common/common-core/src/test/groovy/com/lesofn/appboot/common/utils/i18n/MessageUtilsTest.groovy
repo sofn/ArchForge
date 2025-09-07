@@ -1,7 +1,6 @@
 package com.lesofn.appboot.common.utils.i18n
 
 import spock.lang.Specification
-import com.lesofn.appboot.common.spring.SpringContextHolder
 import org.springframework.context.MessageSource
 import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.context.NoSuchMessageException
@@ -14,8 +13,10 @@ class MessageUtilsTest extends Specification {
     def "test message retrieves message from MessageSource"() {
         given:
         def messageSource = Mock(MessageSource)
-        SpringContextHolder.metaClass.static.getBean = { Class clazz -> messageSource }
-        LocaleContextHolder.metaClass.static.getLocale = { -> Locale.ENGLISH }
+        def originalMessage = MessageUtils.metaClass.getStaticMetaMethod("message", String, Object[])
+        MessageUtils.metaClass.static.message = { String msgCode, Object[] msgArgs ->
+            messageSource.getMessage(msgCode, msgArgs, Locale.ENGLISH)
+        }
         
         def code = "test.code"
         def args = ["arg1", "arg2"] as Object[]
@@ -28,13 +29,22 @@ class MessageUtilsTest extends Specification {
 
         then:
         result == expectedMessage
+        
+        cleanup:
+        if (originalMessage) {
+            MessageUtils.metaClass.static.message = originalMessage
+        } else {
+            MessageUtils.metaClass = null
+        }
     }
 
     def "test message handles NoSuchMessageException"() {
         given:
         def messageSource = Mock(MessageSource)
-        SpringContextHolder.metaClass.static.getBean = { Class clazz -> messageSource }
-        LocaleContextHolder.metaClass.static.getLocale = { -> Locale.ENGLISH }
+        def originalMessage = MessageUtils.metaClass.getStaticMetaMethod("message", String, Object[])
+        MessageUtils.metaClass.static.message = { String msgCode, Object[] msgArgs ->
+            messageSource.getMessage(msgCode, msgArgs, Locale.ENGLISH)
+        }
         
         def code = "test.code"
         def args = [] as Object[]
@@ -46,5 +56,12 @@ class MessageUtilsTest extends Specification {
 
         then:
         thrown(NoSuchMessageException)
+        
+        cleanup:
+        if (originalMessage) {
+            MessageUtils.metaClass.static.message = originalMessage
+        } else {
+            MessageUtils.metaClass = null
+        }
     }
 }

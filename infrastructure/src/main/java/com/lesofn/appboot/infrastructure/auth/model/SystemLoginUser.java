@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Optional;
+
 /**
  * 登录用户身份权限
  * @author sofn
@@ -39,17 +41,8 @@ public class SystemLoginUser extends BaseLoginUser {
         this.deptId = deptId;
     }
 
-    public RoleInfo getRoleInfo() {
-        return roleInfo;
-    }
-
     public Long getRoleId() {
-        return getRoleInfo().getRoleId();
+        return Optional.ofNullable(getRoleInfo()).map(RoleInfo::getRoleId).orElse(0L);
     }
-
-    public Long getDeptId() {
-        return deptId;
-    }
-
 
 }

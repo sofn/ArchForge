@@ -1,8 +1,7 @@
 package com.lesofn.appboot.user.domain.query;
 
-import com.querydsl.core.types.Predicate;
-import com.querydsl.core.types.dsl.BooleanExpression;
 import com.lesofn.appboot.user.domain.QSysRole;
+import com.querydsl.core.types.Predicate;
 
 public class SysRolePredicates {
 
