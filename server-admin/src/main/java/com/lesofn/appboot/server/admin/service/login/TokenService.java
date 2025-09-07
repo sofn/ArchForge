@@ -49,7 +49,7 @@ public class TokenService {
                 // 解析对应的权限以及用户信息
                 String uuid = (String) claims.get(Constants.Token.LOGIN_USER_KEY);
 
-                return redisCacheService.loginUserCache.getObjectById(uuid);
+                return redisCacheService.loginUserCache.get(uuid);
             } catch (MalformedJwtException | UnsupportedJwtException | IllegalArgumentException jwtException) {
                 log.error("parse token failed.", jwtException);
                 throw new ApiException(jwtException, ErrorCode.Client.INVALID_TOKEN);

@@ -91,8 +91,7 @@ public class LoginService {
             throw new ApiException(LoginExcepFactor.CAPTCHA_EXPIRED);
         }
 
-        String verifyKey = CAPTCHA_CODE_KEY + uuid;
-        Object cacheCode = redisCacheService.captchaCache.getObjectById(uuid);
+        Object cacheCode = redisCacheService.captchaCache.get(uuid);
         redisCacheService.loginUserCache.delete(uuid);
 
         if (cacheCode == null) {

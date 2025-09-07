@@ -19,17 +19,14 @@ public class RedisCacheTemplate<T> {
         this.redisRedisEnum = redisRedisEnum;
     }
 
-    /**
-     * 从缓存中获取对象   如果获取不到的话  从DB层面获取
-     *
-     * @param id id
-     */
-    public T getObjectById(Object id) {
-        T objectFromDb = getObjectFromDb(id);
-        set(id, objectFromDb);
-        return objectFromDb;
+    public T get(Object id) {
+        T res = redisUtil.getCacheObject(generateKey(id));
+        if (res == null) {
+            res = getObjectFromDb(id);
+            set(id, res);
+        }
+        return res;
     }
-
 
     public void set(Object id, T obj) {
         redisUtil.setCacheObject(generateKey(id), obj, redisRedisEnum.expiration(), redisRedisEnum.timeUnit());
