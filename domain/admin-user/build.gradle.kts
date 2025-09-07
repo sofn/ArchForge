@@ -2,10 +2,14 @@ dependencies {
     api(project(":infrastructure"))
 
     // Spring Data JPA
-    api("org.springframework.boot:spring-boot-starter-data-jpa")
+    api("org.springframework.boot:spring-boot-starter-data-jpa") {
+        exclude(group = "org.springframework.boot", module = "spring-boot-starter-logging")
+    }
 
     // Spring Security
-    api("org.springframework.boot:spring-boot-starter-security")
+    api("org.springframework.boot:spring-boot-starter-security") {
+        exclude(group = "org.springframework.boot", module = "spring-boot-starter-logging")
+    }
 
     // QueryDSL
     api("com.querydsl:querydsl-jpa:5.1.0:jakarta")
@@ -20,7 +24,9 @@ dependencies {
     annotationProcessor("com.querydsl:querydsl-apt:5.1.0:jakarta")
     annotationProcessor("jakarta.persistence:jakarta.persistence-api:3.1.0")
 
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-test") {
+        exclude(group = "org.springframework.boot", module = "spring-boot-starter-logging")
+    }
 }
 
 sourceSets {

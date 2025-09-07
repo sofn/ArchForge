@@ -5,6 +5,13 @@ plugins {
 // 构建可执行jar/war包
 configurations {
     create("providedRuntime")
+    
+    // 强制排除log4j-to-slf4j和logback依赖
+    all {
+        exclude(group = "org.apache.logging.log4j", module = "log4j-to-slf4j")
+        exclude(group = "ch.qos.logback", module = "logback-classic")
+        exclude(group = "ch.qos.logback", module = "logback-core")
+    }
 }
 
 tasks.bootJar {
@@ -24,8 +31,18 @@ dependencies {
     api(project(":domain:admin-user"))
     api(project(":example:example-task"))
 
-    api("org.springframework.boot:spring-boot-starter-web")
-    api("org.springframework.boot:spring-boot-starter-security")
+    // 排除logback，使用log4j2
+    api("org.springframework.boot:spring-boot-starter-web") {
+        exclude(group = "org.springframework.boot", module = "spring-boot-starter-logging")
+    }
+    api("org.springframework.boot:spring-boot-starter-security") {
+        exclude(group = "org.springframework.boot", module = "spring-boot-starter-logging")
+    }
+    
+    // 添加log4j2依赖
+    api("org.springframework.boot:spring-boot-starter-log4j2") {
+        exclude(group = "org.apache.logging.log4j", module = "log4j-to-slf4j")
+    }
     api("org.jolokia:jolokia-core")
     
     // JWT

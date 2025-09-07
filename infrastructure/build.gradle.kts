@@ -5,17 +5,30 @@ dependencies {
     api(project(":common:common-core"))
     
     // 核心框架依赖 (Spring Boot BOM 管理的版本)
-    api("org.springframework.boot:spring-boot-starter-web")
-    api("org.springframework.boot:spring-boot-starter-aop")
-    api("org.springframework.boot:spring-boot-starter-actuator")
-    api("org.springframework.boot:spring-boot-starter-security")
-    api("org.springframework.boot:spring-boot-starter-data-redis")
+    // Excluding spring-boot-starter-logging to avoid SLF4J multiple providers issue
+    api("org.springframework.boot:spring-boot-starter-web") {
+        exclude(group = "org.springframework.boot", module = "spring-boot-starter-logging")
+    }
+    api("org.springframework.boot:spring-boot-starter-aop") {
+        exclude(group = "org.springframework.boot", module = "spring-boot-starter-logging")
+    }
+    api("org.springframework.boot:spring-boot-starter-actuator") {
+        exclude(group = "org.springframework.boot", module = "spring-boot-starter-logging")
+    }
+    api("org.springframework.boot:spring-boot-starter-security") {
+        exclude(group = "org.springframework.boot", module = "spring-boot-starter-logging")
+    }
+    api("org.springframework.boot:spring-boot-starter-data-redis") {
+        exclude(group = "org.springframework.boot", module = "spring-boot-starter-logging")
+    }
 
     // Kaptcha 验证码
     api("com.github.penggle:kaptcha")
 
     // 日志依赖 (Spring Boot BOM 管理的版本)
+    // Using Log4j2 to avoid SLF4J multiple providers issue
     api("org.slf4j:slf4j-api")
+    api("org.springframework.boot:spring-boot-starter-log4j2")
     
     // Lombok
     compileOnly("org.projectlombok:lombok")

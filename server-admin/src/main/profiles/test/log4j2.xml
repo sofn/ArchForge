@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN" monitorInterval="30">
+    <properties>
+        <property name="LOG_PATTERN">%d{yyyy-MM-dd HH:mm:ss.SSS} %level %logger:%line %msg%n</property>
+        <property name="LOGS_PATH">../logs</property>
+    </properties>
+
+    <Appenders>
+        <RollingFile name="DebugFile" fileName="${LOGS_PATH}/debug.log"
+                     filePattern="${LOGS_PATH}/debug.%d{yyyyMMdd-HH}.log.zip">
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+            <Filters>
+                <ThresholdFilter level="DEBUG" onMatch="ACCEPT" onMismatch="DENY"/>
+            </Filters>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+            </Policies>
+        </RollingFile>
+        
+        <RollingFile name="InfoFile" fileName="${LOGS_PATH}/info.log"
+                     filePattern="${LOGS_PATH}/info.%d{yyyyMMdd-HH}.log.zip">
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+            <Filters>
+                <ThresholdFilter level="INFO" onMatch="ACCEPT" onMismatch="DENY"/>
+            </Filters>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+            </Policies>
+        </RollingFile>
+        
+        <RollingFile name="WarnFile" fileName="${LOGS_PATH}/warn.log"
+                     filePattern="${LOGS_PATH}/warn.%d{yyyyMMdd}.log.zip">
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+            <Filters>
+                <ThresholdFilter level="WARN" onMatch="ACCEPT" onMismatch="DENY"/>
+            </Filters>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+            </Policies>
+        </RollingFile>
+        
+        <RollingFile name="ErrorFile" fileName="${LOGS_PATH}/error.log"
+                     filePattern="${LOGS_PATH}/error.%d{yyyyMMdd}.log.zip">
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+            <Filters>
+                <ThresholdFilter level="ERROR" onMatch="ACCEPT" onMismatch="DENY"/>
+            </Filters>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+            </Policies>
+        </RollingFile>
+    </Appenders>
+
+    <Loggers>
+        <Logger name="org.springframework" level="WARN" additivity="false">
+            <AppenderRef ref="DebugFile"/>
+            <AppenderRef ref="InfoFile"/>
+            <AppenderRef ref="WarnFile"/>
+            <AppenderRef ref="ErrorFile"/>
+        </Logger>
+        
+        <Logger name="org.hibernate" level="ERROR" additivity="false">
+            <AppenderRef ref="DebugFile"/>
+            <AppenderRef ref="InfoFile"/>
+            <AppenderRef ref="WarnFile"/>
+            <AppenderRef ref="ErrorFile"/>
+        </Logger>
+        
+        <Logger name="druid" level="ERROR" additivity="false">
+            <AppenderRef ref="DebugFile"/>
+            <AppenderRef ref="InfoFile"/>
+            <AppenderRef ref="WarnFile"/>
+            <AppenderRef ref="ErrorFile"/>
+        </Logger>
+        
+        <Logger name="org.apache.catalina" level="OFF" additivity="false"/>
+        
+        <Logger name="com.lesofn.appboot" level="INFO" additivity="false">
+            <AppenderRef ref="DebugFile"/>
+            <AppenderRef ref="InfoFile"/>
+            <AppenderRef ref="WarnFile"/>
+            <AppenderRef ref="ErrorFile"/>
+        </Logger>
+        
+        <Root level="INFO">
+            <AppenderRef ref="DebugFile"/>
+            <AppenderRef ref="InfoFile"/>
+            <AppenderRef ref="WarnFile"/>
+            <AppenderRef ref="ErrorFile"/>
+        </Root>
+    </Loggers>
+</Configuration>

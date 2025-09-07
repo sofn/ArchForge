@@ -11,7 +11,9 @@ dependencies {
     api("commons-codec:commons-codec")
 
     // DB (Spring Boot BOM 和自定义 BOM 管理的版本)
-    api("org.springframework.boot:spring-boot-starter-data-jpa")
+    api("org.springframework.boot:spring-boot-starter-data-jpa") {
+        exclude(group = "org.springframework.boot", module = "spring-boot-starter-logging")
+    }
     api("com.alibaba:druid")
     api("mysql:mysql-connector-java")
     api("com.h2database:h2")
@@ -27,8 +29,12 @@ dependencies {
     api("com.fasterxml.jackson.core:jackson-annotations")
 
     // web (Spring Boot BOM 管理的版本)
-    api("org.springframework.boot:spring-boot-starter-web")
-    api("org.springframework.boot:spring-boot-starter-aop")
+    api("org.springframework.boot:spring-boot-starter-web") {
+        exclude(group = "org.springframework.boot", module = "spring-boot-starter-logging")
+    }
+    api("org.springframework.boot:spring-boot-starter-aop") {
+        exclude(group = "org.springframework.boot", module = "spring-boot-starter-logging")
+    }
 
     // web (使用自定义 BOM 管理的版本)
     api("org.springdoc:springdoc-openapi-starter-webmvc-ui")
