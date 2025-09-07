@@ -66,43 +66,13 @@
     </Appenders>
 
     <Loggers>
-        <Logger name="org.springframework" level="WARN" additivity="false">
-            <AppenderRef ref="Console"/>
-            <AppenderRef ref="ErrorConsole"/>
-            <AppenderRef ref="DebugFile"/>
-            <AppenderRef ref="InfoFile"/>
-            <AppenderRef ref="WarnFile"/>
-            <AppenderRef ref="ErrorFile"/>
-        </Logger>
-        
-        <Logger name="org.hibernate" level="ERROR" additivity="false">
-            <AppenderRef ref="Console"/>
-            <AppenderRef ref="ErrorConsole"/>
-            <AppenderRef ref="DebugFile"/>
-            <AppenderRef ref="InfoFile"/>
-            <AppenderRef ref="WarnFile"/>
-            <AppenderRef ref="ErrorFile"/>
-        </Logger>
-        
-        <Logger name="druid" level="ERROR" additivity="false">
-            <AppenderRef ref="Console"/>
-            <AppenderRef ref="ErrorConsole"/>
-            <AppenderRef ref="DebugFile"/>
-            <AppenderRef ref="InfoFile"/>
-            <AppenderRef ref="WarnFile"/>
-            <AppenderRef ref="ErrorFile"/>
-        </Logger>
-        
+        <Logger name="org.springframework" level="WARN" additivity="false"/>
+        <Logger name="org.hibernate" level="ERROR" additivity="false"/>
+        <Logger name="druid" level="ERROR" additivity="false"/>
         <Logger name="org.apache.catalina" level="OFF" additivity="false"/>
-        
-        <Logger name="com.lesofn.appboot" level="DEBUG" additivity="false">
-            <AppenderRef ref="Console"/>
-            <AppenderRef ref="ErrorConsole"/>
-            <AppenderRef ref="DebugFile"/>
-            <AppenderRef ref="InfoFile"/>
-            <AppenderRef ref="WarnFile"/>
-            <AppenderRef ref="ErrorFile"/>
-        </Logger>
+        <Logger name="io.lettuce" level="INFO" additivity="false"/>
+        <Logger name="io.netty" level="INFO" additivity="false"/>
+        <Logger name="com.lesofn.appboot" level="DEBUG" additivity="false"/>
         
         <Root level="DEBUG">
             <AppenderRef ref="Console"/>
