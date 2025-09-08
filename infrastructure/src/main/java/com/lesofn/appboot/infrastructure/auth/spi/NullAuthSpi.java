@@ -1,7 +1,7 @@
 package com.lesofn.appboot.infrastructure.auth.spi;
 
-import com.lesofn.appboot.infrastructure.auth.model.AuthExcepFactor;
-import com.lesofn.appboot.infrastructure.auth.model.AuthException;
+import com.lesofn.appboot.infrastructure.auth.errors.AdminAuthErrorCode;
+import com.lesofn.appboot.infrastructure.auth.errors.AdminAuthException;
 import com.lesofn.appboot.infrastructure.auth.model.AuthRequest;
 import org.springframework.stereotype.Component;
 
@@ -24,8 +24,8 @@ public class NullAuthSpi extends AbstractAuthSpi {
     }
 
     @Override
-    public long auth(AuthRequest request) throws AuthException {
-        throw new AuthException(AuthExcepFactor.E_USER_AUTHFAIL, "NullAuthSpi::doAuth");
+    public long auth(AuthRequest request) throws AdminAuthException {
+        throw new AdminAuthException(AdminAuthErrorCode.USER_AUTHFAIL, "NullAuthSpi::doAuth");
     }
 
 }

@@ -2,7 +2,7 @@ package com.lesofn.appboot.server.admin.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.lesofn.appboot.common.errors.EngineExceptionHelper;
+import com.lesofn.appboot.infrastructure.auth.AuthenticationUtils;
 import com.lesofn.appboot.infrastructure.auth.model.SystemLoginUser;
 import com.lesofn.appboot.infrastructure.auth.spi.MAuthSpi;
 import com.lesofn.appboot.infrastructure.config.AppBootConfig;
@@ -10,9 +10,10 @@ import com.lesofn.appboot.server.admin.dto.*;
 import com.lesofn.appboot.server.admin.service.login.LoginService;
 import com.lesofn.appboot.server.admin.service.login.TokenService;
 import com.lesofn.appboot.server.admin.service.user.UserService;
+import com.lesofn.appboot.user.domain.SysMenu;
 import com.lesofn.appboot.user.domain.SysUser;
+import com.lesofn.appboot.user.service.SysMenuService;
 import com.lesofn.appboot.user.service.SysUserService;
-import com.lesofn.appboot.user.utils.UserExcepFactor;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -37,6 +38,7 @@ public class LoginController {
     private final TokenService tokenService;
     private final UserService userService;
     private final SysUserService sysUserService;
+    private final SysMenuService menuService;
     private final AppBootConfig appBootConfig;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -67,25 +69,6 @@ public class LoginController {
     @GetMapping("/captchaImage")
     public CaptchaDTO getCaptchaImg() {
         return loginService.generateCaptchaImg();
-    }
-
-    /**
-     * 登录方法 - 原始登录接口（兼容旧接口）
-     *
-     * @param username 用户名
-     * @param password 密码
-     * @return 结果
-     */
-    @Operation(summary = "登录（兼容旧接口）")
-    @PostMapping("/api/login")
-    public ObjectNode add(@RequestParam String username, @RequestParam String password) {
-        ObjectNode result = objectMapper.createObjectNode();
-        SysUser user = sysUserService.findByUsername(username)
-                .orElseThrow(() -> EngineExceptionHelper.localException(UserExcepFactor.USERPASS_ERROR));
-        // 这里简化处理，实际应该验证密码
-        result.set("user", objectMapper.valueToTree(user));
-        result.put("mauth", MAuthSpi.generateMauth(user.getUserId()));
-        return result;
     }
 
     /**
@@ -126,15 +109,50 @@ public class LoginController {
     @GetMapping("/getRouters")
     public List<RouterDTO> getRouters() {
         SystemLoginUser loginUser = getLoginUser();
-        // 暂时返回空列表，因为MenuService不存在
-        return new ArrayList<>();
+        List<SysMenu> menus = menuService.findMenusByRoleId(loginUser.getRoleId());
+        List<SysMenu> menuTree = menuService.buildMenuTree(menus);
+        return convertToRouterDTO(menuTree);
+    }
+
+    /**
+     * 将 SysMenu 转换为 RouterDTO
+     */
+    private List<RouterDTO> convertToRouterDTO(List<SysMenu> sysMenus) {
+        if (sysMenus == null || sysMenus.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        return sysMenus.stream().map(this::convertMenuToRouter).toList();
+    }
+
+    /**
+     * 转换单个菜单项
+     */
+    private RouterDTO convertMenuToRouter(SysMenu menu) {
+        RouterDTO router = new RouterDTO();
+        router.setName(menu.getRouterName());
+        router.setPath(menu.getPath());
+        router.setHidden(false); // 根据实际需求设置
+        router.setComponent(menu.getMetaInfo()); // 假设 metaInfo 存储了组件路径
+        
+        RouterDTO.MetaDTO meta = new RouterDTO.MetaDTO();
+        meta.setTitle(menu.getMenuName());
+        meta.setIcon(""); // 根据实际需求设置图标
+        meta.setNoCache(false);
+        meta.setLink("");
+        router.setMeta(meta);
+        
+        if (menu.getChildren() != null && !menu.getChildren().isEmpty()) {
+            router.setChildren(convertToRouterDTO(menu.getChildren()));
+        }
+        
+        return router;
     }
 
     /**
      * 获取当前登录用户
      */
     private SystemLoginUser getLoginUser() {
-        // TODO: 从 SecurityContext 或 Token 中获取当前登录用户
-        return new SystemLoginUser();
+        return AuthenticationUtils.getSystemLoginUser();
     }
 }

@@ -1,9 +1,9 @@
 package com.lesofn.appboot.infrastructure.auth.service;
 
+import com.lesofn.appboot.common.context.ClientVersion;
 import com.lesofn.appboot.infrastructure.auth.annotation.AuthType;
 import com.lesofn.appboot.infrastructure.auth.annotation.BaseInfo;
-import com.lesofn.appboot.infrastructure.auth.model.AuthExcepFactor;
-import com.lesofn.appboot.infrastructure.auth.model.AuthException;
+import com.lesofn.appboot.infrastructure.auth.errors.AdminAuthException;
 import com.lesofn.appboot.infrastructure.auth.model.AuthRequest;
 import com.lesofn.appboot.infrastructure.auth.model.AuthResponse;
 import com.lesofn.appboot.infrastructure.auth.provider.DefaultUserProvider;
@@ -12,8 +12,6 @@ import com.lesofn.appboot.infrastructure.auth.spi.AuthSpi;
 import com.lesofn.appboot.infrastructure.auth.spi.BasicAuthSpi;
 import com.lesofn.appboot.infrastructure.auth.spi.GuestAuthSpi;
 import com.lesofn.appboot.infrastructure.auth.spi.NullAuthSpi;
-import com.lesofn.appboot.common.context.ClientVersion;
-import com.lesofn.appboot.common.errors.EngineExceptionHelper;
 import com.lesofn.appboot.infrastructure.frame.spring.ApplicationContextHolder;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -26,6 +24,8 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+
+import static com.lesofn.appboot.infrastructure.auth.errors.AdminAuthErrorCode.USER_AUTHFAIL;
 
 /**
  * Authors: sofn
@@ -49,25 +49,18 @@ public class DefaultAuthService implements AuthService, ApplicationContextAware,
             type = AuthType.REQUIRED;
         }
         AuthSpi spi = this.findAuthServiceSpi(request, type);
-        long uid = 0;
-        try {
-            uid = spi.auth(request);
-            Optional<UserProvider> provider = getUserProvider();
-            if (!StringUtils.equals(spi.getName(), BasicAuthSpi.SPI_NAME)
-                    && !StringUtils.equals(spi.getName(), GuestAuthSpi.SPI_NAME)
-                    && (provider.isPresent() && !provider.get().isValidUser(uid))) {
-                uid = 0;
-                LOGGER.warn("auth passed,but uid not found: " + uid + " authType: " + spi.getName());
-                throw EngineExceptionHelper.localException(AuthExcepFactor.E_USER_AUTHFAIL);
-            }
+        long uid = spi.auth(request);
+        Optional<UserProvider> provider = getUserProvider();
+        if (!StringUtils.equals(spi.getName(), BasicAuthSpi.SPI_NAME)
+                && !StringUtils.equals(spi.getName(), GuestAuthSpi.SPI_NAME)
+                && (provider.isPresent() && !provider.get().isValidUser(uid))) {
+            uid = 0;
+            LOGGER.warn("auth passed,but uid not found: " + uid + " authType: " + spi.getName());
+            throw new AdminAuthException(USER_AUTHFAIL);
+        }
 
-            if (uid <= 0 && type.authFailThrowException() && !StringUtils.equals(spi.getName(), GuestAuthSpi.SPI_NAME)) {
-                throw EngineExceptionHelper.localException(AuthExcepFactor.E_USER_AUTHFAIL);
-            }
-        } catch (AuthException e) {
-            if (type.authFailThrowException() && (type != AuthType.OUTER || request.getFrom() != AuthRequest.RequestFrom.INNER)) {
-                throw e;
-            }
+        if (uid <= 0 && type.authFailThrowException() && !StringUtils.equals(spi.getName(), GuestAuthSpi.SPI_NAME)) {
+            throw new AdminAuthException(USER_AUTHFAIL);
         }
 
         spi.afterAuth(uid, request);

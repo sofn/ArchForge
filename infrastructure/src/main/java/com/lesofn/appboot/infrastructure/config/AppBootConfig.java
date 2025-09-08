@@ -65,6 +65,8 @@ public class AppBootConfig {
      */
     private Register register = new Register();
 
+    private boolean enableRedisMock = false;
+
     @Setter
     @Getter
     public static class Token {

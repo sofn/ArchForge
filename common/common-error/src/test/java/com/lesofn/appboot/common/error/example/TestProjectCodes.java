@@ -10,7 +10,7 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-public enum UserProjectCodes implements ProjectModule {
+public enum TestProjectCodes implements ProjectModule {
 
     LOGIN(1, 1, "用户中心", "登录模块"),
     USER(1, 2, "用户中心", "用户模块");

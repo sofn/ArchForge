@@ -1,14 +1,17 @@
 package com.lesofn.appboot.infrastructure.frame.filters;
 
+import com.lesofn.appboot.common.context.ClientVersion;
+import com.lesofn.appboot.common.utils.GlobalConstants;
 import com.lesofn.appboot.infrastructure.auth.annotation.BaseInfo;
-import com.lesofn.appboot.infrastructure.auth.model.AuthException;
+import com.lesofn.appboot.infrastructure.auth.errors.AdminAuthException;
 import com.lesofn.appboot.infrastructure.auth.model.AuthRequest;
 import com.lesofn.appboot.infrastructure.auth.model.AuthResponse;
 import com.lesofn.appboot.infrastructure.auth.service.AuthService;
-import com.lesofn.appboot.common.context.ClientVersion;
-import com.lesofn.appboot.common.utils.GlobalConstants;
 import com.lesofn.appboot.infrastructure.frame.context.RequestContext;
 import com.lesofn.appboot.infrastructure.frame.context.ThreadLocalContext;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,9 +21,6 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 
-import jakarta.annotation.Resource;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
 import java.util.Optional;
 
@@ -61,7 +61,7 @@ public class AuthResourceFilter extends RequestMappingHandlerAdapter {
         AuthResponse authResponse;
         try {
             authResponse = authService.auth(authRequest, Optional.ofNullable(baseInfo));
-        } catch (AuthException e) {
+        } catch (AdminAuthException e) {
             LOGGER.debug("auth failed! path: " + request.getRequestURI() + " appId: " + request.getHeader(AuthService.ENGINE_APPID_HEADER)
                     + " version: " + ClientVersion.valueOf(request.getHeader(ClientVersion.VERSION_HEADER)));
             throw e;

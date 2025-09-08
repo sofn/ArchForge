@@ -2,7 +2,7 @@ package com.lesofn.appboot.infrastructure.frame.response;
 
 import com.lesofn.appboot.infrastructure.frame.response.model.Result;
 import com.lesofn.appboot.infrastructure.frame.response.model.ResponseResult;
-import com.lesofn.appboot.common.error.system.SystemErrorCode;
+import com.lesofn.appboot.common.errors.SystemErrorCode;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.annotation.Order;

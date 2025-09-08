@@ -1,12 +1,12 @@
 package com.lesofn.appboot.infrastructure.auth.spi;
 
-import com.lesofn.appboot.infrastructure.auth.model.AuthExcepFactor;
-import com.lesofn.appboot.infrastructure.auth.model.AuthException;
+import com.lesofn.appboot.infrastructure.auth.errors.AdminAuthErrorCode;
+import com.lesofn.appboot.infrastructure.auth.errors.AdminAuthException;
 import com.lesofn.appboot.infrastructure.auth.model.AuthRequest;
 import com.lesofn.appboot.common.encrypt.AESEncrypter;
 import com.lesofn.appboot.common.encrypt.EncrypterException;
-import com.lesofn.appboot.common.errors.EngineException;
 import com.lesofn.appboot.infrastructure.frame.utils.log.ApiLogger;
+import jakarta.security.auth.message.AuthException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.stereotype.Component;
@@ -56,7 +56,7 @@ public class MAuthSpi extends AbstractAuthSpi {
     }
 
     @Override
-    public long auth(AuthRequest request) throws AuthException {
+    public long auth(AuthRequest request) throws AdminAuthException {
         String authHeader = StringUtils.isBlank(request.getHeader(AUTH_HEADER)) ? request.getHeader(AUTH_HEADER_OTHER) : request.getHeader(AUTH_HEADER);
         if (StringUtils.isBlank(authHeader)) {
             authHeader = request.getParameter(AUTH_PARAM);
@@ -65,7 +65,7 @@ public class MAuthSpi extends AbstractAuthSpi {
         String[] ss = authHeader.split(" ");
         if (ss.length != 2) {
             ApiLogger.error("Authorization header error, authHeader:" + authHeader);
-            throw new AuthException(AuthExcepFactor.E_USER_AUTHFAIL);
+            throw new AdminAuthException(AdminAuthErrorCode.USER_AUTHFAIL);
         }
         String aesHeader = ss[1];
         try {
@@ -74,22 +74,22 @@ public class MAuthSpi extends AbstractAuthSpi {
             long time = NumberUtils.toLong(timeAndUid[0], 0);
             long now = System.currentTimeMillis();
             if (now - time > EXPIRES_TIME) {
-                throw new AuthException(AuthExcepFactor.E_USER_AUTHFAIL, "token expires.");
+                throw new AdminAuthException(AdminAuthErrorCode.USER_AUTHFAIL, "token expires.");
             }
             long uid = NumberUtils.toLong(timeAndUid[1], 0);
             if (uid <= 0) {
-                throw new AuthException(AuthExcepFactor.E_USER_AUTHFAIL, "invalid uid.");
+                throw new AdminAuthException(AdminAuthErrorCode.USER_AUTHFAIL, "invalid uid.");
             }
             return uid;
-        } catch (EngineException e) {
+        } catch (AdminAuthException e) {
             ApiLogger.error("mauth " + e.getMessage() + ", authHeader:" + authHeader);
             throw e;
         } catch (EncrypterException e) {
             ApiLogger.error("auth decrypt mauth token error,header:" + authHeader);
-            throw new AuthException(AuthExcepFactor.E_USER_AUTHFAIL);
+            throw new AdminAuthException(AdminAuthErrorCode.USER_AUTHFAIL);
         } catch (RuntimeException e) {
             ApiLogger.error("auth fail mauth,header:" + authHeader, e);
-            throw new AuthException(AuthExcepFactor.E_USER_AUTHFAIL);
+            throw new AdminAuthException(AdminAuthErrorCode.USER_AUTHFAIL);
         }
     }
 }

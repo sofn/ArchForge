@@ -2,7 +2,7 @@ package com.lesofn.appboot.infrastructure.frame.response.model;
 
 import com.lesofn.appboot.common.error.api.ErrorCode;
 import com.lesofn.appboot.common.error.manager.ErrorInfo;
-import com.lesofn.appboot.common.error.system.SystemErrorCode;
+import com.lesofn.appboot.common.errors.SystemErrorCode;
 import lombok.Getter;
 
 /**

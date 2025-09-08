@@ -1,7 +1,7 @@
 package com.lesofn.appboot.common.encrypt;
 
-import com.lesofn.appboot.common.errors.ExcepFactor;
-import com.lesofn.appboot.common.errors.EngineExceptionHelper;
+import com.lesofn.appboot.common.error.system.SystemException;
+import com.lesofn.appboot.common.errors.SystemErrorCode;
 import org.apache.commons.lang3.Validate;
 
 import java.io.IOException;
@@ -58,7 +58,7 @@ public class Digests {
             }
             return result;
         } catch (GeneralSecurityException e) {
-            throw EngineExceptionHelper.localException(ExcepFactor.E_DIGEST_ERROR);
+            throw new SystemException(SystemErrorCode.E_DIGEST_ERROR);
         }
 
     }
@@ -104,7 +104,7 @@ public class Digests {
 
             return messageDigest.digest();
         } catch (GeneralSecurityException e) {
-            throw EngineExceptionHelper.localException(ExcepFactor.E_DIGEST_ERROR);
+            throw new SystemException(SystemErrorCode.E_DIGEST_ERROR);
         }
     }
 

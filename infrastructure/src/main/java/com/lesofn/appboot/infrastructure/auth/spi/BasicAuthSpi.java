@@ -1,7 +1,7 @@
 package com.lesofn.appboot.infrastructure.auth.spi;
 
-import com.lesofn.appboot.infrastructure.auth.model.AuthExcepFactor;
-import com.lesofn.appboot.infrastructure.auth.model.AuthException;
+import com.lesofn.appboot.infrastructure.auth.errors.AdminAuthErrorCode;
+import com.lesofn.appboot.infrastructure.auth.errors.AdminAuthException;
 import com.lesofn.appboot.infrastructure.auth.model.AuthRequest;
 import com.lesofn.appboot.infrastructure.auth.provider.UserProvider;
 import com.lesofn.appboot.infrastructure.auth.service.DefaultAuthService;
@@ -39,14 +39,14 @@ public class BasicAuthSpi extends AbstractAuthSpi {
     public long auth(AuthRequest request) {
         String authString = request.getHeader("Authorization");
         if (StringUtils.isBlank(authString)) {
-            throw new AuthException(AuthExcepFactor.E_USER_AUTHFAIL);
+            throw new AdminAuthException(AdminAuthErrorCode.USER_AUTHFAIL);
         }
         if (ApiLogger.isTraceEnabled()) {
             ApiLogger.trace("basic auth string:" + authString);
         }
         String base64 = authString.substring(6);
         if (StringUtils.isBlank(base64)) {
-            throw new AuthException(AuthExcepFactor.E_USER_AUTHFAIL);
+            throw new AdminAuthException(AdminAuthErrorCode.USER_AUTHFAIL);
         }
         String nameAndPasswd = new String(
                 Base64.decodeBase64(base64.getBytes()));
@@ -54,13 +54,13 @@ public class BasicAuthSpi extends AbstractAuthSpi {
         int pos = nameAndPasswd.indexOf(":");
         if (pos < 1 || pos == (nameAndPasswd.length() - 1)) {
             ApiLogger.warn("403 PWD error, error user pass: " + nameAndPasswd);
-            throw new AuthException(AuthExcepFactor.E_USER_AUTHFAIL);
+            throw new AdminAuthException(AdminAuthErrorCode.USER_AUTHFAIL);
         }
 
         String username = nameAndPasswd.substring(0, pos);
         String password = nameAndPasswd.substring(pos + 1);
         if (StringUtils.isBlank(username) || StringUtils.isBlank(password)) {
-            throw new AuthException(AuthExcepFactor.E_USER_AUTHFAIL);
+            throw new AdminAuthException(AdminAuthErrorCode.USER_AUTHFAIL);
         }
 
         long uid = 0;
@@ -69,7 +69,7 @@ public class BasicAuthSpi extends AbstractAuthSpi {
             uid = provider.get().authUser(username, password);
         }
         if (uid <= 0) {
-            throw new AuthException(AuthExcepFactor.E_AUTH_PASSWORD_ERROR, "username or password error");
+            throw new AdminAuthException(AdminAuthErrorCode.USERNAME_PASSWORD_ERROR, "username or password error");
         }
         return uid;
     }

@@ -1,7 +1,6 @@
 package com.lesofn.appboot.common.error.manager;
 
 import com.lesofn.appboot.common.error.api.ErrorCode;
-import com.lesofn.appboot.common.error.system.SystemErrorCode;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.slf4j.helpers.MessageFormatter;
@@ -15,6 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @AllArgsConstructor
 public class ErrorInfo {
+    public static final int DEFAULT_ERROR_CODE = 1;
     static final Map<Integer, ErrorInfo> NO_PARAM_CODES_MAP = new ConcurrentHashMap<>();
     static final Map<String, ErrorInfo> ERROR_MSG_CODES_MAP = new ConcurrentHashMap<>();
     /**
@@ -30,7 +30,7 @@ public class ErrorInfo {
 
 
     public static ErrorInfo parse(String message) {
-        return ERROR_MSG_CODES_MAP.computeIfAbsent(message, it -> new ErrorInfo(SystemErrorCode.SYSTEM_ERROR.getCode(), message));
+        return ERROR_MSG_CODES_MAP.computeIfAbsent(message, it -> new ErrorInfo(DEFAULT_ERROR_CODE, message));
     }
 
     public static ErrorInfo parse(ErrorCode errorCode) {

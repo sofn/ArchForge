@@ -9,34 +9,34 @@ import com.lesofn.appboot.common.error.exception.BaseException;
  * @author sofn
  * @version 1.0 Created at: 2022-03-09 18:18
  */
-public class LoginException extends BaseException {
+public class TestException extends BaseException {
 
-    protected LoginException(String message) {
+    protected TestException(String message) {
         super(message);
     }
 
-    protected LoginException(String message, Throwable cause) {
+    protected TestException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    protected LoginException(Throwable cause) {
+    protected TestException(Throwable cause) {
         super(cause);
     }
 
-    protected LoginException(ErrorInfo errorInfo) {
+    protected TestException(ErrorInfo errorInfo) {
         super(errorInfo);
     }
 
-    protected LoginException(ErrorCode errorCode) {
+    protected TestException(ErrorCode errorCode) {
         super(errorCode);
     }
 
-    protected LoginException(ErrorCode errorCode, Object... args) {
+    protected TestException(ErrorCode errorCode, Object... args) {
         super(errorCode, args);
     }
 
     @Override
     public ProjectModule projectModule() {
-        return UserProjectCodes.LOGIN;
+        return TestProjectCodes.LOGIN;
     }
 }

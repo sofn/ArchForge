@@ -1,7 +1,7 @@
 package com.lesofn.appboot.infrastructure.auth.spi;
 
 
-import com.lesofn.appboot.infrastructure.auth.model.AuthException;
+import com.lesofn.appboot.infrastructure.auth.errors.AdminAuthException;
 import com.lesofn.appboot.infrastructure.auth.model.AuthRequest;
 
 /**
@@ -21,12 +21,12 @@ public interface AuthSpi {
      *
      * @param request 上下文
      * @return uid
-     * @throws AuthException
+     * @throws AdminAuthException
      */
-    long auth(AuthRequest request) throws AuthException;
+    long auth(AuthRequest request) throws AdminAuthException;
 
     /**
      * 认证后的额外检查
      */
-    void afterAuth(long uid, AuthRequest request) throws AuthException;
+    void afterAuth(long uid, AuthRequest request) throws AdminAuthException;
 }

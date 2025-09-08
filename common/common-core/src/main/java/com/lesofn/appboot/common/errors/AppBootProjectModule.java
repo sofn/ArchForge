@@ -10,9 +10,11 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-public enum MaxtrixBootProjectModule implements ProjectModule {
+public enum AppBootProjectModule implements ProjectModule {
 
-    USER("AppBoot", 1, "用户模块", 1);
+    ADMIN_AUTH("AppBoot-Admin", 1, "后台认证", 1),
+    ADMIN_USER("AppBoot-Admin", 1, "后台用户", 2),
+    TASK("AppBoot-Admin", 1, "后台Task示例", 3);
 
     final String projectName;
     final int projectCode;

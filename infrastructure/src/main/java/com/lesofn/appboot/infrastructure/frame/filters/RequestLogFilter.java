@@ -1,6 +1,6 @@
 package com.lesofn.appboot.infrastructure.frame.filters;
 
-import com.lesofn.appboot.common.errors.EngineException;
+import com.lesofn.appboot.common.error.exception.IErrorCodeException;
 import com.lesofn.appboot.common.utils.GlobalConstants;
 import com.lesofn.appboot.infrastructure.frame.context.RequestContext;
 import com.lesofn.appboot.infrastructure.frame.context.ThreadLocalContext;
@@ -38,10 +38,10 @@ public class RequestLogFilter implements Filter {
             filterChain.doFilter(request, response);
         } catch (Exception e) {
             //此处拦截也必须抛出，否则不执行ErrorHandlerResource
-            if (e instanceof EngineException) {
-                log.error("EngineException error", e.getMessage() + " " + ((EngineException) e).getErrorMsgCn());
-            } else if (e.getCause() instanceof EngineException) {
-                log.error("EngineException error", e.getCause().getMessage() + " " + ((EngineException) e.getCause()).getErrorMsgCn());
+            if (e instanceof IErrorCodeException) {
+                log.error("EngineException error", e.getMessage() + " " + ((IErrorCodeException) e).getErrorInfo().getMsg());
+            } else if (e.getCause() instanceof IErrorCodeException) {
+                log.error("EngineException error", e.getCause().getMessage() + " " + ((IErrorCodeException) e.getCause()).getErrorInfo().getMsg());
             } else {
                 log.error("filterChain.doFilter error", e);
             }

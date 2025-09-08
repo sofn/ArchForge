@@ -5,6 +5,7 @@ import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
@@ -15,18 +16,27 @@ import java.io.IOException;
  * @version 1.0 Created at: 2025-08-25 23:33
  */
 @Slf4j
-@Profile("dev")
 @Component
+@Profile("dev")
+@ConditionalOnProperty(name = "app-boot.enable-redis-mock", havingValue = "true")
 public class InitRedisMockServer {
 
     @Value("${spring.data.redis.port:6379}")
     private int redisPort;
-    
+
     private RedisServer redisServer;
 
     @PostConstruct
     public void init() {
         try {
+            String osName = System.getProperty("os.name").toLowerCase();
+            String osArch = System.getProperty("os.arch").toLowerCase();
+            // Apple Silicon Mac的特殊处理
+            if (osName.contains("mac") && (osArch.contains("aarch64") || osArch.contains("arm"))) {
+                log.error("检测到Apple Silicon Mac，不支持启动嵌入式Redis...");
+                return;
+            }
+
             log.info("Starting Redis Mock Server on port: {}", redisPort);
             redisServer = RedisServer.newRedisServer(redisPort);
             redisServer.start();
@@ -36,7 +46,7 @@ public class InitRedisMockServer {
             throw new RuntimeException("Failed to start Redis Mock Server", e);
         }
     }
-    
+
     @PreDestroy
     public void destroy() {
         if (redisServer != null) {

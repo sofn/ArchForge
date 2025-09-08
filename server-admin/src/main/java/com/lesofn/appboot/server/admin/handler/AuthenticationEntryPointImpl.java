@@ -1,8 +1,8 @@
 package com.lesofn.appboot.server.admin.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.lesofn.appboot.common.errors.SystemErrorCode;
 import com.lesofn.appboot.infrastructure.frame.response.model.ResponseResult;
-import com.lesofn.appboot.common.exception.ErrorCode;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -26,21 +26,21 @@ public class AuthenticationEntryPointImpl implements AuthenticationEntryPoint {
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response,
-                        AuthenticationException authException) throws IOException, ServletException {
-        
-        log.warn("认证失败，无法访问系统资源 - URI: {}, Error: {}", 
+                         AuthenticationException authException) throws IOException, ServletException {
+
+        log.warn("认证失败，无法访问系统资源 - URI: {}, Error: {}",
                 request.getRequestURI(), authException.getMessage());
-        
+
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("UTF-8");
-        
-        ResponseResult<String> result = ResponseResult.error(ErrorCode.Client.COMMON_REQUEST_UNAUTHORIZED.getErrorCode(),
-                                             ErrorCode.Client.COMMON_REQUEST_UNAUTHORIZED.getErrorMsgCn());
-        
+
+        ResponseResult<String> result = ResponseResult.error(SystemErrorCode.COMMON_REQUEST_FORBIDDEN.getCode(),
+                SystemErrorCode.COMMON_REQUEST_FORBIDDEN.getMsg());
+
         ObjectMapper objectMapper = new ObjectMapper();
         String jsonResult = objectMapper.writeValueAsString(result);
-        
+
         response.getWriter().write(jsonResult);
     }
 }

@@ -1,9 +1,10 @@
 package com.lesofn.appboot.server.admin.error;
 
-import com.lesofn.appboot.common.errors.EngineException;
-import com.lesofn.appboot.common.errors.EngineExceptionHelper;
-import com.lesofn.appboot.common.errors.ExcepFactor;
+import com.lesofn.appboot.common.error.exception.IErrorCodeException;
+import com.lesofn.appboot.common.error.system.SystemException;
+import com.lesofn.appboot.common.errors.SystemErrorCode;
 import com.lesofn.appboot.common.utils.GlobalConstants;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,8 +12,6 @@ import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * 404处理
@@ -38,23 +37,23 @@ public class ErrorHandlerResource implements ErrorController {
         if (exception == null) {
             exception = (Exception) request.getAttribute("jakarta.servlet.error.exception");
         }
-        EngineException apiException;
+        IErrorCodeException apiException;
         String pageError = "500 - System error.";
-        if (exception != null && exception instanceof EngineException) {
-            apiException = (EngineException) exception;
+        if (exception != null && exception instanceof IErrorCodeException) {
+            apiException = (IErrorCodeException) exception;
         } else if (status == 405) {
-            apiException = EngineExceptionHelper.localException(ExcepFactor.E_METHOD_ERROR);
+            apiException = new SystemException(SystemErrorCode.E_METHOD_ERROR);
         } else if (status == 404) {
             pageError = "404 - Page not Found: " + errorMsg;
-            apiException = EngineExceptionHelper.localException(ExcepFactor.E_API_NOT_EXIST);
+            apiException = new SystemException(SystemErrorCode.E_API_NOT_EXIST);
         } else if (status == 415) {
-            apiException = EngineExceptionHelper.localException(ExcepFactor.E_UNSUPPORT_MEDIATYPE_ERROR, new Object[]{"unknow"});
+            apiException = new SystemException(SystemErrorCode.E_UNSUPPORT_MEDIATYPE_ERROR, new Object[]{"unknow"});
         } else if (status >= 400 && status < 500) {
-            apiException = EngineExceptionHelper.localException(ExcepFactor.E_ILLEGAL_REQUEST, errorMsg);
+            apiException = new SystemException(SystemErrorCode.E_ILLEGAL_REQUEST, errorMsg);
         } else if (status == 503) {
-            apiException = EngineExceptionHelper.localException(ExcepFactor.E_SERVICE_UNAVAILABLE);
+            apiException = new SystemException(SystemErrorCode.E_SERVICE_UNAVAILABLE);
         } else {
-            apiException = EngineExceptionHelper.localException(ExcepFactor.E_DEFAULT);
+            apiException = new SystemException(SystemErrorCode.E_DEFAULT);
             log.error(errorMsg, exception);
         }
         if (MediaType.TEXT_HTML.equals(mediaType) || StringUtils.endsWithAny(path, GlobalConstants.staticResourceArray)) {
@@ -68,7 +67,7 @@ public class ErrorHandlerResource implements ErrorController {
                     "</body>\n" +
                     "</html>";
         } else {
-            return apiException.formatException(path);
+            return apiException.getErrorInfo().getMsg() + " " + path;
         }
     }
 }

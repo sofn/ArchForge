@@ -1,8 +1,8 @@
 package com.lesofn.appboot.infrastructure.auth.spi;
 
 
-import com.lesofn.appboot.infrastructure.auth.model.AuthExcepFactor;
-import com.lesofn.appboot.infrastructure.auth.model.AuthException;
+import com.lesofn.appboot.infrastructure.auth.errors.AdminAuthErrorCode;
+import com.lesofn.appboot.infrastructure.auth.errors.AdminAuthException;
 import com.lesofn.appboot.infrastructure.auth.model.AuthRequest;
 import com.lesofn.appboot.infrastructure.auth.service.AuthService;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -27,10 +27,10 @@ public class TrustHostSpi extends AbstractAuthSpi {
     }
 
     @Override
-    public long auth(AuthRequest request) throws AuthException {
+    public long auth(AuthRequest request) throws AdminAuthException {
         long uid = NumberUtils.toLong(request.getHeader(AuthService.ENGINE_UID_HEADER), 0);
         if (uid == 0) {
-            throw new AuthException(AuthExcepFactor.E_USER_AUTHFAIL, "Engine uid header is empty.");
+            throw new AdminAuthException(AdminAuthErrorCode.USER_AUTHFAIL, "Engine uid header is empty.");
         }
         return uid;
     }

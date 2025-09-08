@@ -2,8 +2,8 @@ package com.lesofn.appboot.server.admin.service.login;
 
 import com.lesofn.appboot.common.enums.BasicEnumUtil;
 import com.lesofn.appboot.common.enums.common.UserStatusEnum;
-import com.lesofn.appboot.common.errors.UserErrorCode;
-import com.lesofn.appboot.common.errors.UserException;
+import com.lesofn.appboot.user.errors.AdminUserErrorCode;
+import com.lesofn.appboot.user.errors.AdminUserException;
 import com.lesofn.appboot.infrastructure.config.AppBootConfig;
 import com.lesofn.appboot.infrastructure.auth.model.SystemLoginUser;
 import com.lesofn.appboot.infrastructure.user.web.DataScopeEnum;
@@ -52,11 +52,11 @@ public class AdminUserDetailsService implements UserDetailsService {
         SysUser user = userService.getUserByUserName(username);
         if (user == null) {
             log.info("登录用户：{} 不存在.", username);
-            throw new UserException(UserErrorCode.USER_NON_EXIST, username);
+            throw new AdminUserException(AdminUserErrorCode.USER_NON_EXIST, username);
         }
         if (!Objects.equals(UserStatusEnum.NORMAL.getValue(), user.getStatus())) {
             log.info("登录用户：{} 已被停用.", username);
-            throw new UserException(UserErrorCode.USER_IS_DISABLE, username);
+            throw new AdminUserException(AdminUserErrorCode.USER_IS_DISABLE, username);
         }
 
         RoleInfo roleInfo = getRoleInfo(user.getRoleId(), user.getIsAdmin());

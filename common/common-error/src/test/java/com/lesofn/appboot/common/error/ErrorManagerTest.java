@@ -1,10 +1,10 @@
 package com.lesofn.appboot.common.error;
 
-import com.lesofn.appboot.common.error.example.LoginErrorCodes;
+import com.lesofn.appboot.common.error.example.TestErrorCodes;
+import com.lesofn.appboot.common.error.example.TestSystemErrorCode;
 import com.lesofn.appboot.common.error.manager.ErrorManager;
 import com.lesofn.appboot.common.error.manager.TreeNode;
 import com.lesofn.appboot.common.error.system.HttpCodes;
-import com.lesofn.appboot.common.error.system.SystemErrorCode;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -18,10 +18,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class ErrorManagerTest {
 
     @Test
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     void getAllErrorCodes() {
-        SystemErrorCode.values();
+        TestSystemErrorCode.values();
         HttpCodes.values();
-        LoginErrorCodes.values();
+        TestErrorCodes.values();
         List<TreeNode> allErrorCodes = ErrorManager.getAllErrorCodes();
         System.out.println(allErrorCodes);
         assertEquals(2, allErrorCodes.size());

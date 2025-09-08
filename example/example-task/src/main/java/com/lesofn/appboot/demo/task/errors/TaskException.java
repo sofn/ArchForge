@@ -1,42 +1,43 @@
-package com.lesofn.appboot.common.errors;
+package com.lesofn.appboot.demo.task.errors;
 
 import com.lesofn.appboot.common.error.api.ErrorCode;
 import com.lesofn.appboot.common.error.api.ProjectModule;
 import com.lesofn.appboot.common.error.exception.BaseRuntimeException;
 import com.lesofn.appboot.common.error.manager.ErrorInfo;
+import com.lesofn.appboot.common.errors.AppBootProjectModule;
 
 /**
  * @author sofn
  * @version 1.0 Created at: 2022-03-09 16:41
  */
-public class UserException extends BaseRuntimeException {
+public class TaskException extends BaseRuntimeException {
 
-    public UserException(String message) {
+    public TaskException(String message) {
         super(message);
     }
 
-    public UserException(String message, Throwable cause) {
+    public TaskException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public UserException(Throwable cause) {
+    public TaskException(Throwable cause) {
         super(cause);
     }
 
-    public UserException(ErrorInfo errorInfo) {
+    public TaskException(ErrorInfo errorInfo) {
         super(errorInfo);
     }
 
-    public UserException(ErrorCode errorCode) {
+    public TaskException(ErrorCode errorCode) {
         super(errorCode);
     }
 
-    public UserException(ErrorCode errorCode, Object... args) {
+    public TaskException(ErrorCode errorCode, Object... args) {
         super(errorCode, args);
     }
 
     @Override
     public ProjectModule projectModule() {
-        return MaxtrixBootProjectModule.USER;
+        return AppBootProjectModule.TASK;
     }
 }

@@ -1,10 +1,9 @@
 package com.lesofn.appboot.infrastructure.auth.spi;
 
-
-import com.lesofn.appboot.infrastructure.auth.model.AuthExcepFactor;
-import com.lesofn.appboot.infrastructure.auth.model.AuthException;
-import com.lesofn.appboot.infrastructure.auth.model.AuthRequest;
 import com.lesofn.appboot.common.context.ClientVersion;
+import com.lesofn.appboot.infrastructure.auth.errors.AdminAuthErrorCode;
+import com.lesofn.appboot.infrastructure.auth.errors.AdminAuthException;
+import com.lesofn.appboot.infrastructure.auth.model.AuthRequest;
 import org.springframework.stereotype.Component;
 
 /**
@@ -24,13 +23,13 @@ public class GuestAuthSpi extends AbstractAuthSpi {
     }
 
     @Override
-    public long auth(AuthRequest request) throws AuthException {
+    public long auth(AuthRequest request) throws AdminAuthException {
         ClientVersion version = ClientVersion.valueOf(request.getHeader(ClientVersion.VERSION_HEADER));
         if ((version.sdkVersion.equals(ClientVersion.Version.NULL)
                 || version.clientVersion.equals(ClientVersion.Version.NULL)
                 || version.udid.equals(ClientVersion.DEFAULT_UNKNOW))
                 && request.getFrom() != AuthRequest.RequestFrom.INNER) {
-            throw new AuthException(AuthExcepFactor.E_ILLEGAL_GUEST);
+            throw new AdminAuthException(AdminAuthErrorCode.ILLEGAL_GUEST);
         }
         return 0;
     }

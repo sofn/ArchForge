@@ -2,8 +2,7 @@ package com.lesofn.appboot.server.admin.service.login;
 
 import com.google.common.collect.ImmutableMap;
 import com.lesofn.appboot.common.constant.Constants;
-import com.lesofn.appboot.common.exception.ApiException;
-import com.lesofn.appboot.common.exception.ErrorCode;
+import com.lesofn.appboot.infrastructure.auth.errors.AdminAuthException;
 import com.lesofn.appboot.infrastructure.config.AppBootConfig;
 import com.lesofn.appboot.server.admin.service.cache.RedisCacheService;
 import com.lesofn.appboot.infrastructure.auth.model.SystemLoginUser;
@@ -20,6 +19,9 @@ import java.security.Key;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+
+import static com.lesofn.appboot.infrastructure.auth.errors.AdminAuthErrorCode.TOKEN_INVALID;
+import static org.springframework.boot.actuate.autoconfigure.cloudfoundry.CloudFoundryAuthorizationException.Reason.INVALID_TOKEN;
 
 /**
  * token验证处理
@@ -53,10 +55,10 @@ public class TokenService {
                 return redisCacheService.loginUserCache.get(uuid);
             } catch (MalformedJwtException | UnsupportedJwtException | IllegalArgumentException jwtException) {
                 log.error("parse token failed.", jwtException);
-                throw new ApiException(jwtException, ErrorCode.Client.INVALID_TOKEN);
+                throw new AdminAuthException(TOKEN_INVALID);
             } catch (Exception e) {
                 log.error("fail to get cached user from redis", e);
-                throw new ApiException(e, ErrorCode.Client.TOKEN_PROCESS_FAILED, e.getMessage());
+                throw new AdminAuthException(TOKEN_INVALID);
             }
 
         }

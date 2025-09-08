@@ -5,7 +5,7 @@ import com.lesofn.appboot.common.error.exception.IErrorCodeException;
 import com.lesofn.appboot.common.error.manager.ErrorInfo;
 import com.lesofn.appboot.infrastructure.frame.response.model.ResponseResult;
 import com.lesofn.appboot.common.error.system.HttpCodes;
-import com.lesofn.appboot.common.error.system.SystemErrorCode;
+import com.lesofn.appboot.common.errors.SystemErrorCode;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;

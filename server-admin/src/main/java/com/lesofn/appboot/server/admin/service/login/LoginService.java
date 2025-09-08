@@ -1,9 +1,8 @@
 package com.lesofn.appboot.server.admin.service.login;
 
 import com.google.code.kaptcha.Producer;
-import com.lesofn.appboot.common.encrypt.AESEncrypter;
 import com.lesofn.appboot.common.encrypt.RsaEncrypter;
-import com.lesofn.appboot.common.exception.ApiException;
+import com.lesofn.appboot.infrastructure.auth.errors.AdminAuthException;
 import com.lesofn.appboot.infrastructure.auth.model.SystemLoginUser;
 import com.lesofn.appboot.infrastructure.config.AppBootConfig;
 import com.lesofn.appboot.infrastructure.config.CaptchaType;
@@ -11,7 +10,6 @@ import com.lesofn.appboot.infrastructure.frame.utils.MapCache;
 import com.lesofn.appboot.server.admin.dto.CaptchaDTO;
 import com.lesofn.appboot.server.admin.dto.ConfigDTO;
 import com.lesofn.appboot.server.admin.dto.LoginCommand;
-import com.lesofn.appboot.server.admin.error.LoginExcepFactor;
 import com.lesofn.appboot.server.admin.service.cache.RedisCacheService;
 import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +26,8 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.util.UUID;
+
+import static com.lesofn.appboot.infrastructure.auth.errors.AdminAuthErrorCode.*;
 
 /**
  * 登录服务
@@ -69,10 +69,10 @@ public class LoginService {
             );
         } catch (BadCredentialsException e) {
             log.info("用户[{}]登录失败，用户名或密码错误", loginCommand.getUsername());
-            throw new ApiException(LoginExcepFactor.USERNAME_PASSWORD_ERROR);
+            throw new AdminAuthException(USERNAME_PASSWORD_ERROR);
         } catch (Exception e) {
             log.error("用户[{}]登录失败", loginCommand.getUsername(), e);
-            throw new ApiException(LoginExcepFactor.USERNAME_PASSWORD_ERROR, e.getMessage());
+            throw new AdminAuthException(USERNAME_PASSWORD_ERROR);
         }
 
         SystemLoginUser loginUser = (SystemLoginUser) authentication.getPrincipal();
@@ -86,22 +86,22 @@ public class LoginService {
         }
 
         if (!StringUtils.hasText(code)) {
-            throw new ApiException(LoginExcepFactor.CAPTCHA_REQUIRED);
+            throw new AdminAuthException(CAPTCHA_REQUIRED);
         }
         if (!StringUtils.hasText(uuid)) {
-            throw new ApiException(LoginExcepFactor.CAPTCHA_EXPIRED);
+            throw new AdminAuthException(CAPTCHA_EXPIRED);
         }
 
         Object cacheCode = redisCacheService.captchaCache.get(uuid);
         redisCacheService.loginUserCache.delete(uuid);
 
         if (cacheCode == null) {
-            throw new ApiException(LoginExcepFactor.CAPTCHA_EXPIRED);
+            throw new AdminAuthException(CAPTCHA_EXPIRED);
         }
 
         String verifyCode = String.valueOf(cacheCode);
         if (!code.equalsIgnoreCase(verifyCode)) {
-            throw new ApiException(LoginExcepFactor.CAPTCHA_ERROR);
+            throw new AdminAuthException(CAPTCHA_ERROR);
         }
     }
 
@@ -150,7 +150,7 @@ public class LoginService {
             return new CaptchaDTO(appBootConfig.getCaptcha().isEnabled(), uuid, base64);
         } catch (Exception e) {
             log.error("生成验证码异常", e);
-            throw new ApiException(LoginExcepFactor.CAPTCHA_GENERATE_ERROR);
+            throw new AdminAuthException(CAPTCHA_GENERATE_ERROR);
         }
     }
 
@@ -178,7 +178,7 @@ public class LoginService {
             return RsaEncrypter.decrypt(encryptedPassword, appBootConfig.getRsaPrivateKey());
         } catch (Exception e) {
             log.error("密码解密失败: {}", encryptedPassword, e);
-            throw new ApiException(LoginExcepFactor.USERNAME_PASSWORD_ERROR, "密码解密失败");
+            throw new AdminAuthException(DECODE_PASS_ERROR);
         }
     }
 

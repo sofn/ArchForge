@@ -1,6 +1,6 @@
 package com.lesofn.appboot.common.enums;
 
-import com.lesofn.appboot.common.error.system.SystemErrorCode;
+import com.lesofn.appboot.common.errors.SystemErrorCode;
 import com.lesofn.appboot.common.error.system.SystemException;
 import org.apache.commons.lang3.BooleanUtils;
 
@@ -22,7 +22,7 @@ public class BasicEnumUtil {
         for (E enumConstant : enumClass.getEnumConstants()) {
             BasicEnum<?> basicEnum = (BasicEnum<?>) enumConstant;
             if (Objects.equals(basicEnum.getValue(), value)) {
-                target = (E) basicEnum;
+                target = enumConstant;
             }
         }
 
@@ -33,9 +33,9 @@ public class BasicEnumUtil {
         E target = null;
 
         for (E enumConstant : enumClass.getEnumConstants()) {
-            BasicEnum basicEnum = (BasicEnum) enumConstant;
+            BasicEnum<?> basicEnum = (BasicEnum<?>) enumConstant;
             if (Objects.equals(basicEnum.getValue(), value)) {
-                target = (E) basicEnum;
+                target = enumConstant;
             }
         }
 

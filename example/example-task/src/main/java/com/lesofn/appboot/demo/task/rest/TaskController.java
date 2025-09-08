@@ -1,10 +1,10 @@
 package com.lesofn.appboot.demo.task.rest;
 
-import com.lesofn.appboot.common.errors.EngineExceptionHelper;
-import com.lesofn.appboot.infrastructure.frame.context.RequestContext;
 import com.lesofn.appboot.demo.task.domain.Task;
+import com.lesofn.appboot.demo.task.errors.TaskException;
 import com.lesofn.appboot.demo.task.service.TaskService;
-import com.lesofn.appboot.demo.task.utils.TaskExcepFactor;
+import com.lesofn.appboot.infrastructure.frame.context.RequestContext;
+import jakarta.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import jakarta.annotation.Resource;
+import static com.lesofn.appboot.demo.task.errors.TaskErrorCode.TASK_NOT_EXISTS;
 
 /**
  * Authors: sofn
@@ -44,7 +44,7 @@ public class TaskController {
         if (task == null) {
             String message = "任务不存在(id:" + id + ")";
             logger.warn(message);
-            throw EngineExceptionHelper.localException(TaskExcepFactor.TASK_NOT_EXISTS);
+            throw new TaskException(TASK_NOT_EXISTS);
         }
         return task;
     }

@@ -1,12 +1,12 @@
 package com.lesofn.appboot.infrastructure.auth.spi;
 
-import com.lesofn.appboot.infrastructure.auth.model.AuthExcepFactor;
-import com.lesofn.appboot.infrastructure.auth.model.AuthException;
 import com.lesofn.appboot.infrastructure.auth.model.AuthRequest;
+import com.lesofn.appboot.infrastructure.auth.errors.AdminAuthErrorCode;
+import com.lesofn.appboot.infrastructure.auth.errors.AdminAuthException;
 import com.lesofn.appboot.common.encrypt.AESEncrypter;
 import com.lesofn.appboot.common.encrypt.EncrypterException;
-import com.lesofn.appboot.common.errors.EngineException;
 import com.lesofn.appboot.infrastructure.frame.utils.log.ApiLogger;
+import jakarta.security.auth.message.AuthException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.stereotype.Component;
@@ -45,7 +45,7 @@ public class CookieAuthSpi extends AbstractAuthSpi {
     }
 
     @Override
-    public long auth(AuthRequest request) throws AuthException {
+    public long auth(AuthRequest request) throws AdminAuthException {
         String cookie = request.getCookie(COOKIE_NAME);
         try {
             String decryptedString = encrypter.decryptAsString(cookie);
@@ -53,22 +53,22 @@ public class CookieAuthSpi extends AbstractAuthSpi {
             long time = NumberUtils.toLong(timeAndUid[0], 0);
             long now = System.currentTimeMillis();
             if (time > now || now - time > EXPIRES_TIME) {
-                throw new AuthException(AuthExcepFactor.E_USER_AUTHFAIL, "cookie expires.");
+                throw new AdminAuthException(AdminAuthErrorCode.USER_AUTHFAIL, "cookie expires.");
             }
             long uid = NumberUtils.toLong(timeAndUid[1], 0);
             if (uid <= 0) {
-                throw new AuthException(AuthExcepFactor.E_USER_AUTHFAIL, "invalid uid.");
+                throw new AdminAuthException(AdminAuthErrorCode.USER_AUTHFAIL, "invalid uid.");
             }
             return uid;
-        } catch (EngineException e) {
+        } catch (AdminAuthException e) {
             ApiLogger.error("cauth " + e.getMessage() + ", cookieStr:" + cookie);
             throw e;
         } catch (EncrypterException e) {
             ApiLogger.error("cauth decrypt auth token error, cookieStr:" + cookie);
-            throw new AuthException(AuthExcepFactor.E_USER_AUTHFAIL);
+            throw new AdminAuthException(AdminAuthErrorCode.USER_AUTHFAIL);
         } catch (RuntimeException e) {
             ApiLogger.error("cauth fail auth, cookieStr:" + cookie, e);
-            throw new AuthException(AuthExcepFactor.E_USER_AUTHFAIL);
+            throw new AdminAuthException(AdminAuthErrorCode.USER_AUTHFAIL);
         }
     }
 

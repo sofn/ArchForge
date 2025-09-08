@@ -15,7 +15,5 @@ rootProject.children.forEach { project ->
     // All subprojects now use build.gradle.kts
     project.buildFileName = "build.gradle.kts"
     
-    assert(project.projectDir.isDirectory)
-    assert(project.buildFile.exists())
-    assert(project.buildFile.isFile)
+    require(project.projectDir.isDirectory) { "Project directory must exist: ${project.projectDir}" }
 }

@@ -1,17 +1,18 @@
-package com.lesofn.appboot.common.error.system;
+package com.lesofn.appboot.common.error.example;
 
-import com.lesofn.appboot.common.error.manager.ErrorManager;
 import com.lesofn.appboot.common.error.api.ErrorCode;
+import com.lesofn.appboot.common.error.manager.ErrorManager;
+import com.lesofn.appboot.common.error.system.SystemProjectModule;
 import lombok.Getter;
 
 /**
  * 基础错误码定义
  *
- * @author lishafeng02
- * @date 2018/8/3
+ * @author sofn
+ * @version 1.0 Created at: 2018/8/3
  */
 @Getter
-public enum SystemErrorCode implements ErrorCode {
+public enum TestSystemErrorCode implements ErrorCode {
 
     SUCCESS(0, "ok"),
     SYSTEM_ERROR(1, "system error"),
@@ -20,7 +21,7 @@ public enum SystemErrorCode implements ErrorCode {
     private final int nodeNum;
     private final String msg;
 
-    SystemErrorCode(int nodeNum, String msg) {
+    TestSystemErrorCode(int nodeNum, String msg) {
         this.nodeNum = nodeNum;
         this.msg = msg;
         ErrorManager.register(SystemProjectModule.INSTANCE, this);
