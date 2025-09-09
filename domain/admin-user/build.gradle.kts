@@ -29,27 +29,13 @@ dependencies {
     }
 }
 
-// 配置生成的源文件目录
-val generatedSourcesDir = layout.buildDirectory.dir("generated/sources/annotationProcessor/java/main")
-
-sourceSets {
-    main {
-        java {
-            srcDir("src/main/java")
-            srcDir(generatedSourcesDir)
-        }
-    }
-}
-
-// 配置注解处理器选项
+// QueryDSL configuration
 tasks.withType<JavaCompile> {
     options.apply {
         compilerArgs.addAll(listOf(
             "-Aquerydsl.entityAccessors=true",
             "-Aquerydsl.useFields=false"
         ))
-        // 设置生成的源文件输出目录
-        generatedSourceOutputDirectory.set(generatedSourcesDir.get().asFile)
     }
 }
 

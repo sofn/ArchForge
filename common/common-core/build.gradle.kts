@@ -1,8 +1,3 @@
-apply(plugin = "groovy")
-
-tasks.test {
-    useJUnitPlatform()
-}
 
 dependencies {
     // 项目内依赖
@@ -52,20 +47,4 @@ dependencies {
     // Lombok
     compileOnly("org.projectlombok:lombok")
 
-    // JUnit for tests
-    testImplementation("org.junit.jupiter:junit-jupiter-api")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
-    
-    // Spock for tests
-    testImplementation("org.spockframework:spock-core")
-    testImplementation("org.spockframework:spock-spring")
-    
-    // Spring Test for Spock Spring support
-    testImplementation("org.springframework.boot:spring-boot-starter-test") {
-        exclude(group = "org.springframework.boot", module = "spring-boot-starter-logging")
-    }
-    
-    // Groovy for Spock
-    testImplementation("org.codehaus.groovy:groovy")
-    testImplementation("org.junit.platform:junit-platform-launcher")
 }

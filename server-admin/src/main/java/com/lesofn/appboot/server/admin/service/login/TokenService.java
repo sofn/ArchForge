@@ -6,6 +6,7 @@ import com.lesofn.appboot.infrastructure.auth.errors.AdminAuthException;
 import com.lesofn.appboot.infrastructure.config.AppBootConfig;
 import com.lesofn.appboot.server.admin.service.cache.RedisCacheService;
 import com.lesofn.appboot.infrastructure.auth.model.SystemLoginUser;
+import com.lesofn.appboot.server.admin.util.JwtTokenUtil;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import lombok.Data;
@@ -14,7 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.security.Key;
 import java.util.Map;
 import java.util.UUID;
@@ -36,6 +37,7 @@ public class TokenService {
 
     private final AppBootConfig appBootConfig;
     private final RedisCacheService redisCacheService;
+    private final JwtTokenUtil jwtTokenUtil;
 
 
     /**
@@ -73,10 +75,8 @@ public class TokenService {
      */
     public String createTokenAndPutUserInCache(SystemLoginUser loginUser) {
         loginUser.setCachedKey(UUID.randomUUID().toString().replace("-", ""));
-
         redisCacheService.loginUserCache.set(loginUser.getCachedKey(), loginUser);
-
-        return generateToken(ImmutableMap.of(Constants.Token.LOGIN_USER_KEY, loginUser.getCachedKey()));
+        return jwtTokenUtil.generateToken(loginUser);
     }
 
     /**
@@ -92,21 +92,22 @@ public class TokenService {
         }
     }
 
-
     /**
-     * 从数据声明生成令牌
-     *
-     * @param claims 数据声明
-     * @return 令牌
+     * 删除用户身份信息
+     * @param token 令牌
      */
-    private String generateToken(Map<String, Object> claims) {
-        // 使用新的API：从字符串创建Key对象
-        Key key = Keys.hmacShaKeyFor(appBootConfig.getJwt().getSecret().getBytes());
-        
-        return Jwts.builder()
-                .setClaims(claims)
-                .signWith(key, SignatureAlgorithm.HS512)
-                .compact();
+    public void removeToken(String token) {
+        if (StringUtils.isNotEmpty(token)) {
+            try {
+                Claims claims = parseToken(token);
+                // 解析对应的权限以及用户信息
+                String uuid = (String) claims.get(Constants.Token.LOGIN_USER_KEY);
+                // 删除用户缓存记录
+                redisCacheService.loginUserCache.delete(uuid);
+            } catch (Exception e) {
+                log.warn("Failed to remove token from cache", e);
+            }
+        }
     }
 
     /**

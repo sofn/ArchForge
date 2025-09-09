@@ -1,6 +1,6 @@
 # Development environment specific configuration
 server:
-  port: 8080
+  port: 8081
 spring:
   profiles:
     active: basic,dev
@@ -12,14 +12,13 @@ spring:
     livereload:
       enabled: true  # 启用LiveReload
       port: 35729   # LiveReload端口
-  datasource:
-    h2:
-      console: # H2 控制台配置
-        enabled: true  # 启用控制台
-        path: /h2-console  # 访问路径
-        settings:
-          trace: false  # 关闭跟踪日志（生产环境建议禁用）
-          web-allow-others: false  # 禁止远程访问（安全）
+  h2:
+    console: # H2 控制台配置
+      enabled: true  # 启用控制台
+      path: /h2-console  # 访问路径
+      settings:
+        trace: false  # 关闭跟踪日志（生产环境建议禁用）
+        web-allow-others: false  # 禁止远程访问（安全）
   data:
     # redis 配置 - 开发环境mock
     redis:
@@ -68,7 +67,8 @@ user:
 
 # 项目配置 - 开发环境
 app-boot:
-  enable-redis-mock: false
+  embedded:
+    redis: true
   # JWT配置
   jwt:
     secret: 5/jDAWs7a63GRgjS+uF2mP7dcLwI6GAgxf+Z0+fOAbgMR/jksG5r0v10nDOkrM0btxtb2FAuol8fSzSJis8gIA==

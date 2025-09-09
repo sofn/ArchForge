@@ -65,7 +65,10 @@ public class AppBootConfig {
      */
     private Register register = new Register();
 
-    private boolean enableRedisMock = false;
+    /**
+     * 嵌入式配置
+     */
+    private Embedded embedded = new Embedded();
 
     @Setter
     @Getter
@@ -121,6 +124,19 @@ public class AppBootConfig {
          * 是否开启注册功能
          */
         private boolean enabled = false;
+    }
+
+    @Setter
+    @Getter
+    public static class Embedded {
+        /**
+         * 是否启用嵌入式 Redis
+         */
+        private boolean redis = false;
+        /**
+         * 是否启用嵌入式 h2
+         */
+        private boolean h2 = false;
     }
 
 }

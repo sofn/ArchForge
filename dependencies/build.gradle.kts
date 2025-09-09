@@ -16,6 +16,7 @@ dependencies {
     constraints {
         // 数据库相关
         api("com.alibaba:druid:1.2.24")
+        api("com.alibaba:druid-spring-boot-starter:1.2.23")
         api("mysql:mysql-connector-java:8.0.33")
         api("com.h2database:h2:2.3.232")
         
@@ -71,6 +72,10 @@ dependencies {
         
         // Kaptcha 验证码
         api("com.github.penggle:kaptcha:2.3.2")
+
+        // MapStruct
+        api("org.mapstruct:mapstruct:1.5.5.Final")
+        api("org.mapstruct:mapstruct-processor:1.5.5.Final")
 
     }
 }

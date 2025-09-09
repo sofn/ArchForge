@@ -25,6 +25,8 @@ tasks.jar {
 dependencies {
     // 引入 Spring Boot dependencies BOM
     implementation(platform("org.springframework.boot:spring-boot-dependencies:3.5.4"))
+    // 引入项目统一版本管理平台
+    implementation(platform(project(":dependencies")))
     
     api(project(":common:common-core"))
     api(project(":infrastructure"))
@@ -56,9 +58,19 @@ dependencies {
     // Redis Mock for Dev environment
     api("com.github.fppt:jedis-mock")
     
+    // Druid connection pool and monitoring
+    api("com.alibaba:druid-spring-boot-starter")
+    
+    // Spring Boot DevTools - 开发环境自动重启和热部署
+    developmentOnly("org.springframework.boot:spring-boot-devtools:3.5.4")
+    
     // Lombok注解处理器
     annotationProcessor("org.projectlombok:lombok:1.18.36")
     compileOnly("org.projectlombok:lombok")
+
+    // MapStruct注解处理器
+    annotationProcessor("org.mapstruct:mapstruct-processor:1.5.5.Final")
+    compileOnly("org.mapstruct:mapstruct:1.5.5.Final")
 }
 
 // profile环境配置文件

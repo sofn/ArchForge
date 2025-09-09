@@ -18,7 +18,7 @@ import java.io.IOException;
 @Slf4j
 @Component
 @Profile("dev")
-@ConditionalOnProperty(name = "app-boot.enable-redis-mock", havingValue = "true")
+@ConditionalOnProperty(name = "app-boot.embedded.redis", havingValue = "true")
 public class InitRedisMockServer {
 
     @Value("${spring.data.redis.port:6379}")

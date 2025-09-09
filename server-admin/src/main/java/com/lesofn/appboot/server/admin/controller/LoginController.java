@@ -1,17 +1,14 @@
 package com.lesofn.appboot.server.admin.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.lesofn.appboot.infrastructure.auth.AuthenticationUtils;
 import com.lesofn.appboot.infrastructure.auth.model.SystemLoginUser;
-import com.lesofn.appboot.infrastructure.auth.spi.MAuthSpi;
 import com.lesofn.appboot.infrastructure.config.AppBootConfig;
 import com.lesofn.appboot.server.admin.dto.*;
 import com.lesofn.appboot.server.admin.service.login.LoginService;
 import com.lesofn.appboot.server.admin.service.login.TokenService;
 import com.lesofn.appboot.server.admin.service.user.UserService;
 import com.lesofn.appboot.user.domain.SysMenu;
-import com.lesofn.appboot.user.domain.SysUser;
 import com.lesofn.appboot.user.service.SysMenuService;
 import com.lesofn.appboot.user.service.SysUserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -80,12 +77,12 @@ public class LoginController {
     @Operation(summary = "登录")
     @PostMapping("/login")
     public TokenDTO login(@RequestBody @Valid LoginCommand loginCommand) {
-        // 生成令牌
-        String token = loginService.login(loginCommand);
-        SystemLoginUser loginUser = getLoginUser();
+        // 生成令牌并获取用户信息
+        LoginService.LoginResult loginResult = loginService.login(loginCommand);
+        SystemLoginUser loginUser = loginResult.getLoginUser();
         CurrentLoginUserDTO currentUserDTO = userService.getLoginUserInfo(loginUser);
 
-        return new TokenDTO(token, currentUserDTO);
+        return new TokenDTO(loginResult.getToken(), currentUserDTO);
     }
 
     /**
@@ -96,7 +93,7 @@ public class LoginController {
     @Operation(summary = "获取当前登录用户信息")
     @GetMapping("/getLoginUserInfo")
     public CurrentLoginUserDTO getLoginUserInfo() {
-        SystemLoginUser loginUser = getLoginUser();
+        SystemLoginUser loginUser = AuthenticationUtils.getSystemLoginUser();
         return userService.getLoginUserInfo(loginUser);
     }
 
@@ -108,7 +105,7 @@ public class LoginController {
     @Operation(summary = "获取用户对应的菜单路由", description = "用于动态生成路由")
     @GetMapping("/getRouters")
     public List<RouterDTO> getRouters() {
-        SystemLoginUser loginUser = getLoginUser();
+        SystemLoginUser loginUser = AuthenticationUtils.getSystemLoginUser();
         List<SysMenu> menus = menuService.findMenusByRoleId(loginUser.getRoleId());
         List<SysMenu> menuTree = menuService.buildMenuTree(menus);
         return convertToRouterDTO(menuTree);
@@ -149,10 +146,4 @@ public class LoginController {
         return router;
     }
 
-    /**
-     * 获取当前登录用户
-     */
-    private SystemLoginUser getLoginUser() {
-        return AuthenticationUtils.getSystemLoginUser();
-    }
 }

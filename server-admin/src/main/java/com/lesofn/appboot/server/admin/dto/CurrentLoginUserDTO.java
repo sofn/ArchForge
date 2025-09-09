@@ -1,6 +1,5 @@
 package com.lesofn.appboot.server.admin.dto;
 
-import com.lesofn.appboot.infrastructure.auth.model.SystemLoginUser;
 import lombok.Data;
 
 import java.util.Set;
@@ -14,7 +13,7 @@ public class CurrentLoginUserDTO {
     /**
      * 当前登录用户信息
      */
-    private SystemLoginUser userInfo;
+    private UserDTO userInfo;
     /**
      * 角色列表
      */

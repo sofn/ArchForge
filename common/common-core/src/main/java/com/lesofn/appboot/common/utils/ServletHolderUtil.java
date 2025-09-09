@@ -25,19 +25,30 @@ public class ServletHolderUtil {
      * 获取request
      */
     public static HttpServletRequest getRequest() {
-        return getRequestAttributes().getRequest();
+        ServletRequestAttributes attributes = getRequestAttributes();
+        if (attributes == null) {
+            return null;
+        }
+        return attributes.getRequest();
     }
 
     /**
      * 获取response
      */
     public static HttpServletResponse getResponse() {
-        return getRequestAttributes().getResponse();
+        ServletRequestAttributes attributes = getRequestAttributes();
+        if (attributes == null) {
+            return null;
+        }
+        return attributes.getResponse();
     }
 
 
     public static ServletRequestAttributes getRequestAttributes() {
         RequestAttributes attributes = RequestContextHolder.getRequestAttributes();
+        if (attributes == null || !(attributes instanceof ServletRequestAttributes)) {
+            return null;
+        }
         return (ServletRequestAttributes) attributes;
     }
 
@@ -66,6 +77,9 @@ public class ServletHolderUtil {
      */
     public static String getContextUrl() {
         HttpServletRequest request = getRequest();
+        if (request == null) {
+            return "";
+        }
         StringBuffer url = request.getRequestURL();
         String contextPath = request.getServletContext().getContextPath();
         String strip = StringUtils.removeEnd(url.toString(), request.getRequestURI());

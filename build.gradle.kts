@@ -24,6 +24,12 @@ subprojects {
     // 为除了 dependencies 之外的所有子项目应用插件
     if (name != "dependencies") {
         apply(plugin = "java-library")
+        apply(plugin = "groovy")
+        
+        // 配置测试任务使用JUnit Platform
+        tasks.withType<Test> {
+            useJUnitPlatform()
+        }
         
         dependencies {
             // 引入 Spring Boot dependencies
@@ -35,6 +41,16 @@ subprojects {
             add("annotationProcessor", "org.projectlombok:lombok:1.18.36")
             add("testAnnotationProcessor", "org.projectlombok:lombok:1.18.36")
 
+            // 全局测试依赖 - Spock框架 (版本由 dependencies 模块管理)
+            add("testImplementation", "org.junit.jupiter:junit-jupiter-api")
+            add("testRuntimeOnly", "org.junit.jupiter:junit-jupiter-engine")
+            add("testImplementation", "org.spockframework:spock-core")
+            add("testImplementation", "org.spockframework:spock-spring")
+            add("testImplementation", "org.springframework.boot:spring-boot-starter-test") {
+                exclude(group = "org.springframework.boot", module = "spring-boot-starter-logging")
+            }
+            add("testImplementation", "org.codehaus.groovy:groovy")
+            add("testImplementation", "org.junit.platform:junit-platform-launcher")
         }
     }
 }

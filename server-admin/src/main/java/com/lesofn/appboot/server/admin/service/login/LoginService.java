@@ -54,9 +54,9 @@ public class LoginService {
      * 登录验证
      *
      * @param loginCommand 登录参数
-     * @return token
+     * @return LoginResult 包含token和用户信息
      */
-    public String login(LoginCommand loginCommand) {
+    public LoginResult login(LoginCommand loginCommand) {
         // 验证码校验
         validateCaptcha(loginCommand.getCaptchaCodeKey(), loginCommand.getCaptchaCode());
 
@@ -77,7 +77,30 @@ public class LoginService {
 
         SystemLoginUser loginUser = (SystemLoginUser) authentication.getPrincipal();
         // 生成token
-        return tokenService.createTokenAndPutUserInCache(loginUser);
+        String token = tokenService.createTokenAndPutUserInCache(loginUser);
+        
+        return new LoginResult(token, loginUser);
+    }
+    
+    /**
+     * 登录结果封装类
+     */
+    public static class LoginResult {
+        private final String token;
+        private final SystemLoginUser loginUser;
+        
+        public LoginResult(String token, SystemLoginUser loginUser) {
+            this.token = token;
+            this.loginUser = loginUser;
+        }
+        
+        public String getToken() {
+            return token;
+        }
+        
+        public SystemLoginUser getLoginUser() {
+            return loginUser;
+        }
     }
 
     private void validateCaptcha(String uuid, String code) {

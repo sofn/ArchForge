@@ -12,7 +12,7 @@ import static com.lesofn.appboot.infrastructure.auth.errors.AdminAuthErrorCode.U
 /**
  * 安全服务工具类
  *
- * @author valarchie
+ * @author sofn
  */
 public class AuthenticationUtils {
 

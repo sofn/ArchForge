@@ -38,9 +38,9 @@ public class ErrorExceptionHandle {
         Pair<Throwable, String> pair = getExceptionMessage(e);
         if (e instanceof IErrorCodeException) {
             if (e.getCause() != null) {
-                log.error("error, request: {}", parseParam(request), e.getCause());
+                log.error("error, request: {}", parseParam(request), e);
             } else {
-                log.error("error: {}, request: {}", pair.getRight(), parseParam(request));
+                log.error("error: {}, request: {}", pair.getRight(), parseParam(request), e);
             }
             ErrorInfo errorInfo = ((IErrorCodeException) e).getErrorInfo();
             ResponseResult<?> apiResult;

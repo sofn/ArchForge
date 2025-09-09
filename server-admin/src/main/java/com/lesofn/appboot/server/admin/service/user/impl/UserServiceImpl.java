@@ -2,7 +2,9 @@ package com.lesofn.appboot.server.admin.service.user.impl;
 
 import com.lesofn.appboot.infrastructure.auth.model.SystemLoginUser;
 import com.lesofn.appboot.server.admin.dto.CurrentLoginUserDTO;
+import com.lesofn.appboot.server.admin.dto.UserDTO;
 import com.lesofn.appboot.server.admin.service.user.UserService;
+import com.lesofn.appboot.user.domain.SysUser;
 import com.lesofn.appboot.user.service.SysUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,10 +24,29 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public CurrentLoginUserDTO getLoginUserInfo(SystemLoginUser loginUser) {
-        CurrentLoginUserDTO userInfo = new CurrentLoginUserDTO();
-        userInfo.setUserInfo(loginUser);
-        userInfo.setRoleKey("");
-        userInfo.setPermissions(new HashSet<>());
-        return userInfo;
+        CurrentLoginUserDTO currentUserDTO = new CurrentLoginUserDTO();
+        
+        // 根据用户ID查询用户完整信息
+        SysUser user = sysUserService.findById(loginUser.getUserId()).orElse(null);
+        
+        // 创建UserDTO并设置用户信息
+        UserDTO userDTO = new UserDTO(user);
+        currentUserDTO.setUserInfo(userDTO);
+        
+        // 设置角色key
+        if (loginUser.getRoleInfo() != null) {
+            currentUserDTO.setRoleKey(loginUser.getRoleInfo().getRoleKey());
+        } else {
+            currentUserDTO.setRoleKey("");
+        }
+        
+        // 设置权限列表
+        if (loginUser.getRoleInfo() != null && loginUser.getRoleInfo().getMenuPermissions() != null) {
+            currentUserDTO.setPermissions(loginUser.getRoleInfo().getMenuPermissions());
+        } else {
+            currentUserDTO.setPermissions(new HashSet<>());
+        }
+        
+        return currentUserDTO;
     }
 }

@@ -63,6 +63,24 @@ public class AdminUserDetailsService implements UserDetailsService {
 
         SystemLoginUser loginUser = new SystemLoginUser(user.getUserId(), user.getIsAdmin(), user.getUsername(),
                 user.getPassword(), roleInfo, user.getDeptId());
+        
+        // 填充用户权限信息到authorities中
+        if (roleInfo != null && roleInfo.getMenuPermissions() != null) {
+            for (String permission : roleInfo.getMenuPermissions()) {
+                if (permission != null && !permission.trim().isEmpty()) {
+                    loginUser.grantAppPermission(permission);
+                }
+            }
+        }
+        
+        // 如果是管理员，添加管理员权限
+        if (user.getIsAdmin()) {
+            loginUser.grantAppPermission("ROLE_ADMIN");
+        }
+        
+        // 添加基础用户权限
+        loginUser.grantAppPermission("ROLE_USER");
+        
         loginUser.fillLoginInfo();
         loginUser.setAutoRefreshCacheTime(loginUser.getLoginInfo().getLoginTime()
                 + TimeUnit.MINUTES.toMillis(appBootConfig.getToken().getAutoRefreshTime()));

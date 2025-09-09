@@ -6,6 +6,7 @@ import com.lesofn.appboot.common.utils.ServletHolderUtil;
 import com.lesofn.appboot.common.utils.ip.IpRegionUtil;
 import com.lesofn.appboot.common.utils.ip.IpUtil;
 import eu.bitwalker.useragentutils.UserAgent;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
@@ -55,13 +56,46 @@ public class BaseLoginUser implements UserDetails {
      *
      */
     public void fillLoginInfo() {
-        UserAgent userAgent = UserAgent.parseUserAgentString(ServletHolderUtil.getRequest().getHeader("User-Agent"));
-        String ip = IpUtil.getRealIpAddr(ServletHolderUtil.getRequest());
+        HttpServletRequest request;
+        try {
+            request = ServletHolderUtil.getRequest();
+        } catch (Exception e) {
+            // 如果获取请求上下文失败，使用默认值
+            setDefaultLoginInfo();
+            return;
+        }
+        
+        if (request == null) {
+            // 如果请求上下文不可用，设置默认值
+            setDefaultLoginInfo();
+            return;
+        }
+        
+        try {
+            String userAgentHeader = request.getHeader("User-Agent");
+            if (userAgentHeader == null) {
+                userAgentHeader = "unknown";
+            }
+            
+            UserAgent userAgent = UserAgent.parseUserAgentString(userAgentHeader);
+            String ip = IpUtil.getRealIpAddr(request);
 
-        this.getLoginInfo().setIpAddress(ip);
-        this.getLoginInfo().setLocation(IpRegionUtil.getBriefLocationByIp(ip));
-        this.getLoginInfo().setBrowser(userAgent.getBrowser().getName());
-        this.getLoginInfo().setOperationSystem(userAgent.getOperatingSystem().getName());
+            this.getLoginInfo().setIpAddress(ip);
+            this.getLoginInfo().setLocation(IpRegionUtil.getBriefLocationByIp(ip));
+            this.getLoginInfo().setBrowser(userAgent.getBrowser() != null ? userAgent.getBrowser().getName() : "unknown");
+            this.getLoginInfo().setOperationSystem(userAgent.getOperatingSystem() != null ? userAgent.getOperatingSystem().getName() : "unknown");
+            this.getLoginInfo().setLoginTime(System.currentTimeMillis());
+        } catch (Exception e) {
+            // 如果处理请求信息时发生异常，使用默认值
+            setDefaultLoginInfo();
+        }
+    }
+
+    private void setDefaultLoginInfo() {
+        this.getLoginInfo().setIpAddress("unknown");
+        this.getLoginInfo().setLocation("unknown");
+        this.getLoginInfo().setBrowser("unknown");
+        this.getLoginInfo().setOperationSystem("unknown");
         this.getLoginInfo().setLoginTime(System.currentTimeMillis());
     }
 
