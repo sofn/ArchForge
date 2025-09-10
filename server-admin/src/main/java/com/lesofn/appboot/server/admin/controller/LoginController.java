@@ -1,6 +1,5 @@
 package com.lesofn.appboot.server.admin.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lesofn.appboot.infrastructure.auth.AuthenticationUtils;
 import com.lesofn.appboot.infrastructure.auth.model.SystemLoginUser;
 import com.lesofn.appboot.infrastructure.config.AppBootConfig;
@@ -37,8 +36,6 @@ public class LoginController {
     private final SysUserService sysUserService;
     private final SysMenuService menuService;
     private final AppBootConfig appBootConfig;
-
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
     /**
      * 访问首页，提示语

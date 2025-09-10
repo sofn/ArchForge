@@ -5,7 +5,7 @@
 ### Application Configuration Hierarchy
 
 ```
-application-basic.yaml     # Common configurations
+application-base.yaml     # Common configurations
 ├── application-dev.yaml   # Development environment
 ├── application-test.yaml  # Test environment
 └── application-prod.yaml  # Production environment
@@ -73,7 +73,7 @@ public class TokenService {
 
 ## YAML Configuration Guidelines
 
-### Common Configuration (application-basic.yaml)
+### Common Configuration (application-base.yaml)
 ```yaml
 # Server configuration
 server:
@@ -102,7 +102,7 @@ app-boot:
 ```yaml
 spring:
   profiles:
-    active: basic,dev
+    active: base,dev
   devtools:
     restart:
       enabled: true
@@ -123,7 +123,7 @@ app-boot:
 ```yaml
 spring:
   profiles:
-    active: basic,prod
+    active: base,prod
 
 app-boot:
   jwt:
@@ -251,7 +251,7 @@ public String getProperty() {
 ## Configuration Loading Order
 
 1. `application.yaml` (if exists)
-2. `application-basic.yaml`
+2. `application-base.yaml`
 3. `application-{profile}.yaml`
 4. Environment variables
 5. Command line arguments

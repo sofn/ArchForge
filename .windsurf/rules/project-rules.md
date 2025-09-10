@@ -73,7 +73,7 @@ This is a multi-module Spring Boot 3 project with clean architecture principles:
 ## Configuration Management
 
 ### Configuration Structure
-- Common configurations in `server-admin/src/main/resources/application-basic.yaml`
+- Common configurations in `server-admin/src/main/resources/application-base.yaml`
 - Environment-specific configs in `server-admin/src/main/profiles/{env}/application.yaml`
 - Profiles: `dev` (H2 + mock Redis), `test`, `prod`
 

@@ -1,7 +1,7 @@
 # Test environment specific configuration
 spring:
   profiles:
-    active: basic,test
+    active: base,test
   datasource:
     initialize: true
     sqlScriptEncoding: UTF-8

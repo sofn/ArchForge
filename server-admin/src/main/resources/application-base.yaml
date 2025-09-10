@@ -5,13 +5,13 @@ server:
       enabled: true
       charset: UTF-8
 
-management:
-  server:
-    port: 7002
-  endpoints:
-    web:
-      exposure:
-        include: "*"
+#management:
+#  server:
+#    port: 7002
+#  endpoints:
+#    web:
+#      exposure:
+#        include: "*"
 
 spring:
   application:
@@ -43,7 +43,10 @@ spring:
       fail-on-unknown-properties: false
     serialization:
       write-dates-as-timestamps: false
+      write-date-timestamps-as-nanoseconds: false
     date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+    locale: zh_CN
 
 # 项目相关配置
 app-boot:

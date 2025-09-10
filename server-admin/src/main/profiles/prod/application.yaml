@@ -1,7 +1,7 @@
 # Production environment specific configuration
 spring:
   profiles:
-    active: basic,prod
+    active: base,prod
   datasource:
     initialize: false  # 生产环境不自动初始化
     sqlScriptEncoding: UTF-8

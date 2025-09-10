@@ -3,7 +3,7 @@ server:
   port: 8081
 spring:
   profiles:
-    active: basic,dev
+    active: base,dev
   devtools:
     restart:
       enabled: true  # 启用自动重启
@@ -75,4 +75,4 @@ app-boot:
     expire-seconds: 604800  # JWT有效期（秒），7天
   # 验证码配置
   captcha:
-    enabled: true  # 开发环境关闭验证码，方便测试
+    enabled: false  # 开发环境关闭验证码，方便测试

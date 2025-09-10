@@ -147,7 +147,7 @@ public class MyClass {
 
 ## Configuration Files
 
-- Common: `application-basic.yaml`
+- Common: `application-base.yaml`
 - Dev: `profiles/dev/application.yaml`
 - Test: `profiles/test/application.yaml`
 - Prod: `profiles/prod/application.yaml`

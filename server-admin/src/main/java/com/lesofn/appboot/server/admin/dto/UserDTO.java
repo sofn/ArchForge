@@ -1,5 +1,6 @@
 package com.lesofn.appboot.server.admin.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.lesofn.appboot.user.domain.SysUser;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -98,6 +99,7 @@ public class UserDTO {
     /**
      * 最后登录时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime loginDate;
 
     /**
@@ -113,6 +115,7 @@ public class UserDTO {
     /**
      * 创建时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createTime;
 
     /**
@@ -128,6 +131,7 @@ public class UserDTO {
     /**
      * 修改时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updateTime;
 
     /**
