@@ -8,7 +8,8 @@ import com.lesofn.appboot.server.admin.service.login.LoginService;
 import com.lesofn.appboot.server.admin.service.login.TokenService;
 import com.lesofn.appboot.server.admin.service.user.UserService;
 import com.lesofn.appboot.user.domain.SysMenu;
-import com.lesofn.appboot.user.service.SysMenuService;
+import com.lesofn.appboot.user.menu.SysMenuService;
+import com.lesofn.appboot.user.menu.dto.RouterDTO;
 import com.lesofn.appboot.user.service.SysUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -103,44 +104,7 @@ public class LoginController {
     @GetMapping("/getRouters")
     public List<RouterDTO> getRouters() {
         SystemLoginUser loginUser = AuthenticationUtils.getSystemLoginUser();
-        List<SysMenu> menus = menuService.findMenusByRoleId(loginUser.getRoleId());
-        List<SysMenu> menuTree = menuService.buildMenuTree(menus);
-        return convertToRouterDTO(menuTree);
-    }
-
-    /**
-     * 将 SysMenu 转换为 RouterDTO
-     */
-    private List<RouterDTO> convertToRouterDTO(List<SysMenu> sysMenus) {
-        if (sysMenus == null || sysMenus.isEmpty()) {
-            return new ArrayList<>();
-        }
-
-        return sysMenus.stream().map(this::convertMenuToRouter).toList();
-    }
-
-    /**
-     * 转换单个菜单项
-     */
-    private RouterDTO convertMenuToRouter(SysMenu menu) {
-        RouterDTO router = new RouterDTO();
-        router.setName(menu.getRouterName());
-        router.setPath(menu.getPath());
-        router.setHidden(false); // 根据实际需求设置
-        router.setComponent(menu.getMetaInfo()); // 假设 metaInfo 存储了组件路径
-        
-        RouterDTO.MetaDTO meta = new RouterDTO.MetaDTO();
-        meta.setTitle(menu.getMenuName());
-        meta.setIcon(""); // 根据实际需求设置图标
-        meta.setNoCache(false);
-        meta.setLink("");
-        router.setMeta(meta);
-        
-        if (menu.getChildren() != null && !menu.getChildren().isEmpty()) {
-            router.setChildren(convertToRouterDTO(menu.getChildren()));
-        }
-        
-        return router;
+        return menuService.getRouterTree(loginUser);
     }
 
 }

@@ -1,7 +1,7 @@
 package com.lesofn.appboot.server.admin.controller.system;
 
 import com.lesofn.appboot.user.domain.SysMenu;
-import com.lesofn.appboot.user.service.SysMenuService;
+import com.lesofn.appboot.user.menu.SysMenuService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -81,7 +81,7 @@ public class SysMenuController {
     }
 
     @PatchMapping("/{id}/status")
-    public ResponseEntity<Void> updateMenuStatus(@PathVariable Long id, @RequestParam Short status) {
+    public ResponseEntity<Void> updateMenuStatus(@PathVariable Long id, @RequestParam Integer status) {
         Optional<SysMenu> menuOptional = menuService.findById(id);
         if (menuOptional.isPresent()) {
             SysMenu menu = menuOptional.get();

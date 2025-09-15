@@ -18,11 +18,9 @@ import java.io.Serializable;
 public class SysRoleMenu {
 
     @Id
-    @Column(name = "role_id", nullable = false)
     private Long roleId;
 
     @Id
-    @Column(name = "menu_id", nullable = false)
     private Long menuId;
 
     @Data

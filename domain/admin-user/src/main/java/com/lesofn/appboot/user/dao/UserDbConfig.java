@@ -17,7 +17,11 @@ import jakarta.annotation.Resource;
 import javax.sql.DataSource;
 
 @Configuration
-@EnableJpaRepositories(entityManagerFactoryRef = "userEntityManagerFactory", transactionManagerRef = "userTransactionManager")
+@EnableJpaRepositories(
+        basePackages = {"com.lesofn.appboot.user.dao", "com.lesofn.appboot.user.menu.repository"},
+        entityManagerFactoryRef = "userEntityManagerFactory", 
+        transactionManagerRef = "userTransactionManager"
+)
 public class UserDbConfig {
 
     @Resource(name = "userDataSource")
@@ -39,7 +43,7 @@ public class UserDbConfig {
         factoryBean.setJpaVendorAdapter(jpaVendorAdapter);
         factoryBean.setPersistenceUnitName("user");
         //此处应包含当前模块的domain类
-        factoryBean.setPackagesToScan("com.lesofn.appboot.user.domain");
+        factoryBean.setPackagesToScan("com.lesofn.appboot.user.domain", "com.lesofn.appboot.user.menu.repository");
 
         return factoryBean;
     }

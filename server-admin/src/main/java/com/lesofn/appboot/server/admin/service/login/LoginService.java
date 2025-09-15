@@ -72,7 +72,7 @@ public class LoginService {
             throw new AdminAuthException(USERNAME_PASSWORD_ERROR);
         } catch (Exception e) {
             log.error("用户[{}]登录失败", loginCommand.getUsername(), e);
-            throw new AdminAuthException(USERNAME_PASSWORD_ERROR);
+            throw new AdminAuthException(LOGIN_ERROR);
         }
 
         SystemLoginUser loginUser = (SystemLoginUser) authentication.getPrincipal();

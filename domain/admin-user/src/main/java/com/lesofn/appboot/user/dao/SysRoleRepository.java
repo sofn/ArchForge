@@ -36,8 +36,8 @@ public interface SysRoleRepository extends JpaRepository<SysRole, Long>, JpaSpec
             + "FROM sys_menu m "
             + " LEFT JOIN sys_role_menu rm ON m.menu_id = rm.menu_id "
             + " LEFT JOIN sys_role r ON r.role_id = rm.role_id "
-            + "WHERE m.status = 1 AND m.deleted = 0 "
-            + " AND r.status = 1 AND r.deleted = 0 "
+            + "WHERE m.deleted = 0 AND m.status = 1 "
+            + " AND r.deleted = 0 AND r.status = 1 "
             + " AND r.role_id = :roleId", nativeQuery = true)
     List<SysMenu> getMenuListByRoleId(Long roleId);
 }

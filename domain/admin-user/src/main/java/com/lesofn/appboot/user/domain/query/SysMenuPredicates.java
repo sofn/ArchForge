@@ -9,13 +9,12 @@ public class SysMenuPredicates {
     private static final QSysMenu qSysMenu = QSysMenu.sysMenu;
 
     public static Predicate buildQueryPredicate() {
-        // 默认只查询未删除的菜单
         return qSysMenu.deleted.isFalse();
     }
     
     public static Predicate buildActiveMenusPredicate() {
         // 查询未删除且状态为1的菜单
-        return qSysMenu.deleted.isFalse().and(qSysMenu.status.eq((short) 1));
+        return qSysMenu.deleted.isFalse().and(qSysMenu.status.eq(1));
     }
     
     public static Predicate buildMenusByParentIdPredicate(Long parentId) {

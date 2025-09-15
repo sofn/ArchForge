@@ -1,4 +1,4 @@
-package com.lesofn.appboot.user.dao;
+package com.lesofn.appboot.user.menu.repository;
 
 import com.lesofn.appboot.user.domain.SysMenu;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,8 +10,12 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+/**
+ * SysMenuRepository接口，定义Spring Data JPA方法
+ * 实际使用请注入SysMenuRepositoryImpl类，它同时支持Spring Data JPA和QueryDSL
+ */
 @Repository
-public interface SysMenuRepository extends JpaRepository<SysMenu, Long>, JpaSpecificationExecutor<SysMenu>, QuerydslPredicateExecutor<SysMenu> {
+public interface SysMenuRepository extends JpaRepository<SysMenu, Long>, JpaSpecificationExecutor<SysMenu>, QuerydslPredicateExecutor<SysMenu>, SysMenuRepositoryCustom {
 
     List<SysMenu> findByParentId(Long parentId);
     

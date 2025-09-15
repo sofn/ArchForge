@@ -11,7 +11,7 @@ import com.lesofn.appboot.infrastructure.user.web.RoleInfo;
 import com.lesofn.appboot.user.domain.SysMenu;
 import com.lesofn.appboot.user.domain.SysRole;
 import com.lesofn.appboot.user.domain.SysUser;
-import com.lesofn.appboot.user.service.SysMenuService;
+import com.lesofn.appboot.user.menu.SysMenuService;
 import com.lesofn.appboot.user.service.SysRoleService;
 import com.lesofn.appboot.user.service.SysUserService;
 import lombok.RequiredArgsConstructor;

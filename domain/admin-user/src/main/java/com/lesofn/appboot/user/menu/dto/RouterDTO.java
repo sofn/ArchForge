@@ -1,5 +1,8 @@
-package com.lesofn.appboot.server.admin.dto;
+package com.lesofn.appboot.user.menu.dto;
 
+import com.google.common.collect.Lists;
+import com.lesofn.appboot.common.utils.jackson.JacksonUtil;
+import com.lesofn.appboot.user.domain.SysMenu;
 import lombok.Data;
 
 import java.util.List;
@@ -10,7 +13,24 @@ import java.util.List;
  */
 @Data
 public class RouterDTO {
-    
+
+    public RouterDTO(SysMenu entity) {
+        if (entity != null) {
+            this.name = entity.getRouterName();
+            this.path = entity.getPath();
+            // 暂时不需要component
+//            this.component = entity.getComponent();
+//            this.rank = entity.getRank();
+//            this.redirect = entity.getRedirect();
+            if (entity.getMetaInfo() != null) {
+                this.meta = entity.getMetaInfo();
+            } else {
+                this.meta = new MetaDTO();
+            }
+            this.meta.setAuths(Lists.newArrayList(entity.getPermission()));
+        }
+    }
+
     /**
      * 路由名字
      */
@@ -55,27 +75,5 @@ public class RouterDTO {
      * 子路由
      */
     private List<RouterDTO> children;
-    
-    @Data
-    public static class MetaDTO {
-        /**
-         * 路由在侧边栏和面包屑中展示的名字
-         */
-        private String title;
-        
-        /**
-         * 路由的图标
-         */
-        private String icon;
-        
-        /**
-         * 如果设置为 true，则不会被 <keep-alive> 缓存
-         */
-        private boolean noCache;
-        
-        /**
-         * 内链地址
-         */
-        private String link;
-    }
+
 }

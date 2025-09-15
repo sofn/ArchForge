@@ -46,6 +46,7 @@ public enum AdminAuthErrorCode implements ErrorCode {
 
     USER_FAIL_TO_GET_USER_ID(30, "获取用户ID失败"),
     USER_FAIL_TO_GET_USER_INFO(31, "获取用户信息失败"),
+    LOGIN_ERROR(32, "登录失败"),
     ;
 
 

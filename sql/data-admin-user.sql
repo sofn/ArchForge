@@ -1,8 +1,7 @@
 
 create table sys_user
 (
-    user_id      bigint auto_increment comment '用户ID'
-        primary key,
+    user_id      bigint auto_increment comment '用户ID' primary key,
     post_id      bigint                  null comment '职位id',
     role_id      bigint                  null comment '角色id',
     dept_id      bigint                  null comment '部门ID',
