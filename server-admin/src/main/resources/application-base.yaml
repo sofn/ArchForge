@@ -44,9 +44,26 @@ spring:
     serialization:
       write-dates-as-timestamps: false
       write-date-timestamps-as-nanoseconds: false
+      fail-on-empty-beans: false
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: GMT+8
     locale: zh_CN
+    default-property-inclusion: non_null
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+    enabled: true
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+    tags-sorter: alpha
+    operations-sorter: alpha
+    doc-expansion: none
+    display-request-duration: true
+  default-produces-media-type: application/json
+  default-consumes-media-type: application/json
+  show-actuator: false
 
 # 项目相关配置
 app-boot:

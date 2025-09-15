@@ -33,6 +33,18 @@ public class ResultValueWrapper implements ResponseBodyAdvice<Object> {
     @Override
     public Object beforeBodyWrite(@Nullable Object body, @Nullable  MethodParameter returnType, @Nullable MediaType selectedContentType,
                                   @Nullable Class selectedConverterType, @Nonnull ServerHttpRequest request, @Nonnull ServerHttpResponse response) {
+    
+        String requestPath = ((ServletServerHttpRequest) request).getServletRequest().getServletPath();
+    
+        // Skip response wrapping for OpenAPI/Swagger endpoints
+        if (StringUtils.startsWith(requestPath, "/v3/api-docs") 
+            || StringUtils.startsWith(requestPath, "/swagger-ui")
+            || StringUtils.equals(requestPath, "/swagger-ui.html")
+            || StringUtils.startsWith(requestPath, "/swagger-resources")) {
+            System.out.println("[DEBUG] ResultValueWrapper: Skipping path " + requestPath + ", body type: " + (body != null ? body.getClass().getSimpleName() : "null"));
+            return body;
+        }
+    
         if (body == null) {
             return ResponseResult.success(null);
         } else if (body instanceof ResponseResult) {
@@ -42,7 +54,7 @@ public class ResultValueWrapper implements ResponseBodyAdvice<Object> {
             return ResponseResult.success(result.getData());
         }
 
-        if (StringUtils.equals(((ServletServerHttpRequest) request).getServletRequest().getServletPath(), "/error")) {
+        if (StringUtils.equals(requestPath, "/error")) {
             return ResponseResult.error(SystemErrorCode.SYSTEM_ERROR.getCode(), body.toString());
         } else {
             return ResponseResult.success(body);

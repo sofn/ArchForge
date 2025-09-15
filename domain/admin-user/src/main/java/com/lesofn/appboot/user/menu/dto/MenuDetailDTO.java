@@ -1,6 +1,7 @@
 package com.lesofn.appboot.user.menu.dto;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.lesofn.appboot.common.utils.jackson.JacksonUtil;
+import com.lesofn.appboot.infrastructure.config.JacksonConfig;
 import com.lesofn.appboot.user.domain.SysMenu;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -18,8 +19,7 @@ public class MenuDetailDTO extends MenuDTO {
             return;
         }
         if (entity.getMetaInfo() != null) {
-            ObjectMapper objectMapper = new ObjectMapper();
-            this.meta = objectMapper.convertValue(entity.getMetaInfo(), MetaDTO.class);
+            this.meta = entity.getMetaInfo();
         }
         this.permission = entity.getPermission();
     }

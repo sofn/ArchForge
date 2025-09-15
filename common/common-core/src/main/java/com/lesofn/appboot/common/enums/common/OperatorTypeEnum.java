@@ -2,13 +2,17 @@ package com.lesofn.appboot.common.enums.common;
 
 import com.lesofn.appboot.common.enums.BasicEnum;
 import com.lesofn.appboot.common.enums.dictionary.Dictionary;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 /**
  * 操作者类型
  * @author sofn
  */
+@Getter
+@AllArgsConstructor
 @Dictionary(name = "sysOperationLog.operatorType")
-public enum OperatorTypeEnum implements BasicEnum<Integer> {
+public enum OperatorTypeEnum implements BasicEnum {
 
     /**
      * 菜单类型
@@ -19,21 +23,5 @@ public enum OperatorTypeEnum implements BasicEnum<Integer> {
 
     private final int value;
     private final String description;
-
-    OperatorTypeEnum(int value, String description) {
-        this.value = value;
-        this.description = description;
-    }
-
-    @Override
-    public Integer getValue() {
-        return value;
-    }
-
-    @Override
-    public String description() {
-        return description;
-    }
-
 
 }

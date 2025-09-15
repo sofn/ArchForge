@@ -8,6 +8,7 @@ import com.lesofn.appboot.infrastructure.frame.utils.RequestLogRecord;
 import com.lesofn.appboot.infrastructure.frame.utils.ResponseWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.slf4j.MDC;
 
 import jakarta.servlet.*;
@@ -23,8 +24,9 @@ public class RequestLogFilter implements Filter {
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         HttpServletResponse response = (HttpServletResponse) servletResponse;
         String path = request.getRequestURI();
-        if (StringUtils.startsWithAny(path, "/webjars", "/static", "/js", "/css", "/libs", "/WEB-INF")
-                || StringUtils.endsWithAny(path, GlobalConstants.staticResourceArray)) {
+        if (Strings.CS.startsWithAny(path, "/webjars", "/static", "/js", "/css", "/libs", "/WEB-INF")
+                || Strings.CS.startsWithAny(request.getRequestURI(), "/swagger-", "/v3/api-docs")
+                || Strings.CS.startsWithAny(path, GlobalConstants.staticResourceArray)) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -68,7 +70,13 @@ public class RequestLogFilter implements Filter {
                     record.setWriteBody(false);
                 }
                 MDC.put("CUSTOM_LOG", "request");
-                log.info(record.toString());
+                String recordString = record.toString();
+                if (recordString.length() > 1024) {
+                    log.info("Output too long, ignoring detailed log output. RequestId: {}, API: {}, Method: {}, Status: {}, UseTime: {}ms", 
+                             record.getRequestId(), record.getApi(), record.getMethod(), record.getResponseStatus(), record.getUseTime());
+                } else {
+                    log.info(recordString);
+                }
                 MDC.remove("CUSTOM_LOG");
                 ThreadLocalContext.clear();
             }

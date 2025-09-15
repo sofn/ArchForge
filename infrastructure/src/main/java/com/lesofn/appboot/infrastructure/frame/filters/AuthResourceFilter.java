@@ -42,6 +42,9 @@ public class AuthResourceFilter extends RequestMappingHandlerAdapter {
                                           HandlerMethod handlerMethod) throws Exception {
         if (StringUtils.equals(request.getRequestURI(), "/error")
                 || StringUtils.startsWith(request.getRequestURI(), "/swagger-resources")
+                || StringUtils.startsWith(request.getRequestURI(), "/v3/api-docs")
+                || StringUtils.startsWith(request.getRequestURI(), "/swagger-ui")
+                || StringUtils.equals(request.getRequestURI(), "/swagger-ui.html")
                 || StringUtils.endsWithAny(request.getRequestURI(), GlobalConstants.staticResourceArray)
                 || !StringUtils.equals(profile, "prod")) {
             return super.handleInternal(request, response, handlerMethod);

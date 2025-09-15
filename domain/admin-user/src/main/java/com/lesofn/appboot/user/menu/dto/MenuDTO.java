@@ -3,6 +3,7 @@ package com.lesofn.appboot.user.menu.dto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lesofn.appboot.common.enums.BasicEnumUtil;
 import com.lesofn.appboot.common.enums.common.StatusEnum;
+import com.lesofn.appboot.common.utils.jackson.JacksonUtil;
 import com.lesofn.appboot.user.domain.SysMenu;
 import com.lesofn.appboot.user.enums.MenuTypeEnum;
 import lombok.Data;
@@ -36,8 +37,7 @@ public class MenuDTO {
             }
 
             if (entity.getMetaInfo() != null) {
-                ObjectMapper objectMapper = new ObjectMapper();
-                MetaDTO meta = objectMapper.convertValue(entity.getMetaInfo(), MetaDTO.class);
+                MetaDTO meta = entity.getMetaInfo();
                 this.rank = meta.getRank();
                 this.icon = meta.getIcon();
             }

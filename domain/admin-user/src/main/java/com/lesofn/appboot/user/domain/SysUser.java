@@ -1,12 +1,15 @@
 package com.lesofn.appboot.user.domain;
 
+import com.lesofn.appboot.common.enums.common.GenderEnum;
 import com.lesofn.appboot.common.repository.BaseEntity;
+import com.lesofn.appboot.common.repository.converter.JpaValueEnumType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.Type;
 
 import java.time.LocalDateTime;
 
@@ -39,7 +42,8 @@ public class SysUser extends BaseEntity<SysUser> {
 
     private String phoneNumber;
 
-    private Integer sex;
+    @Type(JpaValueEnumType.class)
+    private GenderEnum sex;
 
     private String avatar;
 
@@ -51,7 +55,7 @@ public class SysUser extends BaseEntity<SysUser> {
 
     private LocalDateTime loginDate;
 
-    @Column(columnDefinition = "TINYINT(1)")
+    @Column(name = "is_admin")
     private Boolean isAdmin;
 
     private String remark;

@@ -1,4 +1,4 @@
-package com.lesofn.appboot.common.repository.convert;
+package com.lesofn.appboot.common.repository.converter;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
@@ -8,13 +8,13 @@ import jakarta.persistence.Converter;
  * 数据库: 1 表示 true, 0 表示 false
  * Java: Boolean true/false
  */
-@Converter(autoApply = false)
+@Converter(autoApply = true)
 public class BooleanToIntegerConverter implements AttributeConverter<Boolean, Integer> {
 
     @Override
     public Integer convertToDatabaseColumn(Boolean attribute) {
         if (attribute == null) {
-            return 0; // 默认值为 0 (false)
+            return 0;
         }
         return attribute ? 1 : 0;
     }
@@ -22,7 +22,7 @@ public class BooleanToIntegerConverter implements AttributeConverter<Boolean, In
     @Override
     public Boolean convertToEntityAttribute(Integer dbData) {
         if (dbData == null) {
-            return false; // 默认值为 false
+            return false;
         }
         return dbData == 1;
     }

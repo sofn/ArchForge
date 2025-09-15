@@ -20,7 +20,7 @@ public class BasicEnumUtil {
         E target = null;
 
         for (E enumConstant : enumClass.getEnumConstants()) {
-            BasicEnum<?> basicEnum = (BasicEnum<?>) enumConstant;
+            BasicEnum basicEnum = (BasicEnum) enumConstant;
             if (Objects.equals(basicEnum.getValue(), value)) {
                 target = enumConstant;
             }
@@ -33,7 +33,7 @@ public class BasicEnumUtil {
         E target = null;
 
         for (E enumConstant : enumClass.getEnumConstants()) {
-            BasicEnum<?> basicEnum = (BasicEnum<?>) enumConstant;
+            BasicEnum basicEnum = (BasicEnum) enumConstant;
             if (Objects.equals(basicEnum.getValue(), value)) {
                 target = enumConstant;
             }
@@ -54,7 +54,7 @@ public class BasicEnumUtil {
     public static <E extends Enum<E>> String getDescriptionByValue(Class<E> enumClass, Object value) {
         E basicEnum = fromValueSafely(enumClass, value);
         if (basicEnum != null) {
-            return ((BasicEnum<?>) basicEnum).description();
+            return ((BasicEnum) basicEnum).getDescription();
         }
         return UNKNOWN;
     }

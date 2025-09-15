@@ -60,7 +60,6 @@ public class AdminUserDetailsService implements UserDetailsService {
         }
 
         RoleInfo roleInfo = getRoleInfo(user.getRoleId(), user.getIsAdmin());
-
         SystemLoginUser loginUser = new SystemLoginUser(user.getUserId(), user.getIsAdmin(), user.getUsername(),
                 user.getPassword(), roleInfo, user.getDeptId());
         

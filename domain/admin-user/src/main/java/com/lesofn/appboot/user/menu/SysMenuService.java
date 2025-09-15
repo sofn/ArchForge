@@ -2,11 +2,14 @@ package com.lesofn.appboot.user.menu;
 
 import com.lesofn.appboot.common.enums.common.StatusEnum;
 import com.lesofn.appboot.infrastructure.auth.model.SystemLoginUser;
+import com.lesofn.appboot.user.menu.dto.MetaDTO;
 import com.lesofn.appboot.user.menu.repository.SysMenuRepository;
 import com.lesofn.appboot.user.dao.SysRoleMenuRepository;
 import com.lesofn.appboot.user.domain.SysMenu;
 import com.lesofn.appboot.user.menu.dto.RouterDTO;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -97,7 +100,8 @@ public class SysMenuService {
         // 传给前端的路由排除掉按钮和停用的菜单
         List<SysMenu> noButtonMenus = allMenus.stream()
                 .filter(menu -> !menu.getIsButton())
-                .filter(menu-> StatusEnum.ENABLE.getValue().equals(menu.getStatus()))
+                .filter(menu-> StatusEnum.ENABLE.getValue() == menu.getStatus())
+                .sorted(Comparator.comparing(it -> Optional.ofNullable(it.getMetaInfo()).map(MetaDTO::getRank).orElse(0)))
                 .collect(Collectors.toList());
 
 
@@ -110,12 +114,17 @@ public class SysMenuService {
         List<RouterDTO> roots = new ArrayList<>();
 
         for (Map.Entry<SysMenu, RouterDTO> entry : routerMap.entrySet()) {
-            if (entry.getKey().getParentId() == null) {
+            if (entry.getKey().getParentId() == null || entry.getKey().getParentId() == 0) {
                 roots.add(entry.getValue());
             } else {
                 SysMenu parentSysMenu = parentMap.get(entry.getKey().getParentId());
                 RouterDTO routerDTO = routerMap.get(parentSysMenu);
-                routerDTO.getChildren().add(entry.getValue());
+                if (routerDTO == null) {
+                    continue;
+                }
+                List<RouterDTO> children = Objects.requireNonNullElse(routerDTO.getChildren(), new ArrayList<>());
+                children.add(entry.getValue());
+                routerDTO.setChildren(children);
             }
         }
         return roots;

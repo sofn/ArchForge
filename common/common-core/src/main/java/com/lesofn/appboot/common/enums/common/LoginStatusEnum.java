@@ -3,13 +3,17 @@ package com.lesofn.appboot.common.enums.common;
 import com.lesofn.appboot.common.enums.DictionaryEnum;
 import com.lesofn.appboot.common.enums.dictionary.CssTag;
 import com.lesofn.appboot.common.enums.dictionary.Dictionary;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 /**
  * 用户状态
  * @author sofn
  */
+@Getter
+@AllArgsConstructor
 @Dictionary(name = "sysLoginLog.status")
-public enum LoginStatusEnum implements DictionaryEnum<Integer> {
+public enum LoginStatusEnum implements DictionaryEnum {
     /**
      * status of user
      */
@@ -19,27 +23,6 @@ public enum LoginStatusEnum implements DictionaryEnum<Integer> {
     LOGIN_FAIL(0, "登录失败", CssTag.DANGER);
 
     private final int value;
-    private final String msg;
+    private final String description;
     private final String cssTag;
-
-    LoginStatusEnum(int status, String msg, String cssTag) {
-        this.value = status;
-        this.msg = msg;
-        this.cssTag = cssTag;
-    }
-
-    @Override
-    public Integer getValue() {
-        return value;
-    }
-
-    @Override
-    public String description() {
-        return msg;
-    }
-
-    @Override
-    public String cssTag() {
-        return cssTag;
-    }
 }

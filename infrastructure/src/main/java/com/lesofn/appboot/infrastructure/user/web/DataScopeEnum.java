@@ -2,12 +2,14 @@ package com.lesofn.appboot.infrastructure.user.web;
 
 
 import com.lesofn.appboot.common.enums.BasicEnum;
+import lombok.Getter;
 
 /**
  * 对应sys_role表的data_scope字段
  * @author sofn
  */
-public enum DataScopeEnum implements BasicEnum<Integer> {
+@Getter
+public enum DataScopeEnum implements BasicEnum {
 
     /**
      * 数据权限范围
@@ -24,20 +26,6 @@ public enum DataScopeEnum implements BasicEnum<Integer> {
     DataScopeEnum(int value, String description) {
         this.value = value;
         this.description = description;
-    }
-
-    @Override
-    public Integer getValue() {
-        return value;
-    }
-
-    @Override
-    public String description() {
-        return description;
-    }
-
-    public String getDescription() {
-        return description;
     }
 
 }

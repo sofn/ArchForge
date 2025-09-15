@@ -35,12 +35,12 @@ public class SysMenu extends BaseEntity<SysMenu> {
 
     private String path;
 
+    @Column(name = "is_button")
     private Boolean isButton;
 
     private String permission;
 
     @Convert(converter = MetaInfoConverter.class)
-    @Column(columnDefinition = "TEXT")
     private MetaDTO metaInfo;
 
     private Integer status;

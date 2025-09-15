@@ -17,9 +17,9 @@ public class DictionaryData {
     @SuppressWarnings("rawtypes")
     public DictionaryData(DictionaryEnum enumType) {
         if (enumType != null) {
-            this.label = enumType.description();
+            this.label = enumType.getDescription();
             this.value = (Integer) enumType.getValue();
-            this.cssTag = enumType.cssTag();
+            this.cssTag = enumType.getCssTag();
         }
     }
 

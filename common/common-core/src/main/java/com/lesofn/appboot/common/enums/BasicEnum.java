@@ -3,22 +3,23 @@ package com.lesofn.appboot.common.enums;
 /**
  * @author sofn
  * 普通的枚举 接口
- * @param <T>
  */
-public interface BasicEnum<T>{
+public interface BasicEnum {
 
 
     /**
      * 获取枚举的值
+     *
      * @return 枚举值
      */
-    T getValue();
+    int getValue();
 
     /**
      * 获取枚举的描述
+     *
      * @return 描述
      */
-    String description();
+    String getDescription();
 
 
 }

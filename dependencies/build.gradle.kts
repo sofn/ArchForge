@@ -34,7 +34,8 @@ dependencies {
         api("com.konghq:unirest-java-core:4.5.0")
         
         // Web相关
-        api("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0")
+        api("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.11")
+
         api("org.jolokia:jolokia-core:1.7.2")
         
         // JWT

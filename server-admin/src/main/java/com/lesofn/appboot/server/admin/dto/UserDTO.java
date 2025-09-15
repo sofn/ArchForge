@@ -151,7 +151,7 @@ public class UserDTO {
             this.userType = user.getUserType();
             this.email = user.getEmail();
             this.phoneNumber = user.getPhoneNumber();
-            this.sex = user.getSex();
+            this.sex = user.getSex().getValue();
             this.avatar = user.getAvatar();
             this.status = user.getStatus();
             this.loginIp = user.getLoginIp();

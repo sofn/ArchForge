@@ -1,6 +1,6 @@
 package com.lesofn.appboot.user.domain.convert;
 
-import com.lesofn.appboot.common.repository.convert.AbstractJsonConverter;
+import com.lesofn.appboot.common.repository.converter.AbstractJsonConverter;
 import com.lesofn.appboot.user.menu.dto.MetaDTO;
 import jakarta.persistence.Converter;
 

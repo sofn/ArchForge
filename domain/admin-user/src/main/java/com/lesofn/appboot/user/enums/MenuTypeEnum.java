@@ -2,12 +2,14 @@ package com.lesofn.appboot.user.enums;
 
 
 import com.lesofn.appboot.common.enums.BasicEnum;
+import lombok.Getter;
 
 /**
  * @author sofn
  * 对应 sys_menu表的menu_type字段
  */
-public enum MenuTypeEnum implements BasicEnum<Integer> {
+@Getter
+public enum MenuTypeEnum implements BasicEnum {
 
     /**
      * 菜单类型
@@ -24,16 +26,5 @@ public enum MenuTypeEnum implements BasicEnum<Integer> {
         this.value = value;
         this.description = description;
     }
-
-    @Override
-    public Integer getValue() {
-        return value;
-    }
-
-    @Override
-    public String description() {
-        return description;
-    }
-
 
 }

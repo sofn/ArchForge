@@ -1,23 +1,23 @@
 package com.lesofn.appboot.server.admin.controller;
 
+import com.lesofn.appboot.common.utils.jackson.JacksonUtil;
 import com.lesofn.appboot.infrastructure.auth.AuthenticationUtils;
 import com.lesofn.appboot.infrastructure.auth.model.SystemLoginUser;
 import com.lesofn.appboot.infrastructure.config.AppBootConfig;
 import com.lesofn.appboot.server.admin.dto.*;
 import com.lesofn.appboot.server.admin.service.login.LoginService;
-import com.lesofn.appboot.server.admin.service.login.TokenService;
 import com.lesofn.appboot.server.admin.service.user.UserService;
-import com.lesofn.appboot.user.domain.SysMenu;
 import com.lesofn.appboot.user.menu.SysMenuService;
 import com.lesofn.appboot.user.menu.dto.RouterDTO;
 import com.lesofn.appboot.user.service.SysUserService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -25,6 +25,7 @@ import java.util.List;
  *
  * @author lesofn
  */
+@Slf4j
 @Tag(name = "登录API", description = "登录相关接口")
 @RestController
 @CrossOrigin
@@ -32,7 +33,6 @@ import java.util.List;
 public class LoginController {
 
     private final LoginService loginService;
-    private final TokenService tokenService;
     private final UserService userService;
     private final SysUserService sysUserService;
     private final SysMenuService menuService;
@@ -55,6 +55,8 @@ public class LoginController {
     @Operation(summary = "获取系统配置")
     @GetMapping("/getConfig")
     public ConfigDTO getConfig() {
+        log.info("user: {}", JacksonUtil.to(sysUserService.getUserByUserName("admin")));
+        log.info("user: {}", JacksonUtil.to(sysUserService.getUserByUserName("ag1")));
         return loginService.getConfig();
     }
 
@@ -74,7 +76,10 @@ public class LoginController {
      */
     @Operation(summary = "登录")
     @PostMapping("/login")
-    public TokenDTO login(@RequestBody @Valid LoginCommand loginCommand) {
+    public TokenDTO login(
+            @Parameter(description = "登录信息", required = true)
+            @RequestBody @Valid LoginCommand loginCommand
+    ) {
         // 生成令牌并获取用户信息
         LoginService.LoginResult loginResult = loginService.login(loginCommand);
         SystemLoginUser loginUser = loginResult.getLoginUser();

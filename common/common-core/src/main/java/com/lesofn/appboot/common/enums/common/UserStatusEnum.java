@@ -3,13 +3,17 @@ package com.lesofn.appboot.common.enums.common;
 import com.lesofn.appboot.common.enums.DictionaryEnum;
 import com.lesofn.appboot.common.enums.dictionary.CssTag;
 import com.lesofn.appboot.common.enums.dictionary.Dictionary;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 /**
  * 对应sys_user的status字段
  * @author sofn
  */
+@Getter
+@AllArgsConstructor
 @Dictionary(name = "sysUser.status")
-public enum UserStatusEnum implements DictionaryEnum<Integer> {
+public enum UserStatusEnum implements DictionaryEnum {
 
     /**
      * 用户账户状态
@@ -23,27 +27,4 @@ public enum UserStatusEnum implements DictionaryEnum<Integer> {
 
     private final String cssTag;
 
-    UserStatusEnum(int value, String description, String cssTag) {
-        this.value = value;
-        this.description = description;
-        this.cssTag = cssTag;
-    }
-
-    public Integer getValue() {
-        return value;
-    }
-
-    @Override
-    public String description() {
-        return this.description;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    @Override
-    public String cssTag() {
-        return null;
-    }
 }

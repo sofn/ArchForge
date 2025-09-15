@@ -3,13 +3,17 @@ package com.lesofn.appboot.common.enums.common;
 import com.lesofn.appboot.common.enums.DictionaryEnum;
 import com.lesofn.appboot.common.enums.dictionary.CssTag;
 import com.lesofn.appboot.common.enums.dictionary.Dictionary;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 /**
  * 对应sys_menu表的is_visible字段
  * @author sofn
  */
+@Getter
+@AllArgsConstructor
 @Dictionary(name = "sysMenu.isVisible")
-public enum VisibleStatusEnum implements DictionaryEnum<Integer> {
+public enum VisibleStatusEnum implements DictionaryEnum {
 
     /**
      * 显示与否
@@ -20,26 +24,5 @@ public enum VisibleStatusEnum implements DictionaryEnum<Integer> {
     private final int value;
     private final String description;
     private final String cssTag;
-
-    VisibleStatusEnum(int value, String description, String cssTag) {
-        this.value = value;
-        this.description = description;
-        this.cssTag = cssTag;
-    }
-
-    @Override
-    public Integer getValue() {
-        return value;
-    }
-
-    @Override
-    public String description() {
-        return description;
-    }
-
-    @Override
-    public String cssTag() {
-        return cssTag;
-    }
 
 }

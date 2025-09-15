@@ -3,13 +3,17 @@ package com.lesofn.appboot.common.enums.common;
 import com.lesofn.appboot.common.enums.DictionaryEnum;
 import com.lesofn.appboot.common.enums.dictionary.CssTag;
 import com.lesofn.appboot.common.enums.dictionary.Dictionary;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 /**
  * 除非表有特殊指明的话，一般用这个枚举代表 status字段
  * @author sofn
  */
+@Getter
+@AllArgsConstructor
 @Dictionary(name = "common.status")
-public enum StatusEnum implements DictionaryEnum<Integer> {
+public enum StatusEnum implements DictionaryEnum {
     /**
      * 开关状态
      */
@@ -19,26 +23,5 @@ public enum StatusEnum implements DictionaryEnum<Integer> {
     private final int value;
     private final String description;
     private final String cssTag;
-
-    StatusEnum(int value, String description, String cssTag) {
-        this.value = value;
-        this.description = description;
-        this.cssTag = cssTag;
-    }
-
-    @Override
-    public Integer getValue() {
-        return value;
-    }
-
-    @Override
-    public String description() {
-        return description;
-    }
-
-    @Override
-    public String cssTag() {
-        return cssTag;
-    }
 
 }

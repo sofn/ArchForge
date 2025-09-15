@@ -1,12 +1,16 @@
 package com.lesofn.appboot.common.enums.common;
 
 import com.lesofn.appboot.common.enums.BasicEnum;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 /**
  * Http Method
  * @author sofn
  */
-public enum RequestMethodEnum implements BasicEnum<Integer> {
+@Getter
+@AllArgsConstructor
+public enum RequestMethodEnum implements BasicEnum {
 
     /**
      * 菜单类型
@@ -19,21 +23,5 @@ public enum RequestMethodEnum implements BasicEnum<Integer> {
 
     private final int value;
     private final String description;
-
-    RequestMethodEnum(int value, String description) {
-        this.value = value;
-        this.description = description;
-    }
-
-    @Override
-    public Integer getValue() {
-        return value;
-    }
-
-    @Override
-    public String description() {
-        return description;
-    }
-
 
 }

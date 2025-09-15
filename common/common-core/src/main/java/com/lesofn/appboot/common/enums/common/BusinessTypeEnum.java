@@ -4,14 +4,18 @@ package com.lesofn.appboot.common.enums.common;
 import com.lesofn.appboot.common.enums.DictionaryEnum;
 import com.lesofn.appboot.common.enums.dictionary.CssTag;
 import com.lesofn.appboot.common.enums.dictionary.Dictionary;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 /**
  * 对应sys_operation_log的business_type
  *
  * @author sofn
  */
+@Getter
+@AllArgsConstructor
 @Dictionary(name = "sysOperationLog.businessType")
-public enum BusinessTypeEnum implements DictionaryEnum<Integer> {
+public enum BusinessTypeEnum implements DictionaryEnum {
 
     /**
      * 操作类型
@@ -30,26 +34,5 @@ public enum BusinessTypeEnum implements DictionaryEnum<Integer> {
     private final int value;
     private final String description;
     private final String cssTag;
-
-    BusinessTypeEnum(int value, String description, String cssTag) {
-        this.value = value;
-        this.description = description;
-        this.cssTag = cssTag;
-    }
-
-    @Override
-    public Integer getValue() {
-        return value;
-    }
-
-    @Override
-    public String description() {
-        return description;
-    }
-
-    @Override
-    public String cssTag() {
-        return cssTag;
-    }
 
 }
