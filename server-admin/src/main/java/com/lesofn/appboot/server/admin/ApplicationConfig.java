@@ -57,43 +57,6 @@ public class ApplicationConfig implements WebMvcConfigurer {
     }
 
     /**
-     * Configure multipart resolver for file uploads
-     */
-    @Bean
-    public MultipartResolver multipartResolver() {
-        StandardServletMultipartResolver resolver = new StandardServletMultipartResolver();
-        resolver.setResolveLazily(true);
-        return resolver;
-    }
-
-    /**
-     * Configure MultipartConfigElement with proper limits
-     */
-    @Bean
-    public MultipartConfigElement multipartConfigElement() {
-        // Define upload parameters
-        String uploadTempDir = System.getProperty("java.io.tmpdir");
-        File uploadDirectory = new File(uploadTempDir);
-        
-        // Ensure temp directory exists
-        if (!uploadDirectory.exists()) {
-            uploadDirectory.mkdirs();
-        }
-        
-        // 10MB max file size, 20MB max request size
-        long maxFileSize = 10 * 1024 * 1024; 
-        long maxRequestSize = 20 * 1024 * 1024;
-        int fileSizeThreshold = 0;
-        
-        return new MultipartConfigElement(
-            uploadTempDir, 
-            maxFileSize, 
-            maxRequestSize, 
-            fileSizeThreshold
-        );
-    }
-
-    /**
      * Configure custom argument resolvers
      */
     @Override
