@@ -6,6 +6,7 @@ import com.lesofn.appboot.common.errors.SystemErrorCode;
 import com.lesofn.appboot.common.utils.GlobalConstants;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.web.servlet.error.ErrorController;
@@ -39,7 +40,7 @@ public class ErrorHandlerResource implements ErrorController {
         }
         IErrorCodeException apiException;
         String pageError = "500 - System error.";
-        if (exception != null && exception instanceof IErrorCodeException) {
+        if (exception instanceof IErrorCodeException) {
             apiException = (IErrorCodeException) exception;
         } else if (status == 405) {
             apiException = new SystemException(SystemErrorCode.E_METHOD_ERROR);
@@ -56,7 +57,7 @@ public class ErrorHandlerResource implements ErrorController {
             apiException = new SystemException(SystemErrorCode.E_DEFAULT);
             log.error(errorMsg, exception);
         }
-        if (MediaType.TEXT_HTML.equals(mediaType) || StringUtils.endsWithAny(path, GlobalConstants.staticResourceArray)) {
+        if (MediaType.TEXT_HTML.equals(mediaType) || Strings.CS.endsWithAny(path, GlobalConstants.staticResourceArray)) {
             return "<!DOCTYPE html>\n" +
                     "<html>\n" +
                     "<head>\n" +

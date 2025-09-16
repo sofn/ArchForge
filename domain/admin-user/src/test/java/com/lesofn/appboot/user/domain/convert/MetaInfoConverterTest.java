@@ -2,13 +2,18 @@ package com.lesofn.appboot.user.domain.convert;
 
 import com.lesofn.appboot.user.menu.dto.MetaDTO;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class MetaInfoConverterTest {
 
+    private final MetaInfoConverter converter = new MetaInfoConverter();
+
     @Test
     void testConvertToDatabaseColumn() {
-        MetaInfoConverter converter = new MetaInfoConverter();
         MetaDTO metaDTO = new MetaDTO();
         metaDTO.setTitle("Test Title");
         metaDTO.setIcon("test-icon");
@@ -24,7 +29,6 @@ class MetaInfoConverterTest {
 
     @Test
     void testConvertToEntityAttribute() {
-        MetaInfoConverter converter = new MetaInfoConverter();
         String json = "{\"title\":\"Test Title\",\"icon\":\"test-icon\",\"showLink\":true,\"rank\":1}";
         
         MetaDTO metaDTO = converter.convertToEntityAttribute(json);
@@ -38,8 +42,6 @@ class MetaInfoConverterTest {
 
     @Test
     void testNullConversion() {
-        MetaInfoConverter converter = new MetaInfoConverter();
-        
         assertNull(converter.convertToDatabaseColumn(null));
         assertNull(converter.convertToEntityAttribute(null));
         assertNull(converter.convertToEntityAttribute(""));

@@ -4,7 +4,6 @@ import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
-import io.swagger.v3.oas.models.info.License;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import lombok.RequiredArgsConstructor;
@@ -23,38 +22,36 @@ public class SwaggerConfig {
 	
 	private final AppBootConfig appBootConfig;
 
-	/**
-	 * Configure OpenAPI specification
-	 */
 	@Bean
-	public OpenAPI customOpenAPI() {
-		// Create security scheme
-		SecurityScheme securityScheme = new SecurityScheme()
-			.type(SecurityScheme.Type.HTTP)
-			.scheme("bearer")
-			.bearerFormat("JWT")
-			.in(SecurityScheme.In.HEADER)
-			.name("Authorization")
-			.description("JWT token authentication");
-
-		// Create security requirement
-		SecurityRequirement securityRequirement = new SecurityRequirement()
-			.addList("bearerAuth");
-
-		// Build OpenAPI specification
+	public OpenAPI initOpenAPI() {
 		return new OpenAPI()
-			.info(new Info()
-				.title("AppBoot API Documentation")
-				.description("RESTful API documentation for AppBoot application")
-				.version(appBootConfig.getVersion())
-				.contact(new Contact()
-					.name(appBootConfig.getName())
-					.email("support@appboot.com"))
-				.license(new License()
-					.name("Apache 2.0")
-					.url("https://www.apache.org/licenses/LICENSE-2.0")))
-			.components(new Components()
-				.addSecuritySchemes("bearerAuth", securityScheme))
-			.addSecurityItem(securityRequirement);
+			.openapi("3.1.0")
+			.components(new Components().addSecuritySchemes("apikey", securityScheme()))
+			.addSecurityItem(new SecurityRequirement().addList("apikey"))
+			.info(getApiInfo());
+	}
+
+	@Bean
+	public SecurityScheme securityScheme() {
+		return new SecurityScheme()
+			.type(SecurityScheme.Type.APIKEY)
+			.name("Authorization")
+			.in(SecurityScheme.In.HEADER)
+			.scheme("Bearer");
+	}
+
+	/**
+	 * 添加摘要信息
+	 */
+	public Info getApiInfo() {
+		return new Info()
+			// 设置标题
+			.title("标题：AppBoot接口文档")
+			// 描述
+			.description("描述：文档说明")
+			// 作者信息
+			.contact(new Contact().name(appBootConfig.getName()))
+			// 版本
+			.version("版本号:" + appBootConfig.getVersion());
 	}
 }

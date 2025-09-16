@@ -2,37 +2,28 @@ package com.lesofn.appboot.server.admin;
 
 import com.lesofn.appboot.infrastructure.frame.filters.AuthResourceFilter;
 import com.lesofn.appboot.infrastructure.frame.spring.RequestContextMethodArgumentResolver;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
-import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.ResourceHttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
-import org.springframework.web.multipart.MultipartResolver;
-import org.springframework.web.multipart.support.StandardServletMultipartResolver;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import jakarta.servlet.MultipartConfigElement;
-import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
 /**
  * Spring Boot 3 native configuration replacing spring-context.xml
+ * Note: Removed @EnableWebMvc to allow Spring Boot auto-configuration for SpringDoc OpenAPI
  */
 @Configuration
-@EnableWebMvc
-@ComponentScan(basePackages = "com.lesofn.appboot")
 public class ApplicationConfig implements WebMvcConfigurer {
 
     /**
      * Configure AuthResourceFilter bean
      */
-    @Bean
+//    @Bean
     public AuthResourceFilter authResourceFilter() {
         AuthResourceFilter filter = new AuthResourceFilter();
         filter.setSynchronizeOnSession(true);
@@ -55,7 +46,7 @@ public class ApplicationConfig implements WebMvcConfigurer {
     /**
      * Configure Jackson message converter
      */
-    @Bean
+//    @Bean
     public MappingJackson2HttpMessageConverter jackson2HttpMessageConverter() {
         MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
         converter.setSupportedMediaTypes(Arrays.asList(
@@ -110,13 +101,4 @@ public class ApplicationConfig implements WebMvcConfigurer {
         resolvers.add(new RequestContextMethodArgumentResolver());
     }
 
-    /**
-     * Configure message converters
-     */
-    @Override
-    public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-        converters.add(jackson2HttpMessageConverter());
-        converters.add(new StringHttpMessageConverter());
-        converters.add(new ResourceHttpMessageConverter());
-    }
 }

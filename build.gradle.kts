@@ -30,6 +30,14 @@ subprojects {
         tasks.withType<Test> {
             useJUnitPlatform()
         }
+
+        // 全局排除冲突的日志依赖
+        configurations.all {
+            exclude(group = "org.springframework.boot", module = "spring-boot-starter-logging")
+            exclude(group = "ch.qos.logback", module = "logback-classic")
+            exclude(group = "ch.qos.logback", module = "logback-core")
+            exclude(group = "org.apache.logging.log4j", module = "log4j-to-slf4j")
+        }
         
         dependencies {
             // 引入 Spring Boot dependencies
@@ -48,6 +56,8 @@ subprojects {
             add("testImplementation", "org.spockframework:spock-spring")
             add("testImplementation", "org.springframework.boot:spring-boot-starter-test") {
                 exclude(group = "org.springframework.boot", module = "spring-boot-starter-logging")
+                exclude(group = "ch.qos.logback", module = "logback-classic")
+                exclude(group = "org.apache.logging.log4j", module = "log4j-to-slf4j")
             }
             add("testImplementation", "org.codehaus.groovy:groovy")
             add("testImplementation", "org.junit.platform:junit-platform-launcher")
