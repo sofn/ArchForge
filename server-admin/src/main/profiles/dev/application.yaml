@@ -44,24 +44,24 @@ task:
   jdbc:
     master:
       driver: org.h2.Driver
-      url: jdbc:h2:file:~/.h2/task;AUTO_SERVER=TRUE
+      url: jdbc:h2:file:~/.h2/task;AUTO_SERVER=TRUE;MODE=MySQL;DATABASE_TO_LOWER=TRUE;DB_CLOSE_DELAY=-1
       username: sa
       password: ""
     slave:
       driver: org.h2.Driver
-      url: jdbc:h2:file:~/.h2/task;AUTO_SERVER=TRUE
+      url: jdbc:h2:file:~/.h2/task;AUTO_SERVER=TRUE;MODE=MySQL;DATABASE_TO_LOWER=TRUE;DB_CLOSE_DELAY=-1
       username: sa
       password: ""
 user:
   jdbc:
     master:
       driver: org.h2.Driver
-      url: jdbc:h2:file:~/.h2/user;AUTO_SERVER=TRUE
+      url: jdbc:h2:file:~/.h2/user;AUTO_SERVER=TRUE;MODE=MySQL;DATABASE_TO_LOWER=TRUE;DB_CLOSE_DELAY=-1
       username: sa
       password: ""
     slave:
       driver: org.h2.Driver
-      url: jdbc:h2:file:~/.h2/user;AUTO_SERVER=TRUE
+      url: jdbc:h2:file:~/.h2/user;AUTO_SERVER=TRUE;MODE=MySQL;DATABASE_TO_LOWER=TRUE;DB_CLOSE_DELAY=-1
       username: sa
       password: ""
 
@@ -69,6 +69,7 @@ user:
 app-boot:
   embedded:
     redis: false
+    h2: true
   # JWT配置
   jwt:
     secret: 5/jDAWs7a63GRgjS+uF2mP7dcLwI6GAgxf+Z0+fOAbgMR/jksG5r0v10nDOkrM0btxtb2FAuol8fSzSJis8gIA==

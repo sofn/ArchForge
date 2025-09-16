@@ -1,4 +1,4 @@
-package com.lesofn.appboot.server.admin.service.cache;
+package com.lesofn.appboot.server.admin.config;
 
 import com.github.fppt.jedismock.RedisServer;
 import jakarta.annotation.PostConstruct;

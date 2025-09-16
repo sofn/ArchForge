@@ -1,9 +1,8 @@
-package com.lesofn.appboot.user.dao;
+package com.lesofn.appboot.user.config;
 
 import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.datasource.init.DataSourceInitializer;
@@ -61,21 +60,6 @@ public class UserDbConfig {
         factoryBean.setJpaPropertyMap(properties);
 
         return factoryBean;
-    }
-
-    // @Bean
-    // @Profile("dev")
-    public DataSourceInitializer userDataSourceInitializer() {
-        DataSourceInitializer initializer = new DataSourceInitializer();
-        initializer.setDataSource(dataSource);
-        
-        ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
-        populator.addScript(new ClassPathResource("sql/data-admin-user.sql"));
-        populator.setSqlScriptEncoding("UTF-8");
-        populator.setContinueOnError(true);
-        
-        initializer.setDatabasePopulator(populator);
-        return initializer;
     }
 
 }
