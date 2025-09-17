@@ -1,16 +1,15 @@
 package com.lesofn.appboot.server.admin;
 
-import com.google.common.collect.ImmutableList;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.lesofn.appboot.common.utils.jackson.JsonUtil;
 import com.lesofn.appboot.infrastructure.frame.spring.RequestContextMethodArgumentResolver;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
-import org.springframework.http.converter.ResourceHttpMessageConverter;
-import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
+import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 
 import java.util.Arrays;
 import java.util.List;
@@ -23,37 +22,13 @@ import java.util.List;
 public class ApplicationConfig implements WebMvcConfigurer {
 
     /**
-     * Configure AuthResourceFilter bean
+     * Configure Jackson message converter using global ObjectMapper configuration
      */
     @Bean
-    public RequestMappingHandlerAdapter filterConfig() {
-        RequestMappingHandlerAdapter filter = new RequestMappingHandlerAdapter();
-        filter.setSynchronizeOnSession(true);
-
-        // Set custom argument resolvers
-        filter.setCustomArgumentResolvers(ImmutableList.of(
-                new RequestContextMethodArgumentResolver()
-        ));
-
-        // Set message converters
-        filter.setMessageConverters(Arrays.asList(
-                jackson2HttpMessageConverter(),
-                new StringHttpMessageConverter(),
-                new ResourceHttpMessageConverter()
-        ));
-
-        return filter;
-    }
-
-    /**
-     * Configure Jackson message converter
-     */
-    @Bean
-    public MappingJackson2HttpMessageConverter jackson2HttpMessageConverter() {
-        MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
+    public MappingJackson2HttpMessageConverter jackson2HttpMessageConverter(ObjectMapper objectMapper) {
+        MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter(objectMapper);
         converter.setSupportedMediaTypes(Arrays.asList(
                 MediaType.APPLICATION_JSON,
-                new MediaType("application", "json", java.nio.charset.StandardCharsets.UTF_8),
                 MediaType.MULTIPART_FORM_DATA
         ));
         return converter;
@@ -65,6 +40,19 @@ public class ApplicationConfig implements WebMvcConfigurer {
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
         resolvers.add(new RequestContextMethodArgumentResolver());
+    }
+
+    /**
+     * Configure content negotiation to ensure proper JSON response handling
+     */
+    @Override
+    public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
+        configurer
+                .favorParameter(false)
+                .favorPathExtension(false)
+                .ignoreAcceptHeader(false)
+                .defaultContentType(MediaType.APPLICATION_JSON)
+                .mediaType("json", MediaType.APPLICATION_JSON);
     }
 
 }

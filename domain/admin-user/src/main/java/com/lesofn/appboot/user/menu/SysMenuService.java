@@ -84,10 +84,6 @@ public class SysMenuService {
                 .toList();
     }
 
-    public List<SysMenu> getMenuListByRoleId(Long roleId) {
-        return null;
-    }
-
     public List<RouterDTO> getRouterTree(SystemLoginUser loginUser) {
 
         List<SysMenu> allMenus;
@@ -101,7 +97,6 @@ public class SysMenuService {
         List<SysMenu> noButtonMenus = allMenus.stream()
                 .filter(menu -> !menu.getIsButton())
                 .filter(menu-> StatusEnum.ENABLE.getValue() == menu.getStatus())
-                .sorted(Comparator.comparing(it -> Optional.ofNullable(it.getMetaInfo()).map(MetaDTO::getRank).orElse(0)))
                 .collect(Collectors.toList());
 
 
@@ -127,7 +122,34 @@ public class SysMenuService {
                 routerDTO.setChildren(children);
             }
         }
+
+        roots = roots.stream()
+                .sorted(Comparator.comparing(it -> Optional.ofNullable(it.getMeta()).map(MetaDTO::getRank).orElse(0)))
+                .toList();
+
+        sortRouterDTOChildren(roots);
         return roots;
+    }
+
+    private void sortRouterDTOChildren(List<RouterDTO> routers) {
+        if (CollectionUtils.isEmpty(routers)) {
+            return;
+        }
+
+        Deque<RouterDTO> stack = new ArrayDeque<>(routers);
+
+        while (!stack.isEmpty()) {
+            RouterDTO current = stack.pop();
+
+            if (CollectionUtils.isNotEmpty(current.getChildren())) {
+                List<RouterDTO> sortedChildren = current.getChildren().stream()
+                        .sorted(Comparator.comparing(it -> Optional.ofNullable(it.getMeta()).map(MetaDTO::getRank).orElse(0)))
+                        .toList();
+                current.setChildren(sortedChildren);
+
+                stack.addAll(sortedChildren);
+            }
+        }
     }
 
 }

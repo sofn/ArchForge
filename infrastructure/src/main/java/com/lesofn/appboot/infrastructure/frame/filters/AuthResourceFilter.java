@@ -27,7 +27,7 @@ import java.util.Optional;
 /**
  * @author sofn
  */
-@Service
+//@Service
 public class AuthResourceFilter extends RequestMappingHandlerAdapter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AuthResourceFilter.class);

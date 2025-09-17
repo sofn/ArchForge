@@ -136,7 +136,7 @@ public class AppBootConfig {
         /**
          * 是否启用嵌入式 h2
          */
-        private boolean h2 = false;
+        private boolean h2Init = false;
     }
 
 }

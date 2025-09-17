@@ -1,19 +1,18 @@
 package com.lesofn.appboot.common.utils.jackson
 
 import spock.lang.Specification
-import com.fasterxml.jackson.core.type.TypeReference
 
 /**
  * @author sofn
  */
-class JacksonUtilTest extends Specification {
+class JsonUtilTest extends Specification {
 
     def "test to serializes object to JSON string"() {
         given:
         def obj = [name: "test", value: 123]
 
         when:
-        def result = JacksonUtil.to(obj)
+        def result = JsonUtil.to(obj)
 
         then:
         result == '{"name":"test","value":123}'
@@ -24,7 +23,7 @@ class JacksonUtilTest extends Specification {
         def list = [[name: "test1", value: 123], [name: "test2", value: 456]]
 
         when:
-        def result = JacksonUtil.to(list)
+        def result = JsonUtil.to(list)
 
         then:
         result == '[{"name":"test1","value":123},{"name":"test2","value":456}]'
@@ -35,7 +34,7 @@ class JacksonUtilTest extends Specification {
         def json = '{"name":"test","value":123}'
 
         when:
-        def result = JacksonUtil.fromMap(json)
+        def result = JsonUtil.fromMap(json)
 
         then:
         result.name == "test"
@@ -48,7 +47,7 @@ class JacksonUtilTest extends Specification {
         def type = Map
 
         when:
-        def result = JacksonUtil.fromList(json, type)
+        def result = JsonUtil.fromList(json, type)
 
         then:
         result.size() == 2
@@ -63,7 +62,7 @@ class JacksonUtilTest extends Specification {
         def json = '{"name":"test","value":123}'
 
         when:
-        def result = JacksonUtil.fromMap(json)
+        def result = JsonUtil.fromMap(json)
 
         then:
         result.name == "test"
@@ -75,7 +74,7 @@ class JacksonUtilTest extends Specification {
         def json = '{"name":"test","value":123}'
 
         when:
-        def result = JacksonUtil.getAsString(json, "name")
+        def result = JsonUtil.getAsString(json, "name")
 
         then:
         result == "test"
@@ -86,7 +85,7 @@ class JacksonUtilTest extends Specification {
         def json = '{"name":"test","value":123}'
 
         when:
-        def result = JacksonUtil.getAsInt(json, "value")
+        def result = JsonUtil.getAsInt(json, "value")
 
         then:
         result == 123
@@ -97,7 +96,7 @@ class JacksonUtilTest extends Specification {
         def json = '{"name":"test","value":1234567890}'
 
         when:
-        def result = JacksonUtil.getAsLong(json, "value")
+        def result = JsonUtil.getAsLong(json, "value")
 
         then:
         result == 1234567890L
@@ -108,7 +107,7 @@ class JacksonUtilTest extends Specification {
         def json = '{"name":"test","value":123.45}'
 
         when:
-        def result = JacksonUtil.getAsDouble(json, "value")
+        def result = JsonUtil.getAsDouble(json, "value")
 
         then:
         result == 123.45
@@ -119,7 +118,7 @@ class JacksonUtilTest extends Specification {
         def json = '{"name":"test","value":true}'
 
         when:
-        def result = JacksonUtil.getAsBoolean(json, "value")
+        def result = JsonUtil.getAsBoolean(json, "value")
 
         then:
         result == true
@@ -130,7 +129,7 @@ class JacksonUtilTest extends Specification {
         def json = '{"name":"test","value":123}'
 
         when:
-        def result = JacksonUtil.isJson(json)
+        def result = JsonUtil.isJson(json)
 
         then:
         result == true
@@ -141,7 +140,7 @@ class JacksonUtilTest extends Specification {
         def json = '{"name":"test","value":}'
 
         when:
-        def result = JacksonUtil.isJson(json)
+        def result = JsonUtil.isJson(json)
 
         then:
         result == false
@@ -152,7 +151,7 @@ class JacksonUtilTest extends Specification {
         def json = '{"name":"test","value":123}'
 
         when:
-        def result = JacksonUtil.remove(json, "value")
+        def result = JsonUtil.remove(json, "value")
 
         then:
         result == '{"name":"test"}'
@@ -163,7 +162,7 @@ class JacksonUtilTest extends Specification {
         def json = '{"name":"test","value":123}'
 
         when:
-        def result = JacksonUtil.update(json, "value", 456)
+        def result = JsonUtil.update(json, "value", 456)
 
         then:
         result == '{"name":"test","value":456}'
@@ -174,10 +173,37 @@ class JacksonUtilTest extends Specification {
         def json = '{"name":"test","value":123}'
 
         when:
-        def result = JacksonUtil.format(json)
+        def result = JsonUtil.format(json)
 
         then:
         result.contains('"name" : "test"')
         result.contains('"value" : 123')
+    }
+
+    def "test null fields are excluded from JSON serialization"() {
+        given:
+        def obj = [name: "test", value: 123, description: null, emptyString: ""]
+
+        when:
+        def result = JsonUtil.to(obj)
+
+        then:
+        result == '{"name":"test","value":123,"emptyString":""}'
+        !result.contains('description')
+    }
+
+    def "test null fields are excluded from list serialization"() {
+        given:
+        def list = [
+                [name: "test1", value: 123, description: null],
+                [name: "test2", value: 456, description: "valid"]
+        ]
+
+        when:
+        def result = JsonUtil.to(list)
+
+        then:
+        result == '[{"name":"test1","value":123},{"name":"test2","value":456,"description":"valid"}]'
+        !result.contains('null')
     }
 }

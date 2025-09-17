@@ -1,6 +1,6 @@
 package com.lesofn.appboot.server.admin.controller;
 
-import com.lesofn.appboot.common.utils.jackson.JacksonUtil;
+import com.lesofn.appboot.common.utils.jackson.JsonUtil;
 import com.lesofn.appboot.infrastructure.auth.AuthenticationUtils;
 import com.lesofn.appboot.infrastructure.auth.model.SystemLoginUser;
 import com.lesofn.appboot.infrastructure.config.AppBootConfig;
@@ -55,8 +55,8 @@ public class LoginController {
     @Operation(summary = "获取系统配置")
     @GetMapping("/getConfig")
     public ConfigDTO getConfig() {
-        log.info("user: {}", JacksonUtil.to(sysUserService.getUserByUserName("admin")));
-        log.info("user: {}", JacksonUtil.to(sysUserService.getUserByUserName("ag1")));
+        log.info("user: {}", JsonUtil.to(sysUserService.getUserByUserName("admin")));
+        log.info("user: {}", JsonUtil.to(sysUserService.getUserByUserName("ag1")));
         return loginService.getConfig();
     }
 

@@ -12,7 +12,9 @@ import com.fasterxml.jackson.databind.type.CollectionType;
 import com.fasterxml.jackson.databind.type.MapType;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import com.google.common.collect.ImmutableSet;
@@ -26,6 +28,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -33,30 +36,34 @@ import java.util.*;
 /**
  * Jackson工具类 优势： 数据量高于百万的时候，速度和FastJson相差极小 API和注解支持最完善，可定制性最强
  * 支持的数据源最广泛（字符串，对象，文件、流、URL）
+ *
  * @author sofn
  */
 @Slf4j
-public class JacksonUtil {
+public class JsonUtil {
+
+    private static final String DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
+    private static final String DATE_FORMAT = "yyyy-MM-dd";
 
     private static ObjectMapper mapper;
 
     private static final Set<JsonReadFeature> JSON_READ_FEATURES_ENABLED = ImmutableSet.of(
-        //允许在JSON中使用Java注释
-        JsonReadFeature.ALLOW_JAVA_COMMENTS,
-        //允许 json 存在没用双引号括起来的 field
-        JsonReadFeature.ALLOW_UNQUOTED_FIELD_NAMES,
-        //允许 json 存在使用单引号括起来的 field
-        JsonReadFeature.ALLOW_SINGLE_QUOTES,
-        //允许 json 存在没用引号括起来的 ascii 控制字符
-        JsonReadFeature.ALLOW_UNESCAPED_CONTROL_CHARS,
-        //允许 json number 类型的数存在前导 0 (例: 0001)
-        JsonReadFeature.ALLOW_LEADING_ZEROS_FOR_NUMBERS,
-        //允许 json 存在 NaN, INF, -INF 作为 number 类型
-        JsonReadFeature.ALLOW_NON_NUMERIC_NUMBERS,
-        //允许 只有Key没有Value的情况
-        JsonReadFeature.ALLOW_MISSING_VALUES,
-        //允许数组json的结尾多逗号
-        JsonReadFeature.ALLOW_TRAILING_COMMA
+            //允许在JSON中使用Java注释
+            JsonReadFeature.ALLOW_JAVA_COMMENTS,
+            //允许 json 存在没用双引号括起来的 field
+            JsonReadFeature.ALLOW_UNQUOTED_FIELD_NAMES,
+            //允许 json 存在使用单引号括起来的 field
+            JsonReadFeature.ALLOW_SINGLE_QUOTES,
+            //允许 json 存在没用引号括起来的 ascii 控制字符
+            JsonReadFeature.ALLOW_UNESCAPED_CONTROL_CHARS,
+            //允许 json number 类型的数存在前导 0 (例: 0001)
+            JsonReadFeature.ALLOW_LEADING_ZEROS_FOR_NUMBERS,
+            //允许 json 存在 NaN, INF, -INF 作为 number 类型
+            JsonReadFeature.ALLOW_NON_NUMERIC_NUMBERS,
+            //允许 只有Key没有Value的情况
+            JsonReadFeature.ALLOW_MISSING_VALUES,
+            //允许数组json的结尾多逗号
+            JsonReadFeature.ALLOW_TRAILING_COMMA
     );
 
     static {
@@ -68,19 +75,18 @@ public class JacksonUtil {
         }
     }
 
-    private JacksonUtil() {
-        throw new IllegalStateException("Utility class JacksonUtil can not be instantiated");
+    private JsonUtil() {
+        throw new IllegalStateException("Utility class JsonUtil can not be instantiated");
     }
 
     public static ObjectMapper initMapper() {
         JsonMapper.Builder builder = JsonMapper.builder()
-            .enable(JSON_READ_FEATURES_ENABLED.toArray(new JsonReadFeature[0]));
+                .enable(JSON_READ_FEATURES_ENABLED.toArray(new JsonReadFeature[0]));
         return initMapperConfig(builder.build());
     }
 
     public static ObjectMapper initMapperConfig(ObjectMapper objectMapper) {
-        String dateTimeFormat = "yyyy-MM-dd HH:mm:ss";
-        objectMapper.setDateFormat(new SimpleDateFormat(dateTimeFormat));
+        objectMapper.setDateFormat(new SimpleDateFormat(DATE_TIME_FORMAT));
         //配置序列化级别
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         //配置JSON缩进支持
@@ -105,12 +111,14 @@ public class JacksonUtil {
         objectMapper.registerModule(new ParameterNamesModule());
         objectMapper.registerModule(new Jdk8Module());
         JavaTimeModule javaTimeModule = new JavaTimeModule();
-        javaTimeModule.addSerializer(LocalDateTime.class,
-                new LocalDateTimeSerializer(DateTimeFormatter.ofPattern(dateTimeFormat)))
-            .addDeserializer(LocalDateTime.class,
-                new LocalDateTimeDeserializer(DateTimeFormatter.ofPattern(dateTimeFormat)));
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(DATE_TIME_FORMAT);
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
+
+        javaTimeModule.addSerializer(LocalDateTime.class, new LocalDateTimeSerializer(dateTimeFormatter))
+                .addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer(dateTimeFormatter));
+        javaTimeModule.addSerializer(LocalDate.class, new LocalDateSerializer(dateFormatter))
+                .addDeserializer(LocalDate.class, new LocalDateDeserializer(dateFormatter));
         objectMapper.registerModule(javaTimeModule);
-        //  if we use guava, we can add this line of code: objectMapper.registerModule(new GuavaModule())
         return objectMapper;
     }
 
@@ -194,7 +202,7 @@ public class JacksonUtil {
             return mapper.readValue(file, type);
         } catch (IOException e) {
             throw new JacksonException(
-                String.format("jackson from error, url: %s, type: %s", file.getPath(), type), e);
+                    String.format("jackson from error, url: %s, type: %s", file.getPath(), type), e);
         }
     }
 
@@ -206,7 +214,7 @@ public class JacksonUtil {
             return mapper.readValue(file, type);
         } catch (IOException e) {
             throw new JacksonException(
-                String.format("jackson from error, url: %s, type: %s", file.getPath(), type), e);
+                    String.format("jackson from error, url: %s, type: %s", file.getPath(), type), e);
         }
     }
 
@@ -219,7 +227,7 @@ public class JacksonUtil {
             return mapper.readValue(file, collectionType);
         } catch (IOException e) {
             throw new JacksonException(
-                String.format("jackson from error, url: %s, type: %s", file.getPath(), type), e);
+                    String.format("jackson from error, url: %s, type: %s", file.getPath(), type), e);
         }
     }
 
@@ -413,7 +421,7 @@ public class JacksonUtil {
             return jsonNode.isBigInteger() ? jsonNode.bigIntegerValue() : new BigInteger(getAsString(jsonNode));
         } catch (Exception e) {
             throw new JacksonException(String.format("jackson get big integer error, json: %s, key: %s", json, key),
-                e);
+                    e);
         }
     }
 
@@ -434,7 +442,7 @@ public class JacksonUtil {
             return jsonNode.isBigDecimal() ? jsonNode.decimalValue() : new BigDecimal(getAsString(jsonNode));
         } catch (Exception e) {
             throw new JacksonException(String.format("jackson get big decimal error, json: %s, key: %s", json, key),
-                e);
+                    e);
         }
     }
 
@@ -505,7 +513,7 @@ public class JacksonUtil {
             return from(getAsString(jsonNode), javaType);
         } catch (Exception e) {
             throw new JacksonException(
-                String.format("jackson get list error, json: %s, key: %s, type: %s", json, key, type), e);
+                    String.format("jackson get list error, json: %s, key: %s, type: %s", json, key, type), e);
         }
     }
 
@@ -528,7 +536,7 @@ public class JacksonUtil {
             return from(getAsString(jsonNode), collectionType);
         } catch (Exception e) {
             throw new JacksonException(
-                String.format("jackson get list error, json: %s, key: %s, type: %s", json, key, type), e);
+                    String.format("jackson get list error, json: %s, key: %s, type: %s", json, key, type), e);
         }
     }
 
@@ -546,7 +554,7 @@ public class JacksonUtil {
             return node.get(key);
         } catch (IOException e) {
             throw new JacksonException(
-                String.format("jackson get object from json error, json: %s, key: %s", json, key), e);
+                    String.format("jackson get object from json error, json: %s, key: %s", json, key), e);
         }
     }
 
@@ -605,7 +613,7 @@ public class JacksonUtil {
             return node.toString();
         } catch (IOException e) {
             throw new JacksonException(
-                String.format("jackson update error, json: %s, key: %s, value: %s", json, key, value), e);
+                    String.format("jackson update error, json: %s, key: %s, value: %s", json, key, value), e);
         }
     }
 

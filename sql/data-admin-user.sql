@@ -1,4 +1,3 @@
-
 create table sys_user
 (
     user_id      bigint auto_increment comment '用户ID' primary key,
@@ -23,18 +22,15 @@ create table sys_user
     update_time  datetime                null comment '更新时间',
     remark       varchar(512)            null comment '备注',
     deleted      tinyint(1)   default 0  not null comment '删除标志（0代表存在 1代表删除）'
-)
-    comment '用户信息表';
+) comment '用户信息表';
 
 INSERT INTO  sys_user (user_id, post_id, role_id, dept_id, username, nickname, user_type, email, phone_number, sex, avatar, password, status, login_ip, login_date, is_admin, creator_id, create_time, updater_id, update_time, remark, deleted) VALUES (1, 1, 1, 4, 'admin', 'valarchie1', 0, 'agileboot@163.com', '15888888883', 0, '/profile/avatar/20230725164110_blob_6b7a989b1cdd4dd396665d2cfd2addc5.png', '$2a$10$o55UFZAtyWnDpRV6dvQe8.c/MjlFacC49ASj2usNXm9BY74SYI/uG', 1, '127.0.0.1', '2023-08-14 23:07:03', 1, null, '2022-05-21 08:30:54', 1, '2023-08-14 23:07:03', '管理员', 0);
 INSERT INTO  sys_user (user_id, post_id, role_id, dept_id, username, nickname, user_type, email, phone_number, sex, avatar, password, status, login_ip, login_date, is_admin, creator_id, create_time, updater_id, update_time, remark, deleted) VALUES (2, 2, 2, 5, 'ag1', 'valarchie2', 0, 'agileboot1@qq.com', '15666666666', 1, '/profile/avatar/20230725114818_avatar_b5bf400732bb43369b4df58802049b22.png', '$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', 1, '127.0.0.1', '2022-05-21 08:30:54', 0, null, '2022-05-21 08:30:54', null, null, '测试员1', 0);
 INSERT INTO  sys_user (user_id, post_id, role_id, dept_id, username, nickname, user_type, email, phone_number, sex, avatar, password, status, login_ip, login_date, is_admin, creator_id, create_time, updater_id, update_time, remark, deleted) VALUES (3, 2, 0, 5, 'ag2', 'valarchie3', 0, 'agileboot2@qq.com', '15666666667', 1, '/profile/avatar/20230725114818_avatar_b5bf400732bb43369b4df58802049b22.png', '$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', 1, '127.0.0.1', '2022-05-21 08:30:54', 0, null, '2022-05-21 08:30:54', null, null, '测试员2', 0);
 
 
-create table sys_menu
-(
-    menu_id     bigint auto_increment comment '菜单ID'
-        primary key,
+create table sys_menu (
+    menu_id     bigint auto_increment comment '菜单ID' primary key,
     menu_name   varchar(64)                not null comment '菜单名称',
     menu_type   smallint      default 0    not null comment '菜单的类型(1为普通菜单2为目录3为内嵌iFrame4为外链跳转)',
     router_name varchar(255)  default ''   not null comment '路由名称（需保持和前端对应的vue文件中的name保持一致defineOptions方法中设置的name）',
@@ -50,8 +46,7 @@ create table sys_menu
     updater_id  bigint                     null comment '更新者ID',
     update_time datetime                   null comment '更新时间',
     deleted     tinyint(1)    default 0    not null comment '逻辑删除'
-)
-    comment '菜单权限表';
+) comment '菜单权限表';
 
 INSERT INTO  sys_menu (menu_id, menu_name, menu_type, router_name, parent_id, path, is_button, permission, meta_info, status, remark, creator_id, create_time, updater_id, update_time, deleted) VALUES (1, '系统管理', 2, '', 0, '/system', 0, '', '{"title":"系统管理","icon":"ep:management","showParent":true,"rank":1}', 1, '系统管理目录', 0, '2022-05-21 08:30:54', 1, '2023-08-14 23:08:50', 0);
 INSERT INTO  sys_menu (menu_id, menu_name, menu_type, router_name, parent_id, path, is_button, permission, meta_info, status, remark, creator_id, create_time, updater_id, update_time, deleted) VALUES (2, '系统监控', 2, '', 0, '/monitor', 0, '', '{"title":"系统监控","icon":"ep:monitor","showParent":true,"rank":3}', 1, '系统监控目录', 0, '2022-05-21 08:30:54', 1, '2023-08-14 23:09:15', 0);
@@ -121,10 +116,8 @@ INSERT INTO  sys_menu (menu_id, menu_name, menu_type, router_name, parent_id, pa
 
 
 
-create table sys_role
-(
-    role_id     bigint auto_increment comment '角色ID'
-        primary key,
+create table sys_role (
+    role_id     bigint auto_increment comment '角色ID' primary key,
     role_name   varchar(32)              not null comment '角色名称',
     role_key    varchar(128)             not null comment '角色权限字符串',
     role_sort   int                      not null comment '显示顺序',
@@ -137,20 +130,17 @@ create table sys_role
     update_time datetime                 null comment '更新时间',
     remark      varchar(512)             null comment '备注',
     deleted     tinyint(1)    default 0  not null comment '删除标志（0代表存在 1代表删除）'
-)
-    comment '角色信息表';
+) comment '角色信息表';
 
 INSERT INTO  sys_role (role_id, role_name, role_key, role_sort, data_scope, dept_id_set, status, creator_id, create_time, updater_id, update_time, remark, deleted) VALUES (1, '超级管理员', 'admin', 1, 1, '', 1, null, '2022-05-21 08:30:54', null, null, '超级管理员', 0);
 INSERT INTO  sys_role (role_id, role_name, role_key, role_sort, data_scope, dept_id_set, status, creator_id, create_time, updater_id, update_time, remark, deleted) VALUES (2, '普通角色', 'common', 3, 2, '', 1, null, '2022-05-21 08:30:54', null, null, '普通角色', 0);
 INSERT INTO  sys_role (role_id, role_name, role_key, role_sort, data_scope, dept_id_set, status, creator_id, create_time, updater_id, update_time, remark, deleted) VALUES (3, '闲置角色', 'unused', 4, 2, '', 0, null, '2022-05-21 08:30:54', null, null, '未使用的角色', 0);
 
-create table sys_role_menu
-(
+create table sys_role_menu (
     role_id bigint not null comment '角色ID',
     menu_id bigint not null comment '菜单ID',
     primary key (role_id, menu_id)
-)
-    comment '角色和菜单关联表';
+) comment '角色和菜单关联表';
 
 INSERT INTO  sys_role_menu (role_id, menu_id) VALUES (2, 1);
 INSERT INTO  sys_role_menu (role_id, menu_id) VALUES (2, 2);

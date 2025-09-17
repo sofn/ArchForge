@@ -1,6 +1,6 @@
 package com.lesofn.appboot.common.utils.ip;
 
-import com.lesofn.appboot.common.utils.jackson.JacksonUtil;
+import com.lesofn.appboot.common.utils.jackson.JsonUtil;
 import kong.unirest.core.GetRequest;
 import kong.unirest.core.Unirest;
 import lombok.extern.slf4j.Slf4j;
@@ -37,8 +37,8 @@ public class OnlineIpRegionUtil {
                 return null;
             }
 
-            String province = JacksonUtil.getAsString(rspStr, "pro");
-            String city = JacksonUtil.getAsString(rspStr, "city");
+            String province = JsonUtil.getAsString(rspStr, "pro");
+            String city = JsonUtil.getAsString(rspStr, "city");
             return new IpRegion(province, city);
         } catch (Exception e) {
             log.error("获取地理位置异常 {}", ip, e);

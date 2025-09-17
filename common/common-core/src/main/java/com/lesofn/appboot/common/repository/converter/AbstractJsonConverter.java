@@ -3,7 +3,7 @@ package com.lesofn.appboot.common.repository.converter;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lesofn.appboot.common.spring.SpringContextHolder;
-import com.lesofn.appboot.common.utils.jackson.JacksonUtil;
+import com.lesofn.appboot.common.utils.jackson.JsonUtil;
 import jakarta.persistence.AttributeConverter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
@@ -61,7 +61,7 @@ public abstract class AbstractJsonConverter<T> implements AttributeConverter<T, 
         if (SpringContextHolder.isInjectedApplicationContext()) {
             return SpringContextHolder.getBean(ObjectMapper.class);
         } else {
-            return JacksonUtil.getObjectMapper();
+            return JsonUtil.getObjectMapper();
         }
     }
 }

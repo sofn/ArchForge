@@ -1,7 +1,5 @@
 package com.lesofn.appboot.user.menu.dto;
 
-import com.lesofn.appboot.common.utils.jackson.JacksonUtil;
-import com.lesofn.appboot.infrastructure.config.JacksonConfig;
 import com.lesofn.appboot.user.domain.SysMenu;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

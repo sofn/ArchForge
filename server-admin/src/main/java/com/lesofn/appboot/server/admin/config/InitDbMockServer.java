@@ -21,7 +21,7 @@ import java.io.IOException;
 @Slf4j
 @Component
 @Profile("dev")
-@ConditionalOnProperty(name = "app-boot.embedded.h2", havingValue = "true")
+@ConditionalOnProperty(name = "app-boot.embedded.h2-init", havingValue = "true")
 public class InitDbMockServer {
 
     @Resource(name = "userDataSource")
@@ -29,14 +29,21 @@ public class InitDbMockServer {
 
     @PostConstruct
     public void init() {
-        DataSourceInitializer initializer = new DataSourceInitializer();
-        initializer.setDataSource(dataSource);
+        try {
+            log.info("开始初始化数据库数据...");
+      
+            ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
+            populator.addScript(new ClassPathResource("sql/data-admin-user.sql"));
+            populator.setSqlScriptEncoding("UTF-8");
+            populator.setContinueOnError(true);
 
-        ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
-        populator.addScript(new ClassPathResource("sql/data-admin-user.sql"));
-        populator.setSqlScriptEncoding("UTF-8");
-        populator.setContinueOnError(true);
-
-        initializer.setDatabasePopulator(populator);
+            // 直接使用 ResourceDatabasePopulator 执行SQL脚本
+            populator.execute(dataSource);
+      
+            log.info("数据库数据初始化完成！");
+        } catch (Exception e) {
+            log.error("数据库初始化失败: {}", e.getMessage(), e);
+            throw new RuntimeException("数据库初始化失败", e);
+        }
     }
 }
