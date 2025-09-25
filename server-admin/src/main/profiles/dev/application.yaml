@@ -1,6 +1,6 @@
 # Development environment specific configuration
 server:
-  port: 8080
+  port: 8081
 spring:
   profiles:
     active: base,dev
@@ -22,8 +22,8 @@ spring:
   data:
     # redis 配置 - 开发环境mock
     redis:
-      host: 127.0.0.1 # 地址
-      port: 6379 # 端口
+      host: 192.168.0.3 # 地址
+      port: 6380 # 端口
       database: 0 # 数据库索引
       # password: # 开发环境使用 mock server，不需要密码
       # 连接超时时间
@@ -69,7 +69,7 @@ user:
 app-boot:
   embedded:
     redis: false
-    h2: true
+    h2-init: true
   # JWT配置
   jwt:
     secret: 5/jDAWs7a63GRgjS+uF2mP7dcLwI6GAgxf+Z0+fOAbgMR/jksG5r0v10nDOkrM0btxtb2FAuol8fSzSJis8gIA==
