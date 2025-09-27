@@ -18,8 +18,8 @@ import java.util.Map;
 
 @Configuration
 @EnableJpaRepositories(
-        basePackages = {"com.lesofn.appboot.user.dao", "com.lesofn.appboot.user.menu.repository", "com.lesofn.appboot.user.dept.repository"},
-        entityManagerFactoryRef = "userEntityManagerFactory",
+        basePackages = {"com.lesofn.appboot.user.dao", "com.lesofn.appboot.user.menu.repository"},
+        entityManagerFactoryRef = "userEntityManagerFactory", 
         transactionManagerRef = "userTransactionManager"
 )
 public class UserDbConfig {
@@ -48,7 +48,6 @@ public class UserDbConfig {
         factoryBean.setPackagesToScan(
                 "com.lesofn.appboot.user.domain",
                 "com.lesofn.appboot.user.menu.repository",
-                "com.lesofn.appboot.user.dept.repository",
                 "com.lesofn.appboot.common.repository.converter"
         );
         

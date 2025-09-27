@@ -97,7 +97,8 @@ public class SysMenuService {
         List<SysMenu> noButtonMenus = allMenus.stream()
                 .filter(menu -> !menu.getIsButton())
                 .filter(menu-> StatusEnum.ENABLE.getValue() == menu.getStatus())
-                .toList();
+                .collect(Collectors.toList());
+
 
         Map<Long, SysMenu> parentMap = noButtonMenus.stream()
                 .collect(Collectors.toMap(SysMenu::getMenuId, Function.identity()));
@@ -106,27 +107,24 @@ public class SysMenuService {
                 .collect(Collectors.toMap(Function.identity(), RouterDTO::new));
 
         List<RouterDTO> roots = new ArrayList<>();
-        for (SysMenu sysMenu : noButtonMenus) {
-            RouterDTO routerDTO = routerMap.get(sysMenu);
-            if (sysMenu.getParentId() == null || sysMenu.getParentId() == 0) {
-                roots.add(routerDTO);
+
+        for (Map.Entry<SysMenu, RouterDTO> entry : routerMap.entrySet()) {
+            if (entry.getKey().getParentId() == null || entry.getKey().getParentId() == 0) {
+                roots.add(entry.getValue());
             } else {
-                SysMenu parentSysMenu = parentMap.get(sysMenu.getParentId());
-                RouterDTO childRouterDTO = routerMap.get(parentSysMenu);
-                if (childRouterDTO == null) {
+                SysMenu parentSysMenu = parentMap.get(entry.getKey().getParentId());
+                RouterDTO routerDTO = routerMap.get(parentSysMenu);
+                if (routerDTO == null) {
                     continue;
                 }
-                List<RouterDTO> dtoChildren = childRouterDTO.getChildren();
-                if (dtoChildren == null) {
-                    dtoChildren = new ArrayList<>();
-                    childRouterDTO.setChildren(dtoChildren);
-                }
-                dtoChildren.add(routerDTO);
+                List<RouterDTO> children = Objects.requireNonNullElse(routerDTO.getChildren(), new ArrayList<>());
+                children.add(entry.getValue());
+                routerDTO.setChildren(children);
             }
         }
 
         roots = roots.stream()
-                .sorted(Comparator.comparing(it -> Optional.ofNullable(it.getMeta()).map(MetaDTO::getRank).orElse(-1)))
+                .sorted(Comparator.comparing(it -> Optional.ofNullable(it.getMeta()).map(MetaDTO::getRank).orElse(0)))
                 .toList();
 
         sortRouterDTOChildren(roots);
@@ -145,7 +143,7 @@ public class SysMenuService {
 
             if (CollectionUtils.isNotEmpty(current.getChildren())) {
                 List<RouterDTO> sortedChildren = current.getChildren().stream()
-                        .sorted(Comparator.comparing(it -> Optional.ofNullable(it.getMeta()).map(MetaDTO::getRank).orElse(-1)))
+                        .sorted(Comparator.comparing(it -> Optional.ofNullable(it.getMeta()).map(MetaDTO::getRank).orElse(0)))
                         .toList();
                 current.setChildren(sortedChildren);
 
