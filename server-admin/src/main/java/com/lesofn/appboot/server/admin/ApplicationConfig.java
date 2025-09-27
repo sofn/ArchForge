@@ -1,7 +1,6 @@
 package com.lesofn.appboot.server.admin;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.lesofn.appboot.common.utils.jackson.JsonUtil;
 import com.lesofn.appboot.infrastructure.frame.spring.RequestContextMethodArgumentResolver;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
