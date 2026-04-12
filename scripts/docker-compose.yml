@@ -3,10 +3,10 @@ services:
   mysqldb:
     image: mysql
     environment:
-      MYSQL_DATABASE: appboot
+      MYSQL_DATABASE: appforge
       MYSQL_ROOT_PASSWORD: 123
-  appboot:
-    image: com.lesofn.appboot/deploy:prod-0.1.RELEASE
+  appforge:
+    image: com.lesofn.appforge/deploy:prod-0.1.RELEASE
     links:
       - mysqldb:mysql_host
     ports:

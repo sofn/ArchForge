@@ -9,10 +9,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `./gradlew clean build`: Clean build the project
 - `./gradlew test`: Run all tests
 - `./gradlew :server-admin:test`: Run tests for specific module
+- Requires Java 21 (`JAVA_HOME` must point to a JDK 21 installation)
 
 ## Development
 
-- Main application entry point: `server-admin/src/main/java/com/lesofn/appboot/server/admin/Application.java`
+- Main application entry point: `server-admin/src/main/java/com/lesofn/appforge/server/admin/Application.java`
 - Default ports: Application (8080), Management (7002)
 - Development profile uses H2 database with console at `/h2-console`
 - Hot reload enabled via Spring Boot devtools
@@ -20,7 +21,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Architecture
 
-This is a multi-module Spring Boot 3 project with clean architecture principles:
+This is a multi-module Spring Boot 4 project with clean architecture principles:
 
 ### Module Structure
 - `common/`: Shared utilities and error handling
@@ -42,10 +43,12 @@ This is a multi-module Spring Boot 3 project with clean architecture principles:
 ## Dependencies
 
 - All dependency versions centrally managed in `dependencies/build.gradle.kts`
-- Spring Boot 3.5.4 with Java 17
+- Spring Boot 4.0.5 with Java 21
+- Gradle 9.4.1 with configuration cache support
 - Key libraries: Druid (connection pooling), Guava, Apache Commons, SpringDoc OpenAPI
-- Testing: JUnit 5, Testcontainers, Spock Framework
+- Testing: JUnit 6, Testcontainers, Spock 2.3 (Groovy 4.x)
 - Database: H2 (dev), MySQL (production)
+- Groovy is forced to 4.0.31 (overriding SB4's Groovy 5.x) for Spock 2.3 compatibility
 
 ## Code Style
 
@@ -60,6 +63,7 @@ This is a multi-module Spring Boot 3 project with clean architecture principles:
 - Profiles: `dev` (H2 + mock Redis), `test`, `prod`
 - JWT secret and Redis configuration environment-specific
 - Gradle profile set in `gradle.properties`
+- Config prefix: `app-forge`
 
 ## Monitoring
 

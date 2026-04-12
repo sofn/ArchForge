@@ -1,5 +1,5 @@
 plugins {
-    id("org.springframework.boot") version "3.5.4"
+    id("org.springframework.boot") version "4.0.5"
 }
 
 // 构建可执行jar/war包
@@ -24,7 +24,7 @@ tasks.jar {
 
 dependencies {
     // 引入 Spring Boot dependencies BOM
-    implementation(platform("org.springframework.boot:spring-boot-dependencies:3.5.4"))
+    implementation(platform("org.springframework.boot:spring-boot-dependencies:4.0.5"))
     // 引入项目统一版本管理平台
     implementation(platform(project(":dependencies")))
     
@@ -59,18 +59,18 @@ dependencies {
     api("com.github.fppt:jedis-mock")
     
     // Druid connection pool and monitoring
-    api("com.alibaba:druid-spring-boot-starter")
+    api("com.alibaba:druid-spring-boot-3-starter")
     
     // Spring Boot DevTools - 开发环境自动重启和热部署
-    developmentOnly("org.springframework.boot:spring-boot-devtools:3.5.4")
+    developmentOnly("org.springframework.boot:spring-boot-devtools:4.0.5")
     
     // Lombok注解处理器
-    annotationProcessor("org.projectlombok:lombok:1.18.36")
+    annotationProcessor("org.projectlombok:lombok:1.18.44")
     compileOnly("org.projectlombok:lombok")
 
     // MapStruct注解处理器
-    annotationProcessor("org.mapstruct:mapstruct-processor:1.5.5.Final")
-    compileOnly("org.mapstruct:mapstruct:1.5.5.Final")
+    annotationProcessor("org.mapstruct:mapstruct-processor:1.6.3")
+    compileOnly("org.mapstruct:mapstruct:1.6.3")
 }
 
 // profile环境配置文件

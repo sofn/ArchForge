@@ -1,4 +1,4 @@
-group = "com.lesofn.appboot"
+group = "com.lesofn.appforge"
 version = "0.1.SNAPSHOT"
 
 allprojects {
@@ -25,6 +25,16 @@ subprojects {
     if (name != "dependencies") {
         apply(plugin = "java-library")
         apply(plugin = "groovy")
+
+        // 配置 Java 21
+        configure<JavaPluginExtension> {
+            sourceCompatibility = JavaVersion.VERSION_21
+            targetCompatibility = JavaVersion.VERSION_21
+        }
+
+        tasks.withType<JavaCompile> {
+            options.release.set(21)
+        }
         
         // 配置测试任务使用JUnit Platform
         tasks.withType<Test> {
@@ -37,19 +47,23 @@ subprojects {
             exclude(group = "ch.qos.logback", module = "logback-classic")
             exclude(group = "ch.qos.logback", module = "logback-core")
             exclude(group = "org.apache.logging.log4j", module = "log4j-to-slf4j")
+            // Force Groovy 4.x for Spock 2.3 compatibility (SB4 BOM brings Groovy 5.x)
+            resolutionStrategy {
+                force("org.apache.groovy:groovy:4.0.31")
+            }
         }
         
         dependencies {
             // 引入 Spring Boot dependencies
-            add("implementation", platform("org.springframework.boot:spring-boot-dependencies:3.5.4"))
+            add("implementation", platform("org.springframework.boot:spring-boot-dependencies:4.0.5"))
             // 引入自定义 dependencies
             add("implementation", platform(project(":dependencies")))
 
-            // compile - Lombok配置 (版本由 dependencies 模块管理)
-            add("annotationProcessor", "org.projectlombok:lombok:1.18.36")
-            add("testAnnotationProcessor", "org.projectlombok:lombok:1.18.36")
+            // compile - Lombok配置
+            add("annotationProcessor", "org.projectlombok:lombok:1.18.44")
+            add("testAnnotationProcessor", "org.projectlombok:lombok:1.18.44")
 
-            // 全局测试依赖 - Spock框架 (版本由 dependencies 模块管理)
+            // 全局测试依赖 - Spock框架 (Groovy 4.x)
             add("testImplementation", "org.junit.jupiter:junit-jupiter-api")
             add("testRuntimeOnly", "org.junit.jupiter:junit-jupiter-engine")
             add("testImplementation", "org.spockframework:spock-core")
@@ -59,7 +73,7 @@ subprojects {
                 exclude(group = "ch.qos.logback", module = "logback-classic")
                 exclude(group = "org.apache.logging.log4j", module = "log4j-to-slf4j")
             }
-            add("testImplementation", "org.codehaus.groovy:groovy")
+            add("testImplementation", "org.apache.groovy:groovy")
             add("testImplementation", "org.junit.platform:junit-platform-launcher")
         }
     }

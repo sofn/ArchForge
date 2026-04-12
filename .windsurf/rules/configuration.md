@@ -11,12 +11,12 @@ application-base.yaml     # Common configurations
 └── application-prod.yaml  # Production environment
 ```
 
-## AppBootConfig Bean Usage
+## AppForgeConfig Bean Usage
 
 ### Configuration Bean Structure
 ```java
-@ConfigurationProperties(prefix = "app-boot")
-public class AppBootConfig {
+@ConfigurationProperties(prefix = "app-forge")
+public class AppForgeConfig {
     private String name;
     private String version;
     private Token token = new Token();
@@ -42,19 +42,19 @@ public class AppBootConfig {
 }
 ```
 
-### ✅ CORRECT - Using AppBootConfig
+### ✅ CORRECT - Using AppForgeConfig
 ```java
 @Service
 @RequiredArgsConstructor
 public class TokenService {
-    private final AppBootConfig appBootConfig;
+    private final AppForgeConfig appForgeConfig;
     
     public String getTokenHeader() {
-        return appBootConfig.getToken().getHeader();
+        return appForgeConfig.getToken().getHeader();
     }
     
     public boolean isCaptchaEnabled() {
-        return appBootConfig.getCaptcha().isEnabled();
+        return appForgeConfig.getCaptcha().isEnabled();
     }
 }
 ```
@@ -88,8 +88,8 @@ management:
     port: 7002
 
 # Application properties
-app-boot:
-  name: AppBoot
+app-forge:
+  name: AppForge
   version: 1.0.0
   token:
     header: Authorization
@@ -111,7 +111,7 @@ spring:
       console:
         enabled: true
 
-app-boot:
+app-forge:
   jwt:
     secret: dev-secret-key
     expire-seconds: 604800  # 7 days
@@ -125,7 +125,7 @@ spring:
   profiles:
     active: base,prod
 
-app-boot:
+app-forge:
   jwt:
     secret: ${JWT_SECRET}  # From environment variable
     expire-seconds: 3600   # 1 hour
@@ -136,7 +136,7 @@ app-boot:
 ## Configuration Best Practices
 
 ### 1. Centralize Configuration Access
-- All configuration access should go through `AppBootConfig`
+- All configuration access should go through `AppForgeConfig`
 - Never scatter `@Value` annotations throughout the codebase
 - Create nested configuration classes for logical grouping
 
@@ -144,7 +144,7 @@ app-boot:
 ```yaml
 # Production configuration with env variable fallback
 database:
-  url: ${DATABASE_URL:jdbc:mysql://localhost:3306/appboot}
+  url: ${DATABASE_URL:jdbc:mysql://localhost:3306/appforge}
   username: ${DB_USERNAME:root}
   password: ${DB_PASSWORD:}
   
@@ -154,9 +154,9 @@ jwt:
 
 ### 3. Configuration Validation
 ```java
-@ConfigurationProperties(prefix = "app-boot")
+@ConfigurationProperties(prefix = "app-forge")
 @Validated
-public class AppBootConfig {
+public class AppForgeConfig {
     
     @NotBlank
     private String name;
@@ -177,7 +177,7 @@ public class AppBootConfig {
 
 ### 4. Configuration Documentation
 ```java
-public class AppBootConfig {
+public class AppForgeConfig {
     
     /**
      * Application name displayed in UI and logs
@@ -207,17 +207,17 @@ public class AppBootConfig {
 
 ## Migration Guide
 
-### Converting @Value to AppBootConfig
+### Converting @Value to AppForgeConfig
 
 #### Step 1: Identify @Value usage
 ```bash
 grep -r "@Value" --include="*.java" .
 ```
 
-#### Step 2: Add to AppBootConfig
+#### Step 2: Add to AppForgeConfig
 ```java
 // Add new configuration property
-public class AppBootConfig {
+public class AppForgeConfig {
     private NewConfig newConfig = new NewConfig();
     
     @Getter @Setter
@@ -229,7 +229,7 @@ public class AppBootConfig {
 
 #### Step 3: Update YAML files
 ```yaml
-app-boot:
+app-forge:
   new-config:
     property: value
 ```
@@ -241,10 +241,10 @@ app-boot:
 private String property;
 
 // After
-private final AppBootConfig appBootConfig;
+private final AppForgeConfig appForgeConfig;
 
 public String getProperty() {
-    return appBootConfig.getNewConfig().getProperty();
+    return appForgeConfig.getNewConfig().getProperty();
 }
 ```
 

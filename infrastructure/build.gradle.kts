@@ -1,4 +1,4 @@
-// Java version inherited from parent build.gradle.kts (Java 17)
+// Java 21
 
 dependencies {
     // 依赖 common-core 模块
@@ -11,7 +11,8 @@ dependencies {
         exclude(group = "ch.qos.logback", module = "logback-classic")
         exclude(group = "org.apache.logging.log4j", module = "log4j-to-slf4j")
     }
-    api("org.springframework.boot:spring-boot-starter-aop") {
+    // AspectJ support (replaces spring-boot-starter-aop in Spring Boot 4)
+    api("org.springframework.boot:spring-boot-starter-aspectj") {
         exclude(group = "org.springframework.boot", module = "spring-boot-starter-logging")
         exclude(group = "ch.qos.logback", module = "logback-classic")
         exclude(group = "org.apache.logging.log4j", module = "log4j-to-slf4j")

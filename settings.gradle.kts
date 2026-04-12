@@ -17,7 +17,7 @@ pluginManagement {
     }
 }
 
-rootProject.name = "AppBoot"
+rootProject.name = "AppForge"
 
 include("common:common-core")
 include("common:common-error")

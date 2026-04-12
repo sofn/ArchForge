@@ -1,16 +1,16 @@
-# Quick Reference for AppBoot Development
+# Quick Reference for AppForge Development
 
 ## Most Important Rules
 
 ### 🚫 NEVER DO THIS
 - **NEVER use `var` or `val`** - always explicit types
-- **NEVER use `@Value`** - use AppBootConfig bean
+- **NEVER use `@Value`** - use AppForgeConfig bean
 - **NEVER import hutool** - use standard libraries
 - **NEVER use field injection** - use constructor injection
 
 ### ✅ ALWAYS DO THIS
 - **ALWAYS use Lombok annotations** for boilerplate reduction
-- **ALWAYS use AppBootConfig** for configuration access
+- **ALWAYS use AppForgeConfig** for configuration access
 - **ALWAYS use constructor injection** with `@RequiredArgsConstructor`
 - **ALWAYS specify explicit types** in variable declarations
 
@@ -37,7 +37,7 @@
 @Service
 @RequiredArgsConstructor
 public class MyService {
-    private final AppBootConfig config;
+    private final AppForgeConfig config;
     
     // Access configuration
     public void example() {
@@ -57,7 +57,7 @@ public class MyService {
 @Slf4j
 public class UserService {
     private final UserRepository repository;
-    private final AppBootConfig config;
+    private final AppForgeConfig config;
 }
 ```
 
@@ -90,7 +90,7 @@ public class User extends IdEntity {
 ## Module Structure Reference
 
 ```
-AppBoot/
+AppForge/
 ├── common/
 │   ├── common-core/      # Utilities, constants
 │   └── common-error/      # Error handling
@@ -169,4 +169,4 @@ public interface UserRepository extends JpaRepository<User, Long> {
 ```
 
 ---
-Remember: When in doubt, check `AppBootConfig` for configuration and use Lombok for cleaner code!
+Remember: When in doubt, check `AppForgeConfig` for configuration and use Lombok for cleaner code!

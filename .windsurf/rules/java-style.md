@@ -98,7 +98,7 @@ private final MyService myService;  // With @RequiredArgsConstructor
 @Slf4j
 public class UserService {
     private final UserRepository userRepository;
-    private final AppBootConfig appBootConfig;
+    private final AppForgeConfig appForgeConfig;
 }
 ```
 
@@ -107,14 +107,14 @@ public class UserService {
 // CORRECT - Use configuration beans
 @Component
 public class MyComponent {
-    private final AppBootConfig appBootConfig;
+    private final AppForgeConfig appForgeConfig;
     
-    public MyComponent(AppBootConfig appBootConfig) {
-        this.appBootConfig = appBootConfig;
+    public MyComponent(AppForgeConfig appForgeConfig) {
+        this.appForgeConfig = appForgeConfig;
     }
     
     public void doSomething() {
-        String token = appBootConfig.getToken().getHeader();
+        String token = appForgeConfig.getToken().getHeader();
         // Use configuration
     }
 }

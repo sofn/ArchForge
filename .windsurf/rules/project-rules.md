@@ -1,6 +1,6 @@
-# AppBoot Project Rules for Windsurf
+# AppForge Project Rules for Windsurf
 
-This file provides guidance when working with code in the AppBoot repository.
+This file provides guidance when working with code in the AppForge repository.
 
 ## Build Commands
 
@@ -12,7 +12,7 @@ This file provides guidance when working with code in the AppBoot repository.
 
 ## Development
 
-- Main application entry point: `server-admin/src/main/java/com/lesofn/appboot/server/admin/Application.java`
+- Main application entry point: `server-admin/src/main/java/com/lesofn/appforge/server/admin/Application.java`
 - Default ports: Application (8080), Management (7002)
 - Development profile uses H2 database with console at `/h2-console`
 - Hot reload enabled via Spring Boot devtools
@@ -38,7 +38,7 @@ This is a multi-module Spring Boot 3 project with clean architecture principles:
 - Authentication handled via JWT tokens with configurable expiration
 - Multi-datasource support with master/slave configuration
 - Profile-based configuration (dev/test/prod) with separate YAML files in `src/main/profiles/`
-- All configurations should be centralized in `AppBootConfig` bean
+- All configurations should be centralized in `AppForgeConfig` bean
 
 ## Dependencies
 
@@ -78,12 +78,12 @@ This is a multi-module Spring Boot 3 project with clean architecture principles:
 - Profiles: `dev` (H2 + mock Redis), `test`, `prod`
 
 ### Configuration Bean Usage
-- All application configurations should be managed through `AppBootConfig` bean
-- Avoid using `@Value` annotations directly - use `AppBootConfig` instead
+- All application configurations should be managed through `AppForgeConfig` bean
+- Avoid using `@Value` annotations directly - use `AppForgeConfig` instead
 - Configuration structure:
   ```java
-  @ConfigurationProperties(prefix = "app-boot")
-  public class AppBootConfig {
+  @ConfigurationProperties(prefix = "app-forge")
+  public class AppForgeConfig {
       private Token token;
       private Jwt jwt;
       private Captcha captcha;
@@ -120,7 +120,7 @@ This is a multi-module Spring Boot 3 project with clean architecture principles:
 
 ## Important Notes
 
-1. When modifying configuration properties, always update `AppBootConfig` bean
+1. When modifying configuration properties, always update `AppForgeConfig` bean
 2. Maintain clean separation between modules - don't create circular dependencies
 3. Use appropriate Lombok annotations but avoid `var` keyword
 4. Follow DDD principles for domain logic organization
