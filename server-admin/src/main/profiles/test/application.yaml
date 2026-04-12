@@ -47,7 +47,7 @@ user:
       password: test123
 
 # 项目配置 - 测试环境
-app-boot:
+app-forge:
   # JWT配置
   jwt:
     secret: myTestSecretKey+2024TestEnvironment/SecureKey=

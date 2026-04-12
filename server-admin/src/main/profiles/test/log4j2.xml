@@ -114,7 +114,7 @@
         <Logger name="org.jboss" level="WARN"/>
         <Logger name="io.micrometer" level="WARN"/>
         <Logger name="reactor.util" level="WARN"/>
-        <Logger name="com.lesofn.appboot" level="INFO"/>
+        <Logger name="com.lesofn.appforge" level="INFO"/>
         
         <Root level="INFO">
             <AppenderRef ref="AsyncDebugFile"/>

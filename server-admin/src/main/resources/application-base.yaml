@@ -15,7 +15,7 @@ server:
 
 spring:
   application:
-    name: AppBoot
+    name: AppForge
     version: 1.0.0
   jpa:
     hibernate:
@@ -67,9 +67,9 @@ springdoc:
   show-actuator: false
 
 # 项目相关配置
-app-boot:
+app-forge:
   # 名称
-  name: AppBoot
+  name: AppForge
   # 版本
   version: 1.0.0
   # 版权年份

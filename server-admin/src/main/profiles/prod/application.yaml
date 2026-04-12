@@ -47,10 +47,10 @@ user:
       password: ${DB_PASSWORD:prodpassword}
 
 # 项目配置 - 生产环境
-app-boot:
+app-forge:
   # JWT配置
   jwt:
-    secret: ${JWT_SECRET:VerySecureProductionKey2024/AppBoot+SecretKey=}
+    secret: ${JWT_SECRET:VerySecureProductionKey2024/AppForge+SecretKey=}
     expire-seconds: 3600  # JWT有效期（秒），1小时
   # 验证码配置
   captcha:
