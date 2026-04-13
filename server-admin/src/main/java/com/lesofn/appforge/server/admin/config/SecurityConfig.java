@@ -150,7 +150,8 @@ public class SecurityConfig {
                                                 "/login",
                                                 "/register",
                                                 "/getConfig",
-                                                "/captchaImage")
+                                                "/captchaImage",
+                                                "/refresh-token")
                                         .permitAll()
                                         .requestMatchers("/api/**")
                                         .permitAll()
