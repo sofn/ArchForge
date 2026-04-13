@@ -1,7 +1,5 @@
 package com.lesofn.appforge.infrastructure.frame.utils;
 
-import org.apache.commons.io.output.TeeOutputStream;
-
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.WriteListener;
@@ -10,6 +8,7 @@ import jakarta.servlet.http.HttpServletResponseWrapper;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import org.apache.commons.io.output.TeeOutputStream;
 
 public class ResponseWrapper extends HttpServletResponseWrapper {
 
@@ -28,7 +27,8 @@ public class ResponseWrapper extends HttpServletResponseWrapper {
     @Override
     public ServletOutputStream getOutputStream() throws IOException {
         return new ServletOutputStream() {
-            private final TeeOutputStream tee = new TeeOutputStream(ResponseWrapper.super.getOutputStream(), bos);
+            private final TeeOutputStream tee =
+                    new TeeOutputStream(ResponseWrapper.super.getOutputStream(), bos);
 
             @Override
             public boolean isReady() {
@@ -36,8 +36,7 @@ public class ResponseWrapper extends HttpServletResponseWrapper {
             }
 
             @Override
-            public void setWriteListener(WriteListener writeListener) {
-            }
+            public void setWriteListener(WriteListener writeListener) {}
 
             @Override
             public void write(int b) throws IOException {
@@ -55,8 +54,7 @@ public class ResponseWrapper extends HttpServletResponseWrapper {
         return bos.toByteArray();
     }
 
-
-    private static class TeePrintWriter extends PrintWriter{
+    private static class TeePrintWriter extends PrintWriter {
 
         PrintWriter branch;
 

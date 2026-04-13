@@ -1,8 +1,5 @@
 package com.lesofn.appforge.common.encrypt;
 
-import org.apache.commons.codec.binary.Base64;
-
-import javax.crypto.Cipher;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -12,6 +9,8 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.HashMap;
 import java.util.Map;
+import javax.crypto.Cipher;
+import org.apache.commons.codec.binary.Base64;
 
 /**
  * RSA密钥对生成器
@@ -81,7 +80,7 @@ public class RsaEncrypter {
     /**
      * 使用公钥加密数据
      *
-     * @param data         待加密数据
+     * @param data 待加密数据
      * @param publicKeyStr Base64编码的公钥字符串
      * @return 加密后的数据(Base64编码)
      * @throws Exception 加密异常
@@ -98,7 +97,7 @@ public class RsaEncrypter {
      * 使用私钥解密数据
      *
      * @param encryptedDataStr Base64编码的加密数据
-     * @param privateKeyStr    Base64编码的私钥字符串
+     * @param privateKeyStr Base64编码的私钥字符串
      * @return 解密后的数据
      * @throws Exception 解密异常
      */

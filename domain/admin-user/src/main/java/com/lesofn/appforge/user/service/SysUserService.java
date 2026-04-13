@@ -1,17 +1,16 @@
 package com.lesofn.appforge.user.service;
 
-import com.lesofn.appforge.user.domain.query.SysUserQuery;
 import com.lesofn.appforge.user.dao.SysUserRepository;
 import com.lesofn.appforge.user.domain.SysUser;
+import com.lesofn.appforge.user.domain.query.SysUserQuery;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -64,11 +63,14 @@ public class SysUserService {
 
     @Transactional
     public void softDeleteById(Long id) {
-        userRepository.findById(id).ifPresent(user -> {
-            user.setDeleted(true);
-            user.setUpdateTime(LocalDateTime.now());
-            userRepository.save(user);
-        });
+        userRepository
+                .findById(id)
+                .ifPresent(
+                        user -> {
+                            user.setDeleted(true);
+                            user.setUpdateTime(LocalDateTime.now());
+                            userRepository.save(user);
+                        });
     }
 
     public boolean existsByUsername(String username) {
@@ -85,20 +87,26 @@ public class SysUserService {
 
     @Transactional
     public void updateLoginInfo(Long userId, String loginIp) {
-        userRepository.findById(userId).ifPresent(user -> {
-            user.setLoginIp(loginIp);
-            user.setLoginDate(LocalDateTime.now());
-            userRepository.save(user);
-        });
+        userRepository
+                .findById(userId)
+                .ifPresent(
+                        user -> {
+                            user.setLoginIp(loginIp);
+                            user.setLoginDate(LocalDateTime.now());
+                            userRepository.save(user);
+                        });
     }
 
     @Transactional
     public void resetPassword(Long userId, String newPassword) {
-        userRepository.findById(userId).ifPresent(user -> {
-            user.setPassword(newPassword);
-            user.setUpdateTime(LocalDateTime.now());
-            userRepository.save(user);
-        });
+        userRepository
+                .findById(userId)
+                .ifPresent(
+                        user -> {
+                            user.setPassword(newPassword);
+                            user.setUpdateTime(LocalDateTime.now());
+                            userRepository.save(user);
+                        });
     }
 
     public Page<SysUser> searchUsers(SysUserQuery query, Pageable pageable) {
@@ -108,20 +116,26 @@ public class SysUserService {
 
     @Transactional
     public void updateStatus(Long userId, Integer status) {
-        userRepository.findById(userId).ifPresent(user -> {
-            user.setStatus(status);
-            user.setUpdateTime(LocalDateTime.now());
-            userRepository.save(user);
-        });
+        userRepository
+                .findById(userId)
+                .ifPresent(
+                        user -> {
+                            user.setStatus(status);
+                            user.setUpdateTime(LocalDateTime.now());
+                            userRepository.save(user);
+                        });
     }
 
     @Transactional
     public void updatePassword(Long userId, String newPassword) {
-        userRepository.findById(userId).ifPresent(user -> {
-            user.setPassword(newPassword);
-            user.setUpdateTime(LocalDateTime.now());
-            userRepository.save(user);
-        });
+        userRepository
+                .findById(userId)
+                .ifPresent(
+                        user -> {
+                            user.setPassword(newPassword);
+                            user.setUpdateTime(LocalDateTime.now());
+                            userRepository.save(user);
+                        });
     }
 
     public List<SysUser> findActiveUsers() {

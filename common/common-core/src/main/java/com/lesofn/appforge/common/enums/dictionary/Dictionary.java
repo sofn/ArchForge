@@ -12,10 +12,6 @@ import java.lang.annotation.*;
 @Documented
 public @interface Dictionary {
 
-    /**
-     * 字典类型名称
-     */
+    /** 字典类型名称 */
     String name() default "";
-
-
 }

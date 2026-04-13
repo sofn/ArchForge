@@ -1,7 +1,7 @@
 package com.lesofn.appforge.common.error.system;
 
-import com.lesofn.appforge.common.error.manager.ErrorManager;
 import com.lesofn.appforge.common.error.api.ErrorCode;
+import com.lesofn.appforge.common.error.manager.ErrorManager;
 import lombok.Getter;
 
 /**
@@ -12,7 +12,6 @@ import lombok.Getter;
  */
 @Getter
 public enum HttpCodes implements ErrorCode {
-
     CONTINUE(100, "Continue"),
     SWITCHING_PROTOCOLS(101, "Switching Protocols"),
     PROCESSING(102, "Processing"),
@@ -109,8 +108,6 @@ public enum HttpCodes implements ErrorCode {
         ErrorManager.register(SystemProjectModule.INSTANCE, this);
     }
 
-
-
     public Series series() {
         return Series.valueOf(this);
     }
@@ -171,7 +168,6 @@ public enum HttpCodes implements ErrorCode {
         return this.status;
     }
 
-
     public static enum Series {
         INFORMATIONAL(1),
         SUCCESSFUL(2),
@@ -208,5 +204,4 @@ public enum HttpCodes implements ErrorCode {
             throw new IllegalArgumentException("No matching constant for [" + statusCode + "]");
         }
     }
-
 }

@@ -16,9 +16,7 @@ import lombok.Getter;
 @Dictionary(name = "sysUser.sex")
 public enum GenderEnum implements DictionaryEnum {
 
-    /**
-     * 用户性别
-     */
+    /** 用户性别 */
     MALE(0, "男", CssTag.PRIMARY),
     FEMALE(1, "女", CssTag.PRIMARY),
     UNKNOWN(2, "未知", CssTag.PRIMARY);

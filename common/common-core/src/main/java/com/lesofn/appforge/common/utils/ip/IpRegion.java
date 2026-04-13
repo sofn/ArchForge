@@ -1,10 +1,10 @@
 package com.lesofn.appforge.common.utils.ip;
 
+import java.util.Objects;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import org.apache.commons.lang3.ObjectUtils;
 
 /**
  * @author sofn
@@ -27,9 +27,10 @@ public class IpRegion {
     }
 
     public String briefLocation() {
-        return String.format("%s %s",
-                ObjectUtils.defaultIfNull(province, UNKNOWN),
-                ObjectUtils.defaultIfNull(city, UNKNOWN)).trim();
+        return String.format(
+                        "%s %s",
+                        Objects.requireNonNullElse(province, UNKNOWN),
+                        Objects.requireNonNullElse(city, UNKNOWN))
+                .trim();
     }
-
 }

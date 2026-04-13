@@ -1,25 +1,24 @@
 package com.lesofn.appforge.server.admin.service.login;
 
+import static com.lesofn.appforge.infrastructure.auth.errors.AdminAuthErrorCode.TOKEN_INVALID;
+
 import com.lesofn.appforge.common.constant.Constants;
 import com.lesofn.appforge.infrastructure.auth.errors.AdminAuthException;
+import com.lesofn.appforge.infrastructure.auth.model.SystemLoginUser;
 import com.lesofn.appforge.infrastructure.config.AppForgeConfig;
 import com.lesofn.appforge.server.admin.service.cache.RedisCacheService;
-import com.lesofn.appforge.infrastructure.auth.model.SystemLoginUser;
 import com.lesofn.appforge.server.admin.util.JwtTokenUtil;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.HttpServletRequest;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+import javax.crypto.SecretKey;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
-
-import jakarta.servlet.http.HttpServletRequest;
-import javax.crypto.SecretKey;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
-
-import static com.lesofn.appforge.infrastructure.auth.errors.AdminAuthErrorCode.TOKEN_INVALID;
 
 /**
  * token验证处理
@@ -36,7 +35,6 @@ public class TokenService {
     private final RedisCacheService redisCacheService;
     private final JwtTokenUtil jwtTokenUtil;
 
-
     /**
      * 获取用户身份信息
      *
@@ -52,14 +50,15 @@ public class TokenService {
                 String uuid = (String) claims.get(Constants.Token.LOGIN_USER_KEY);
 
                 return redisCacheService.loginUserCache.get(uuid);
-            } catch (MalformedJwtException | UnsupportedJwtException | IllegalArgumentException jwtException) {
+            } catch (MalformedJwtException
+                    | UnsupportedJwtException
+                    | IllegalArgumentException jwtException) {
                 log.error("parse token failed.", jwtException);
                 throw new AdminAuthException(TOKEN_INVALID);
             } catch (Exception e) {
                 log.error("fail to get cached user from redis", e);
                 throw new AdminAuthException(TOKEN_INVALID);
             }
-
         }
         return null;
     }
@@ -78,12 +77,16 @@ public class TokenService {
 
     /**
      * 当超过20分钟，自动刷新token
+     *
      * @param loginUser 登录用户
      */
     public void refreshToken(SystemLoginUser loginUser) {
         long currentTime = System.currentTimeMillis();
         if (currentTime > loginUser.getAutoRefreshCacheTime()) {
-            loginUser.setAutoRefreshCacheTime(currentTime + TimeUnit.MINUTES.toMillis(appForgeConfig.getToken().getAutoRefreshTime()));
+            loginUser.setAutoRefreshCacheTime(
+                    currentTime
+                            + TimeUnit.MINUTES.toMillis(
+                                    appForgeConfig.getToken().getAutoRefreshTime()));
             // 根据uuid将loginUser存入缓存
             redisCacheService.loginUserCache.set(loginUser.getCachedKey(), loginUser);
         }
@@ -91,6 +94,7 @@ public class TokenService {
 
     /**
      * 删除用户身份信息
+     *
      * @param token 令牌
      */
     public void removeToken(String token) {
@@ -115,12 +119,8 @@ public class TokenService {
      */
     private Claims parseToken(String token) {
         SecretKey key = Keys.hmacShaKeyFor(appForgeConfig.getJwt().getSecret().getBytes());
-        
-        return Jwts.parser()
-                .verifyWith(key)
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
+
+        return Jwts.parser().verifyWith(key).build().parseSignedClaims(token).getPayload();
     }
 
     /**
@@ -146,5 +146,4 @@ public class TokenService {
         }
         return token;
     }
-
 }

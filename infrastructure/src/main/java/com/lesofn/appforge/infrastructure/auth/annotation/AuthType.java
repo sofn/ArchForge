@@ -10,7 +10,7 @@ public enum AuthType {
     REQUIRED(true),
     // 外部认证，内部不需要
     OUTER(true),
-    //访客模式，用户信息验证失败不报错，增加设备号验证
+    // 访客模式，用户信息验证失败不报错，增加设备号验证
     GUEST(true);
 
     // 认证失败是否抛出异常

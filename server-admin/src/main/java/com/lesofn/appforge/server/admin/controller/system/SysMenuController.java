@@ -2,12 +2,11 @@ package com.lesofn.appforge.server.admin.controller.system;
 
 import com.lesofn.appforge.user.domain.SysMenu;
 import com.lesofn.appforge.user.menu.SysMenuService;
+import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/system/menu")
@@ -18,7 +17,8 @@ public class SysMenuController {
 
     @GetMapping("/{id}")
     public ResponseEntity<SysMenu> getMenuById(@PathVariable Long id) {
-        return menuService.findById(id)
+        return menuService
+                .findById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -81,7 +81,8 @@ public class SysMenuController {
     }
 
     @PatchMapping("/{id}/status")
-    public ResponseEntity<Void> updateMenuStatus(@PathVariable Long id, @RequestParam Integer status) {
+    public ResponseEntity<Void> updateMenuStatus(
+            @PathVariable Long id, @RequestParam Integer status) {
         Optional<SysMenu> menuOptional = menuService.findById(id);
         if (menuOptional.isPresent()) {
             SysMenu menu = menuOptional.get();
@@ -90,5 +91,4 @@ public class SysMenuController {
         }
         return ResponseEntity.ok().build();
     }
-
 }

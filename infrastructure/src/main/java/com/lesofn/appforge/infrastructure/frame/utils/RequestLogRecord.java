@@ -4,11 +4,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.lesofn.appforge.common.context.ClientVersion;
-import org.apache.commons.lang3.StringUtils;
-
 import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 
 /**
  * @author sofn
@@ -23,19 +23,13 @@ public class RequestLogRecord {
 
     private String api;
 
-    /**
-     * http method
-     */
+    /** http method */
     private String method;
 
-    /**
-     * http response status
-     */
+    /** http response status */
     private int responseStatus;
 
-    /**
-     * 来源 appkey
-     */
+    /** 来源 appkey */
     private String source = "unknow";
 
     private String platform;
@@ -57,25 +51,18 @@ public class RequestLogRecord {
     // */
     // private String clientIp;
 
-    /**
-     * 用户ip,如果是内网服务器端调用，该ip是调用方通过 Api-RemoteIP机制传递的用户ip
-     */
+    /** 用户ip,如果是内网服务器端调用，该ip是调用方通过 Api-RemoteIP机制传递的用户ip */
     private String ip;
 
-    /**
-     * 接口响应使用时间
-     */
+    /** 接口响应使用时间 */
     private long useTime;
 
-    /**
-     * 响应大小，单位：字节
-     */
+    /** 响应大小，单位：字节 */
     private long responseSize;
 
     private boolean writeBody = true;
 
-    public RequestLogRecord() {
-    }
+    public RequestLogRecord() {}
 
     public String getApi() {
         return api;
@@ -268,7 +255,7 @@ public class RequestLogRecord {
     }
 
     private String passwordEscape(String key, String value) {
-        if (StringUtils.equals("password", key) || StringUtils.equals("old_password", key)) {
+        if (Strings.CS.equals("password", key) || Strings.CS.equals("old_password", key)) {
             return "***";
         }
         return value;

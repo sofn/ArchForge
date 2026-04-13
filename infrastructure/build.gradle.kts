@@ -46,6 +46,10 @@ dependencies {
     // Lombok
     compileOnly("org.projectlombok:lombok")
 
+    // Micrometer + OpenTelemetry
+    api("io.micrometer:micrometer-tracing-bridge-otel")
+    api("io.opentelemetry:opentelemetry-exporter-otlp")
+
     // JUnit for tests
     testImplementation("org.junit.jupiter:junit-jupiter-api")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")

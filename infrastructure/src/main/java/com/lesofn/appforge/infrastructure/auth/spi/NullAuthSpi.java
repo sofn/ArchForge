@@ -27,5 +27,4 @@ public class NullAuthSpi extends AbstractAuthSpi {
     public long auth(AuthRequest request) throws AdminAuthException {
         throw new AdminAuthException(AdminAuthErrorCode.USER_AUTHFAIL, "NullAuthSpi::doAuth");
     }
-
 }

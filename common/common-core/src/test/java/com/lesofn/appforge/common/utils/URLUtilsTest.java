@@ -1,12 +1,11 @@
 package com.lesofn.appforge.common.utils;
 
-import com.google.common.collect.Lists;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import com.google.common.collect.Lists;
 import java.util.List;
 import java.util.Map;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author sofn

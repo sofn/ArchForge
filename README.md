@@ -29,7 +29,7 @@
 - **Request Logging** - Automatic request/response logging via AOP
 - **Rate Limiting** - Built-in API rate limiting interceptor
 - **Multi-Datasource** - Master/slave read-write splitting support
-- **Multi-Profile** - Integrated Gradle, Spring, and application profiles (`dev` / `test` / `prod`)
+- **Multi-Profile** - Standard Spring Boot `application-{profile}.yaml` convention (`dev` / `test` / `prod`)
 - **Monitoring** - Health checks, metrics, and Druid connection pool monitoring
 - **Hot Reload** - Spring Boot DevTools for rapid development
 - **API Documentation** - Auto-generated via SpringDoc OpenAPI (Swagger UI)
@@ -70,9 +70,19 @@ The application starts on port **8080** (management port **7002**).
 | `test`  | MySQL | Redis | Testing |
 | `prod`  | MySQL | Redis | Production |
 
-Set the active profile in `gradle.properties`:
-```properties
-profile=dev
+Set the active profile via environment variable or JVM argument:
+```bash
+# Environment variable
+export SPRING_PROFILES_ACTIVE=dev
+
+# Or JVM argument
+java -Dspring.profiles.active=prod -jar server-admin/build/libs/admin-*.jar
+```
+
+For test/prod, copy the example templates and fill in real values:
+```bash
+cp server-admin/src/main/resources/application-test.yaml.example server-admin/src/main/resources/application-test.yaml
+cp server-admin/src/main/resources/application-prod.yaml.example server-admin/src/main/resources/application-prod.yaml
 ```
 
 ### Monitoring Endpoints
@@ -116,7 +126,7 @@ java -jar server-admin/build/libs/admin-*.jar
 - **请求日志** - 通过 AOP 自动记录请求/响应日志
 - **接口限流** - 内置 API 频次拦截器
 - **多数据源** - 支持主从读写分离
-- **多环境配置** - Gradle、Spring、应用三层 Profile 整合（`dev` / `test` / `prod`）
+- **多环境配置** - 标准 Spring Boot `application-{profile}.yaml` 约定（`dev` / `test` / `prod`）
 - **系统监控** - 健康检查、性能指标、Druid 连接池监控
 - **热部署** - Spring Boot DevTools 快速开发
 - **接口文档** - SpringDoc OpenAPI 自动生成（Swagger UI）
@@ -157,9 +167,19 @@ AppForge/
 | `test`  | MySQL | Redis | 测试环境 |
 | `prod`  | MySQL | Redis | 生产环境 |
 
-在 `gradle.properties` 中设置：
-```properties
-profile=dev
+通过环境变量或 JVM 参数设置：
+```bash
+# 环境变量
+export SPRING_PROFILES_ACTIVE=dev
+
+# 或 JVM 参数
+java -Dspring.profiles.active=prod -jar server-admin/build/libs/admin-*.jar
+```
+
+测试/生产环境需要复制示例模板并填写真实配置：
+```bash
+cp server-admin/src/main/resources/application-test.yaml.example server-admin/src/main/resources/application-test.yaml
+cp server-admin/src/main/resources/application-prod.yaml.example server-admin/src/main/resources/application-prod.yaml
 ```
 
 ### 监控端点

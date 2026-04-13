@@ -1,3 +1,7 @@
+plugins {
+    id("com.diffplug.spotless") version "7.0.4" apply false
+}
+
 group = "com.lesofn.appforge"
 version = "0.1.SNAPSHOT"
 
@@ -25,6 +29,19 @@ subprojects {
     if (name != "dependencies") {
         apply(plugin = "java-library")
         apply(plugin = "groovy")
+        apply(plugin = "com.diffplug.spotless")
+
+        // Spotless 代码格式化 - Google Java Style (AOSP: 4-space indent)
+        configure<com.diffplug.gradle.spotless.SpotlessExtension> {
+            lineEndings = com.diffplug.spotless.LineEnding.UNIX
+            java {
+                target("src/*/java/**/*.java")
+                googleJavaFormat().aosp()
+                removeUnusedImports()
+                trimTrailingWhitespace()
+                endWithNewline()
+            }
+        }
 
         // 配置 Java 21
         configure<JavaPluginExtension> {
@@ -34,6 +51,7 @@ subprojects {
 
         tasks.withType<JavaCompile> {
             options.release.set(21)
+            options.compilerArgs.addAll(listOf("-Xlint:deprecation"))
         }
         
         // 配置测试任务使用JUnit Platform
@@ -47,10 +65,6 @@ subprojects {
             exclude(group = "ch.qos.logback", module = "logback-classic")
             exclude(group = "ch.qos.logback", module = "logback-core")
             exclude(group = "org.apache.logging.log4j", module = "log4j-to-slf4j")
-            // Force Groovy 4.x for Spock 2.3 compatibility (SB4 BOM brings Groovy 5.x)
-            resolutionStrategy {
-                force("org.apache.groovy:groovy:4.0.31")
-            }
         }
         
         dependencies {
@@ -63,7 +77,7 @@ subprojects {
             add("annotationProcessor", "org.projectlombok:lombok:1.18.44")
             add("testAnnotationProcessor", "org.projectlombok:lombok:1.18.44")
 
-            // 全局测试依赖 - Spock框架 (Groovy 4.x)
+            // 全局测试依赖 - Spock 2.4 (Groovy 5.x)
             add("testImplementation", "org.junit.jupiter:junit-jupiter-api")
             add("testRuntimeOnly", "org.junit.jupiter:junit-jupiter-engine")
             add("testImplementation", "org.spockframework:spock-core")

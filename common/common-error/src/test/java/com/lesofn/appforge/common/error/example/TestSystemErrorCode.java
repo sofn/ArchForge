@@ -13,7 +13,6 @@ import lombok.Getter;
  */
 @Getter
 public enum TestSystemErrorCode implements ErrorCode {
-
     SUCCESS(0, "ok"),
     SYSTEM_ERROR(1, "system error"),
     GET_ENUM_FAILED(2, "获取枚举类型失败, 枚举类：{}");
@@ -26,5 +25,4 @@ public enum TestSystemErrorCode implements ErrorCode {
         this.msg = msg;
         ErrorManager.register(SystemProjectModule.INSTANCE, this);
     }
-
 }

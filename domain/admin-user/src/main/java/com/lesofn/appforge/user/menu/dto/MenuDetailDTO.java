@@ -24,5 +24,4 @@ public class MenuDetailDTO extends MenuDTO {
 
     private String permission;
     private MetaDTO meta;
-
 }

@@ -5,6 +5,7 @@ import lombok.Data;
 
 /**
  * 字典模型类
+ *
  * @author sofn
  */
 @Data
@@ -22,5 +23,4 @@ public class DictionaryData {
             this.cssTag = enumType.getCssTag();
         }
     }
-
 }

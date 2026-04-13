@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lesofn.appforge.common.context.ClientVersion;
-
 import jakarta.servlet.http.HttpServletRequest;
 import java.io.Serializable;
 import java.util.HashMap;
@@ -18,36 +17,32 @@ public class RequestContext implements Serializable {
 
     @JsonProperty("request_id")
     private String requestId;
-    
+
     @JsonProperty("current_uid")
     private long currentUid;
-    
+
     private String ip;
-    
+
     @JsonProperty("app_id")
     private int appId;
-    
+
     @JsonProperty("is_official_app")
     private boolean isOfficialApp;
-    
+
     @JsonProperty("platform")
     private String platform;
-    
+
     @JsonProperty("client_version")
     private ClientVersion clientVersion;
-    
+
     private Map<String, Object> attribute;
 
     private transient HttpServletRequest originRequest;
-    // 直接从主库中读取数据
-    private boolean readMasterDB;
-    private boolean shouldReadMasterDB;
 
     public RequestContext(String requestId) {
         this.requestId = requestId;
         clientVersion = ClientVersion.NULL;
         attribute = new HashMap<>();
-        readMasterDB = false;
     }
 
     public String getRequestId() {
@@ -118,22 +113,6 @@ public class RequestContext implements Serializable {
         this.attribute.put(name, value);
     }
 
-    public boolean isReadMasterDB() {
-        return readMasterDB;
-    }
-
-    public void setReadMasterDB(boolean readMasterDB) {
-        this.readMasterDB = readMasterDB;
-    }
-
-    public boolean isShouldReadMasterDB() {
-        return shouldReadMasterDB;
-    }
-
-    public void setShouldReadMasterDB(boolean shouldReadMasterDB) {
-        this.shouldReadMasterDB = shouldReadMasterDB;
-    }
-
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -148,32 +127,21 @@ public class RequestContext implements Serializable {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
+        if (this == obj) return true;
+        if (obj == null) return false;
+        if (getClass() != obj.getClass()) return false;
         RequestContext other = (RequestContext) obj;
-        if (appId != other.appId)
-            return false;
+        if (appId != other.appId) return false;
         if (clientVersion == null) {
-            if (other.clientVersion != null)
-                return false;
-        } else if (!clientVersion.equals(other.clientVersion))
-            return false;
-        if (currentUid != other.currentUid)
-            return false;
+            if (other.clientVersion != null) return false;
+        } else if (!clientVersion.equals(other.clientVersion)) return false;
+        if (currentUid != other.currentUid) return false;
         if (ip == null) {
-            if (other.ip != null)
-                return false;
-        } else if (!ip.equals(other.ip))
-            return false;
+            if (other.ip != null) return false;
+        } else if (!ip.equals(other.ip)) return false;
         if (requestId == null) {
-            if (other.requestId != null)
-                return false;
-        } else if (!requestId.equals(other.requestId))
-            return false;
+            if (other.requestId != null) return false;
+        } else if (!requestId.equals(other.requestId)) return false;
         return true;
     }
 

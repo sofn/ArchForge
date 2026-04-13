@@ -8,10 +8,7 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
-/**
- * Authors: sofn
- * Version: 1.0  Created at 2015-09-06 22:56.
- */
+/** Authors: sofn Version: 1.0 Created at 2015-09-06 22:56. */
 public class RequestContextMethodArgumentResolver implements HandlerMethodArgumentResolver {
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
@@ -19,8 +16,12 @@ public class RequestContextMethodArgumentResolver implements HandlerMethodArgume
     }
 
     @Override
-    public Object resolveArgument(MethodParameter methodParameter, ModelAndViewContainer modelAndViewContainer, NativeWebRequest nativeWebRequest,
-                                  WebDataBinderFactory webDataBinderFactory) throws Exception {
+    public Object resolveArgument(
+            MethodParameter methodParameter,
+            ModelAndViewContainer modelAndViewContainer,
+            NativeWebRequest nativeWebRequest,
+            WebDataBinderFactory webDataBinderFactory)
+            throws Exception {
         return ThreadLocalContext.getRequestContext();
     }
 }

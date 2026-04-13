@@ -3,22 +3,17 @@ package com.lesofn.appforge.user.web;
 import com.lesofn.appforge.infrastructure.auth.annotation.AuthType;
 import com.lesofn.appforge.infrastructure.auth.annotation.BaseInfo;
 import com.lesofn.appforge.user.service.UserService;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import jakarta.annotation.Resource;
-
-/**
- * Authors: sofn
- * Version: 1.0  Created at 2015-10-18 00:09.
- */
+/** Authors: sofn Version: 1.0 Created at 2015-10-18 00:09. */
 @Controller
 @RequestMapping("/web")
 public class WebUserController {
 
-    @Resource
-    private UserService userService;
+    @Resource private UserService userService;
 
     @BaseInfo(needAuth = AuthType.OPTION)
     @RequestMapping(value = "register", method = RequestMethod.GET)
@@ -31,6 +26,4 @@ public class WebUserController {
     public String login() {
         return "account/login";
     }
-
-
 }

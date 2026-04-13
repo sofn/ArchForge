@@ -18,16 +18,17 @@ public class GuestAuthSpi extends AbstractAuthSpi {
 
     @Override
     protected boolean checkCanAuth(AuthRequest request) {
-        //此spi需手动指定
+        // 此spi需手动指定
         return false;
     }
 
     @Override
     public long auth(AuthRequest request) throws AdminAuthException {
-        ClientVersion version = ClientVersion.valueOf(request.getHeader(ClientVersion.VERSION_HEADER));
+        ClientVersion version =
+                ClientVersion.valueOf(request.getHeader(ClientVersion.VERSION_HEADER));
         if ((version.sdkVersion.equals(ClientVersion.Version.NULL)
-                || version.clientVersion.equals(ClientVersion.Version.NULL)
-                || version.udid.equals(ClientVersion.DEFAULT_UNKNOW))
+                        || version.clientVersion.equals(ClientVersion.Version.NULL)
+                        || version.udid.equals(ClientVersion.DEFAULT_UNKNOW))
                 && request.getFrom() != AuthRequest.RequestFrom.INNER) {
             throw new AdminAuthException(AdminAuthErrorCode.ILLEGAL_GUEST);
         }

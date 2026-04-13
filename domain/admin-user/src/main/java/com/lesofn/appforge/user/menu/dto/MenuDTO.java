@@ -4,10 +4,9 @@ import com.lesofn.appforge.common.enums.BasicEnumUtil;
 import com.lesofn.appforge.common.enums.common.StatusEnum;
 import com.lesofn.appforge.user.domain.SysMenu;
 import com.lesofn.appforge.user.enums.MenuTypeEnum;
+import java.time.LocalDateTime;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
 
 /**
  * @author sofn
@@ -25,11 +24,14 @@ public class MenuDTO {
             this.path = entity.getPath();
             this.status = entity.getStatus();
             this.isButton = entity.getIsButton();
-            this.statusStr = BasicEnumUtil.getDescriptionByValue(StatusEnum.class, entity.getStatus());
+            this.statusStr =
+                    BasicEnumUtil.getDescriptionByValue(StatusEnum.class, entity.getStatus());
 
             if (!entity.getIsButton()) {
                 this.menuType = entity.getMenuType();
-                this.menuTypeStr = BasicEnumUtil.getDescriptionByValue(MenuTypeEnum.class, entity.getMenuType());
+                this.menuTypeStr =
+                        BasicEnumUtil.getDescriptionByValue(
+                                MenuTypeEnum.class, entity.getMenuType());
             } else {
                 this.menuType = 0;
             }
@@ -69,7 +71,4 @@ public class MenuDTO {
     private LocalDateTime createTime;
 
     private String icon;
-
-
-
 }

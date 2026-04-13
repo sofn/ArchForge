@@ -1,0 +1,77 @@
+# Development environment
+server:
+  port: 8080
+
+spring:
+  devtools:
+    restart:
+      enabled: true
+      additional-paths: src/main/java,src/main/resources
+      exclude: "static/**,public/**"
+    livereload:
+      enabled: true
+      port: 35729
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+      settings:
+        trace: false
+        web-allow-others: false
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+      database: 0
+      timeout: 10s
+      lettuce:
+        pool:
+          min-idle: 0
+          max-idle: 8
+          max-active: 8
+          max-wait: -1ms
+  # Database - H2 (dynamic-datasource)
+  datasource:
+    dynamic:
+      datasource:
+        user_master:
+          driver-class-name: org.h2.Driver
+          url: jdbc:h2:file:~/.h2/user;AUTO_SERVER=TRUE;MODE=MySQL;DATABASE_TO_LOWER=TRUE;DB_CLOSE_DELAY=-1
+          username: sa
+          password: ""
+        user_slave:
+          driver-class-name: org.h2.Driver
+          url: jdbc:h2:file:~/.h2/user;AUTO_SERVER=TRUE;MODE=MySQL;DATABASE_TO_LOWER=TRUE;DB_CLOSE_DELAY=-1
+          username: sa
+          password: ""
+        task_master:
+          driver-class-name: org.h2.Driver
+          url: jdbc:h2:file:~/.h2/task;AUTO_SERVER=TRUE;MODE=MySQL;DATABASE_TO_LOWER=TRUE;DB_CLOSE_DELAY=-1
+          username: sa
+          password: ""
+        task_slave:
+          driver-class-name: org.h2.Driver
+          url: jdbc:h2:file:~/.h2/task;AUTO_SERVER=TRUE;MODE=MySQL;DATABASE_TO_LOWER=TRUE;DB_CLOSE_DELAY=-1
+          username: sa
+          password: ""
+
+# OpenTelemetry
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+  otlp:
+    tracing:
+      endpoint: http://localhost:4318/v1/traces
+    metrics:
+      endpoint: http://localhost:4318/v1/metrics
+
+app-forge:
+  embedded:
+    redis: false
+    h2-init: true
+  jwt:
+    secret: 5/jDAWs7a63GRgjS+uF2mP7dcLwI6GAgxf+Z0+fOAbgMR/jksG5r0v10nDOkrM0btxtb2FAuol8fSzSJis8gIA==
+    expire-seconds: 604800
+  captcha:
+    enabled: false

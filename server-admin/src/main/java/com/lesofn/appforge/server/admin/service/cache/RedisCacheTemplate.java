@@ -31,7 +31,8 @@ public class RedisCacheTemplate<T> {
     }
 
     public void set(Object id, T obj) {
-        redisUtil.setCacheObject(generateKey(id), obj, redisRedisEnum.expiration(), redisRedisEnum.timeUnit());
+        redisUtil.setCacheObject(
+                generateKey(id), obj, redisRedisEnum.expiration(), redisRedisEnum.timeUnit());
     }
 
     public void delete(Object id) {
@@ -49,5 +50,4 @@ public class RedisCacheTemplate<T> {
     public T getObjectFromDb(Object id) {
         return null;
     }
-
 }

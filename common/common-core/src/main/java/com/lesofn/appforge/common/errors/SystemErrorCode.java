@@ -1,7 +1,7 @@
 package com.lesofn.appforge.common.errors;
 
-import com.lesofn.appforge.common.error.manager.ErrorManager;
 import com.lesofn.appforge.common.error.api.ErrorCode;
+import com.lesofn.appforge.common.error.manager.ErrorManager;
 import com.lesofn.appforge.common.error.system.SystemProjectModule;
 import lombok.Getter;
 
@@ -13,11 +13,10 @@ import lombok.Getter;
  */
 @Getter
 public enum SystemErrorCode implements ErrorCode {
-
     SUCCESS(0, "ok"),
     SYSTEM_ERROR(1, "system error"),
     GET_ENUM_FAILED(2, "获取枚举类型失败, 枚举类：{}"),
-    
+
     // 系统级异常
     E_DEFAULT(3, "system error!"),
     E_SERVICE_UNAVAILABLE(4, "service unavailable!"),
@@ -31,7 +30,8 @@ public enum SystemErrorCode implements ErrorCode {
     E_PARAM_ERROR(12, "param error, see doc for more info."),
     E_ILLEGAL_REQUEST(13, "Illegal Request!"),
     E_PARAM_MISS_ERROR(14, "miss required parameter (%s), see doc for more info."),
-    E_PARAM_INVALID_ERROR(15, "parameter (%s)'s value invalid,expect (%s), but get (%s), see doc for more info."),
+    E_PARAM_INVALID_ERROR(
+            15, "parameter (%s)'s value invalid,expect (%s), but get (%s), see doc for more info."),
     E_POST_BODY_LENGTH_LIMIT(16, "request boday length over limit."),
     E_INPUT_IMAGEERROR(17, "unsupported image type, only suport JPG, GIF, PNG!"),
     E_INPUT_IMAGESIZEERROR(18, "image size too large."),
@@ -62,5 +62,4 @@ public enum SystemErrorCode implements ErrorCode {
         this.msg = msg;
         ErrorManager.register(SystemProjectModule.INSTANCE, this);
     }
-
 }

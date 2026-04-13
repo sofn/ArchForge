@@ -2,10 +2,24 @@
 <Configuration status="WARN" monitorInterval="30">
     <properties>
         <property name="LOG_PATTERN">%d{yyyy-MM-dd HH:mm:ss.SSS} %level %logger:%line %msg%n</property>
-        <property name="LOGS_PATH">logs</property>
+        <property name="LOGS_PATH">${sys:LOG_PATH:-logs}</property>
     </properties>
 
     <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+            <Filters>
+                <ThresholdFilter level="ERROR" onMatch="DENY" onMismatch="NEUTRAL"/>
+            </Filters>
+        </Console>
+
+        <Console name="ErrorConsole" target="SYSTEM_ERR">
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+            <Filters>
+                <ThresholdFilter level="ERROR" onMatch="ACCEPT" onMismatch="DENY"/>
+            </Filters>
+        </Console>
+
         <RollingFile name="DebugFile" fileName="${LOGS_PATH}/debug.log"
                      filePattern="${LOGS_PATH}/debug.%d{yyyyMMdd-HH}.%i.log.zip"
                      immediateFlush="false">
@@ -24,7 +38,7 @@
                 </Delete>
             </DefaultRolloverStrategy>
         </RollingFile>
-        
+
         <RollingFile name="InfoFile" fileName="${LOGS_PATH}/info.log"
                      filePattern="${LOGS_PATH}/info.%d{yyyyMMdd-HH}.%i.log.zip"
                      immediateFlush="false">
@@ -43,7 +57,7 @@
                 </Delete>
             </DefaultRolloverStrategy>
         </RollingFile>
-        
+
         <RollingFile name="WarnFile" fileName="${LOGS_PATH}/warn.log"
                      filePattern="${LOGS_PATH}/warn.%d{yyyyMMdd}.%i.log.zip"
                      immediateFlush="false">
@@ -62,7 +76,7 @@
                 </Delete>
             </DefaultRolloverStrategy>
         </RollingFile>
-        
+
         <RollingFile name="ErrorFile" fileName="${LOGS_PATH}/error.log"
                      filePattern="${LOGS_PATH}/error.%d{yyyyMMdd}.%i.log.zip"
                      immediateFlush="false">
@@ -86,15 +100,12 @@
         <Async name="AsyncDebugFile" bufferSize="8192">
             <AppenderRef ref="DebugFile"/>
         </Async>
-        
         <Async name="AsyncInfoFile" bufferSize="8192">
             <AppenderRef ref="InfoFile"/>
         </Async>
-        
         <Async name="AsyncWarnFile" bufferSize="8192">
             <AppenderRef ref="WarnFile"/>
         </Async>
-        
         <Async name="AsyncErrorFile" bufferSize="8192">
             <AppenderRef ref="ErrorFile"/>
         </Async>
@@ -114,13 +125,27 @@
         <Logger name="org.jboss" level="WARN"/>
         <Logger name="io.micrometer" level="WARN"/>
         <Logger name="reactor.util" level="WARN"/>
-        <Logger name="com.lesofn.appforge" level="INFO"/>
-        
-        <Root level="INFO">
-            <AppenderRef ref="AsyncDebugFile"/>
-            <AppenderRef ref="AsyncInfoFile"/>
-            <AppenderRef ref="AsyncWarnFile"/>
-            <AppenderRef ref="AsyncErrorFile"/>
-        </Root>
+
+        <!-- dev: DEBUG + Console; other: INFO, file only -->
+        <SpringProfile name="dev">
+            <Logger name="com.lesofn.appforge" level="DEBUG"/>
+            <Root level="DEBUG">
+                <AppenderRef ref="Console"/>
+                <AppenderRef ref="ErrorConsole"/>
+                <AppenderRef ref="AsyncDebugFile"/>
+                <AppenderRef ref="AsyncInfoFile"/>
+                <AppenderRef ref="AsyncWarnFile"/>
+                <AppenderRef ref="AsyncErrorFile"/>
+            </Root>
+        </SpringProfile>
+
+        <SpringProfile name="!dev">
+            <Logger name="com.lesofn.appforge" level="INFO"/>
+            <Root level="INFO">
+                <AppenderRef ref="AsyncInfoFile"/>
+                <AppenderRef ref="AsyncWarnFile"/>
+                <AppenderRef ref="AsyncErrorFile"/>
+            </Root>
+        </SpringProfile>
     </Loggers>
 </Configuration>

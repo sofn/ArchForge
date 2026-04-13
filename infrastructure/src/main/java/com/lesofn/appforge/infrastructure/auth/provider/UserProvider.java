@@ -1,6 +1,5 @@
 package com.lesofn.appforge.infrastructure.auth.provider;
 
-
 import com.lesofn.appforge.infrastructure.auth.model.AuthRequest;
 
 /**
@@ -24,14 +23,12 @@ public interface UserProvider {
      */
     boolean checkCanAccess(AuthRequest request, long uid);
 
-
     /**
      * 通过用户名密码认证用户
      *
-     * @param loginName     不能为空
-     * @param password      不能为空
+     * @param loginName 不能为空
+     * @param password 不能为空
      * @return uid
      */
     long authUser(String loginName, String password);
-
 }

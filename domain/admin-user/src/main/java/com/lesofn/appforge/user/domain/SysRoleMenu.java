@@ -1,12 +1,11 @@
 package com.lesofn.appforge.user.domain;
 
 import jakarta.persistence.*;
+import java.io.Serializable;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
-
-import java.io.Serializable;
 
 @Data
 @Accessors(chain = true)
@@ -17,11 +16,9 @@ import java.io.Serializable;
 @IdClass(SysRoleMenu.SysRoleMenuId.class)
 public class SysRoleMenu {
 
-    @Id
-    private Long roleId;
+    @Id private Long roleId;
 
-    @Id
-    private Long menuId;
+    @Id private Long menuId;
 
     @Data
     @Accessors(chain = true)

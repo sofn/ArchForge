@@ -7,6 +7,7 @@ import lombok.Getter;
 
 /**
  * 操作者类型
+ *
  * @author sofn
  */
 @Getter
@@ -14,14 +15,11 @@ import lombok.Getter;
 @Dictionary(name = "sysOperationLog.operatorType")
 public enum OperatorTypeEnum implements BasicEnum {
 
-    /**
-     * 菜单类型
-     */
+    /** 菜单类型 */
     OTHER(1, "其他"),
     WEB(2, "Web用户"),
     MOBILE(3, "手机端用户");
 
     private final int value;
     private final String description;
-
 }

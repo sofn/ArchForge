@@ -8,6 +8,7 @@ import lombok.Getter;
 
 /**
  * 对应sys_notice的 status字段
+ *
  * @author sofn
  */
 @Getter
@@ -15,14 +16,11 @@ import lombok.Getter;
 @Dictionary(name = "sysNotice.status")
 public enum NoticeStatusEnum implements DictionaryEnum {
 
-    /**
-     * 通知状态
-     */
+    /** 通知状态 */
     OPEN(1, "正常", CssTag.PRIMARY),
     CLOSE(0, "关闭", CssTag.DANGER);
 
     private final int value;
     private final String description;
     private final String cssTag;
-
 }

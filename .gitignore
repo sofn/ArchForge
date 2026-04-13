@@ -35,3 +35,7 @@ rebel.xml
 build
 .vscode/
 IFLOW.md
+
+# Environment-specific config files (use .example templates)
+server-admin/src/main/resources/application-test.yaml
+server-admin/src/main/resources/application-prod.yaml

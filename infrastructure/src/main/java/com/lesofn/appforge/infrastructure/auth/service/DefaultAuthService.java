@@ -1,5 +1,7 @@
 package com.lesofn.appforge.infrastructure.auth.service;
 
+import static com.lesofn.appforge.infrastructure.auth.errors.AdminAuthErrorCode.USER_AUTHFAIL;
+
 import com.lesofn.appforge.common.context.ClientVersion;
 import com.lesofn.appforge.infrastructure.auth.annotation.AuthType;
 import com.lesofn.appforge.infrastructure.auth.annotation.BaseInfo;
@@ -13,7 +15,9 @@ import com.lesofn.appforge.infrastructure.auth.spi.BasicAuthSpi;
 import com.lesofn.appforge.infrastructure.auth.spi.GuestAuthSpi;
 import com.lesofn.appforge.infrastructure.auth.spi.NullAuthSpi;
 import com.lesofn.appforge.infrastructure.frame.spring.ApplicationContextHolder;
+import java.util.*;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,14 +27,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
-
-import static com.lesofn.appforge.infrastructure.auth.errors.AdminAuthErrorCode.USER_AUTHFAIL;
-
-/**
- * Authors: sofn
- * Version: 1.0  Created at 15-8-30 00:22.
- */
+/** Authors: sofn Version: 1.0 Created at 15-8-30 00:22. */
 @Service
 public class DefaultAuthService implements AuthService, ApplicationContextAware, InitializingBean {
 
@@ -51,15 +48,17 @@ public class DefaultAuthService implements AuthService, ApplicationContextAware,
         AuthSpi spi = this.findAuthServiceSpi(request, type);
         long uid = spi.auth(request);
         Optional<UserProvider> provider = getUserProvider();
-        if (!StringUtils.equals(spi.getName(), BasicAuthSpi.SPI_NAME)
-                && !StringUtils.equals(spi.getName(), GuestAuthSpi.SPI_NAME)
+        if (!Strings.CS.equals(spi.getName(), BasicAuthSpi.SPI_NAME)
+                && !Strings.CS.equals(spi.getName(), GuestAuthSpi.SPI_NAME)
                 && (provider.isPresent() && !provider.get().isValidUser(uid))) {
             uid = 0;
             LOGGER.warn("auth passed,but uid not found: " + uid + " authType: " + spi.getName());
             throw new AdminAuthException(USER_AUTHFAIL);
         }
 
-        if (uid <= 0 && type.authFailThrowException() && !StringUtils.equals(spi.getName(), GuestAuthSpi.SPI_NAME)) {
+        if (uid <= 0
+                && type.authFailThrowException()
+                && !Strings.CS.equals(spi.getName(), GuestAuthSpi.SPI_NAME)) {
             throw new AdminAuthException(USER_AUTHFAIL);
         }
 
@@ -71,14 +70,27 @@ public class DefaultAuthService implements AuthService, ApplicationContextAware,
 
         String authType = spi.getName();
         int appId = NumberUtils.toInt(request.getHeader(ENGINE_APPID_HEADER));
-        ClientVersion clientVersion = ClientVersion.valueOf(request.getHeader(ClientVersion.VERSION_HEADER));
+        ClientVersion clientVersion =
+                ClientVersion.valueOf(request.getHeader(ClientVersion.VERSION_HEADER));
 
-        AuthResponse response = new AuthResponse((String) request.getAttribute("platform"), uid,
-                remoteIp, appId, authType, clientVersion);
+        AuthResponse response =
+                new AuthResponse(
+                        (String) request.getAttribute("platform"),
+                        uid,
+                        remoteIp,
+                        appId,
+                        authType,
+                        clientVersion);
 
         try {
-            LOGGER.info(String.format("auth %s %s %s %s %s", request.getRequestURI(), uid,
-                    response.getAuthedBy(), remoteIp, response.getAppId()));
+            LOGGER.info(
+                    String.format(
+                            "auth %s %s %s %s %s",
+                            request.getRequestURI(),
+                            uid,
+                            response.getAuthedBy(),
+                            remoteIp,
+                            response.getAppId()));
         } catch (Exception e) {
             LOGGER.warn("DefaultAuthServer", e);
         }
@@ -99,7 +111,7 @@ public class DefaultAuthService implements AuthService, ApplicationContextAware,
             }
         }
 
-        //默认NullAuthSpi
+        // 默认NullAuthSpi
         if (authSpi == null) {
             authSpi = this.getAuthSpi(NullAuthSpi.SPI_NAME);
         }
@@ -122,7 +134,6 @@ public class DefaultAuthService implements AuthService, ApplicationContextAware,
             }
             authSpiMap.put(StringUtils.lowerCase(spi.getName()), spi);
         }
-
     }
 
     @SuppressWarnings("unchecked")
@@ -139,6 +150,5 @@ public class DefaultAuthService implements AuthService, ApplicationContextAware,
         } else {
             return Optional.empty();
         }
-
     }
 }

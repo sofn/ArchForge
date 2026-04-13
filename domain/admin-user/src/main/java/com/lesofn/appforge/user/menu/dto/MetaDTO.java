@@ -1,12 +1,12 @@
 package com.lesofn.appforge.user.menu.dto;
 
+import java.util.List;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 /**
  * 路由显示信息
+ *
  * @author sofn
  */
 @Data
@@ -26,18 +26,15 @@ public class MetaDTO {
     private List<String> auths;
     // 需要内嵌的iframe链接地址
     private String frameSrc;
+
     /**
-     *  是否是内部页面   使用frameSrc来嵌入页面时，当isFrameSrcInternal=true的时候, 前端需要做特殊处理
-     *  比如链接是 /druid/login.html
-     *  前端需要处理成 http://localhost:8080/druid/login.html
-    */
+     * 是否是内部页面 使用frameSrc来嵌入页面时，当isFrameSrcInternal=true的时候, 前端需要做特殊处理 比如链接是 /druid/login.html
+     * 前端需要处理成 http://localhost:8080/druid/login.html
+     */
     private Boolean isFrameSrcInternal;
 
-    /**
-     *  菜单排序，值越高排的越后（只针对顶级路由）
-     */
+    /** 菜单排序，值越高排的越后（只针对顶级路由） */
     private Integer rank;
-
 
     // =========  目前系统仅支持以上这些参数的设置 后续有需要的话开发者可自行设置的这些参数  ===========
 
@@ -53,5 +50,4 @@ public class MetaDTO {
     private Boolean hiddenTag;
     // 显示在标签页的最大数量，需满足后面的条件：不显示在菜单中的路由并且是通过query或params传参模式打开的页面。在完整版全局搜dynamicLevel即可查看代码演示
     private Integer dynamicLevel;
-
 }

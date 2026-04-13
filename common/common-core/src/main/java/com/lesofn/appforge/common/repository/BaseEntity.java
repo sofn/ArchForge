@@ -1,10 +1,9 @@
 package com.lesofn.appforge.common.repository;
 
 import jakarta.persistence.MappedSuperclass;
+import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.time.LocalDateTime;
 
 /**
  * @author sofn
@@ -23,9 +22,6 @@ public class BaseEntity<T> {
 
     private LocalDateTime updateTime;
 
-    /**
-     * deleted字段请在数据库中 设置为tinyInt   并且非null   默认值为0
-     */
+    /** deleted字段请在数据库中 设置为tinyInt 并且非null 默认值为0 */
     private Boolean deleted;
-
 }

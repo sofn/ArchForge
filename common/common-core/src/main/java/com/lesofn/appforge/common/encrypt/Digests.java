@@ -2,18 +2,17 @@ package com.lesofn.appforge.common.encrypt;
 
 import com.lesofn.appforge.common.error.system.SystemException;
 import com.lesofn.appforge.common.errors.SystemErrorCode;
-import org.apache.commons.lang3.Validate;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
+import org.apache.commons.lang3.Validate;
 
 /**
  * 支持SHA-1/MD5消息摘要的工具类.
- * <p>
- * 返回ByteSource，可进一步被编码为Hex, Base64或UrlSafeBase64
+ *
+ * <p>返回ByteSource，可进一步被编码为Hex, Base64或UrlSafeBase64
  *
  * @author calvin
  */
@@ -24,9 +23,7 @@ public class Digests {
 
     private static SecureRandom random = new SecureRandom();
 
-    /**
-     * 对输入字符串进行sha1散列.
-     */
+    /** 对输入字符串进行sha1散列. */
     public static byte[] sha1(byte[] input) {
         return digest(input, SHA1, null, 1);
     }
@@ -39,9 +36,7 @@ public class Digests {
         return digest(input, SHA1, salt, iterations);
     }
 
-    /**
-     * 对字符串进行散列, 支持md5与sha1算法.
-     */
+    /** 对字符串进行散列, 支持md5与sha1算法. */
     private static byte[] digest(byte[] input, String algorithm, byte[] salt, int iterations) {
         try {
             MessageDigest digest = MessageDigest.getInstance(algorithm);
@@ -60,7 +55,6 @@ public class Digests {
         } catch (GeneralSecurityException e) {
             throw new SystemException(SystemErrorCode.E_DIGEST_ERROR);
         }
-
     }
 
     /**
@@ -69,23 +63,22 @@ public class Digests {
      * @param numBytes byte数组的大小
      */
     public static byte[] generateSalt(int numBytes) {
-        Validate.isTrue(numBytes > 0, "numBytes argument must be a positive integer (1 or larger)", numBytes);
+        Validate.isTrue(
+                numBytes > 0,
+                "numBytes argument must be a positive integer (1 or larger)",
+                numBytes);
 
         byte[] bytes = new byte[numBytes];
         random.nextBytes(bytes);
         return bytes;
     }
 
-    /**
-     * 对文件进行md5散列.
-     */
+    /** 对文件进行md5散列. */
     public static byte[] md5(InputStream input) throws IOException {
         return digest(input, MD5);
     }
 
-    /**
-     * 对文件进行sha1散列.
-     */
+    /** 对文件进行sha1散列. */
     public static byte[] sha1(InputStream input) throws IOException {
         return digest(input, SHA1);
     }
@@ -107,5 +100,4 @@ public class Digests {
             throw new SystemException(SystemErrorCode.E_DIGEST_ERROR);
         }
     }
-
 }

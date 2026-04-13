@@ -2,9 +2,8 @@ package com.lesofn.appforge.user.menu.dto;
 
 import com.google.common.collect.Lists;
 import com.lesofn.appforge.user.domain.SysMenu;
-import lombok.Data;
-
 import java.util.List;
+import lombok.Data;
 
 /**
  * 路由配置信息 DTO
@@ -27,24 +26,15 @@ public class RouterDTO {
         }
     }
 
-    /**
-     * 路由名字
-     */
+    /** 路由名字 */
     private String name;
 
-    /**
-     * 路由地址
-     */
+    /** 路由地址 */
     private String path;
 
-    /**
-     * 其他元素
-     */
+    /** 其他元素 */
     private MetaDTO meta;
 
-    /**
-     * 子路由
-     */
+    /** 子路由 */
     private List<RouterDTO> children;
-
 }

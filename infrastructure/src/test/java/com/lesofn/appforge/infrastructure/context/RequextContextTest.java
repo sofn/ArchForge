@@ -20,7 +20,6 @@ public class RequextContextTest {
             MockContext context = (MockContext) o;
 
             return id == context.id;
-
         }
 
         @Override

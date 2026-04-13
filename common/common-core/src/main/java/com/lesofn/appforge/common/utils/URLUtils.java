@@ -1,8 +1,5 @@
 package com.lesofn.appforge.common.utils;
 
-import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
-
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -10,6 +7,8 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author sofn
@@ -83,5 +82,4 @@ public class URLUtils {
         List<String> values = params.computeIfAbsent(name, it -> new ArrayList<>(1));
         values.add(value);
     }
-
 }

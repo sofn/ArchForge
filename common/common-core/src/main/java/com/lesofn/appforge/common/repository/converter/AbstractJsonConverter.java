@@ -9,16 +9,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
 
 /**
- * 通用JSON转换器基类
- * 使用方式：为每个需要转换的类型创建一个具体的Converter类
- * 
- * @Converter
- * public class MetaInfoConverter extends AbstractJsonConverter<MetaDTO> {}
- * 
- * 然后在entity字段上使用：
- * @Convert(converter = MetaInfoConverter.class)
- * @Column(columnDefinition = "TEXT")
- * private MetaDTO metaInfo;
+ * 通用JSON转换器基类 使用方式：为每个需要转换的类型创建一个具体的Converter类 @Converter public class MetaInfoConverter extends
+ * AbstractJsonConverter<MetaDTO> {}
+ *
+ * <p>然后在entity字段上使用： @Convert(converter = MetaInfoConverter.class) @Column(columnDefinition =
+ * "TEXT") private MetaDTO metaInfo;
  */
 @Slf4j
 public abstract class AbstractJsonConverter<T> implements AttributeConverter<T, String> {
@@ -49,14 +44,10 @@ public abstract class AbstractJsonConverter<T> implements AttributeConverter<T, 
         }
     }
 
-    /**
-     * 子类必须实现此方法，返回目标类型
-     */
+    /** 子类必须实现此方法，返回目标类型 */
     protected abstract Class<T> getTargetType();
 
-    /**
-     * 获取Spring配置的ObjectMapper实例
-     */
+    /** 获取Spring配置的ObjectMapper实例 */
     protected ObjectMapper getObjectMapper() {
         if (SpringContextHolder.isInjectedApplicationContext()) {
             return SpringContextHolder.getBean(ObjectMapper.class);

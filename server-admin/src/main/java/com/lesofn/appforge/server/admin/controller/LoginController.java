@@ -14,11 +14,10 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 /**
  * 认证控制器 - 登录相关接口
@@ -38,13 +37,13 @@ public class LoginController {
     private final SysMenuService menuService;
     private final AppForgeConfig appForgeConfig;
 
-    /**
-     * 访问首页，提示语
-     */
+    /** 访问首页，提示语 */
     @Operation(summary = "首页")
     @GetMapping("/")
     public String index() {
-        return String.format("欢迎使用%s后台管理系统，当前版本：v%s，请通过前端地址访问。", appForgeConfig.getName(), appForgeConfig.getVersion());
+        return String.format(
+                "欢迎使用%s后台管理系统，当前版本：v%s，请通过前端地址访问。",
+                appForgeConfig.getName(), appForgeConfig.getVersion());
     }
 
     /**
@@ -60,9 +59,7 @@ public class LoginController {
         return loginService.getConfig();
     }
 
-    /**
-     * 生成验证码
-     */
+    /** 生成验证码 */
     @GetMapping("/captchaImage")
     public CaptchaDTO getCaptchaImg() {
         return loginService.generateCaptchaImg();
@@ -77,9 +74,8 @@ public class LoginController {
     @Operation(summary = "登录")
     @PostMapping("/login")
     public TokenDTO login(
-            @Parameter(description = "登录信息", required = true)
-            @RequestBody @Valid LoginCommand loginCommand
-    ) {
+            @Parameter(description = "登录信息", required = true) @RequestBody @Valid
+                    LoginCommand loginCommand) {
         // 生成令牌并获取用户信息
         LoginService.LoginResult loginResult = loginService.login(loginCommand);
         SystemLoginUser loginUser = loginResult.getLoginUser();
@@ -111,5 +107,4 @@ public class LoginController {
         SystemLoginUser loginUser = AuthenticationUtils.getSystemLoginUser();
         return menuService.getRouterTree(loginUser);
     }
-
 }

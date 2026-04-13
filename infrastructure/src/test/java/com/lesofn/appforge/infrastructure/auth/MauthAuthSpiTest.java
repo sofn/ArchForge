@@ -3,10 +3,7 @@ package com.lesofn.appforge.infrastructure.auth;
 import com.lesofn.appforge.infrastructure.auth.spi.MAuthSpi;
 import org.junit.jupiter.api.Test;
 
-/**
- * Authors: sofn
- * Version: 1.0  Created at 2015-10-04 22:45.
- */
+/** Authors: sofn Version: 1.0 Created at 2015-10-04 22:45. */
 public class MauthAuthSpiTest {
     @Test
     public void testCreate() {

@@ -1,6 +1,5 @@
 package com.lesofn.appforge.infrastructure.auth.spi;
 
-
 import com.lesofn.appforge.infrastructure.auth.errors.AdminAuthException;
 import com.lesofn.appforge.infrastructure.auth.model.AuthRequest;
 
@@ -25,8 +24,6 @@ public interface AuthSpi {
      */
     long auth(AuthRequest request) throws AdminAuthException;
 
-    /**
-     * 认证后的额外检查
-     */
+    /** 认证后的额外检查 */
     void afterAuth(long uid, AuthRequest request) throws AdminAuthException;
 }

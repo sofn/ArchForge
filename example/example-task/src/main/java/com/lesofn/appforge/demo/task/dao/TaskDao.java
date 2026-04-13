@@ -3,10 +3,10 @@ package com.lesofn.appforge.demo.task.dao;
 import com.lesofn.appforge.demo.task.domain.Task;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface TaskDao extends JpaRepository<Task, Long>, JpaSpecificationExecutor<Task> {
 

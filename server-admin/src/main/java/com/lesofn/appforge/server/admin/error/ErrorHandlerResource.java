@@ -5,7 +5,6 @@ import com.lesofn.appforge.common.error.system.SystemException;
 import com.lesofn.appforge.common.errors.SystemErrorCode;
 import com.lesofn.appforge.common.utils.GlobalConstants;
 import jakarta.servlet.http.HttpServletRequest;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,10 +30,14 @@ public class ErrorHandlerResource implements ErrorController {
     public String error(HttpServletRequest request) {
         String path = (String) request.getAttribute("jakarta.servlet.error.request_uri");
         String errorMsg = (String) request.getAttribute("jakarta.servlet.error.message");
-        MediaType mediaType = (MediaType) request.getAttribute("org.springframework.web.servlet.View.selectedContentType");
+        MediaType mediaType =
+                (MediaType)
+                        request.getAttribute(
+                                "org.springframework.web.servlet.View.selectedContentType");
         int status = (int) request.getAttribute("jakarta.servlet.error.status_code");
 
-        Exception exception = (Exception) request.getAttribute(GlobalExceptionHandler.GlobalExceptionAttribute);
+        Exception exception =
+                (Exception) request.getAttribute(GlobalExceptionHandler.GlobalExceptionAttribute);
         if (exception == null) {
             exception = (Exception) request.getAttribute("jakarta.servlet.error.exception");
         }
@@ -48,7 +51,9 @@ public class ErrorHandlerResource implements ErrorController {
             pageError = "404 - Page not Found: " + errorMsg;
             apiException = new SystemException(SystemErrorCode.E_API_NOT_EXIST);
         } else if (status == 415) {
-            apiException = new SystemException(SystemErrorCode.E_UNSUPPORT_MEDIATYPE_ERROR, new Object[]{"unknow"});
+            apiException =
+                    new SystemException(
+                            SystemErrorCode.E_UNSUPPORT_MEDIATYPE_ERROR, new Object[] {"unknow"});
         } else if (status >= 400 && status < 500) {
             apiException = new SystemException(SystemErrorCode.E_ILLEGAL_REQUEST, errorMsg);
         } else if (status == 503) {
@@ -57,16 +62,21 @@ public class ErrorHandlerResource implements ErrorController {
             apiException = new SystemException(SystemErrorCode.E_DEFAULT);
             log.error(errorMsg, exception);
         }
-        if (MediaType.TEXT_HTML.equals(mediaType) || Strings.CS.endsWithAny(path, GlobalConstants.staticResourceArray)) {
-            return "<!DOCTYPE html>\n" +
-                    "<html>\n" +
-                    "<head>\n" +
-                    "    <title>" + pageError + "</title>\n" +
-                    "</head>\n" +
-                    "<body>\n" +
-                    "<h2>" + pageError + "</h2>\n" +
-                    "</body>\n" +
-                    "</html>";
+        if (MediaType.TEXT_HTML.equals(mediaType)
+                || Strings.CS.endsWithAny(path, GlobalConstants.staticResourceArray)) {
+            return "<!DOCTYPE html>\n"
+                    + "<html>\n"
+                    + "<head>\n"
+                    + "    <title>"
+                    + pageError
+                    + "</title>\n"
+                    + "</head>\n"
+                    + "<body>\n"
+                    + "<h2>"
+                    + pageError
+                    + "</h2>\n"
+                    + "</body>\n"
+                    + "</html>";
         } else {
             return apiException.getErrorInfo().getMsg() + " " + path;
         }

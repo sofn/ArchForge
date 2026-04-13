@@ -1,16 +1,12 @@
 package com.lesofn.appforge.infrastructure.auth.model;
 
 import com.lesofn.appforge.common.context.ClientVersion;
-
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * Authors: sofn
- * Version: 1.0  Created at 2015-09-17 22:06.
- */
+/** Authors: sofn Version: 1.0 Created at 2015-09-17 22:06. */
 public class AuthResponse implements Serializable {
     private static final long serialVersionUID = 5453139780159342985L;
 
@@ -22,7 +18,13 @@ public class AuthResponse implements Serializable {
     private final String platform;
     private final ClientVersion clientVersion;
 
-    public AuthResponse(String platform, long uid, String ip, int appId, String authedBy, ClientVersion clientVersion) {
+    public AuthResponse(
+            String platform,
+            long uid,
+            String ip,
+            int appId,
+            String authedBy,
+            ClientVersion clientVersion) {
         this.platform = platform;
         this.uid = uid;
         this.attributes = new HashMap<>();

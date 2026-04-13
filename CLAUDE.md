@@ -37,37 +37,48 @@ This is a multi-module Spring Boot 4 project with clean architecture principles:
 ### Key Patterns
 - Uses domain-driven design with separate modules for different bounded contexts
 - Authentication handled via JWT tokens with configurable expiration
-- Multi-datasource support with master/slave configuration
-- Profile-based configuration (dev/test/prod) with separate YAML files in `src/main/profiles/`
+- Multi-datasource support with master/slave configuration via `dynamic-datasource-spring-boot4-starter`
+  - Datasource groups configured in YAML under `spring.datasource.dynamic.datasource`
+  - `GroupDataSourceProxy` bridges dynamic-datasource groups with JPA EntityManagerFactories
+  - `@DS("group_name")` annotation available for explicit datasource routing
+- Profile-based configuration (dev/test/prod) using standard Spring Boot `application-{profile}.yaml`
 
 ## Dependencies
 
 - All dependency versions centrally managed in `dependencies/build.gradle.kts`
 - Spring Boot 4.0.5 with Java 21
 - Gradle 9.4.1 with configuration cache support
-- Key libraries: Druid (connection pooling), Guava, Apache Commons, SpringDoc OpenAPI
-- Testing: JUnit 6, Testcontainers, Spock 2.3 (Groovy 4.x)
+- Key libraries: dynamic-datasource-spring-boot4-starter (multi-datasource + read/write split), Guava, Apache Commons, SpringDoc OpenAPI
+- Testing: JUnit 6, Testcontainers, Spock 2.4 (Groovy 5.x)
 - Database: H2 (dev), MySQL (production)
-- Groovy is forced to 4.0.31 (overriding SB4's Groovy 5.x) for Spock 2.3 compatibility
 
 ## Code Style
 
 - Follow Alibaba Java coding guidelines: https://github.com/alibaba/Alibaba-Java-Coding-Guidelines
+- **Spotless + Google Java Style** enforced via `com.diffplug.spotless` plugin
+  - `./gradlew spotlessCheck`: Check code formatting
+  - `./gradlew spotlessApply`: Auto-fix formatting violations
 - Do not import `cn.hutool:hutool-all` - use standard JDK, Apache Commons, Guava, or Spring utilities instead
 - Lombok annotations used throughout for reducing boilerplate
 - Use Lombok annotations actively (@Data, @Getter, @Setter, @Builder, @RequiredArgsConstructor, etc.) but DO NOT use `var` keyword - always specify explicit types
 
 ## Configuration
 
-- Environment-specific configs in `server-admin/src/main/profiles/{env}/application.yaml`
-- Profiles: `dev` (H2 + mock Redis), `test`, `prod`
-- JWT secret and Redis configuration environment-specific
-- Gradle profile set in `gradle.properties`
+- Standard Spring Boot profile-based config in `server-admin/src/main/resources/`:
+  - `application.yaml`: Shared base config (default profile: `dev`)
+  - `application-dev.yaml`: Dev profile (H2, mock Redis, DevTools)
+  - `application-test.yaml.example` / `application-prod.yaml.example`: Templates for test/prod
+  - Real `application-test.yaml` and `application-prod.yaml` are gitignored
+- Set active profile via `SPRING_PROFILES_ACTIVE` env var or JVM arg `-Dspring.profiles.active=...`
+- Logging: Single `log4j2-spring.xml` with `<SpringProfile>` — Console for dev, file-only for non-dev
 - Config prefix: `app-forge`
 
 ## Monitoring
 
-- Health check: `http://localhost:7002/health`
-- Metrics: `http://localhost:7002/metrics`
-- Druid monitoring: `http://localhost:8080/druid`
-- All actuator endpoints exposed on management port 7002
+- Health check: `http://localhost:8080/actuator/health`
+- Metrics: `http://localhost:8080/actuator/metrics`
+- Prometheus: `http://localhost:8080/actuator/prometheus`
+- **Micrometer + OpenTelemetry** integrated for distributed tracing and metrics
+  - OTLP tracing/metrics export configured per profile
+  - Dev: 100% sampling, Prod: 10% sampling
+  - OTLP endpoint configurable via `OTEL_EXPORTER_OTLP_ENDPOINT` env var (prod)

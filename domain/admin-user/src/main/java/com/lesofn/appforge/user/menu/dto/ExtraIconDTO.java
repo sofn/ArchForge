@@ -12,5 +12,4 @@ public class ExtraIconDTO {
     private boolean svg;
     // iconfont名称，目前只支持iconfont，后续拓展
     private String name;
-
 }

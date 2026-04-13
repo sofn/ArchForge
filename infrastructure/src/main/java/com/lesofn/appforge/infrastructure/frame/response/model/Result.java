@@ -11,9 +11,6 @@ import lombok.Data;
 @Data
 public class Result<T> {
 
-    /**
-     * 业务数据
-     */
+    /** 业务数据 */
     private T data;
-
 }

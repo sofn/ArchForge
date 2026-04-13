@@ -1,7 +1,6 @@
 package com.lesofn.appforge.infrastructure.config.captcha;
 
 import com.google.code.kaptcha.text.impl.DefaultTextCreator;
-
 import java.util.concurrent.ThreadLocalRandom;
 
 /**

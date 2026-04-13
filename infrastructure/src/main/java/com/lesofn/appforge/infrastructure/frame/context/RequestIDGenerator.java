@@ -35,5 +35,4 @@ public class RequestIDGenerator {
     public String nextId() {
         return this.hostName + "-" + requestId.getAndIncrement();
     }
-
 }

@@ -2,18 +2,21 @@ package com.lesofn.appforge.server.admin.service.login;
 
 import com.lesofn.appforge.common.enums.BasicEnumUtil;
 import com.lesofn.appforge.common.enums.common.UserStatusEnum;
-import com.lesofn.appforge.user.errors.AdminUserErrorCode;
-import com.lesofn.appforge.user.errors.AdminUserException;
-import com.lesofn.appforge.infrastructure.config.AppForgeConfig;
 import com.lesofn.appforge.infrastructure.auth.model.SystemLoginUser;
+import com.lesofn.appforge.infrastructure.config.AppForgeConfig;
 import com.lesofn.appforge.infrastructure.user.web.DataScopeEnum;
 import com.lesofn.appforge.infrastructure.user.web.RoleInfo;
 import com.lesofn.appforge.user.domain.SysMenu;
 import com.lesofn.appforge.user.domain.SysRole;
 import com.lesofn.appforge.user.domain.SysUser;
+import com.lesofn.appforge.user.errors.AdminUserErrorCode;
+import com.lesofn.appforge.user.errors.AdminUserException;
 import com.lesofn.appforge.user.menu.SysMenuService;
 import com.lesofn.appforge.user.service.SysRoleService;
 import com.lesofn.appforge.user.service.SysUserService;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -22,10 +25,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
-import java.util.*;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 /**
  * 管理员用户详情服务类
@@ -44,7 +43,7 @@ public class AdminUserDetailsService implements UserDetailsService {
     private final SysRoleService roleService;
 
     private final TokenService tokenService;
-    
+
     private final AppForgeConfig appForgeConfig;
 
     @Override
@@ -60,9 +59,15 @@ public class AdminUserDetailsService implements UserDetailsService {
         }
 
         RoleInfo roleInfo = getRoleInfo(user.getRoleId(), user.getIsAdmin());
-        SystemLoginUser loginUser = new SystemLoginUser(user.getUserId(), user.getIsAdmin(), user.getUsername(),
-                user.getPassword(), roleInfo, user.getDeptId());
-        
+        SystemLoginUser loginUser =
+                new SystemLoginUser(
+                        user.getUserId(),
+                        user.getIsAdmin(),
+                        user.getUsername(),
+                        user.getPassword(),
+                        roleInfo,
+                        user.getDeptId());
+
         // 填充用户权限信息到authorities中
         if (roleInfo != null && roleInfo.getMenuPermissions() != null) {
             for (String permission : roleInfo.getMenuPermissions()) {
@@ -71,18 +76,20 @@ public class AdminUserDetailsService implements UserDetailsService {
                 }
             }
         }
-        
+
         // 如果是管理员，添加管理员权限
         if (user.getIsAdmin()) {
             loginUser.grantAppPermission("ROLE_ADMIN");
         }
-        
+
         // 添加基础用户权限
         loginUser.grantAppPermission("ROLE_USER");
-        
+
         loginUser.fillLoginInfo();
-        loginUser.setAutoRefreshCacheTime(loginUser.getLoginInfo().getLoginTime()
-                + TimeUnit.MINUTES.toMillis(appForgeConfig.getToken().getAutoRefreshTime()));
+        loginUser.setAutoRefreshCacheTime(
+                loginUser.getLoginInfo().getLoginTime()
+                        + TimeUnit.MINUTES.toMillis(
+                                appForgeConfig.getToken().getAutoRefreshTime()));
         return loginUser;
     }
 
@@ -94,11 +101,16 @@ public class AdminUserDetailsService implements UserDetailsService {
         if (isAdmin) {
             List<SysMenu> allMenus = menuService.findAllActiveMenus();
 
-            Set<Long> allMenuIds = allMenus.stream().map(SysMenu::getMenuId).collect(Collectors.toSet());
+            Set<Long> allMenuIds =
+                    allMenus.stream().map(SysMenu::getMenuId).collect(Collectors.toSet());
 
-            return new RoleInfo(RoleInfo.ADMIN_ROLE_ID, RoleInfo.ADMIN_ROLE_KEY, DataScopeEnum.ALL, Collections.emptySet(),
-                    RoleInfo.ADMIN_PERMISSIONS, allMenuIds);
-
+            return new RoleInfo(
+                    RoleInfo.ADMIN_ROLE_ID,
+                    RoleInfo.ADMIN_ROLE_KEY,
+                    DataScopeEnum.ALL,
+                    Collections.emptySet(),
+                    RoleInfo.ADMIN_PERMISSIONS,
+                    allMenuIds);
         }
 
         SysRole role = roleService.getById(roleId);
@@ -110,18 +122,21 @@ public class AdminUserDetailsService implements UserDetailsService {
         List<SysMenu> menuList = roleService.getMenuListByRoleId(roleId);
 
         Set<Long> menuIds = menuList.stream().map(SysMenu::getMenuId).collect(Collectors.toSet());
-        Set<String> permissions = menuList.stream().map(SysMenu::getPermission).collect(Collectors.toSet());
+        Set<String> permissions =
+                menuList.stream().map(SysMenu::getPermission).collect(Collectors.toSet());
 
-        DataScopeEnum dataScopeEnum = BasicEnumUtil.fromValue(DataScopeEnum.class, role.getDataScope());
+        DataScopeEnum dataScopeEnum =
+                BasicEnumUtil.fromValue(DataScopeEnum.class, role.getDataScope());
 
         Set<Long> deptIdSet = Collections.emptySet();
         if (StringUtils.isNotEmpty(role.getDeptIdSet())) {
-            deptIdSet = Arrays.stream(StringUtils.split(role.getDeptIdSet(), ","))
-                    .map(NumberUtils::toLong)
-                    .collect(Collectors.toSet());
+            deptIdSet =
+                    Arrays.stream(StringUtils.split(role.getDeptIdSet(), ","))
+                            .map(NumberUtils::toLong)
+                            .collect(Collectors.toSet());
         }
 
-        return new RoleInfo(roleId, role.getRoleKey(), dataScopeEnum, deptIdSet, permissions, menuIds);
+        return new RoleInfo(
+                roleId, role.getRoleKey(), dataScopeEnum, deptIdSet, permissions, menuIds);
     }
-
 }

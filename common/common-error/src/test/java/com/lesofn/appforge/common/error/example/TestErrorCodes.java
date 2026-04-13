@@ -10,8 +10,8 @@ import lombok.Getter;
  */
 @Getter
 public enum TestErrorCodes implements ErrorCode {
-    USER_NOT_EXIST(0, "用户名不存在"), //错误码: 10100
-    PASSWORD_ERROR(1, "密码错误");    //错误码: 10101
+    USER_NOT_EXIST(0, "用户名不存在"), // 错误码: 10100
+    PASSWORD_ERROR(1, "密码错误"); // 错误码: 10101
 
     private final int nodeNum;
     private final String msg;
@@ -21,5 +21,4 @@ public enum TestErrorCodes implements ErrorCode {
         this.msg = msg;
         ErrorManager.register(TestProjectCodes.LOGIN, this);
     }
-
 }

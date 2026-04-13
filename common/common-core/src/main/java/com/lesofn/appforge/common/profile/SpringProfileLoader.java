@@ -8,10 +8,9 @@ import org.springframework.stereotype.Service;
  * @author sofn
  */
 @Service
-public class SpringProfileLoader  {
+public class SpringProfileLoader {
 
-    @Autowired
-    private Environment env;
+    @Autowired private Environment env;
 
     private Env envVar;
 

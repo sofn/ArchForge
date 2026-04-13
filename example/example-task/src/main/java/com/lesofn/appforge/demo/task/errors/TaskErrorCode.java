@@ -13,7 +13,6 @@ import lombok.Getter;
  */
 @Getter
 public enum TaskErrorCode implements ErrorCode {
-
     TASK_NOT_EXISTS(1, "任务不存在");
 
     private final int nodeNum;
@@ -24,5 +23,4 @@ public enum TaskErrorCode implements ErrorCode {
         this.msg = msg;
         ErrorManager.register(AppForgeProjectModule.TASK, this);
     }
-
 }

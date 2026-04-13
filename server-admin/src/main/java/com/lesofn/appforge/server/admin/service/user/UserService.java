@@ -1,7 +1,7 @@
 package com.lesofn.appforge.server.admin.service.user;
 
-import com.lesofn.appforge.server.admin.dto.CurrentLoginUserDTO;
 import com.lesofn.appforge.infrastructure.auth.model.SystemLoginUser;
+import com.lesofn.appforge.server.admin.dto.CurrentLoginUserDTO;
 
 /**
  * 用户服务接口

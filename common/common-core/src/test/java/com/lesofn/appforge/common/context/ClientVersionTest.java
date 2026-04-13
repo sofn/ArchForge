@@ -1,8 +1,8 @@
 package com.lesofn.appforge.common.context;
 
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.api.Test;
 
 /**
  * @author sofn
@@ -31,7 +31,6 @@ class ClientVersionTest {
         System.out.println(version);
         assertEquals(header, version2.toString());
     }
-
 
     @Test
     public void testClientVersionChannel() {
@@ -66,15 +65,35 @@ class ClientVersionTest {
     @Test
     public void testCompare() {
         assertEquals(1, ClientVersion.Version.valueOf("1.1.75").compareTo(null));
-        assertEquals(1, ClientVersion.Version.valueOf("1.1.75").compareTo(ClientVersion.Version.valueOf("0.1.75")));
-        assertEquals(1, ClientVersion.Version.valueOf("1.1.75").compareTo(ClientVersion.Version.valueOf("1.0.75")));
-        assertEquals(1, ClientVersion.Version.valueOf("1.1.75").compareTo(ClientVersion.Version.valueOf("1.1.74")));
+        assertEquals(
+                1,
+                ClientVersion.Version.valueOf("1.1.75")
+                        .compareTo(ClientVersion.Version.valueOf("0.1.75")));
+        assertEquals(
+                1,
+                ClientVersion.Version.valueOf("1.1.75")
+                        .compareTo(ClientVersion.Version.valueOf("1.0.75")));
+        assertEquals(
+                1,
+                ClientVersion.Version.valueOf("1.1.75")
+                        .compareTo(ClientVersion.Version.valueOf("1.1.74")));
 
-        assertEquals(0, ClientVersion.Version.valueOf("1.1.75").compareTo(ClientVersion.Version.valueOf("1.1.75")));
+        assertEquals(
+                0,
+                ClientVersion.Version.valueOf("1.1.75")
+                        .compareTo(ClientVersion.Version.valueOf("1.1.75")));
 
-        assertEquals(-1, ClientVersion.Version.valueOf("1.1.75").compareTo(ClientVersion.Version.valueOf("2.1.75")));
-        assertEquals(-1, ClientVersion.Version.valueOf("1.1.75").compareTo(ClientVersion.Version.valueOf("1.2.75")));
-        assertEquals(-1, ClientVersion.Version.valueOf("1.1.75").compareTo(ClientVersion.Version.valueOf("1.1.76")));
+        assertEquals(
+                -1,
+                ClientVersion.Version.valueOf("1.1.75")
+                        .compareTo(ClientVersion.Version.valueOf("2.1.75")));
+        assertEquals(
+                -1,
+                ClientVersion.Version.valueOf("1.1.75")
+                        .compareTo(ClientVersion.Version.valueOf("1.2.75")));
+        assertEquals(
+                -1,
+                ClientVersion.Version.valueOf("1.1.75")
+                        .compareTo(ClientVersion.Version.valueOf("1.1.76")));
     }
-
 }

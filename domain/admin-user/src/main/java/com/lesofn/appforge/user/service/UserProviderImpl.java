@@ -3,19 +3,14 @@ package com.lesofn.appforge.user.service;
 import com.lesofn.appforge.infrastructure.auth.model.AuthRequest;
 import com.lesofn.appforge.infrastructure.auth.provider.UserProvider;
 import com.lesofn.appforge.user.domain.SysUser;
-import org.springframework.stereotype.Service;
-
 import jakarta.annotation.Resource;
 import java.util.Optional;
+import org.springframework.stereotype.Service;
 
-/**
- * Authors: sofn
- * Version: 1.0  Created at 2015-10-02 22:10.
- */
+/** Authors: sofn Version: 1.0 Created at 2015-10-02 22:10. */
 @Service
 public class UserProviderImpl implements UserProvider {
-    @Resource
-    private UserService userService;
+    @Resource private UserService userService;
 
     @Override
     public boolean isValidUser(long uid) {

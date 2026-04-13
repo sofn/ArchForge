@@ -8,24 +8,18 @@ import com.lesofn.appforge.common.error.manager.ErrorManager;
  */
 public interface ErrorCode {
 
-    /**
-     * 最细粒度 Code
-     */
+    /** 最细粒度 Code */
     int getNodeNum();
 
-    /**
-     * 异常信息 英文
-     */
+    /** 异常信息 英文 */
     String getMsg();
 
-    /**
-     * 拼接project、module、node后的完整的错误码
-     */
+    /** 拼接project、module、node后的完整的错误码 */
     default int getCode() {
         return ErrorManager.genCode(this);
     }
 
-    default ProjectModule projectModule(){
+    default ProjectModule projectModule() {
         return ErrorManager.projectModule(this);
     }
 }

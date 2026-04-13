@@ -2,11 +2,10 @@ package com.lesofn.appforge.user.service;
 
 import com.lesofn.appforge.user.dao.SysRoleMenuRepository;
 import com.lesofn.appforge.user.domain.SysRoleMenu;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -53,16 +52,18 @@ public class SysRoleMenuService {
     @Transactional
     public void updateRoleMenus(Long roleId, List<Long> menuIds) {
         roleMenuRepository.deleteByRoleId(roleId);
-        
-        List<SysRoleMenu> roleMenus = menuIds.stream()
-                .map(menuId -> {
-                    SysRoleMenu roleMenu = new SysRoleMenu();
-                    roleMenu.setRoleId(roleId);
-                    roleMenu.setMenuId(menuId);
-                    return roleMenu;
-                })
-                .toList();
-        
+
+        List<SysRoleMenu> roleMenus =
+                menuIds.stream()
+                        .map(
+                                menuId -> {
+                                    SysRoleMenu roleMenu = new SysRoleMenu();
+                                    roleMenu.setRoleId(roleId);
+                                    roleMenu.setMenuId(menuId);
+                                    return roleMenu;
+                                })
+                        .toList();
+
         roleMenuRepository.saveAll(roleMenus);
     }
 }

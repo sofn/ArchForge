@@ -1,15 +1,14 @@
 package com.lesofn.appforge.common.error;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import com.lesofn.appforge.common.error.example.TestErrorCodes;
 import com.lesofn.appforge.common.error.example.TestSystemErrorCode;
 import com.lesofn.appforge.common.error.manager.ErrorManager;
 import com.lesofn.appforge.common.error.manager.TreeNode;
 import com.lesofn.appforge.common.error.system.HttpCodes;
-import org.junit.jupiter.api.Test;
-
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author sofn
@@ -36,6 +35,5 @@ class ErrorManagerTest {
                 }
             }
         }
-
     }
 }

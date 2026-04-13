@@ -1,27 +1,24 @@
 package com.lesofn.appforge.common.profile;
 
 import com.lesofn.appforge.common.utils.collection.CollectionUtils;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.core.io.support.PropertiesLoaderUtils;
-import org.yaml.snakeyaml.Yaml;
-
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.core.io.support.PropertiesLoaderUtils;
+import org.yaml.snakeyaml.Yaml;
 
 /**
  * @author sofn
  */
 @Slf4j
 public class DefaultProfileLoader {
-    /**
-     * 默认线上环境，防止线上bug
-     */
+    /** 默认线上环境，防止线上bug */
     static final Env DEFAULT_DEV = Env.prod;
 
     public static final String APP_ENV_VAR = "profile";
@@ -40,15 +37,15 @@ public class DefaultProfileLoader {
         }
         synchronized (this) {
             if (envVar == null) {
-                //先通过环境变量判断
+                // 先通过环境变量判断
                 String env = System.getenv(APP_ENV_VAR);
                 if (env == null) {
-                    //先从Yaml文件中读取
+                    // 先从Yaml文件中读取
                     Optional<String> envOptional = readFromYaml();
                     if (!envOptional.isPresent()) {
                         envOptional = readFromProperties();
                     }
-                    //再从再从Properties文件中读取
+                    // 再从再从Properties文件中读取
                     if (envOptional.isPresent()) {
                         env = envOptional.get();
                     }
@@ -69,7 +66,9 @@ public class DefaultProfileLoader {
     private Optional<String> readFromProperties() {
         String env = null;
         try {
-            env = PropertiesLoaderUtils.loadAllProperties("application.properties").getProperty("profile");
+            env =
+                    PropertiesLoaderUtils.loadAllProperties("application.properties")
+                            .getProperty("profile");
             env = StringUtils.strip(env);
         } catch (IOException e) {
             log.error(e.getMessage());
@@ -87,8 +86,12 @@ public class DefaultProfileLoader {
             }
             String fileContent = IOUtils.toString(url, StandardCharsets.UTF_8);
             Map<?, ?> map = ya.load(fileContent);
-            if (map.get("spring") != null && ((Map<?, ?>) map.get("spring")).get("profiles") != null) {
-                String active = (String) ((Map<?, ?>) ((Map<?, ?>) map.get("spring")).get("profiles")).get("active");
+            if (map.get("spring") != null
+                    && ((Map<?, ?>) map.get("spring")).get("profiles") != null) {
+                String active =
+                        (String)
+                                ((Map<?, ?>) ((Map<?, ?>) map.get("spring")).get("profiles"))
+                                        .get("active");
 
                 if (StringUtils.isEmpty(active)) {
                     return Optional.empty();

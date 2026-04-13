@@ -1,0 +1,60 @@
+# Production environment - copy to application-prod.yaml and fill in real values
+spring:
+  sql:
+    init:
+      mode: never
+  data:
+    redis:
+      host: <your-redis-host>
+      port: 6379
+      database: 0
+      password: ${REDIS_PASSWORD}
+      timeout: 10s
+      lettuce:
+        pool:
+          min-idle: 5
+          max-idle: 20
+          max-active: 50
+          max-wait: -1ms
+  # Database - MySQL (dynamic-datasource, master/slave)
+  datasource:
+    dynamic:
+      datasource:
+        user_master:
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          url: jdbc:mysql://<db-master-host>:3306/user_prod?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
+          username: ${DB_USERNAME}
+          password: ${DB_PASSWORD}
+        user_slave:
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          url: jdbc:mysql://<db-slave-host>:3306/user_prod?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
+          username: ${DB_USERNAME}
+          password: ${DB_PASSWORD}
+        task_master:
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          url: jdbc:mysql://<db-master-host>:3306/task_prod?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
+          username: ${DB_USERNAME}
+          password: ${DB_PASSWORD}
+        task_slave:
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          url: jdbc:mysql://<db-slave-host>:3306/task_prod?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
+          username: ${DB_USERNAME}
+          password: ${DB_PASSWORD}
+
+# OpenTelemetry
+management:
+  tracing:
+    sampling:
+      probability: 0.1
+  otlp:
+    tracing:
+      endpoint: ${OTEL_EXPORTER_OTLP_ENDPOINT:http://localhost:4318/v1/traces}
+    metrics:
+      endpoint: ${OTEL_EXPORTER_OTLP_ENDPOINT:http://localhost:4318/v1/metrics}
+
+app-forge:
+  jwt:
+    secret: ${JWT_SECRET}
+    expire-seconds: 3600
+  captcha:
+    enabled: true

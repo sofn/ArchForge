@@ -23,16 +23,6 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
 
-// QueryDSL configuration
-tasks.withType<JavaCompile> {
-    options.apply {
-        compilerArgs.addAll(listOf(
-            "-Aquerydsl.entityAccessors=true",
-            "-Aquerydsl.useFields=false"
-        ))
-    }
-}
-
 // 清理任务
 tasks.clean {
     doLast {

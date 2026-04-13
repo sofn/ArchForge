@@ -1,15 +1,14 @@
 package com.lesofn.appforge.server.admin.controller.system;
 
 import com.lesofn.appforge.user.domain.SysUser;
-import com.lesofn.appforge.user.service.SysUserService;
 import com.lesofn.appforge.user.domain.query.SysUserQuery;
+import com.lesofn.appforge.user.service.SysUserService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/system/user")
@@ -20,14 +19,16 @@ public class SysUserController {
 
     @GetMapping("/{id}")
     public ResponseEntity<SysUser> getUserById(@PathVariable Long id) {
-        return userService.findById(id)
+        return userService
+                .findById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/username/{username}")
     public ResponseEntity<SysUser> getUserByUsername(@PathVariable String username) {
-        return userService.findByUsername(username)
+        return userService
+                .findByUsername(username)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -58,13 +59,15 @@ public class SysUserController {
     }
 
     @PatchMapping("/{id}/status")
-    public ResponseEntity<Void> updateUserStatus(@PathVariable Long id, @RequestParam Integer status) {
+    public ResponseEntity<Void> updateUserStatus(
+            @PathVariable Long id, @RequestParam Integer status) {
         userService.updateStatus(id, status);
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/{id}/reset-password")
-    public ResponseEntity<Void> resetPassword(@PathVariable Long id, @RequestParam String newPassword) {
+    public ResponseEntity<Void> resetPassword(
+            @PathVariable Long id, @RequestParam String newPassword) {
         userService.resetPassword(id, newPassword);
         return ResponseEntity.ok().build();
     }

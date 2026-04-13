@@ -2,21 +2,19 @@ package com.lesofn.appforge.user.menu;
 
 import com.lesofn.appforge.common.enums.common.StatusEnum;
 import com.lesofn.appforge.infrastructure.auth.model.SystemLoginUser;
-import com.lesofn.appforge.user.menu.dto.MetaDTO;
-import com.lesofn.appforge.user.menu.repository.SysMenuRepository;
 import com.lesofn.appforge.user.dao.SysRoleMenuRepository;
 import com.lesofn.appforge.user.domain.SysMenu;
+import com.lesofn.appforge.user.menu.dto.MetaDTO;
 import com.lesofn.appforge.user.menu.dto.RouterDTO;
-import lombok.RequiredArgsConstructor;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.ObjectUtils;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
+import com.lesofn.appforge.user.menu.repository.SysMenuRepository;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -66,11 +64,14 @@ public class SysMenuService {
 
     @Transactional
     public void softDeleteById(Long id) {
-        sysMenuRepository.findById(id).ifPresent(menu -> {
-            menu.setDeleted(true);
-            menu.setUpdateTime(LocalDateTime.now());
-            sysMenuRepository.save(menu);
-        });
+        sysMenuRepository
+                .findById(id)
+                .ifPresent(
+                        menu -> {
+                            menu.setDeleted(true);
+                            menu.setUpdateTime(LocalDateTime.now());
+                            sysMenuRepository.save(menu);
+                        });
     }
 
     public List<SysMenu> buildMenuTree(List<SysMenu> menus) {
@@ -94,16 +95,19 @@ public class SysMenuService {
         }
 
         // 传给前端的路由排除掉按钮和停用的菜单
-        List<SysMenu> noButtonMenus = allMenus.stream()
-                .filter(menu -> !menu.getIsButton())
-                .filter(menu-> StatusEnum.ENABLE.getValue() == menu.getStatus())
-                .toList();
+        List<SysMenu> noButtonMenus =
+                allMenus.stream()
+                        .filter(menu -> !menu.getIsButton())
+                        .filter(menu -> StatusEnum.ENABLE.getValue() == menu.getStatus())
+                        .toList();
 
-        Map<Long, SysMenu> parentMap = noButtonMenus.stream()
-                .collect(Collectors.toMap(SysMenu::getMenuId, Function.identity()));
+        Map<Long, SysMenu> parentMap =
+                noButtonMenus.stream()
+                        .collect(Collectors.toMap(SysMenu::getMenuId, Function.identity()));
 
-        Map<SysMenu, RouterDTO> routerMap = noButtonMenus.stream()
-                .collect(Collectors.toMap(Function.identity(), RouterDTO::new));
+        Map<SysMenu, RouterDTO> routerMap =
+                noButtonMenus.stream()
+                        .collect(Collectors.toMap(Function.identity(), RouterDTO::new));
 
         List<RouterDTO> roots = new ArrayList<>();
         for (SysMenu sysMenu : noButtonMenus) {
@@ -125,9 +129,15 @@ public class SysMenuService {
             }
         }
 
-        roots = roots.stream()
-                .sorted(Comparator.comparing(it -> Optional.ofNullable(it.getMeta()).map(MetaDTO::getRank).orElse(-1)))
-                .toList();
+        roots =
+                roots.stream()
+                        .sorted(
+                                Comparator.comparing(
+                                        it ->
+                                                Optional.ofNullable(it.getMeta())
+                                                        .map(MetaDTO::getRank)
+                                                        .orElse(-1)))
+                        .toList();
 
         sortRouterDTOChildren(roots);
         return roots;
@@ -144,14 +154,19 @@ public class SysMenuService {
             RouterDTO current = stack.pop();
 
             if (CollectionUtils.isNotEmpty(current.getChildren())) {
-                List<RouterDTO> sortedChildren = current.getChildren().stream()
-                        .sorted(Comparator.comparing(it -> Optional.ofNullable(it.getMeta()).map(MetaDTO::getRank).orElse(-1)))
-                        .toList();
+                List<RouterDTO> sortedChildren =
+                        current.getChildren().stream()
+                                .sorted(
+                                        Comparator.comparing(
+                                                it ->
+                                                        Optional.ofNullable(it.getMeta())
+                                                                .map(MetaDTO::getRank)
+                                                                .orElse(-1)))
+                                .toList();
                 current.setChildren(sortedChildren);
 
                 stack.addAll(sortedChildren);
             }
         }
     }
-
 }

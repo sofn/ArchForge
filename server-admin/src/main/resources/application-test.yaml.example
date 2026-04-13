@@ -1,0 +1,60 @@
+# Test environment - copy to application-test.yaml and fill in real values
+spring:
+  sql:
+    init:
+      mode: always
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+      database: 1
+      password: <your-redis-password>
+      timeout: 10s
+      lettuce:
+        pool:
+          min-idle: 0
+          max-idle: 8
+          max-active: 8
+          max-wait: -1ms
+  # Database - MySQL (dynamic-datasource, master/slave)
+  datasource:
+    dynamic:
+      datasource:
+        user_master:
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          url: jdbc:mysql://localhost:3306/user_test?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
+          username: <your-db-username>
+          password: <your-db-password>
+        user_slave:
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          url: jdbc:mysql://localhost:3306/user_test?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
+          username: <your-db-username>
+          password: <your-db-password>
+        task_master:
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          url: jdbc:mysql://localhost:3306/task_test?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
+          username: <your-db-username>
+          password: <your-db-password>
+        task_slave:
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          url: jdbc:mysql://localhost:3306/task_test?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
+          username: <your-db-username>
+          password: <your-db-password>
+
+# OpenTelemetry
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+  otlp:
+    tracing:
+      endpoint: http://localhost:4318/v1/traces
+    metrics:
+      endpoint: http://localhost:4318/v1/metrics
+
+app-forge:
+  jwt:
+    secret: <your-jwt-secret>
+    expire-seconds: 86400
+  captcha:
+    enabled: true

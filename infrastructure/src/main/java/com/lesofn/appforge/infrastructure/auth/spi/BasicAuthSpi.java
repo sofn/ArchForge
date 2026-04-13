@@ -6,11 +6,11 @@ import com.lesofn.appforge.infrastructure.auth.model.AuthRequest;
 import com.lesofn.appforge.infrastructure.auth.provider.UserProvider;
 import com.lesofn.appforge.infrastructure.auth.service.DefaultAuthService;
 import com.lesofn.appforge.infrastructure.frame.utils.log.ApiLogger;
+import java.util.Optional;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.springframework.stereotype.Component;
-
-import java.util.Optional;
 
 /**
  * @author sofn
@@ -26,13 +26,14 @@ public class BasicAuthSpi extends AbstractAuthSpi {
     }
 
     public static String generateBasicAuthHeader(String username, String password) {
-        return "Basic " + new String(Base64.encodeBase64((username + ":" + password).getBytes(), false));
+        return "Basic "
+                + new String(Base64.encodeBase64((username + ":" + password).getBytes(), false));
     }
 
     @Override
     protected boolean checkCanAuth(AuthRequest request) {
         String authString = request.getHeader(AUTH_HEADER);
-        return StringUtils.startsWith(authString, "Basic");
+        return Strings.CS.startsWith(authString, "Basic");
     }
 
     @Override
@@ -48,8 +49,7 @@ public class BasicAuthSpi extends AbstractAuthSpi {
         if (StringUtils.isBlank(base64)) {
             throw new AdminAuthException(AdminAuthErrorCode.USER_AUTHFAIL);
         }
-        String nameAndPasswd = new String(
-                Base64.decodeBase64(base64.getBytes()));
+        String nameAndPasswd = new String(Base64.decodeBase64(base64.getBytes()));
 
         int pos = nameAndPasswd.indexOf(":");
         if (pos < 1 || pos == (nameAndPasswd.length() - 1)) {
@@ -69,9 +69,9 @@ public class BasicAuthSpi extends AbstractAuthSpi {
             uid = provider.get().authUser(username, password);
         }
         if (uid <= 0) {
-            throw new AdminAuthException(AdminAuthErrorCode.USERNAME_PASSWORD_ERROR, "username or password error");
+            throw new AdminAuthException(
+                    AdminAuthErrorCode.USERNAME_PASSWORD_ERROR, "username or password error");
         }
         return uid;
     }
-
 }

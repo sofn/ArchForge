@@ -9,8 +9,7 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class IpRegionUtil {
 
-    private IpRegionUtil() {
-    }
+    private IpRegionUtil() {}
 
     public static IpRegion getIpRegion(String ip) {
         if (StringUtils.isEmpty(ip)) {
@@ -37,5 +36,4 @@ public class IpRegionUtil {
     public static String getBriefLocationByIp(String ip) {
         return getIpRegion(ip).briefLocation();
     }
-
 }

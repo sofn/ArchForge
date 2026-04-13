@@ -4,14 +4,13 @@ import com.lesofn.appforge.common.enums.common.GenderEnum;
 import com.lesofn.appforge.common.repository.BaseEntity;
 import com.lesofn.appforge.common.repository.converter.JpaValueEnumType;
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.Type;
-
-import java.time.LocalDateTime;
 
 @Setter
 @Getter

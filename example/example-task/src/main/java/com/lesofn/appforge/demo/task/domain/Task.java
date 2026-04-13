@@ -1,13 +1,9 @@
 package com.lesofn.appforge.demo.task.domain;
 
+import jakarta.persistence.*;
 import lombok.*;
 
-import jakarta.persistence.*;
-
-/**
- * Authors: sofn
- * Version: 1.0  Created at 2015-10-12 00:12.
- */
+/** Authors: sofn Version: 1.0 Created at 2015-10-12 00:12. */
 @Setter
 @Getter
 @ToString
@@ -20,8 +16,10 @@ public class Task {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Long id;
+
     public String title;
     public String description;
+
     @Column(name = "uid", nullable = false)
     public long uid;
 

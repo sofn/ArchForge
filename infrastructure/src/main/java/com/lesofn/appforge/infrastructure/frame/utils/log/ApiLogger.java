@@ -7,10 +7,7 @@ import com.lesofn.appforge.infrastructure.frame.context.ThreadLocalContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Authors: sofn
- * Version: 1.0  Created at 15-6-7 21:00.
- */
+/** Authors: sofn Version: 1.0 Created at 15-6-7 21:00. */
 public class ApiLogger {
     private static Logger log = LoggerFactory.getLogger("debug");
     private static Logger infoLog = LoggerFactory.getLogger("info");
@@ -42,18 +39,25 @@ public class ApiLogger {
     }
 
     private static String formatMsg(Object msg) {
-        return String.format("%s\t%s", ThreadLocalContext.getRequestContext().getRequestId(), msg == null ? "null" : msg.toString());
+        return String.format(
+                "%s\t%s",
+                ThreadLocalContext.getRequestContext().getRequestId(),
+                msg == null ? "null" : msg.toString());
     }
 
     private static String formatMsg(String tag, Object msg) {
-        return String.format("%s\t%s\t%s", ThreadLocalContext.getRequestContext().getRequestId(), tag, msg == null ? "null" : msg.toString());
+        return String.format(
+                "%s\t%s\t%s",
+                ThreadLocalContext.getRequestContext().getRequestId(),
+                tag,
+                msg == null ? "null" : msg.toString());
     }
 
     public static void debug(String tag, Object msg) {
         if (msg == null) {
             return;
         }
-        //非生产环境打印debug日志
+        // 非生产环境打印debug日志
         if (log.isDebugEnabled() && !DefaultProfileLoader.isProd()) {
             log.debug(formatMsg(tag, msg));
         }
@@ -61,14 +65,15 @@ public class ApiLogger {
 
     /**
      * @param resourceType 资源类型
-     * @param resourceId   资源id 如 服务器ip端口，接口的 url地址等
-     * @param useTime      耗费时间
+     * @param resourceId 资源id 如 服务器ip端口，接口的 url地址等
+     * @param useTime 耗费时间
      */
     public static void fireSlow(String resourceType, String resourceId, long useTime) {
         fireSlow(resourceType, resourceId, useTime, null);
     }
 
-    public static void fireSlow(String resourceType, String resourceId, long useTime, ObjectNode ext) {
+    public static void fireSlow(
+            String resourceType, String resourceId, long useTime, ObjectNode ext) {
         String extStr = "";
         if (ext != null) {
             try {
@@ -78,17 +83,33 @@ public class ApiLogger {
                 // Ignore serialization errors
             }
         }
-        fireLog.warn(String.format("%s\t%s\t%s\t%s\t%s\t%s", ThreadLocalContext.getRequestContext().getRequestId(), resourceType, resourceId, "slow", useTime, extStr));
+        fireLog.warn(
+                String.format(
+                        "%s\t%s\t%s\t%s\t%s\t%s",
+                        ThreadLocalContext.getRequestContext().getRequestId(),
+                        resourceType,
+                        resourceId,
+                        "slow",
+                        useTime,
+                        extStr));
     }
 
     /**
      * @param resourceType 资源类型
-     * @param resourceId   资源id
-     * @param msg          错误消息
-     * @param e            exception
+     * @param resourceId 资源id
+     * @param msg 错误消息
+     * @param e exception
      */
     public static void fireError(String resourceType, String resourceId, String msg, Exception e) {
-        fireLog.error(String.format("%s\t%s\t%s\t%s\t%s\t%s", ThreadLocalContext.getRequestContext().getRequestId(), resourceType, resourceId, "error", msg, e.getClass().getName()));
+        fireLog.error(
+                String.format(
+                        "%s\t%s\t%s\t%s\t%s\t%s",
+                        ThreadLocalContext.getRequestContext().getRequestId(),
+                        resourceType,
+                        resourceId,
+                        "error",
+                        msg,
+                        e.getClass().getName()));
     }
 
     public static void info(Object msg) {
@@ -124,5 +145,4 @@ public class ApiLogger {
     public static void error(Object msg, Throwable e) {
         errorLog.error(formatMsg(msg), e);
     }
-
 }

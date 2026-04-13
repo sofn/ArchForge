@@ -1,10 +1,9 @@
 package com.lesofn.appforge.common.error.manager;
 
+import java.util.List;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
-
-import java.util.List;
 
 /**
  * @author sofn

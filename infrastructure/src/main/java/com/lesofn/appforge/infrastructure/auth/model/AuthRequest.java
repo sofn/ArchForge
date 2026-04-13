@@ -3,23 +3,19 @@ package com.lesofn.appforge.infrastructure.auth.model;
 import com.lesofn.appforge.common.utils.ip.IpUtil;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
-import org.javatuples.KeyValue;
-
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
+import org.apache.commons.lang3.Strings;
+import org.apache.commons.lang3.math.NumberUtils;
+import org.javatuples.KeyValue;
 
-/**
- * Authors: sofn
- * Version: 1.0  Created at 2015-09-17 22:05.
- */
+/** Authors: sofn Version: 1.0 Created at 2015-09-17 22:05. */
 public class AuthRequest {
 
     public static final String MULTIPART = "multipart/";
-    public static final String FROM_HEADER = "X-Engine-From"; //用于判断内网外网（Nginx配置添加Header）
+    public static final String FROM_HEADER = "X-Engine-From"; // 用于判断内网外网（Nginx配置添加Header）
     public static final String SSL_HEADER = "X-Engine-SSL";
     private HttpServletRequest request;
     private List<KeyValue<String, String>> cacheCookies;
@@ -64,24 +60,24 @@ public class AuthRequest {
 
     public Iterable<String> getHeaderNames() {
         final Enumeration<String> e = request.getHeaderNames();
-        return () -> new Iterator<String>() {
+        return () ->
+                new Iterator<String>() {
 
-            @Override
-            public boolean hasNext() {
-                return e.hasMoreElements();
-            }
+                    @Override
+                    public boolean hasNext() {
+                        return e.hasMoreElements();
+                    }
 
-            @Override
-            public String next() {
-                return e.nextElement();
-            }
+                    @Override
+                    public String next() {
+                        return e.nextElement();
+                    }
 
-            @Override
-            public void remove() {
-                throw new UnsupportedOperationException();
-            }
-
-        };
+                    @Override
+                    public void remove() {
+                        throw new UnsupportedOperationException();
+                    }
+                };
     }
 
     public List<KeyValue<String, String>> getCookies() {
@@ -92,8 +88,7 @@ public class AuthRequest {
         Cookie[] cookieArr = request.getCookies();
         if (cookieArr != null) {
             for (Cookie acookie : cookieArr) {
-                ret.add(new KeyValue<>(acookie.getName(),
-                        acookie.getValue()));
+                ret.add(new KeyValue<>(acookie.getName(), acookie.getValue()));
             }
         }
         cacheCookies = ret;
@@ -106,8 +101,7 @@ public class AuthRequest {
         }
         List<KeyValue<String, String>> cookies = getCookies();
         for (KeyValue<String, String> pair : cookies) {
-            if (name.equals(pair.getKey()))
-                return pair.getValue();
+            if (name.equals(pair.getKey())) return pair.getValue();
         }
         return null;
     }
@@ -122,10 +116,10 @@ public class AuthRequest {
 
     public boolean isMultiPart() {
         String contentType = request.getContentType();
-        return "POST".equals(request.getMethod()) && contentType != null
+        return "POST".equals(request.getMethod())
+                && contentType != null
                 && contentType.toLowerCase().startsWith(MULTIPART);
     }
-
 
     public Object getAttribute(String name) {
         return request.getAttribute(name);
@@ -175,9 +169,8 @@ public class AuthRequest {
     }
 
     public boolean isHttps() {
-        return StringUtils.equalsIgnoreCase("HTTPS", this.getScheme())
-                || StringUtils.equalsIgnoreCase("SSL", this.getHeader("X-Proto"));
-
+        return Strings.CI.equals("HTTPS", this.getScheme())
+                || Strings.CI.equals("SSL", this.getHeader("X-Proto"));
     }
 
     public String getParameter(String name) {
@@ -187,5 +180,4 @@ public class AuthRequest {
     public RequestFrom getFrom() {
         return RequestFrom.valueOf(this.request.getHeader(FROM_HEADER), RequestFrom.INNER);
     }
-
 }

@@ -1,16 +1,15 @@
 package com.lesofn.appforge.common.encrypt;
 
-import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.codec.binary.Hex;
-
+import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
+import java.util.Map;
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
-import java.security.NoSuchAlgorithmException;
-import java.util.HashMap;
-import java.util.Map;
+import org.apache.commons.codec.DecoderException;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.binary.Hex;
 
 /**
  * AES工具类，提供加密解密、生成Key等方法

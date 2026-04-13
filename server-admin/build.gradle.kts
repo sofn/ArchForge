@@ -58,9 +58,6 @@ dependencies {
     // Redis Mock for Dev environment
     api("com.github.fppt:jedis-mock")
     
-    // Druid connection pool and monitoring
-    api("com.alibaba:druid-spring-boot-3-starter")
-    
     // Spring Boot DevTools - 开发环境自动重启和热部署
     developmentOnly("org.springframework.boot:spring-boot-devtools:4.0.5")
     
@@ -73,11 +70,3 @@ dependencies {
     compileOnly("org.mapstruct:mapstruct:1.6.3")
 }
 
-// profile环境配置文件
-sourceSets {
-    main {
-        resources {
-            setSrcDirs(listOf("src/main/resources/", "src/main/profiles/${findProperty("profile") ?: "dev"}"))
-        }
-    }
-}

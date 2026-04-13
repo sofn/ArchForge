@@ -3,13 +3,9 @@ package com.lesofn.appforge.infrastructure.auth.service;
 import com.lesofn.appforge.infrastructure.auth.annotation.BaseInfo;
 import com.lesofn.appforge.infrastructure.auth.model.AuthRequest;
 import com.lesofn.appforge.infrastructure.auth.model.AuthResponse;
-
 import java.util.Optional;
 
-/**
- * Authors: sofn
- * Version: 1.0  Created at 15-8-30 00:22.
- */
+/** Authors: sofn Version: 1.0 Created at 15-8-30 00:22. */
 public interface AuthService {
     String ENGINE_REMOTEIP_HEADER = "X-Engine-RemoteIP";
     String ENGINE_UID_HEADER = "X-Engine-UID";

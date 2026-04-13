@@ -3,9 +3,12 @@ package com.lesofn.appforge.infrastructure.frame.response;
 import com.google.common.base.Joiner;
 import com.lesofn.appforge.common.error.exception.IErrorCodeException;
 import com.lesofn.appforge.common.error.manager.ErrorInfo;
-import com.lesofn.appforge.infrastructure.frame.response.model.ResponseResult;
 import com.lesofn.appforge.common.error.system.HttpCodes;
 import com.lesofn.appforge.common.errors.SystemErrorCode;
+import com.lesofn.appforge.infrastructure.frame.response.model.ResponseResult;
+import jakarta.servlet.http.HttpServletRequest;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -19,10 +22,6 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import jakarta.servlet.http.HttpServletRequest;
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * @author sofn
  * @version 2019-07-11 16:56
@@ -34,7 +33,8 @@ public class ErrorExceptionHandle {
 
     @ResponseBody
     @ExceptionHandler(value = Throwable.class)
-    public ResponseEntity<ResponseResult<?>> processException(HttpServletRequest request, Exception e) {
+    public ResponseEntity<ResponseResult<?>> processException(
+            HttpServletRequest request, Exception e) {
         Pair<Throwable, String> pair = getExceptionMessage(e);
         if (e instanceof IErrorCodeException) {
             if (e.getCause() != null) {
@@ -45,36 +45,44 @@ public class ErrorExceptionHandle {
             ErrorInfo errorInfo = ((IErrorCodeException) e).getErrorInfo();
             ResponseResult<?> apiResult;
             if (errorInfo == null) {
-                apiResult = ResponseResult.error(SystemErrorCode.SYSTEM_ERROR.getCode(), pair.getRight());
+                apiResult =
+                        ResponseResult.error(
+                                SystemErrorCode.SYSTEM_ERROR.getCode(), pair.getRight());
             } else {
                 apiResult = ResponseResult.error(errorInfo.getCode(), errorInfo.getMsg());
             }
             return new ResponseEntity<>(apiResult, HttpStatus.OK);
         }
         log.error("error, request: {}", parseParam(request), e);
-        ResponseResult<String> errorResult = ResponseResult.error(SystemErrorCode.SYSTEM_ERROR.getCode(), pair.getLeft().getClass().getSimpleName() + ": " + pair.getRight());
+        ResponseResult<String> errorResult =
+                ResponseResult.error(
+                        SystemErrorCode.SYSTEM_ERROR.getCode(),
+                        pair.getLeft().getClass().getSimpleName() + ": " + pair.getRight());
         return new ResponseEntity<>(errorResult, HttpStatus.OK);
     }
 
-    /**
-     * 请求参数异常
-     */
+    /** 请求参数异常 */
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
-    public ResponseEntity<ResponseResult<String>> badRequestException(HttpServletRequest request, MethodArgumentNotValidException e) {
+    public ResponseEntity<ResponseResult<String>> badRequestException(
+            HttpServletRequest request, MethodArgumentNotValidException e) {
         BindingResult bindingResult = e.getBindingResult();
         StringBuilder builder = new StringBuilder();
         for (FieldError fieldError : bindingResult.getFieldErrors()) {
             builder.append(fieldError.getField() + fieldError.getDefaultMessage()).append(", ");
         }
         log.error("BadRequestException, request: {}", parseParam(request), e);
-        return new ResponseEntity<>(ResponseResult.error(HttpCodes.BAD_REQUEST.getStatus(), builder.toString()), HttpStatus.OK);
+        return new ResponseEntity<>(
+                ResponseResult.error(HttpCodes.BAD_REQUEST.getStatus(), builder.toString()),
+                HttpStatus.OK);
     }
 
     public String parseParam(HttpServletRequest request) {
         Map<String, String[]> parameterMap = request.getParameterMap();
         HashMap<String, String> map = new HashMap<>(parameterMap.size());
         for (Map.Entry<String, String[]> entry : parameterMap.entrySet()) {
-            map.put(entry.getKey(), ArrayUtils.isNotEmpty(entry.getValue()) ? entry.getValue()[0] : "");
+            map.put(
+                    entry.getKey(),
+                    ArrayUtils.isNotEmpty(entry.getValue()) ? entry.getValue()[0] : "");
         }
         return JOINER.join(map);
     }
@@ -86,5 +94,4 @@ public class ErrorExceptionHandle {
         }
         return ImmutablePair.of(detail, detail.getMessage());
     }
-
 }

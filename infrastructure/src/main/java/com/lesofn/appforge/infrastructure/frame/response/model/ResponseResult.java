@@ -18,9 +18,10 @@ public class ResponseResult<T> extends ErrorInfo {
         super(code, msg);
     }
 
-
     public static <T> ResponseResult<T> success(T data) {
-        ResponseResult<T> result = new ResponseResult<>(SystemErrorCode.SUCCESS.getCode(), SystemErrorCode.SUCCESS.getMsg());
+        ResponseResult<T> result =
+                new ResponseResult<>(
+                        SystemErrorCode.SUCCESS.getCode(), SystemErrorCode.SUCCESS.getMsg());
         result.data = data;
         return result;
     }
@@ -32,5 +33,4 @@ public class ResponseResult<T> extends ErrorInfo {
     public static ResponseResult<String> error(Integer code, String msg) {
         return new ResponseResult<>(code, msg);
     }
-
 }

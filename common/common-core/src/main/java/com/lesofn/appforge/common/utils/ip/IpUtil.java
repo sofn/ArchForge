@@ -1,13 +1,12 @@
 package com.lesofn.appforge.common.utils.ip;
 
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-
 import java.io.IOException;
 import java.net.*;
 import java.util.*;
 import java.util.regex.Pattern;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * IP工具类
@@ -17,20 +16,22 @@ import java.util.regex.Pattern;
 @Slf4j
 public class IpUtil {
 
-    public static final String INNER_IP_REGEX = "^(127\\.0\\.0\\.\\d{1,3})|(localhost)|(10\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})|(172\\.((1[6-9])|(2\\d)|(3[01]))\\.\\d{1,3}\\.\\d{1,3})|(192\\.168\\.\\d{1,3}\\.\\d{1,3})$";
+    public static final String INNER_IP_REGEX =
+            "^(127\\.0\\.0\\.\\d{1,3})|(localhost)|(10\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})|(172\\.((1[6-9])|(2\\d)|(3[01]))\\.\\d{1,3}\\.\\d{1,3})|(192\\.168\\.\\d{1,3}\\.\\d{1,3})$";
     public static final Pattern INNER_IP_PATTERN = Pattern.compile(INNER_IP_REGEX);
-    public static final String IPV4 = "^(25[0-5]|2[0-4]\\d|[0-1]?\\d?\\d)\\.(25[0-5]|2[0-4]\\d|[0-1]?\\d?\\d)\\.(25[0-5]|2[0-4]\\d|[0-1]?\\d?\\d)\\.(25[0-5]|2[0-4]\\d|[0-1]?\\d?\\d)$";
+    public static final String IPV4 =
+            "^(25[0-5]|2[0-4]\\d|[0-1]?\\d?\\d)\\.(25[0-5]|2[0-4]\\d|[0-1]?\\d?\\d)\\.(25[0-5]|2[0-4]\\d|[0-1]?\\d?\\d)\\.(25[0-5]|2[0-4]\\d|[0-1]?\\d?\\d)$";
     public static final Pattern IPV4_PATTERN = Pattern.compile(IPV4);
-    public static final String IPV6 = "(([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]+|::(ffff(:0{1,4})?:)?((25[0-5]|(2[0-4]|1?[0-9])?[0-9])\\.){3}(25[0-5]|(2[0-4]|1?[0-9])?[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1?[0-9])?[0-9])\\.){3}(25[0-5]|(2[0-4]|1?[0-9])?[0-9]))";
+    public static final String IPV6 =
+            "(([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]+|::(ffff(:0{1,4})?:)?((25[0-5]|(2[0-4]|1?[0-9])?[0-9])\\.){3}(25[0-5]|(2[0-4]|1?[0-9])?[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1?[0-9])?[0-9])\\.){3}(25[0-5]|(2[0-4]|1?[0-9])?[0-9]))";
     public static final Pattern IPV6_PATTERN = Pattern.compile(IPV6);
 
-
-    private static long[][] INTRANET_IP_RANGES = new long[][]{
-            {ipToInt("10.0.0.0"), ipToInt("10.255.255.255")},
-            {ipToInt("172.16.0.0"), ipToInt("172.31.255.255")},
-            {ipToInt("192.168.0.0"), ipToInt("192.168.255.255")}
-    };
-
+    private static long[][] INTRANET_IP_RANGES =
+            new long[][] {
+                {ipToInt("10.0.0.0"), ipToInt("10.255.255.255")},
+                {ipToInt("172.16.0.0"), ipToInt("172.31.255.255")},
+                {ipToInt("192.168.0.0"), ipToInt("192.168.255.255")}
+            };
 
     public static boolean isInnerIp(String ip) {
         return INNER_IP_PATTERN.matcher(ip).matches() || isLocalHost(ip);
@@ -51,7 +52,6 @@ public class IpUtil {
         }
         return ia.isSiteLocalAddress() || ia.isLoopbackAddress();
     }
-
 
     public static boolean isValidIpv4(String inetAddress) {
         return IPV4_PATTERN.matcher(inetAddress).matches();
@@ -91,9 +91,7 @@ public class IpUtil {
         }
     }
 
-    /**
-     * 获取服务器ip 判断规则 eth0 > eth1 > ... ethN > wlan > lo
-     */
+    /** 获取服务器ip 判断规则 eth0 > eth1 > ... ethN > wlan > lo */
     public static String getLocalIp() {
 
         Map<String, String> ips = getLocalIps();
@@ -114,9 +112,7 @@ public class IpUtil {
 
     private static String localIp = null;
 
-    /**
-     * 只获取一次ip
-     */
+    /** 只获取一次ip */
     public static String getSingleLocalIp() {
         if (localIp == null) {
             localIp = getLocalIp();
@@ -135,13 +131,15 @@ public class IpUtil {
     public static int randomAvailablePort() {
         int port;
         do {
-            port = (int) ((MAX_USER_PORT_NUMBER - MIN_USER_PORT_NUMBER) * Math.random()) + MIN_USER_PORT_NUMBER;
+            port =
+                    (int) ((MAX_USER_PORT_NUMBER - MIN_USER_PORT_NUMBER) * Math.random())
+                            + MIN_USER_PORT_NUMBER;
         } while (!availablePort(port));
         return port;
     }
 
     /**
-     * 检测该端口是否可用 <br/>
+     * 检测该端口是否可用 <br>
      * 端口必须大于 0 小于 {@value #MAX_USER_PORT_NUMBER}
      *
      * @param port 端口号
@@ -195,10 +193,15 @@ public class IpUtil {
         if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
             ip = request.getRemoteAddr();
         }
-        log.debug("x-forwarded-for:" + request.getHeader("x-forwarded-for") +
-                ",Proxy-Client-IP:" + request.getHeader("Proxy-Client-IP") +
-                ",WL-Proxy-Client-IP:" + request.getHeader("WL-Proxy-Client-IP") +
-                ",ip:" + ip);
+        log.debug(
+                "x-forwarded-for:"
+                        + request.getHeader("x-forwarded-for")
+                        + ",Proxy-Client-IP:"
+                        + request.getHeader("Proxy-Client-IP")
+                        + ",WL-Proxy-Client-IP:"
+                        + request.getHeader("WL-Proxy-Client-IP")
+                        + ",ip:"
+                        + ip);
         if (ip != null) {
             // 为了解决移动网关的问题。移动网关过来的请求，第二个ip是真实ip
             int idx = ip.indexOf(",");
@@ -232,7 +235,7 @@ public class IpUtil {
     /**
      * Convert IP to Int.
      *
-     * @param address   ip地址
+     * @param address ip地址
      * @param isSegment true IP segment, false full IP.
      * @return 数字
      */
@@ -259,8 +262,7 @@ public class IpUtil {
     }
 
     /**
-     * 将ip转化为数字，并且保持ip的大小顺序不变 如 ipToInt("10.75.0.1") > ipToInt("10.75.0.0")
-     * 如果ip不合法则返回 0
+     * 将ip转化为数字，并且保持ip的大小顺序不变 如 ipToInt("10.75.0.1") > ipToInt("10.75.0.0") 如果ip不合法则返回 0
      *
      * @param addr ip地址
      * @return 数字
@@ -268,5 +270,4 @@ public class IpUtil {
     public static int ipToInt(final String addr) {
         return ipToInt(addr, false);
     }
-
 }

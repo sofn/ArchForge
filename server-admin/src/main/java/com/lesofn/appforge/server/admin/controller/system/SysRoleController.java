@@ -2,13 +2,12 @@ package com.lesofn.appforge.server.admin.controller.system;
 
 import com.lesofn.appforge.user.domain.SysRole;
 import com.lesofn.appforge.user.service.SysRoleService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/system/role")
@@ -19,21 +18,24 @@ public class SysRoleController {
 
     @GetMapping("/{id}")
     public ResponseEntity<SysRole> getRoleById(@PathVariable Long id) {
-        return roleService.findById(id)
+        return roleService
+                .findById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/key/{roleKey}")
     public ResponseEntity<SysRole> getRoleByKey(@PathVariable String roleKey) {
-        return roleService.findByRoleKey(roleKey)
+        return roleService
+                .findByRoleKey(roleKey)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/name/{roleName}")
     public ResponseEntity<SysRole> getRoleByName(@PathVariable String roleName) {
-        return roleService.findByRoleName(roleName)
+        return roleService
+                .findByRoleName(roleName)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }

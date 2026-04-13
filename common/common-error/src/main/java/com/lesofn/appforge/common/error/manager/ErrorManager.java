@@ -5,7 +5,6 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.lesofn.appforge.common.error.api.ErrorCode;
 import com.lesofn.appforge.common.error.api.ProjectModule;
-
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
@@ -19,11 +18,14 @@ import java.util.stream.Collectors;
  */
 public class ErrorManager {
     private static final BiMap<Integer, ErrorCode> GLOBAL_ERROR_CODE_MAP = HashBiMap.create();
-    private static final Map<ErrorCode, ProjectModule> ERROR_PROJECT_MODULE_MAP = new ConcurrentHashMap<>();
+    private static final Map<ErrorCode, ProjectModule> ERROR_PROJECT_MODULE_MAP =
+            new ConcurrentHashMap<>();
 
-    private static final Comparator<ProjectModule> PROJECT_MODULE_COMPARATOR = Comparator.comparingInt(ProjectModule::getProjectCode)
-            .thenComparingInt(ProjectModule::getModuleCode);
-    private static final Comparator<ErrorCode> ERROR_CODE_COMPARATOR = Comparator.comparingInt(ErrorCode::getNodeNum);
+    private static final Comparator<ProjectModule> PROJECT_MODULE_COMPARATOR =
+            Comparator.comparingInt(ProjectModule::getProjectCode)
+                    .thenComparingInt(ProjectModule::getModuleCode);
+    private static final Comparator<ErrorCode> ERROR_CODE_COMPARATOR =
+            Comparator.comparingInt(ErrorCode::getNodeNum);
 
     public static void register(ProjectModule projectModule, ErrorCode errorCode) {
         Preconditions.checkNotNull(projectModule);
@@ -39,44 +41,63 @@ public class ErrorManager {
     public static List<TreeNode> getAllErrorCodes() {
         return ERROR_PROJECT_MODULE_MAP.entrySet().stream()
                 .sorted((it1, it2) -> ERROR_CODE_COMPARATOR.compare(it1.getKey(), it2.getKey()))
-                .collect(Collectors.groupingBy(Map.Entry::getValue,
-                        Collectors.mapping(Map.Entry::getKey, Collectors.toList())))
+                .collect(
+                        Collectors.groupingBy(
+                                Map.Entry::getValue,
+                                Collectors.mapping(Map.Entry::getKey, Collectors.toList())))
                 .entrySet()
                 .stream()
                 .sorted((it1, it2) -> PROJECT_MODULE_COMPARATOR.compare(it1.getKey(), it2.getKey()))
-                .collect(Collectors.groupingBy(
-                                e -> new TreeNode(e.getKey().getProjectCode(), e.getKey().getProjectName()),
+                .collect(
+                        Collectors.groupingBy(
+                                e ->
+                                        new TreeNode(
+                                                e.getKey().getProjectCode(),
+                                                e.getKey().getProjectName()),
                                 Collectors.groupingBy(
-                                        it -> new TreeNode(it.getKey().getModuleCode(), it.getKey().getModuleName()),
-                                        Collectors.mapping(Map.Entry::getValue, Collectors.toList())
-                                )
-                        )
-                )
+                                        it ->
+                                                new TreeNode(
+                                                        it.getKey().getModuleCode(),
+                                                        it.getKey().getModuleName()),
+                                        Collectors.mapping(
+                                                Map.Entry::getValue, Collectors.toList()))))
                 .entrySet()
                 .stream()
-                .map(e -> {
-                    TreeNode top = e.getKey();
-                    List<TreeNode> middleNode = e.getValue()
-                            .entrySet()
-                            .stream()
-                            .map(e1 -> {
-                                TreeNode key = e1.getKey();
-                                List<TreeNode> leftNode = e1.getValue().stream()
-                                        .flatMap(Collection::stream)
-                                        .map(errorCode -> new TreeNode(errorCode.getCode(), errorCode.getMsg()))
-                                        .collect(Collectors.toList());
-                                key.setNodes(leftNode);
-                                return key;
-                            })
-                            .collect(Collectors.toList());
-                    top.setNodes(middleNode);
-                    return top;
-                })
+                .map(
+                        e -> {
+                            TreeNode top = e.getKey();
+                            List<TreeNode> middleNode =
+                                    e.getValue().entrySet().stream()
+                                            .map(
+                                                    e1 -> {
+                                                        TreeNode key = e1.getKey();
+                                                        List<TreeNode> leftNode =
+                                                                e1.getValue().stream()
+                                                                        .flatMap(Collection::stream)
+                                                                        .map(
+                                                                                errorCode ->
+                                                                                        new TreeNode(
+                                                                                                errorCode
+                                                                                                        .getCode(),
+                                                                                                errorCode
+                                                                                                        .getMsg()))
+                                                                        .collect(
+                                                                                Collectors
+                                                                                        .toList());
+                                                        key.setNodes(leftNode);
+                                                        return key;
+                                                    })
+                                            .collect(Collectors.toList());
+                            top.setNodes(middleNode);
+                            return top;
+                        })
                 .collect(Collectors.toList());
     }
 
     private static int genCode(ProjectModule projectModule, ErrorCode errorCode) {
-        return projectModule.getProjectCode() * 10000 + projectModule.getModuleCode() * 100 + errorCode.getNodeNum();
+        return projectModule.getProjectCode() * 10000
+                + projectModule.getModuleCode() * 100
+                + errorCode.getNodeNum();
     }
 
     public static int genCode(ErrorCode errorCode) {

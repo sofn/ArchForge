@@ -3,15 +3,14 @@ package com.lesofn.appforge.user.service;
 import com.lesofn.appforge.user.dao.SysRoleRepository;
 import com.lesofn.appforge.user.domain.SysMenu;
 import com.lesofn.appforge.user.domain.SysRole;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -63,11 +62,14 @@ public class SysRoleService {
 
     @Transactional
     public void softDeleteById(Long id) {
-        roleRepository.findById(id).ifPresent(role -> {
-            role.setDeleted(true);
-            role.setUpdateTime(LocalDateTime.now());
-            roleRepository.save(role);
-        });
+        roleRepository
+                .findById(id)
+                .ifPresent(
+                        role -> {
+                            role.setDeleted(true);
+                            role.setUpdateTime(LocalDateTime.now());
+                            roleRepository.save(role);
+                        });
     }
 
     public boolean existsByRoleKey(String roleKey) {

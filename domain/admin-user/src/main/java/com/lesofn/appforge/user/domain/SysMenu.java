@@ -4,13 +4,12 @@ import com.lesofn.appforge.common.repository.BaseEntity;
 import com.lesofn.appforge.user.domain.convert.MetaInfoConverter;
 import com.lesofn.appforge.user.menu.dto.MetaDTO;
 import jakarta.persistence.*;
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
-
-import java.util.List;
 
 @Setter
 @Getter
@@ -47,7 +46,5 @@ public class SysMenu extends BaseEntity<SysMenu> {
 
     private String remark;
 
-    @Transient
-    private List<SysMenu> children;
-
+    @Transient private List<SysMenu> children;
 }

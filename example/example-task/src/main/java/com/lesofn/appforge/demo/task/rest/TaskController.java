@@ -1,5 +1,7 @@
 package com.lesofn.appforge.demo.task.rest;
 
+import static com.lesofn.appforge.demo.task.errors.TaskErrorCode.TASK_NOT_EXISTS;
+
 import com.lesofn.appforge.demo.task.domain.Task;
 import com.lesofn.appforge.demo.task.errors.TaskException;
 import com.lesofn.appforge.demo.task.service.TaskService;
@@ -14,26 +16,19 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import static com.lesofn.appforge.demo.task.errors.TaskErrorCode.TASK_NOT_EXISTS;
-
-/**
- * Authors: sofn
- * Version: 1.0  Created at 2015-10-12 00:18.
- */
+/** Authors: sofn Version: 1.0 Created at 2015-10-12 00:18. */
 @RestController
 @RequestMapping("/task")
 public class TaskController {
     private static Logger logger = LoggerFactory.getLogger(TaskController.class);
 
-    @Resource
-    private TaskService taskService;
+    @Resource private TaskService taskService;
 
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     public Page<Task> list(
             RequestContext rc,
             @RequestParam(required = false, defaultValue = "1") int page,
-            @RequestParam(value = "pagesize", required = false, defaultValue = "10") int pageSize
-    ) {
+            @RequestParam(value = "pagesize", required = false, defaultValue = "10") int pageSize) {
         PageRequest request = PageRequest.of(page - 1, pageSize);
         return taskService.getTasksByPage(rc.getCurrentUid(), request);
     }
@@ -50,16 +45,16 @@ public class TaskController {
     }
 
     @RequestMapping(value = "/save", method = RequestMethod.POST)
-    public long save(RequestContext rc,
-                     @RequestParam(required = false, defaultValue = "0") long id,
-                     @RequestParam String title,
-                     @RequestParam String desc
-    ) {
+    public long save(
+            RequestContext rc,
+            @RequestParam(required = false, defaultValue = "0") long id,
+            @RequestParam String title,
+            @RequestParam String desc) {
         Task task = new Task(title, desc, rc.getCurrentUid());
         if (id > 0) {
             task.setId(id);
         }
-        //保存任务,没有则创建,有则更新
+        // 保存任务,没有则创建,有则更新
         taskService.saveTask(task);
         return task.getId();
     }

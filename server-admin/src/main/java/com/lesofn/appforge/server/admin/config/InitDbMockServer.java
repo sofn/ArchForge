@@ -1,18 +1,14 @@
 package com.lesofn.appforge.server.admin.config;
 
 import jakarta.annotation.PostConstruct;
-import jakarta.annotation.PreDestroy;
 import jakarta.annotation.Resource;
+import javax.sql.DataSource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.jdbc.datasource.init.DataSourceInitializer;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.stereotype.Component;
-
-import javax.sql.DataSource;
-import java.io.IOException;
 
 /**
  * @author sofn
@@ -31,7 +27,7 @@ public class InitDbMockServer {
     public void init() {
         try {
             log.info("开始初始化数据库数据...");
-      
+
             ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
             populator.addScript(new ClassPathResource("sql/data-admin-user.sql"));
             populator.setSqlScriptEncoding("UTF-8");
@@ -39,7 +35,7 @@ public class InitDbMockServer {
 
             // 直接使用 ResourceDatabasePopulator 执行SQL脚本
             populator.execute(dataSource);
-      
+
             log.info("数据库数据初始化完成！");
         } catch (Exception e) {
             log.error("数据库初始化失败: {}", e.getMessage(), e);

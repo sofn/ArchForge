@@ -1,8 +1,8 @@
 package com.lesofn.appforge.common.error.exception;
 
-import com.lesofn.appforge.common.error.manager.ErrorInfo;
 import com.lesofn.appforge.common.error.api.ErrorCode;
 import com.lesofn.appforge.common.error.api.ProjectModule;
+import com.lesofn.appforge.common.error.manager.ErrorInfo;
 import lombok.Getter;
 
 /**
@@ -10,7 +10,7 @@ import lombok.Getter;
  * @version 1.0 Created at: 2021-05-27 11:34
  */
 @Getter
-public abstract class BaseRuntimeException extends RuntimeException implements IErrorCodeException{
+public abstract class BaseRuntimeException extends RuntimeException implements IErrorCodeException {
 
     final ErrorInfo errorInfo;
 

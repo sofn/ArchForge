@@ -1,6 +1,5 @@
 package com.lesofn.appforge.common.enums.common;
 
-
 import com.lesofn.appforge.common.enums.DictionaryEnum;
 import com.lesofn.appforge.common.enums.dictionary.CssTag;
 import com.lesofn.appforge.common.enums.dictionary.Dictionary;
@@ -17,9 +16,7 @@ import lombok.Getter;
 @Dictionary(name = "sysOperationLog.businessType")
 public enum BusinessTypeEnum implements DictionaryEnum {
 
-    /**
-     * 操作类型
-     */
+    /** 操作类型 */
     OTHER(0, "其他操作", CssTag.INFO),
     ADD(1, "添加", CssTag.PRIMARY),
     MODIFY(2, "修改", CssTag.PRIMARY),
@@ -34,5 +31,4 @@ public enum BusinessTypeEnum implements DictionaryEnum {
     private final int value;
     private final String description;
     private final String cssTag;
-
 }

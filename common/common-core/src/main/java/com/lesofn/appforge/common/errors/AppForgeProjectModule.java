@@ -11,7 +11,6 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum AppForgeProjectModule implements ProjectModule {
-
     ADMIN_AUTH("AppForge-Admin", 1, "后台认证", 1),
     ADMIN_USER("AppForge-Admin", 1, "后台用户", 2),
     TASK("AppForge-Admin", 1, "后台Task示例", 3);

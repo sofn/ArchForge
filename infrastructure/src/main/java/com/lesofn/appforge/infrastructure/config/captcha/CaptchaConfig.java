@@ -5,10 +5,9 @@ import com.google.code.kaptcha.impl.DefaultKaptcha;
 import com.google.code.kaptcha.impl.NoNoise;
 import com.google.code.kaptcha.impl.WaterRipple;
 import com.google.code.kaptcha.util.Config;
+import java.util.Properties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.util.Properties;
 
 /**
  * 验证码配置类
@@ -18,14 +17,12 @@ import java.util.Properties;
 @Configuration
 public class CaptchaConfig {
 
-    /**
-     * 字符验证码生成器
-     */
+    /** 字符验证码生成器 */
     @Bean(name = "captchaProducer")
     public Producer captchaProducer() {
         DefaultKaptcha defaultKaptcha = new DefaultKaptcha();
         Properties properties = new Properties();
-        
+
         // 是否有边框
         properties.setProperty("kaptcha.border", "yes");
         // 边框颜色
@@ -47,7 +44,8 @@ public class CaptchaConfig {
         // 验证码噪点颜色
         properties.setProperty("kaptcha.noise.color", "white");
         // 验证码文本字符内容范围
-        properties.setProperty("kaptcha.textproducer.char.string", "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+        properties.setProperty(
+                "kaptcha.textproducer.char.string", "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ");
 
         Config config = new Config(properties);
         defaultKaptcha.setConfig(config);
@@ -55,14 +53,12 @@ public class CaptchaConfig {
         return defaultKaptcha;
     }
 
-    /**
-     * 数学验证码生成器
-     */
+    /** 数学验证码生成器 */
     @Bean(name = "captchaProducerMath")
     public Producer captchaProducerMath() {
         DefaultKaptcha defaultKaptcha = new DefaultKaptcha();
         Properties properties = new Properties();
-        
+
         // 是否有边框
         properties.setProperty("kaptcha.border", "yes");
         // 边框颜色

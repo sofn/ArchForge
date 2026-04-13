@@ -15,8 +15,7 @@ dependencies {
     // 定义依赖约束，这些依赖不会被直接引入，但会为使用它们的项目提供版本管理
     constraints {
         // 数据库相关
-        api("com.alibaba:druid:1.2.25")
-        api("com.alibaba:druid-spring-boot-3-starter:1.2.25")
+        api("com.baomidou:dynamic-datasource-spring-boot4-starter:4.5.0")
         api("com.mysql:mysql-connector-j:9.3.0")
         api("com.h2database:h2:2.4.240")
         
@@ -64,10 +63,10 @@ dependencies {
         api("org.testcontainers:testcontainers:2.0.4")
         api("org.testcontainers:junit-jupiter:2.0.4")
         api("org.testcontainers:mysql:2.0.4")
-        // Spock 2.3 with Groovy 4.0 (Groovy 5 not yet supported by Spock)
-        api("org.spockframework:spock-core:2.3-groovy-4.0")
-        api("org.spockframework:spock-spring:2.3-groovy-4.0")
-        api("org.apache.groovy:groovy:4.0.31")
+        // Spock 2.4 with Groovy 5.0
+        api("org.spockframework:spock-core:2.4-groovy-5.0")
+        api("org.spockframework:spock-spring:2.4-groovy-5.0")
+        api("org.apache.groovy:groovy:5.0.5")
 
         // Redis Mock for Dev environment
         api("com.github.fppt:jedis-mock:1.1.11")
@@ -78,6 +77,10 @@ dependencies {
         // MapStruct
         api("org.mapstruct:mapstruct:1.6.3")
         api("org.mapstruct:mapstruct-processor:1.6.3")
+
+        // Micrometer + OpenTelemetry
+        api("io.micrometer:micrometer-tracing-bridge-otel:1.5.6")
+        api("io.opentelemetry:opentelemetry-exporter-otlp:1.52.0")
 
     }
 }

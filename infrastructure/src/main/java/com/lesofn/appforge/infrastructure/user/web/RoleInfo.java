@@ -1,12 +1,11 @@
 package com.lesofn.appforge.infrastructure.user.web;
 
 import com.google.common.collect.ImmutableSet;
+import java.util.Collections;
+import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.Collections;
-import java.util.Set;
 
 /**
  * @author sofn
@@ -23,9 +22,13 @@ public class RoleInfo {
 
     public static final Set<String> ADMIN_PERMISSIONS = ImmutableSet.of(ALL_PERMISSIONS);
 
-
-    public RoleInfo(Long roleId, String roleKey, DataScopeEnum dataScope, Set<Long> deptIdSet,
-                    Set<String> menuPermissions, Set<Long> menuIds) {
+    public RoleInfo(
+            Long roleId,
+            String roleKey,
+            DataScopeEnum dataScope,
+            Set<Long> deptIdSet,
+            Set<String> menuPermissions,
+            Set<Long> menuIds) {
         this.roleId = roleId;
         this.roleKey = roleKey;
         this.dataScope = dataScope;
@@ -34,7 +37,6 @@ public class RoleInfo {
         this.menuIds = menuIds != null ? menuIds : Collections.emptySet();
     }
 
-
     private Long roleId;
     private String roleName;
     private DataScopeEnum dataScope;
@@ -42,5 +44,4 @@ public class RoleInfo {
     private String roleKey;
     private Set<String> menuPermissions;
     private Set<Long> menuIds;
-
 }

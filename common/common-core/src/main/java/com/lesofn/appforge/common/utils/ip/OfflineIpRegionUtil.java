@@ -1,12 +1,11 @@
 package com.lesofn.appforge.common.utils.ip;
 
+import java.io.IOException;
+import java.io.InputStream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.lionsoul.ip2region.xdb.Searcher;
-
-import java.io.IOException;
-import java.io.InputStream;
 
 /**
  * @author sofn
@@ -16,11 +15,11 @@ public class OfflineIpRegionUtil {
 
     private static Searcher searcher;
 
-    private OfflineIpRegionUtil() {
-    }
+    private OfflineIpRegionUtil() {}
 
     static {
-        InputStream resourceAsStream = OfflineIpRegionUtil.class.getResourceAsStream("/ip2region.xdb");
+        InputStream resourceAsStream =
+                OfflineIpRegionUtil.class.getResourceAsStream("/ip2region.xdb");
 
         byte[] bytes = null;
         try {
@@ -35,13 +34,11 @@ public class OfflineIpRegionUtil {
         } catch (Exception e) {
             log.error("构建本地Ip缓存失败", e);
         }
-
     }
 
     public static IpRegion getIpRegion(String ip) {
         try {
-            if (StringUtils.isBlank(ip) || IpUtil.isValidIpv6(ip)
-                || !IpUtil.isValidIpv4(ip)) {
+            if (StringUtils.isBlank(ip) || IpUtil.isValidIpv6(ip) || !IpUtil.isValidIpv4(ip)) {
                 return null;
             }
 
@@ -59,6 +56,4 @@ public class OfflineIpRegionUtil {
         }
         return null;
     }
-
-
 }

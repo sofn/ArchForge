@@ -1,5 +1,8 @@
 package com.lesofn.appforge.common.spring;
 
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.DisposableBean;
@@ -8,10 +11,6 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.env.EnvironmentCapable;
 import org.springframework.stereotype.Component;
-
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
 
 /**
  * @author sofn
@@ -36,7 +35,8 @@ public class SpringContextHolder implements ApplicationContextAware, DisposableB
 
     public static ApplicationContext getApplicationContext() {
         if (SpringContextHolder.applicationContext == null) {
-            throw new IllegalStateException("applicaitonContext未注入,请在applicationContext.xml中定义SpringContextHolder");
+            throw new IllegalStateException(
+                    "applicaitonContext未注入,请在applicationContext.xml中定义SpringContextHolder");
         }
         return applicationContext;
     }
@@ -67,10 +67,10 @@ public class SpringContextHolder implements ApplicationContextAware, DisposableB
     /**
      * 获取property信息
      *
-     * @param property     属性key
-     * @param clazz        类型
+     * @param property 属性key
+     * @param clazz 类型
      * @param defaultValue 默认值
-     * @param <T>          类型
+     * @param <T> 类型
      * @return 值
      */
     @SuppressWarnings("unchecked")
@@ -78,18 +78,29 @@ public class SpringContextHolder implements ApplicationContextAware, DisposableB
         return Optional.ofNullable(applicationContext)
                 .map(EnvironmentCapable::getEnvironment)
                 .map(it -> it.getProperty(property, clazz, defaultValue))
-                .orElse(Optional.ofNullable(applicationContext)
-                        .map(it -> it.getBeansOfType(PropertySourcesPlaceholderConfigurer.class).values())
-                        .flatMap(it -> it.stream()
-                                .map(PropertySourcesPlaceholderConfigurer::getAppliedPropertySources)
-                                .map(aps -> aps.get("localProperties"))
-                                .filter(Objects::nonNull)
-                                .filter(p -> p.getProperty(property) != null)
-                                .findFirst()
-                        )
-                        .map(it -> (T) it.getProperty(property))
-                        .orElse(defaultValue)
-                );
+                .orElse(
+                        Optional.ofNullable(applicationContext)
+                                .map(
+                                        it ->
+                                                it.getBeansOfType(
+                                                                PropertySourcesPlaceholderConfigurer
+                                                                        .class)
+                                                        .values())
+                                .flatMap(
+                                        it ->
+                                                it.stream()
+                                                        .map(
+                                                                PropertySourcesPlaceholderConfigurer
+                                                                        ::getAppliedPropertySources)
+                                                        .map(aps -> aps.get("localProperties"))
+                                                        .filter(Objects::nonNull)
+                                                        .filter(
+                                                                p ->
+                                                                        p.getProperty(property)
+                                                                                != null)
+                                                        .findFirst())
+                                .map(it -> (T) it.getProperty(property))
+                                .orElse(defaultValue));
     }
 
     public static boolean isInjectedApplicationContext() {

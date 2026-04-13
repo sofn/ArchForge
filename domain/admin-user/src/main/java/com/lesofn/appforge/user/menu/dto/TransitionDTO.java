@@ -15,5 +15,4 @@ public class TransitionDTO {
     private String enterTransition;
     // 当前页面离场动画，这里是第二种模式，比如 leaveTransition: "animate__fadeOutRight"
     private String leaveTransition;
-
 }

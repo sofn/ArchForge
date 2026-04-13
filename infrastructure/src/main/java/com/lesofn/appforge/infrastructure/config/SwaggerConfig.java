@@ -12,46 +12,44 @@ import org.springframework.context.annotation.Configuration;
 
 /**
  * Swagger/OpenAPI Configuration
- * 
+ *
  * @author sofn
  * @version 1.0 Created at: 2016-10-18 20:10
  */
 @Configuration
 @RequiredArgsConstructor
 public class SwaggerConfig {
-	
-	private final AppForgeConfig appForgeConfig;
 
-	@Bean
-	public OpenAPI initOpenAPI() {
-		return new OpenAPI()
-			.openapi("3.1.0")
-			.components(new Components().addSecuritySchemes("apikey", securityScheme()))
-			.addSecurityItem(new SecurityRequirement().addList("apikey"))
-			.info(getApiInfo());
-	}
+    private final AppForgeConfig appForgeConfig;
 
-	@Bean
-	public SecurityScheme securityScheme() {
-		return new SecurityScheme()
-			.type(SecurityScheme.Type.APIKEY)
-			.name("Authorization")
-			.in(SecurityScheme.In.HEADER)
-			.scheme("Bearer");
-	}
+    @Bean
+    public OpenAPI initOpenAPI() {
+        return new OpenAPI()
+                .openapi("3.1.0")
+                .components(new Components().addSecuritySchemes("apikey", securityScheme()))
+                .addSecurityItem(new SecurityRequirement().addList("apikey"))
+                .info(getApiInfo());
+    }
 
-	/**
-	 * 添加摘要信息
-	 */
-	public Info getApiInfo() {
-		return new Info()
-			// 设置标题
-			.title("标题：AppForge接口文档")
-			// 描述
-			.description("描述：文档说明")
-			// 作者信息
-			.contact(new Contact().name(appForgeConfig.getName()))
-			// 版本
-			.version("版本号:" + appForgeConfig.getVersion());
-	}
+    @Bean
+    public SecurityScheme securityScheme() {
+        return new SecurityScheme()
+                .type(SecurityScheme.Type.APIKEY)
+                .name("Authorization")
+                .in(SecurityScheme.In.HEADER)
+                .scheme("Bearer");
+    }
+
+    /** 添加摘要信息 */
+    public Info getApiInfo() {
+        return new Info()
+                // 设置标题
+                .title("标题：AppForge接口文档")
+                // 描述
+                .description("描述：文档说明")
+                // 作者信息
+                .contact(new Contact().name(appForgeConfig.getName()))
+                // 版本
+                .version("版本号:" + appForgeConfig.getVersion());
+    }
 }

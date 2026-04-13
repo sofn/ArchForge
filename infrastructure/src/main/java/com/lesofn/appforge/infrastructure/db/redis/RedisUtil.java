@@ -1,5 +1,10 @@
 package com.lesofn.appforge.infrastructure.db.redis;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.BoundSetOperations;
 import org.springframework.data.redis.core.HashOperations;
@@ -7,17 +12,11 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Component;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-
 /**
  * spring redis 工具类
  *
  * @author sofn
- **/
+ */
 @SuppressWarnings(value = {"unchecked", "rawtypes"})
 @Component
 public class RedisUtil {
@@ -46,7 +45,8 @@ public class RedisUtil {
      * @param timeout 时间
      * @param timeUnit 时间颗粒度
      */
-    public <T> void setCacheObject(final String key, final T value, final Integer timeout, final TimeUnit timeUnit) {
+    public <T> void setCacheObject(
+            final String key, final T value, final Integer timeout, final TimeUnit timeUnit) {
         redisTemplate.opsForValue().set(key, value, timeout, timeUnit);
     }
 
@@ -84,9 +84,7 @@ public class RedisUtil {
         return operation.get(key);
     }
 
-    /**
-     * 删除单个对象
-     */
+    /** 删除单个对象 */
     public void deleteObject(final String key) {
         redisTemplate.delete(key);
     }
@@ -137,25 +135,19 @@ public class RedisUtil {
         return setOperation;
     }
 
-    /**
-     * 获得缓存的set
-     */
+    /** 获得缓存的set */
     public <T> Set<T> getCacheSet(final String key) {
         return redisTemplate.opsForSet().members(key);
     }
 
-    /**
-     * 缓存Map
-     */
+    /** 缓存Map */
     public <T> void setCacheMap(final String key, final Map<String, T> dataMap) {
         if (dataMap != null) {
             redisTemplate.opsForHash().putAll(key, dataMap);
         }
     }
 
-    /**
-     * 获得缓存的Map
-     */
+    /** 获得缓存的Map */
     public <T> Map<String, T> getCacheMap(final String key) {
         return redisTemplate.opsForHash().entries(key);
     }
@@ -183,9 +175,7 @@ public class RedisUtil {
         return opsForHash.get(key, hKey);
     }
 
-    /**
-     * 删除Hash中的数据
-     */
+    /** 删除Hash中的数据 */
     public void delCacheMapValue(final String key, final String hKey) {
         HashOperations hashOperations = redisTemplate.opsForHash();
         hashOperations.delete(key, hKey);

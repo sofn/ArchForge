@@ -1,9 +1,9 @@
 package com.lesofn.appforge.common.error.example;
 
-import com.lesofn.appforge.common.error.manager.ErrorInfo;
 import com.lesofn.appforge.common.error.api.ErrorCode;
 import com.lesofn.appforge.common.error.api.ProjectModule;
 import com.lesofn.appforge.common.error.exception.BaseException;
+import com.lesofn.appforge.common.error.manager.ErrorInfo;
 
 /**
  * @author sofn

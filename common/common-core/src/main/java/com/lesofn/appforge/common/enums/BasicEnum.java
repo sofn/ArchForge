@@ -1,11 +1,9 @@
 package com.lesofn.appforge.common.enums;
 
 /**
- * @author sofn
- * 普通的枚举 接口
+ * @author sofn 普通的枚举 接口
  */
 public interface BasicEnum {
-
 
     /**
      * 获取枚举的值
@@ -20,6 +18,4 @@ public interface BasicEnum {
      * @return 描述
      */
     String getDescription();
-
-
 }

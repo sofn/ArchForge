@@ -8,15 +8,14 @@ import lombok.Getter;
 
 /**
  * 用户状态
+ *
  * @author sofn
  */
 @Getter
 @AllArgsConstructor
 @Dictionary(name = "sysLoginLog.status")
 public enum LoginStatusEnum implements DictionaryEnum {
-    /**
-     * status of user
-     */
+    /** status of user */
     LOGIN_SUCCESS(1, "登录成功", CssTag.SUCCESS),
     LOGOUT(2, "退出成功", CssTag.INFO),
     REGISTER(3, "注册", CssTag.PRIMARY),

@@ -1,5 +1,7 @@
 package com.lesofn.appforge.infrastructure.frame.spring;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.ApplicationContext;
@@ -7,12 +9,8 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
- * 建议如下形式获取
- * ServletContext servletContext = request.getSession().getServletContext();
+ * 建议如下形式获取 ServletContext servletContext = request.getSession().getServletContext();
  * ApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(servletContext);
  *
  * @author sofn
@@ -27,9 +25,7 @@ public class ApplicationContextHolder implements ApplicationContextAware {
         return context;
     }
 
-    /**
-     * 将该对象中的带有Autowired annotation的属性自动注入
-     */
+    /** 将该对象中的带有Autowired annotation的属性自动注入 */
     public static void autowireBean(Object obj) {
         if (context != null) {
             AutowireCapableBeanFactory factory = context.getAutowireCapableBeanFactory();
@@ -54,8 +50,7 @@ public class ApplicationContextHolder implements ApplicationContextAware {
     @SuppressWarnings("unchecked")
     public static <T> List<T> getBeans(Class<T> clazz) {
         List<T> ret = new ArrayList<>();
-        if (context == null)
-            return ret;
+        if (context == null) return ret;
         String[] names = context.getBeanNamesForType(clazz);
         if (names == null || names.length == 0) {
             return ret;
@@ -67,8 +62,7 @@ public class ApplicationContextHolder implements ApplicationContextAware {
     }
 
     @Override
-    public void setApplicationContext(ApplicationContext applicationContext)
-            throws BeansException {
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         context = applicationContext;
     }
 }

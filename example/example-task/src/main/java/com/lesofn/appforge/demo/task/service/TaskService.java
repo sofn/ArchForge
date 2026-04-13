@@ -7,10 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-/**
- * Authors: sofn
- * Version: 1.0  Created at 2015-10-12 00:17.
- */
+/** Authors: sofn Version: 1.0 Created at 2015-10-12 00:17. */
 @Service
 public class TaskService {
     private TaskDao taskDao;

@@ -11,7 +11,7 @@ public class SysRolePredicates {
         // 默认只查询未删除的角色
         return qSysRole.deleted.isFalse();
     }
-    
+
     public static Predicate buildActiveRolesPredicate() {
         // 查询未删除且状态为1的角色
         return qSysRole.deleted.isFalse().and(qSysRole.status.eq((short) 1));

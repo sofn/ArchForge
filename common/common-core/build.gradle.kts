@@ -14,7 +14,7 @@ dependencies {
     api("org.springframework.boot:spring-boot-starter-data-jpa") {
         exclude(group = "org.springframework.boot", module = "spring-boot-starter-logging")
     }
-    api("com.alibaba:druid")
+    api("com.baomidou:dynamic-datasource-spring-boot4-starter")
     api("com.mysql:mysql-connector-j")
     api("com.h2database:h2")
     

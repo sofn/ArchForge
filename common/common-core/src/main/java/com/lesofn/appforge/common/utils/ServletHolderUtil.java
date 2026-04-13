@@ -1,14 +1,13 @@
 package com.lesofn.appforge.common.utils;
 
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.web.context.request.RequestAttributes;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
-
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.Strings;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 /**
  * 客户端工具类
@@ -18,12 +17,9 @@ import java.io.IOException;
 @Slf4j
 public class ServletHolderUtil {
 
-    private ServletHolderUtil() {
-    }
+    private ServletHolderUtil() {}
 
-    /**
-     * 获取request
-     */
+    /** 获取request */
     public static HttpServletRequest getRequest() {
         ServletRequestAttributes attributes = getRequestAttributes();
         if (attributes == null) {
@@ -32,9 +28,7 @@ public class ServletHolderUtil {
         return attributes.getRequest();
     }
 
-    /**
-     * 获取response
-     */
+    /** 获取response */
     public static HttpServletResponse getResponse() {
         ServletRequestAttributes attributes = getRequestAttributes();
         if (attributes == null) {
@@ -42,7 +36,6 @@ public class ServletHolderUtil {
         }
         return attributes.getResponse();
     }
-
 
     public static ServletRequestAttributes getRequestAttributes() {
         RequestAttributes attributes = RequestContextHolder.getRequestAttributes();
@@ -70,9 +63,8 @@ public class ServletHolderUtil {
     }
 
     /**
-     * 获取仅含有项目根路径的url
-     * 比如 localhost:8080/agileboot/user/list
-     * 返回 localhost:8080/agileboot
+     * 获取仅含有项目根路径的url 比如 localhost:8080/agileboot/user/list 返回 localhost:8080/agileboot
+     *
      * @return localhost:8080/agileboot
      */
     public static String getContextUrl() {
@@ -82,10 +74,7 @@ public class ServletHolderUtil {
         }
         StringBuffer url = request.getRequestURL();
         String contextPath = request.getServletContext().getContextPath();
-        String strip = StringUtils.removeEnd(url.toString(), request.getRequestURI());
+        String strip = Strings.CS.removeEnd(url.toString(), request.getRequestURI());
         return strip + contextPath;
     }
-
-
-
 }

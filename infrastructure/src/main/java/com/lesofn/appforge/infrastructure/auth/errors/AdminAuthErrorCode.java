@@ -13,7 +13,6 @@ import lombok.Getter;
  */
 @Getter
 public enum AdminAuthErrorCode implements ErrorCode {
-
     USERNAME_PASSWORD_ERROR(1, "用户名或密码错误"),
     CAPTCHA_REQUIRED(2, "验证码不能为空"),
     CAPTCHA_EXPIRED(3, "验证码已失效"),
@@ -49,7 +48,6 @@ public enum AdminAuthErrorCode implements ErrorCode {
     LOGIN_ERROR(32, "登录失败"),
     ;
 
-
     private final int nodeNum;
     private final String msg;
 
@@ -58,5 +56,4 @@ public enum AdminAuthErrorCode implements ErrorCode {
         this.msg = msg;
         ErrorManager.register(AppForgeProjectModule.ADMIN_AUTH, this);
     }
-
 }

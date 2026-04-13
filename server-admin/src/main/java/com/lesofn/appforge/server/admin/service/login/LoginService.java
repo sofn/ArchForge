@@ -1,5 +1,7 @@
 package com.lesofn.appforge.server.admin.service.login;
 
+import static com.lesofn.appforge.infrastructure.auth.errors.AdminAuthErrorCode.*;
+
 import com.google.code.kaptcha.Producer;
 import com.lesofn.appforge.common.encrypt.RsaEncrypter;
 import com.lesofn.appforge.infrastructure.auth.errors.AdminAuthException;
@@ -12,6 +14,10 @@ import com.lesofn.appforge.server.admin.dto.ConfigDTO;
 import com.lesofn.appforge.server.admin.dto.LoginCommand;
 import com.lesofn.appforge.server.admin.service.cache.RedisCacheService;
 import jakarta.annotation.Resource;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.util.UUID;
+import javax.imageio.ImageIO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
@@ -21,13 +27,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.util.UUID;
-
-import static com.lesofn.appforge.infrastructure.auth.errors.AdminAuthErrorCode.*;
 
 /**
  * 登录服务
@@ -64,9 +63,10 @@ public class LoginService {
         Authentication authentication;
         try {
             String decryptedPassword = decryptPassword(loginCommand.getPassword());
-            authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(loginCommand.getUsername(), decryptedPassword)
-            );
+            authentication =
+                    authenticationManager.authenticate(
+                            new UsernamePasswordAuthenticationToken(
+                                    loginCommand.getUsername(), decryptedPassword));
         } catch (BadCredentialsException e) {
             log.info("用户[{}]登录失败，用户名或密码错误", loginCommand.getUsername());
             throw new AdminAuthException(USERNAME_PASSWORD_ERROR);
@@ -78,26 +78,24 @@ public class LoginService {
         SystemLoginUser loginUser = (SystemLoginUser) authentication.getPrincipal();
         // 生成token
         String token = tokenService.createTokenAndPutUserInCache(loginUser);
-        
+
         return new LoginResult(token, loginUser);
     }
-    
-    /**
-     * 登录结果封装类
-     */
+
+    /** 登录结果封装类 */
     public static class LoginResult {
         private final String token;
         private final SystemLoginUser loginUser;
-        
+
         public LoginResult(String token, SystemLoginUser loginUser) {
             this.token = token;
             this.loginUser = loginUser;
         }
-        
+
         public String getToken() {
             return token;
         }
-        
+
         public SystemLoginUser getLoginUser() {
             return loginUser;
         }
@@ -204,5 +202,4 @@ public class LoginService {
             throw new AdminAuthException(DECODE_PASS_ERROR);
         }
     }
-
 }

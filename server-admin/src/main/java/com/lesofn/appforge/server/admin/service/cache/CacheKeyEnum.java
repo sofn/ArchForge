@@ -7,9 +7,7 @@ import java.util.concurrent.TimeUnit;
  */
 public enum CacheKeyEnum {
 
-    /**
-     * Redis各类缓存集合
-     */
+    /** Redis各类缓存集合 */
     CAPTCHA("captcha_codes:", 2, TimeUnit.MINUTES),
     LOGIN_USER_KEY("login_tokens:", 30, TimeUnit.MINUTES),
     RATE_LIMIT_KEY("rate_limit:", 60, TimeUnit.SECONDS),
@@ -17,9 +15,7 @@ public enum CacheKeyEnum {
     ROLE_ENTITY_KEY("role_entity:", 60, TimeUnit.MINUTES),
     POST_ENTITY_KEY("post_entity:", 60, TimeUnit.MINUTES),
     ROLE_MODEL_INFO_KEY("role_model_info:", 60, TimeUnit.MINUTES),
-
     ;
-
 
     CacheKeyEnum(String key, int expiration, TimeUnit timeUnit) {
         this.key = key;
@@ -42,5 +38,4 @@ public enum CacheKeyEnum {
     public TimeUnit timeUnit() {
         return timeUnit;
     }
-
 }

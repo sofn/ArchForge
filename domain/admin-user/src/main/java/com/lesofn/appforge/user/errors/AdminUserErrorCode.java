@@ -13,7 +13,6 @@ import lombok.Getter;
  */
 @Getter
 public enum AdminUserErrorCode implements ErrorCode {
-
     USER_NON_EXIST(1, "用户不存在"),
     USER_IS_DISABLE(2, "用户已被停用"),
     ACCOUNT_EXISTS(3, "账号已存在"),
@@ -27,5 +26,4 @@ public enum AdminUserErrorCode implements ErrorCode {
         this.msg = msg;
         ErrorManager.register(AppForgeProjectModule.ADMIN_USER, this);
     }
-
 }

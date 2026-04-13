@@ -1,6 +1,5 @@
 package com.lesofn.appforge.infrastructure.auth.spi;
 
-
 import com.lesofn.appforge.infrastructure.auth.errors.AdminAuthErrorCode;
 import com.lesofn.appforge.infrastructure.auth.errors.AdminAuthException;
 import com.lesofn.appforge.infrastructure.auth.model.AuthRequest;
@@ -23,16 +22,17 @@ public class TrustHostSpi extends AbstractAuthSpi {
 
     @Override
     protected boolean checkCanAuth(AuthRequest request) {
-        return request.getFrom() == AuthRequest.RequestFrom.INNER && request.getHeader(AuthService.ENGINE_UID_HEADER) != null;
+        return request.getFrom() == AuthRequest.RequestFrom.INNER
+                && request.getHeader(AuthService.ENGINE_UID_HEADER) != null;
     }
 
     @Override
     public long auth(AuthRequest request) throws AdminAuthException {
         long uid = NumberUtils.toLong(request.getHeader(AuthService.ENGINE_UID_HEADER), 0);
         if (uid == 0) {
-            throw new AdminAuthException(AdminAuthErrorCode.USER_AUTHFAIL, "Engine uid header is empty.");
+            throw new AdminAuthException(
+                    AdminAuthErrorCode.USER_AUTHFAIL, "Engine uid header is empty.");
         }
         return uid;
     }
-
 }

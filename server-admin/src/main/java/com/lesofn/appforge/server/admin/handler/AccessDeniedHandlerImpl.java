@@ -6,17 +6,15 @@ import com.lesofn.appforge.infrastructure.frame.response.model.ResponseResult;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-
 /**
- * 访问拒绝处理器
- * 当用户已认证但没有权限访问某个资源时，会调用此处理器
+ * 访问拒绝处理器 当用户已认证但没有权限访问某个资源时，会调用此处理器
  *
  * @author sofn
  */
@@ -25,10 +23,14 @@ import java.io.IOException;
 public class AccessDeniedHandlerImpl implements AccessDeniedHandler {
 
     @Override
-    public void handle(HttpServletRequest request, HttpServletResponse response,
-                       AccessDeniedException accessDeniedException) throws IOException, ServletException {
+    public void handle(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            AccessDeniedException accessDeniedException)
+            throws IOException, ServletException {
 
-        log.warn("访问权限不足，拒绝访问 - URI: {}, User: {}, Error: {}",
+        log.warn(
+                "访问权限不足，拒绝访问 - URI: {}, User: {}, Error: {}",
                 request.getRequestURI(),
                 request.getRemoteUser(),
                 accessDeniedException.getMessage());
@@ -37,8 +39,10 @@ public class AccessDeniedHandlerImpl implements AccessDeniedHandler {
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("UTF-8");
 
-        ResponseResult<String> result = ResponseResult.error(SystemErrorCode.COMMON_REQUEST_FORBIDDEN.getCode(),
-                SystemErrorCode.COMMON_REQUEST_FORBIDDEN.getMsg());
+        ResponseResult<String> result =
+                ResponseResult.error(
+                        SystemErrorCode.COMMON_REQUEST_FORBIDDEN.getCode(),
+                        SystemErrorCode.COMMON_REQUEST_FORBIDDEN.getMsg());
 
         ObjectMapper objectMapper = new ObjectMapper();
         String jsonResult = objectMapper.writeValueAsString(result);

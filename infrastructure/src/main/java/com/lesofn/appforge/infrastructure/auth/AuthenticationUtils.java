@@ -1,13 +1,13 @@
 package com.lesofn.appforge.infrastructure.auth;
 
+import static com.lesofn.appforge.infrastructure.auth.errors.AdminAuthErrorCode.USER_FAIL_TO_GET_USER_ID;
+import static com.lesofn.appforge.infrastructure.auth.errors.AdminAuthErrorCode.USER_FAIL_TO_GET_USER_INFO;
+
 import com.lesofn.appforge.infrastructure.auth.errors.AdminAuthException;
 import com.lesofn.appforge.infrastructure.auth.model.SystemLoginUser;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-
-import static com.lesofn.appforge.infrastructure.auth.errors.AdminAuthErrorCode.USER_FAIL_TO_GET_USER_ID;
-import static com.lesofn.appforge.infrastructure.auth.errors.AdminAuthErrorCode.USER_FAIL_TO_GET_USER_INFO;
 
 /**
  * 安全服务工具类
@@ -18,9 +18,7 @@ public class AuthenticationUtils {
 
     private AuthenticationUtils() {}
 
-    /**
-     * 用户ID
-     **/
+    /** 用户ID */
     public static Long getUserId() {
         try {
             return getSystemLoginUser().getUserId();
@@ -29,9 +27,7 @@ public class AuthenticationUtils {
         }
     }
 
-    /**
-     * 获取系统用户
-     **/
+    /** 获取系统用户 */
     public static SystemLoginUser getSystemLoginUser() {
         try {
             return (SystemLoginUser) getAuthentication().getPrincipal();
@@ -40,10 +36,7 @@ public class AuthenticationUtils {
         }
     }
 
-
-    /**
-     * 获取Authentication
-     */
+    /** 获取Authentication */
     public static Authentication getAuthentication() {
         return SecurityContextHolder.getContext().getAuthentication();
     }
@@ -70,6 +63,4 @@ public class AuthenticationUtils {
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         return passwordEncoder.matches(rawPassword, encodedPassword);
     }
-
-
 }

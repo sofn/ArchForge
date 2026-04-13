@@ -6,15 +6,14 @@ import lombok.Getter;
 
 /**
  * Http Method
+ *
  * @author sofn
  */
 @Getter
 @AllArgsConstructor
 public enum RequestMethodEnum implements BasicEnum {
 
-    /**
-     * 菜单类型
-     */
+    /** 菜单类型 */
     GET(1, "GET"),
     POST(2, "POST"),
     PUT(3, "PUT"),
@@ -23,5 +22,4 @@ public enum RequestMethodEnum implements BasicEnum {
 
     private final int value;
     private final String description;
-
 }
