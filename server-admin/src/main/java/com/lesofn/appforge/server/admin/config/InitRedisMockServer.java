@@ -1,61 +1,68 @@
 package com.lesofn.appforge.server.admin.config;
 
-import com.github.fppt.jedismock.RedisServer;
-import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
-import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
-import org.springframework.stereotype.Component;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
+import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
+import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.utility.DockerImageName;
 
 /**
+ * 使用 Testcontainers 启动 Redis 容器，替代 jedis-mock，支持所有平台（包括 Apple Silicon Mac）。
+ *
  * @author sofn
- * @version 1.0 Created at: 2025-08-25 23:33
+ * @version 2.0 Created at: 2025-08-25 23:33
  */
 @Slf4j
-@Component
+@Configuration
 @Profile("dev")
 @ConditionalOnProperty(name = "app-forge.embedded.redis", havingValue = "true")
 public class InitRedisMockServer {
 
-    @Value("${spring.data.redis.port:6379}")
-    private int redisPort;
+    private static final int REDIS_PORT = 6379;
+    private static final String REDIS_IMAGE = "redis:7-alpine";
 
-    private RedisServer redisServer;
+    private GenericContainer<?> redisContainer;
+    private String redisHost;
+    private Integer redisPort;
 
-    @PostConstruct
-    public void init() {
+    public InitRedisMockServer() {
         try {
-            String osName = System.getProperty("os.name").toLowerCase();
-            String osArch = System.getProperty("os.arch").toLowerCase();
-            // Apple Silicon Mac的特殊处理
-            if (osName.contains("mac") && (osArch.contains("aarch64") || osArch.contains("arm"))) {
-                log.error("检测到Apple Silicon Mac，不支持启动嵌入式Redis...");
-                return;
-            }
+            log.info("Starting Redis container via Testcontainers...");
+            redisContainer =
+                    new GenericContainer<>(DockerImageName.parse(REDIS_IMAGE))
+                            .withExposedPorts(REDIS_PORT);
+            redisContainer.start();
 
-            log.info("Starting Redis Mock Server on port: {}", redisPort);
-            redisServer = RedisServer.newRedisServer(redisPort);
-            redisServer.start();
-            log.info("Redis Mock Server started successfully on port: {}", redisPort);
-        } catch (IOException e) {
-            log.error("Failed to start Redis Mock Server", e);
-            throw new RuntimeException("Failed to start Redis Mock Server", e);
+            redisPort = redisContainer.getMappedPort(REDIS_PORT);
+            redisHost = redisContainer.getHost();
+            log.info("Redis container started at {}:{}", redisHost, redisPort);
+        } catch (Exception e) {
+            log.error("Failed to start Redis container", e);
+            throw new RuntimeException("Failed to start Redis container", e);
         }
+    }
+
+    @Bean
+    @Primary
+    public RedisConnectionFactory redisConnectionFactory() {
+        RedisStandaloneConfiguration configuration =
+                new RedisStandaloneConfiguration(redisHost, redisPort);
+        return new LettuceConnectionFactory(configuration);
     }
 
     @PreDestroy
     public void destroy() {
-        if (redisServer != null) {
-            try {
-                log.info("Stopping Redis Mock Server");
-                redisServer.stop();
-                log.info("Redis Mock Server stopped successfully");
-            } catch (Exception e) {
-                log.error("Error stopping Redis Mock Server", e);
-            }
+        if (redisContainer != null && redisContainer.isRunning()) {
+            log.info("Stopping Redis container");
+            redisContainer.stop();
+            log.info("Redis container stopped");
         }
     }
 }

@@ -11,7 +11,7 @@ import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 
 /**
- * 自定义 Redis 健康检查配置 用于解决 jedis-mock 在开发环境下的健康检查问题
+ * 自定义 Redis 健康检查配置 用于解决开发环境下 Testcontainers Redis 的健康检查问题
  *
  * @author sofn
  * @version 1.0 Created at: 2025-08-25

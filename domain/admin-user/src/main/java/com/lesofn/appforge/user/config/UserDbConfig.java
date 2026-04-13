@@ -1,5 +1,6 @@
 package com.lesofn.appforge.user.config;
 
+import com.lesofn.appforge.infrastructure.frame.database.GroupDataSourceProxy;
 import jakarta.annotation.Resource;
 import java.util.HashMap;
 import java.util.Map;
@@ -23,8 +24,7 @@ import org.springframework.transaction.PlatformTransactionManager;
         transactionManagerRef = "userTransactionManager")
 public class UserDbConfig {
 
-    @Resource(name = "userDataSource")
-    private DataSource dataSource;
+    @Resource private DataSource dataSource;
 
     @Bean
     PlatformTransactionManager userTransactionManager() {
@@ -41,7 +41,7 @@ public class UserDbConfig {
         LocalContainerEntityManagerFactoryBean factoryBean =
                 new LocalContainerEntityManagerFactoryBean();
 
-        factoryBean.setDataSource(dataSource);
+        factoryBean.setDataSource(new GroupDataSourceProxy(dataSource, "user"));
         factoryBean.setJpaVendorAdapter(jpaVendorAdapter);
         factoryBean.setPersistenceUnitName("user");
         // 此处应包含当前模块的domain类与需要自动应用的JPA转换器所在的包

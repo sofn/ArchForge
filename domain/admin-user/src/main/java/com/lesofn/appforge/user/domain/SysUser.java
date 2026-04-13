@@ -3,6 +3,8 @@ package com.lesofn.appforge.user.domain;
 import com.lesofn.appforge.common.enums.common.GenderEnum;
 import com.lesofn.appforge.common.repository.BaseEntity;
 import com.lesofn.appforge.common.repository.converter.JpaValueEnumType;
+import com.lesofn.appforge.common.sensitive.Sensitive;
+import com.lesofn.appforge.common.sensitive.SensitiveType;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import lombok.Getter;
@@ -37,8 +39,10 @@ public class SysUser extends BaseEntity<SysUser> {
 
     private Integer userType;
 
+    @Sensitive(SensitiveType.EMAIL)
     private String email;
 
+    @Sensitive(SensitiveType.PHONE)
     private String phoneNumber;
 
     @Type(JpaValueEnumType.class)
@@ -46,10 +50,12 @@ public class SysUser extends BaseEntity<SysUser> {
 
     private String avatar;
 
+    @Sensitive(SensitiveType.PASSWORD)
     private String password;
 
     private Integer status;
 
+    @Sensitive(SensitiveType.IP_ADDRESS)
     private String loginIp;
 
     private LocalDateTime loginDate;

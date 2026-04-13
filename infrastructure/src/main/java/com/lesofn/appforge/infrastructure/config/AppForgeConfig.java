@@ -49,6 +49,9 @@ public class AppForgeConfig {
     /** 嵌入式配置 */
     private Embedded embedded = new Embedded();
 
+    /** 数据脱敏配置 */
+    private Sensitive sensitive = new Sensitive();
+
     @Setter
     @Getter
     public static class Token {
@@ -97,5 +100,12 @@ public class AppForgeConfig {
 
         /** 是否启用嵌入式 h2 */
         private boolean h2Init = false;
+    }
+
+    @Setter
+    @Getter
+    public static class Sensitive {
+        /** 是否启用数据脱敏 */
+        private boolean enabled = true;
     }
 }

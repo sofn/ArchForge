@@ -1,9 +1,7 @@
 #!/usr/bin/env bash
-dir=`dirname $0`
+set -e
+dir="$(cd "$(dirname "$0")" && pwd)"
 
-#buildDocker image
-${dir}/../gradlew buildDocker -x test -Pprofile=prod
-
-#start docker-compose
-cd ${dir}
-docker-compose up -d
+# Build and start via docker-compose
+cd "${dir}"
+docker compose up -d --build

@@ -119,17 +119,19 @@
         <Logger name="io.lettuce" level="INFO"/>
         <Logger name="io.netty" level="INFO"/>
         <Logger name="com.alibaba" level="WARN"/>
-        <Logger name="com.github.fppt" level="WARN"/>
+        <Logger name="org.testcontainers" level="INFO"/>
+        <Logger name="tc" level="INFO"/>
+        <Logger name="com.github.dockerjava" level="WARN"/>
         <Logger name="sun.rmi" level="WARN"/>
         <Logger name="javax.management" level="WARN"/>
         <Logger name="org.jboss" level="WARN"/>
         <Logger name="io.micrometer" level="WARN"/>
         <Logger name="reactor.util" level="WARN"/>
 
-        <!-- dev: DEBUG + Console; other: INFO, file only -->
+        <!-- dev: 项目代码 DEBUG，依赖包 INFO；输出到 Console + 文件 -->
         <SpringProfile name="dev">
             <Logger name="com.lesofn.appforge" level="DEBUG"/>
-            <Root level="DEBUG">
+            <Root level="INFO">
                 <AppenderRef ref="Console"/>
                 <AppenderRef ref="ErrorConsole"/>
                 <AppenderRef ref="AsyncDebugFile"/>
@@ -139,6 +141,7 @@
             </Root>
         </SpringProfile>
 
+        <!-- test/prod: 所有日志 INFO 及以上；仅输出到文件 -->
         <SpringProfile name="!dev">
             <Logger name="com.lesofn.appforge" level="INFO"/>
             <Root level="INFO">

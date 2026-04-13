@@ -66,7 +66,7 @@ The application starts on port **8080** (management port **7002**).
 
 | Profile | Database | Redis | Usage |
 |---------|----------|-------|-------|
-| `dev`   | H2 (in-memory) | jedis-mock | Local development |
+| `dev`   | H2 (in-memory) | Testcontainers Redis | Local development |
 | `test`  | MySQL | Redis | Testing |
 | `prod`  | MySQL | Redis | Production |
 
@@ -163,7 +163,7 @@ AppForge/
 
 | 环境 | 数据库 | Redis | 用途 |
 |------|--------|-------|------|
-| `dev`   | H2（内存） | jedis-mock | 本地开发 |
+| `dev`   | H2（内存） | Testcontainers Redis | 本地开发 |
 | `test`  | MySQL | Redis | 测试环境 |
 | `prod`  | MySQL | Redis | 生产环境 |
 

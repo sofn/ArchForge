@@ -1,5 +1,6 @@
 package com.lesofn.appforge.server.admin.config;
 
+import com.lesofn.appforge.infrastructure.frame.database.GroupDataSourceProxy;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import javax.sql.DataSource;
@@ -20,8 +21,7 @@ import org.springframework.stereotype.Component;
 @ConditionalOnProperty(name = "app-forge.embedded.h2-init", havingValue = "true")
 public class InitDbMockServer {
 
-    @Resource(name = "userDataSource")
-    private DataSource dataSource;
+    @Resource private DataSource dataSource;
 
     @PostConstruct
     public void init() {
@@ -34,7 +34,7 @@ public class InitDbMockServer {
             populator.setContinueOnError(true);
 
             // 直接使用 ResourceDatabasePopulator 执行SQL脚本
-            populator.execute(dataSource);
+            populator.execute(new GroupDataSourceProxy(dataSource, "user"));
 
             log.info("数据库数据初始化完成！");
         } catch (Exception e) {

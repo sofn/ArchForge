@@ -1,15 +1,32 @@
-version: '3'
 services:
   mysqldb:
-    image: mysql
+    image: mysql:8
     environment:
       MYSQL_DATABASE: appforge
       MYSQL_ROOT_PASSWORD: 123
-  appforge:
-    image: com.lesofn.appforge/deploy:prod-0.1.RELEASE
-    links:
-      - mysqldb:mysql_host
     ports:
-      - 8080:8080
+      - "3306:3306"
     volumes:
-      - ./logs:/opt/logs
+      - mysql-data:/var/lib/mysql
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  appforge:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    depends_on:
+      - mysqldb
+      - redis
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+    volumes:
+      - ./logs:/app/logs
+
+volumes:
+  mysql-data:

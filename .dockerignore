@@ -1,0 +1,12 @@
+.git
+.gradle
+build
+**/build
+.idea
+*.iml
+*.log
+logs
+.h2
+node_modules
+.devin
+docs

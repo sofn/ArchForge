@@ -1,5 +1,6 @@
 package com.lesofn.appforge.demo.task.dao;
 
+import com.lesofn.appforge.infrastructure.frame.database.GroupDataSourceProxy;
 import jakarta.annotation.Resource;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,8 +19,7 @@ import org.springframework.transaction.PlatformTransactionManager;
         transactionManagerRef = "taskTransactionManager")
 public class TaskDbConfig {
 
-    @Resource(name = "taskDataSource")
-    private DataSource dataSource;
+    @Resource private DataSource dataSource;
 
     @Bean
     PlatformTransactionManager taskTransactionManager() {
@@ -37,7 +37,7 @@ public class TaskDbConfig {
         LocalContainerEntityManagerFactoryBean factoryBean =
                 new LocalContainerEntityManagerFactoryBean();
 
-        factoryBean.setDataSource(dataSource);
+        factoryBean.setDataSource(new GroupDataSourceProxy(dataSource, "task"));
         factoryBean.setJpaVendorAdapter(jpaVendorAdapter);
         factoryBean.setPersistenceUnitName("task");
         // 此处应包含当前模块的domain类

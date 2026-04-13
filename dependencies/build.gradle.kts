@@ -68,8 +68,8 @@ dependencies {
         api("org.spockframework:spock-spring:2.4-groovy-5.0")
         api("org.apache.groovy:groovy:5.0.5")
 
-        // Redis Mock for Dev environment
-        api("com.github.fppt:jedis-mock:1.1.11")
+        // Testcontainers Redis for Dev environment
+        api("org.testcontainers:testcontainers:2.0.4")
         
         // Kaptcha 验证码
         api("com.github.penggle:kaptcha:2.3.2")
