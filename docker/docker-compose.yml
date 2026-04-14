@@ -1,0 +1,78 @@
+# docker-compose.yml — JVM 模式 (Project Leyden / CDS 优化)
+# 使用方式: docker compose up -d --build
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: ${DB_USERNAME:-appforge}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-appforge}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-appforge}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  appforge:
+    image: appforge:jvm
+    build:
+      context: ..
+      dockerfile: docker/jvm/Dockerfile
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATA_REDIS_HOST: redis
+      JWT_SECRET: ${JWT_SECRET:-5/jDAWs7a63GRgjS+uF2mP7dcLwI6GAgxf+Z0+fOAbgMR/jksG5r0v10nDOkrM0btxtb2FAuol8fSzSJis8gIA==}
+      SPRING_DATASOURCE_DYNAMIC_DATASOURCE_USER_MASTER_URL: jdbc:postgresql://postgres:5432/appforge_user
+      SPRING_DATASOURCE_DYNAMIC_DATASOURCE_USER_SLAVE_URL: jdbc:postgresql://postgres:5432/appforge_user
+      SPRING_DATASOURCE_DYNAMIC_DATASOURCE_TASK_MASTER_URL: jdbc:postgresql://postgres:5432/appforge_task
+      SPRING_DATASOURCE_DYNAMIC_DATASOURCE_TASK_SLAVE_URL: jdbc:postgresql://postgres:5432/appforge_task
+      SPRING_DATASOURCE_DYNAMIC_DATASOURCE_USER_MASTER_USERNAME: ${DB_USERNAME:-appforge}
+      SPRING_DATASOURCE_DYNAMIC_DATASOURCE_USER_MASTER_PASSWORD: ${DB_PASSWORD:-appforge}
+      SPRING_DATASOURCE_DYNAMIC_DATASOURCE_USER_SLAVE_USERNAME: ${DB_USERNAME:-appforge}
+      SPRING_DATASOURCE_DYNAMIC_DATASOURCE_USER_SLAVE_PASSWORD: ${DB_PASSWORD:-appforge}
+      SPRING_DATASOURCE_DYNAMIC_DATASOURCE_TASK_MASTER_USERNAME: ${DB_USERNAME:-appforge}
+      SPRING_DATASOURCE_DYNAMIC_DATASOURCE_TASK_MASTER_PASSWORD: ${DB_PASSWORD:-appforge}
+      SPRING_DATASOURCE_DYNAMIC_DATASOURCE_TASK_SLAVE_USERNAME: ${DB_USERNAME:-appforge}
+      SPRING_DATASOURCE_DYNAMIC_DATASOURCE_TASK_SLAVE_PASSWORD: ${DB_PASSWORD:-appforge}
+      SPRING_DATASOURCE_DYNAMIC_DATASOURCE_USER_MASTER_DRIVER_CLASS_NAME: org.postgresql.Driver
+      SPRING_DATASOURCE_DYNAMIC_DATASOURCE_USER_SLAVE_DRIVER_CLASS_NAME: org.postgresql.Driver
+      SPRING_DATASOURCE_DYNAMIC_DATASOURCE_TASK_MASTER_DRIVER_CLASS_NAME: org.postgresql.Driver
+      SPRING_DATASOURCE_DYNAMIC_DATASOURCE_TASK_SLAVE_DRIVER_CLASS_NAME: org.postgresql.Driver
+    volumes:
+      - ./logs:/app/logs
+
+  appforge-admin:
+    build:
+      context: ../../AppForgeAdmin
+      dockerfile: Dockerfile
+    depends_on:
+      - appforge
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+
+volumes:
+  postgres-data:
