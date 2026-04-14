@@ -26,7 +26,10 @@ import oshi.software.os.OperatingSystem;
  */
 @Slf4j
 @Service
-@ConditionalOnProperty(name = "app-forge.monitor.enabled", havingValue = "true", matchIfMissing = true)
+@ConditionalOnProperty(
+        name = "app-forge.monitor.enabled",
+        havingValue = "true",
+        matchIfMissing = true)
 public class ServerMonitorService {
 
     private static final DecimalFormat DF = new DecimalFormat("#.##");
@@ -65,18 +68,34 @@ public class ServerMonitorService {
         }
         long[] ticks = processor.getSystemCpuLoadTicks();
 
-        long user = ticks[CentralProcessor.TickType.USER.getIndex()] - prevTicks[CentralProcessor.TickType.USER.getIndex()];
-        long nice = ticks[CentralProcessor.TickType.NICE.getIndex()] - prevTicks[CentralProcessor.TickType.NICE.getIndex()];
-        long sys = ticks[CentralProcessor.TickType.SYSTEM.getIndex()] - prevTicks[CentralProcessor.TickType.SYSTEM.getIndex()];
-        long idle = ticks[CentralProcessor.TickType.IDLE.getIndex()] - prevTicks[CentralProcessor.TickType.IDLE.getIndex()];
-        long iowait = ticks[CentralProcessor.TickType.IOWAIT.getIndex()] - prevTicks[CentralProcessor.TickType.IOWAIT.getIndex()];
-        long irq = ticks[CentralProcessor.TickType.IRQ.getIndex()] - prevTicks[CentralProcessor.TickType.IRQ.getIndex()];
-        long softirq = ticks[CentralProcessor.TickType.SOFTIRQ.getIndex()] - prevTicks[CentralProcessor.TickType.SOFTIRQ.getIndex()];
+        long user =
+                ticks[CentralProcessor.TickType.USER.getIndex()]
+                        - prevTicks[CentralProcessor.TickType.USER.getIndex()];
+        long nice =
+                ticks[CentralProcessor.TickType.NICE.getIndex()]
+                        - prevTicks[CentralProcessor.TickType.NICE.getIndex()];
+        long sys =
+                ticks[CentralProcessor.TickType.SYSTEM.getIndex()]
+                        - prevTicks[CentralProcessor.TickType.SYSTEM.getIndex()];
+        long idle =
+                ticks[CentralProcessor.TickType.IDLE.getIndex()]
+                        - prevTicks[CentralProcessor.TickType.IDLE.getIndex()];
+        long iowait =
+                ticks[CentralProcessor.TickType.IOWAIT.getIndex()]
+                        - prevTicks[CentralProcessor.TickType.IOWAIT.getIndex()];
+        long irq =
+                ticks[CentralProcessor.TickType.IRQ.getIndex()]
+                        - prevTicks[CentralProcessor.TickType.IRQ.getIndex()];
+        long softirq =
+                ticks[CentralProcessor.TickType.SOFTIRQ.getIndex()]
+                        - prevTicks[CentralProcessor.TickType.SOFTIRQ.getIndex()];
         long total = user + nice + sys + idle + iowait + irq + softirq;
 
         cpu.put("userUsage", total > 0 ? Double.parseDouble(DF.format(100.0 * user / total)) : 0);
         cpu.put("sysUsage", total > 0 ? Double.parseDouble(DF.format(100.0 * sys / total)) : 0);
-        cpu.put("usage", total > 0 ? Double.parseDouble(DF.format(100.0 * (total - idle) / total)) : 0);
+        cpu.put(
+                "usage",
+                total > 0 ? Double.parseDouble(DF.format(100.0 * (total - idle) / total)) : 0);
         cpu.put("idle", total > 0 ? Double.parseDouble(DF.format(100.0 * idle / total)) : 0);
         return cpu;
     }
@@ -104,7 +123,9 @@ public class ServerMonitorService {
 
         jvm.put("heapMax", formatBytes(heapMax));
         jvm.put("heapUsed", formatBytes(heapUsed));
-        jvm.put("heapUsage", heapMax > 0 ? Double.parseDouble(DF.format(100.0 * heapUsed / heapMax)) : 0);
+        jvm.put(
+                "heapUsage",
+                heapMax > 0 ? Double.parseDouble(DF.format(100.0 * heapUsed / heapMax)) : 0);
         jvm.put("nonHeapUsed", formatBytes(nonHeapUsed));
         jvm.put("javaVersion", System.getProperty("java.version"));
         jvm.put("javaVendor", System.getProperty("java.vendor"));
@@ -115,8 +136,11 @@ public class ServerMonitorService {
         long uptime = runtimeMXBean.getUptime();
         Duration duration = Duration.ofMillis(uptime);
         jvm.put("startTime", Instant.ofEpochMilli(runtimeMXBean.getStartTime()).toString());
-        jvm.put("uptime", String.format("%d天%d小时%d分钟",
-                duration.toDays(), duration.toHoursPart(), duration.toMinutesPart()));
+        jvm.put(
+                "uptime",
+                String.format(
+                        "%d天%d小时%d分钟",
+                        duration.toDays(), duration.toHoursPart(), duration.toMinutesPart()));
         return jvm;
     }
 

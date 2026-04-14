@@ -12,8 +12,8 @@ import org.springframework.context.annotation.Configuration;
 /**
  * Flyway 数据库迁移配置
  *
- * <p>因为项目使用 dynamic-datasource，Spring Boot 无法自动配置 Flyway。 此处手动创建 Flyway 实例，通过
- * GroupDataSourceProxy 路由到 user 数据源组。
+ * <p>因为项目使用 dynamic-datasource，Spring Boot 无法自动配置 Flyway。 此处手动创建 Flyway 实例，通过 GroupDataSourceProxy
+ * 路由到 user 数据源组。
  *
  * <p>配置方式：
  *

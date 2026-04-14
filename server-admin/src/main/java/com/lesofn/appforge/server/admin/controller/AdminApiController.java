@@ -4,27 +4,27 @@ import com.lesofn.appforge.common.enums.common.GenderEnum;
 import com.lesofn.appforge.server.admin.dto.*;
 import com.lesofn.appforge.server.admin.service.monitor.ServerMonitorService;
 import com.lesofn.appforge.user.dao.SysRoleMenuRepository;
+import com.lesofn.appforge.user.domain.SysConfig;
 import com.lesofn.appforge.user.domain.SysDept;
+import com.lesofn.appforge.user.domain.SysLoginLog;
 import com.lesofn.appforge.user.domain.SysMenu;
+import com.lesofn.appforge.user.domain.SysNotice;
+import com.lesofn.appforge.user.domain.SysOperLog;
 import com.lesofn.appforge.user.domain.SysRole;
 import com.lesofn.appforge.user.domain.SysRoleMenu;
 import com.lesofn.appforge.user.domain.SysUser;
-import com.lesofn.appforge.user.domain.SysConfig;
-import com.lesofn.appforge.user.domain.SysNotice;
-import com.lesofn.appforge.user.domain.SysOperLog;
-import com.lesofn.appforge.user.domain.SysLoginLog;
 import com.lesofn.appforge.user.menu.SysMenuService;
 import com.lesofn.appforge.user.menu.dto.ExtraIconDTO;
 import com.lesofn.appforge.user.menu.dto.MetaDTO;
 import com.lesofn.appforge.user.menu.dto.TransitionDTO;
+import com.lesofn.appforge.user.service.SysConfigService;
 import com.lesofn.appforge.user.service.SysDeptService;
+import com.lesofn.appforge.user.service.SysLoginLogService;
+import com.lesofn.appforge.user.service.SysNoticeService;
+import com.lesofn.appforge.user.service.SysOperLogService;
 import com.lesofn.appforge.user.service.SysRoleMenuService;
 import com.lesofn.appforge.user.service.SysRoleService;
 import com.lesofn.appforge.user.service.SysUserService;
-import com.lesofn.appforge.user.service.SysConfigService;
-import com.lesofn.appforge.user.service.SysNoticeService;
-import com.lesofn.appforge.user.service.SysOperLogService;
-import com.lesofn.appforge.user.service.SysLoginLogService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.time.LocalDateTime;
@@ -133,8 +133,7 @@ public class AdminApiController {
                         .map(user -> convertToUserItemDTO(user, deptNameMap))
                         .collect(Collectors.toList());
 
-        return AdminPageResult.of(
-                userItems, (long) userItems.size(), pageSize, currentPage);
+        return AdminPageResult.of(userItems, (long) userItems.size(), pageSize, currentPage);
     }
 
     @Operation(summary = "获取全量角色列表")
@@ -493,7 +492,8 @@ public class AdminApiController {
         config.setConfigName((String) data.get("configName"));
         config.setConfigKey((String) data.get("configKey"));
         config.setConfigValue((String) data.get("configValue"));
-        config.setConfigType(data.get("configType") != null ? ((Number) data.get("configType")).intValue() : 0);
+        config.setConfigType(
+                data.get("configType") != null ? ((Number) data.get("configType")).intValue() : 0);
         config.setRemark((String) data.getOrDefault("remark", ""));
         SysConfig saved = configService.create(config);
         return saved.getConfigId();
@@ -508,8 +508,10 @@ public class AdminApiController {
         SysConfig config = opt.get();
         if (data.containsKey("configName")) config.setConfigName((String) data.get("configName"));
         if (data.containsKey("configKey")) config.setConfigKey((String) data.get("configKey"));
-        if (data.containsKey("configValue")) config.setConfigValue((String) data.get("configValue"));
-        if (data.get("configType") != null) config.setConfigType(((Number) data.get("configType")).intValue());
+        if (data.containsKey("configValue"))
+            config.setConfigValue((String) data.get("configValue"));
+        if (data.get("configType") != null)
+            config.setConfigType(((Number) data.get("configType")).intValue());
         if (data.containsKey("remark")) config.setRemark((String) data.get("remark"));
         configService.update(config);
         return true;
@@ -557,7 +559,8 @@ public class AdminApiController {
     public Long createNotice(@RequestBody Map<String, Object> data) {
         SysNotice notice = new SysNotice();
         notice.setNoticeTitle((String) data.get("noticeTitle"));
-        notice.setNoticeType(data.get("noticeType") != null ? ((Number) data.get("noticeType")).intValue() : 1);
+        notice.setNoticeType(
+                data.get("noticeType") != null ? ((Number) data.get("noticeType")).intValue() : 1);
         notice.setNoticeContent((String) data.getOrDefault("noticeContent", ""));
         notice.setStatus(data.get("status") != null ? ((Number) data.get("status")).intValue() : 1);
         notice.setRemark((String) data.getOrDefault("remark", ""));
@@ -572,9 +575,12 @@ public class AdminApiController {
         Optional<SysNotice> opt = noticeService.findById(id);
         if (opt.isEmpty()) return false;
         SysNotice notice = opt.get();
-        if (data.containsKey("noticeTitle")) notice.setNoticeTitle((String) data.get("noticeTitle"));
-        if (data.get("noticeType") != null) notice.setNoticeType(((Number) data.get("noticeType")).intValue());
-        if (data.containsKey("noticeContent")) notice.setNoticeContent((String) data.get("noticeContent"));
+        if (data.containsKey("noticeTitle"))
+            notice.setNoticeTitle((String) data.get("noticeTitle"));
+        if (data.get("noticeType") != null)
+            notice.setNoticeType(((Number) data.get("noticeType")).intValue());
+        if (data.containsKey("noticeContent"))
+            notice.setNoticeContent((String) data.get("noticeContent"));
         if (data.get("status") != null) notice.setStatus(((Number) data.get("status")).intValue());
         if (data.containsKey("remark")) notice.setRemark((String) data.get("remark"));
         noticeService.update(notice);

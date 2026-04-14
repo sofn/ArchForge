@@ -8,8 +8,8 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
- * 将 ByteArrayHttpMessageConverter 提前并支持 application/json，
- * 以确保 SpringDoc 的 byte[] OpenAPI JSON 响应以原始字节输出，不被 Jackson 序列化为 base64。
+ * 将 ByteArrayHttpMessageConverter 提前并支持 application/json， 以确保 SpringDoc 的 byte[] OpenAPI JSON
+ * 响应以原始字节输出，不被 Jackson 序列化为 base64。
  *
  * @author sofn
  */
