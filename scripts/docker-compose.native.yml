@@ -1,7 +1,8 @@
-# docker-compose.yml — JVM 模式（标准构建）
-# 使用方式: docker compose up -d --build
+# docker-compose.native.yml — Spring Native (GraalVM) 模式
+# 使用方式: docker compose -f docker-compose.native.yml up -d --build
 #
-# 使用 JVM 模式运行，构建速度快，适合开发和标准部署
+# 构建为 GraalVM Native Image，启动极快 (~100ms)、内存占用低 (~50MB)
+# 首次构建较慢（~10min），后续利用 Docker 缓存会快很多
 
 services:
   mysqldb:
@@ -32,7 +33,7 @@ services:
   appforge:
     build:
       context: ..
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.native
     depends_on:
       mysqldb:
         condition: service_healthy
