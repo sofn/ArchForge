@@ -63,9 +63,9 @@ public class ServletHolderUtil {
     }
 
     /**
-     * 获取仅含有项目根路径的url 比如 localhost:8080/agileboot/user/list 返回 localhost:8080/agileboot
+     * 获取仅含有项目根路径的url 比如 localhost:8080/appforge/user/list 返回 localhost:8080/appforge
      *
-     * @return localhost:8080/agileboot
+     * @return localhost:8080/appforge
      */
     public static String getContextUrl() {
         HttpServletRequest request = getRequest();

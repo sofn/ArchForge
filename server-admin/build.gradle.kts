@@ -69,6 +69,13 @@ dependencies {
     // Redis
     api("org.springframework.boot:spring-boot-starter-data-redis")
     
+    // Flyway
+    api("org.flywaydb:flyway-core")
+    api("org.flywaydb:flyway-mysql")
+    
+    // Oshi (系统监控)
+    api("com.github.oshi:oshi-core")
+    
     // Testcontainers Redis for Dev environment
     api("org.testcontainers:testcontainers")
     

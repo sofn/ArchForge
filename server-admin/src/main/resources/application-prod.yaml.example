@@ -3,6 +3,9 @@ spring:
   sql:
     init:
       mode: never
+  jpa:
+    hibernate:
+      ddl-auto: validate
   data:
     redis:
       host: <your-redis-host>
@@ -53,6 +56,8 @@ management:
       endpoint: ${OTEL_EXPORTER_OTLP_ENDPOINT:http://localhost:4318/v1/metrics}
 
 app-forge:
+  flyway:
+    enabled: true
   jwt:
     secret: ${JWT_SECRET}
     expire-seconds: 3600

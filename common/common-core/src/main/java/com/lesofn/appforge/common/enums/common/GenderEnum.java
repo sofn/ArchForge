@@ -24,4 +24,13 @@ public enum GenderEnum implements DictionaryEnum {
     private final int value;
     private final String description;
     private final String cssTag;
+
+    public static GenderEnum fromValue(int value) {
+        for (GenderEnum gender : values()) {
+            if (gender.value == value) {
+                return gender;
+            }
+        }
+        return UNKNOWN;
+    }
 }

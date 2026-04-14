@@ -23,6 +23,7 @@ public class RedisCacheService {
 
     public RedisCacheTemplate<String> captchaCache;
     public RedisCacheTemplate<SystemLoginUser> loginUserCache;
+    public RedisCacheTemplate<String> refreshTokenCache;
     public RedisCacheTemplate<SysUser> userCache;
     public RedisCacheTemplate<SysRole> roleCache;
 
@@ -32,6 +33,8 @@ public class RedisCacheService {
         captchaCache = new RedisCacheTemplate<>(redisUtil, CacheKeyEnum.CAPTCHA);
 
         loginUserCache = new RedisCacheTemplate<>(redisUtil, CacheKeyEnum.LOGIN_USER_KEY);
+
+        refreshTokenCache = new RedisCacheTemplate<>(redisUtil, CacheKeyEnum.REFRESH_TOKEN);
 
         userCache =
                 new RedisCacheTemplate<>(redisUtil, CacheKeyEnum.USER_ENTITY_KEY) {

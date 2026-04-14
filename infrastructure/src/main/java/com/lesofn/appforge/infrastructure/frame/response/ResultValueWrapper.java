@@ -5,7 +5,6 @@ import com.lesofn.appforge.infrastructure.frame.response.model.ResponseResult;
 import com.lesofn.appforge.infrastructure.frame.response.model.Result;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
-import org.apache.commons.lang3.Strings;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.MediaType;
@@ -42,10 +41,10 @@ public class ResultValueWrapper implements ResponseBodyAdvice<Object> {
                 ((ServletServerHttpRequest) request).getServletRequest().getServletPath();
 
         // Skip response wrapping for OpenAPI/Swagger endpoints
-        if (Strings.CS.startsWith(requestPath, "/v3/api-docs")
-                || Strings.CS.startsWith(requestPath, "/swagger-ui")
-                || Strings.CS.equals(requestPath, "/swagger-ui.html")
-                || Strings.CS.startsWith(requestPath, "/swagger-resources")) {
+        if (requestPath.startsWith("/v3/api-docs")
+                || requestPath.startsWith("/swagger-ui")
+                || requestPath.equals("/swagger-ui.html")
+                || requestPath.startsWith("/swagger-resources")) {
             return body;
         }
 
@@ -58,7 +57,7 @@ public class ResultValueWrapper implements ResponseBodyAdvice<Object> {
             return ResponseResult.success(result.getData());
         }
 
-        if (Strings.CS.equals(requestPath, "/error")) {
+        if (requestPath.equals("/error")) {
             return ResponseResult.error(SystemErrorCode.SYSTEM_ERROR.getCode(), body.toString());
         } else {
             return ResponseResult.success(body);

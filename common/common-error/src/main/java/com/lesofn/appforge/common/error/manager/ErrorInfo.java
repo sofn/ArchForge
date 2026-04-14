@@ -20,8 +20,17 @@ public class ErrorInfo {
     /** 错误码 */
     @Getter private final int code;
 
-    /** 返回错误信息 英文 */
-    @Getter private final String msg;
+    /** 返回错误信息 */
+    private final String msg;
+
+    public String getMsg() {
+        return msg;
+    }
+
+    /** 兼容前端字段名: message */
+    public String getMessage() {
+        return msg;
+    }
 
     public static ErrorInfo parse(String message) {
         return ERROR_MSG_CODES_MAP.computeIfAbsent(

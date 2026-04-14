@@ -93,6 +93,51 @@ public class TokenService {
     }
 
     /**
+     * 创建刷新令牌
+     *
+     * @param loginUser 登录用户
+     * @return 刷新令牌
+     */
+    public String createRefreshToken(SystemLoginUser loginUser) {
+        String refreshToken = UUID.randomUUID().toString().replace("-", "");
+        // 存储 refreshToken -> cachedKey 的映射
+        redisCacheService.refreshTokenCache.set(refreshToken, loginUser.getCachedKey());
+        return refreshToken;
+    }
+
+    /**
+     * 根据刷新令牌获取登录用户
+     *
+     * @param refreshToken 刷新令牌
+     * @return 登录用户
+     */
+    public SystemLoginUser getLoginUserByRefreshToken(String refreshToken) {
+        String cachedKey = redisCacheService.refreshTokenCache.get(refreshToken);
+        if (cachedKey == null) {
+            return null;
+        }
+        return redisCacheService.loginUserCache.get(cachedKey);
+    }
+
+    /**
+     * 移除刷新令牌
+     *
+     * @param refreshToken 刷新令牌
+     */
+    public void removeRefreshToken(String refreshToken) {
+        redisCacheService.refreshTokenCache.delete(refreshToken);
+    }
+
+    /**
+     * 获取JWT过期时间（秒）
+     *
+     * @return 过期时间秒数
+     */
+    public long getExpireSeconds() {
+        return appForgeConfig.getJwt().getExpireSeconds();
+    }
+
+    /**
      * 删除用户身份信息
      *
      * @param token 令牌

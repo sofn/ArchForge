@@ -5,8 +5,10 @@ import jakarta.annotation.Resource;
 import java.util.HashMap;
 import java.util.Map;
 import javax.sql.DataSource;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
@@ -26,7 +28,11 @@ public class UserDbConfig {
 
     @Resource private DataSource dataSource;
 
+    @Value("${spring.jpa.hibernate.ddl-auto:update}")
+    private String ddlAuto;
+
     @Bean
+    @Primary
     PlatformTransactionManager userTransactionManager() {
         return new JpaTransactionManager(userEntityManagerFactory().getObject());
     }
@@ -53,7 +59,7 @@ public class UserDbConfig {
 
         // Set JPA properties
         Map<String, Object> properties = new HashMap<>();
-        properties.put("hibernate.hbm2ddl.auto", "update");
+        properties.put("hibernate.hbm2ddl.auto", ddlAuto);
         properties.put("hibernate.dialect", "org.hibernate.dialect.MySQLDialect");
         properties.put(
                 "hibernate.physical_naming_strategy",
