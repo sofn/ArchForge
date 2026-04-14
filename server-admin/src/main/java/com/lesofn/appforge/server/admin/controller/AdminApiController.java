@@ -13,6 +13,7 @@ import com.lesofn.appforge.user.menu.dto.ExtraIconDTO;
 import com.lesofn.appforge.user.menu.dto.MetaDTO;
 import com.lesofn.appforge.user.menu.dto.TransitionDTO;
 import com.lesofn.appforge.user.service.SysDeptService;
+import com.lesofn.appforge.user.service.SysRoleMenuService;
 import com.lesofn.appforge.user.service.SysRoleService;
 import com.lesofn.appforge.user.service.SysUserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -32,7 +33,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -51,6 +51,7 @@ public class AdminApiController {
     private final SysRoleService roleService;
     private final SysMenuService menuService;
     private final SysRoleMenuRepository roleMenuRepository;
+    private final SysRoleMenuService roleMenuService;
     private final PasswordEncoder passwordEncoder;
 
     @Autowired(required = false)
@@ -77,6 +78,7 @@ public class AdminApiController {
 
         List<AdminUserItemDTO> userItems =
                 userPage.getContent().stream()
+                        .filter(user -> !Boolean.TRUE.equals(user.getDeleted()))
                         .map(user -> convertToUserItemDTO(user, deptNameMap))
                         .collect(Collectors.toList());
 
@@ -173,7 +175,6 @@ public class AdminApiController {
 
     @Operation(summary = "创建用户")
     @PostMapping("/user/create")
-    @Transactional
     public Long createUser(@RequestBody Map<String, Object> data) {
         SysUser user = new SysUser();
         user.setUsername((String) data.get("username"));
@@ -196,7 +197,6 @@ public class AdminApiController {
 
     @Operation(summary = "更新用户")
     @PutMapping("/user/update")
-    @Transactional
     public Boolean updateUser(@RequestBody Map<String, Object> data) {
         Long id = ((Number) data.get("id")).longValue();
         Optional<SysUser> opt = userService.findById(id);
@@ -217,7 +217,6 @@ public class AdminApiController {
 
     @Operation(summary = "删除用户")
     @PostMapping("/user/delete")
-    @Transactional
     public Boolean deleteUser(@RequestBody Map<String, Object> data) {
         Object idObj = data.get("id");
         if (idObj instanceof Number) {
@@ -227,8 +226,7 @@ public class AdminApiController {
     }
 
     @Operation(summary = "更新用户状态")
-    @PatchMapping("/user/status")
-    @Transactional
+    @PostMapping("/user/status")
     public Boolean updateUserStatus(@RequestBody Map<String, Object> data) {
         Long id = ((Number) data.get("id")).longValue();
         Integer status = (Integer) data.get("status");
@@ -238,7 +236,6 @@ public class AdminApiController {
 
     @Operation(summary = "重置用户密码")
     @PostMapping("/user/reset-password")
-    @Transactional
     public Boolean resetUserPassword(@RequestBody Map<String, Object> data) {
         Long id = ((Number) data.get("id")).longValue();
         String newPwd = (String) data.getOrDefault("newPwd", "admin123");
@@ -249,7 +246,6 @@ public class AdminApiController {
     @SuppressWarnings("unchecked")
     @Operation(summary = "分配用户角色")
     @PostMapping("/user/assign-role")
-    @Transactional
     public Boolean assignUserRole(@RequestBody Map<String, Object> data) {
         Long userId = ((Number) data.get("id")).longValue();
         List<Number> ids = (List<Number>) data.get("ids");
@@ -269,7 +265,6 @@ public class AdminApiController {
 
     @Operation(summary = "创建角色")
     @PostMapping("/role/create")
-    @Transactional
     public Long createRole(@RequestBody Map<String, Object> data) {
         SysRole role = new SysRole();
         role.setRoleName((String) data.get("name"));
@@ -283,7 +278,6 @@ public class AdminApiController {
 
     @Operation(summary = "更新角色")
     @PutMapping("/role/update")
-    @Transactional
     public Boolean updateRole(@RequestBody Map<String, Object> data) {
         Long id = ((Number) data.get("id")).longValue();
         Optional<SysRole> opt = roleService.findById(id);
@@ -298,7 +292,6 @@ public class AdminApiController {
 
     @Operation(summary = "删除角色")
     @PostMapping("/role/delete")
-    @Transactional
     public Boolean deleteRole(@RequestBody Map<String, Object> data) {
         Long id = ((Number) data.get("id")).longValue();
         roleService.softDeleteById(id);
@@ -306,8 +299,7 @@ public class AdminApiController {
     }
 
     @Operation(summary = "更新角色状态")
-    @PatchMapping("/role/status")
-    @Transactional
+    @PostMapping("/role/status")
     public Boolean updateRoleStatus(@RequestBody Map<String, Object> data) {
         Long id = ((Number) data.get("id")).longValue();
         Integer status = (Integer) data.get("status");
@@ -323,19 +315,14 @@ public class AdminApiController {
     @SuppressWarnings("unchecked")
     @Operation(summary = "保存角色菜单权限")
     @PostMapping("/role/save-menu")
-    @Transactional
     public Boolean saveRoleMenu(@RequestBody Map<String, Object> data) {
         Long roleId = ((Number) data.get("id")).longValue();
         List<Number> menuIds = (List<Number>) data.get("menuIds");
-        roleMenuRepository.deleteByRoleId(roleId);
-        if (menuIds != null) {
-            for (Number menuId : menuIds) {
-                SysRoleMenu roleMenu = new SysRoleMenu();
-                roleMenu.setRoleId(roleId);
-                roleMenu.setMenuId(menuId.longValue());
-                roleMenuRepository.save(roleMenu);
-            }
-        }
+        List<Long> menuIdList =
+                menuIds != null
+                        ? menuIds.stream().map(Number::longValue).collect(Collectors.toList())
+                        : Collections.emptyList();
+        roleMenuService.updateRoleMenus(roleId, menuIdList);
         return true;
     }
 
@@ -343,7 +330,6 @@ public class AdminApiController {
 
     @Operation(summary = "创建菜单")
     @PostMapping("/menu/create")
-    @Transactional
     public Long createMenu(@RequestBody Map<String, Object> data) {
         SysMenu menu = buildMenuFromData(data);
         SysMenu saved = menuService.create(menu);
@@ -352,7 +338,6 @@ public class AdminApiController {
 
     @Operation(summary = "更新菜单")
     @PutMapping("/menu/update")
-    @Transactional
     public Boolean updateMenu(@RequestBody Map<String, Object> data) {
         Long id = ((Number) data.get("id")).longValue();
         Optional<SysMenu> opt = menuService.findById(id);
@@ -365,7 +350,6 @@ public class AdminApiController {
 
     @Operation(summary = "删除菜单")
     @PostMapping("/menu/delete")
-    @Transactional
     public Boolean deleteMenu(@RequestBody Map<String, Object> data) {
         Long id = ((Number) data.get("id")).longValue();
         menuService.softDeleteById(id);
@@ -376,7 +360,6 @@ public class AdminApiController {
 
     @Operation(summary = "创建部门")
     @PostMapping("/dept/create")
-    @Transactional
     public Long createDept(@RequestBody Map<String, Object> data) {
         SysDept dept = new SysDept();
         dept.setParentId(
@@ -394,7 +377,6 @@ public class AdminApiController {
 
     @Operation(summary = "更新部门")
     @PutMapping("/dept/update")
-    @Transactional
     public Boolean updateDept(@RequestBody Map<String, Object> data) {
         Long id = ((Number) data.get("id")).longValue();
         Optional<SysDept> opt = deptService.findById(id);
@@ -415,7 +397,6 @@ public class AdminApiController {
 
     @Operation(summary = "删除部门")
     @PostMapping("/dept/delete")
-    @Transactional
     public Boolean deleteDept(@RequestBody Map<String, Object> data) {
         Long id = ((Number) data.get("id")).longValue();
         deptService.deleteById(id);

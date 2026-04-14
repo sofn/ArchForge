@@ -7,6 +7,7 @@ import java.util.Map;
 import javax.sql.DataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
@@ -27,6 +28,7 @@ public class UserDbConfig {
     @Resource private DataSource dataSource;
 
     @Bean
+    @Primary
     PlatformTransactionManager userTransactionManager() {
         return new JpaTransactionManager(userEntityManagerFactory().getObject());
     }
