@@ -8,6 +8,10 @@ import com.lesofn.appforge.user.domain.SysMenu;
 import com.lesofn.appforge.user.domain.SysRole;
 import com.lesofn.appforge.user.domain.SysRoleMenu;
 import com.lesofn.appforge.user.domain.SysUser;
+import com.lesofn.appforge.user.domain.SysConfig;
+import com.lesofn.appforge.user.domain.SysNotice;
+import com.lesofn.appforge.user.domain.SysOperLog;
+import com.lesofn.appforge.user.domain.SysLoginLog;
 import com.lesofn.appforge.user.menu.SysMenuService;
 import com.lesofn.appforge.user.menu.dto.ExtraIconDTO;
 import com.lesofn.appforge.user.menu.dto.MetaDTO;
@@ -16,6 +20,10 @@ import com.lesofn.appforge.user.service.SysDeptService;
 import com.lesofn.appforge.user.service.SysRoleMenuService;
 import com.lesofn.appforge.user.service.SysRoleService;
 import com.lesofn.appforge.user.service.SysUserService;
+import com.lesofn.appforge.user.service.SysConfigService;
+import com.lesofn.appforge.user.service.SysNoticeService;
+import com.lesofn.appforge.user.service.SysOperLogService;
+import com.lesofn.appforge.user.service.SysLoginLogService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.time.LocalDateTime;
@@ -52,6 +60,10 @@ public class AdminApiController {
     private final SysMenuService menuService;
     private final SysRoleMenuRepository roleMenuRepository;
     private final SysRoleMenuService roleMenuService;
+    private final SysConfigService configService;
+    private final SysNoticeService noticeService;
+    private final SysOperLogService operLogService;
+    private final SysLoginLogService loginLogService;
     private final PasswordEncoder passwordEncoder;
 
     @Autowired(required = false)
@@ -403,6 +415,231 @@ public class AdminApiController {
         return true;
     }
 
+    // ==================== Config CRUD ====================
+
+    @Operation(summary = "获取参数列表")
+    @PostMapping("/config")
+    public AdminPageResult<Map<String, Object>> getConfigList(
+            @RequestBody Map<String, Object> request) {
+        int currentPage = getInt(request, "currentPage", 1);
+        int pageSize = getInt(request, "pageSize", 10);
+        Pageable pageable = PageRequest.of(currentPage - 1, pageSize);
+        Page<SysConfig> page = configService.findAll(pageable);
+        List<Map<String, Object>> list =
+                page.getContent().stream()
+                        .filter(c -> !Boolean.TRUE.equals(c.getDeleted()))
+                        .map(
+                                c -> {
+                                    Map<String, Object> m = new java.util.LinkedHashMap<>();
+                                    m.put("id", c.getConfigId());
+                                    m.put("configName", c.getConfigName());
+                                    m.put("configKey", c.getConfigKey());
+                                    m.put("configValue", c.getConfigValue());
+                                    m.put("configType", c.getConfigType());
+                                    m.put("remark", c.getRemark());
+                                    m.put("createTime", toEpochMilli(c.getCreateTime()));
+                                    return m;
+                                })
+                        .collect(Collectors.toList());
+        return AdminPageResult.of(list, page.getTotalElements(), pageSize, currentPage);
+    }
+
+    @Operation(summary = "创建参数")
+    @PostMapping("/config/create")
+    public Long createConfig(@RequestBody Map<String, Object> data) {
+        SysConfig config = new SysConfig();
+        config.setConfigName((String) data.get("configName"));
+        config.setConfigKey((String) data.get("configKey"));
+        config.setConfigValue((String) data.get("configValue"));
+        config.setConfigType(data.get("configType") != null ? ((Number) data.get("configType")).intValue() : 0);
+        config.setRemark((String) data.getOrDefault("remark", ""));
+        SysConfig saved = configService.create(config);
+        return saved.getConfigId();
+    }
+
+    @Operation(summary = "更新参数")
+    @PutMapping("/config/update")
+    public Boolean updateConfig(@RequestBody Map<String, Object> data) {
+        Long id = ((Number) data.get("id")).longValue();
+        Optional<SysConfig> opt = configService.findById(id);
+        if (opt.isEmpty()) return false;
+        SysConfig config = opt.get();
+        if (data.containsKey("configName")) config.setConfigName((String) data.get("configName"));
+        if (data.containsKey("configKey")) config.setConfigKey((String) data.get("configKey"));
+        if (data.containsKey("configValue")) config.setConfigValue((String) data.get("configValue"));
+        if (data.get("configType") != null) config.setConfigType(((Number) data.get("configType")).intValue());
+        if (data.containsKey("remark")) config.setRemark((String) data.get("remark"));
+        configService.update(config);
+        return true;
+    }
+
+    @Operation(summary = "删除参数")
+    @PostMapping("/config/delete")
+    public Boolean deleteConfig(@RequestBody Map<String, Object> data) {
+        Long id = ((Number) data.get("id")).longValue();
+        configService.deleteById(id);
+        return true;
+    }
+
+    // ==================== Notice CRUD ====================
+
+    @Operation(summary = "获取通知公告列表")
+    @PostMapping("/notice")
+    public AdminPageResult<Map<String, Object>> getNoticeList(
+            @RequestBody Map<String, Object> request) {
+        int currentPage = getInt(request, "currentPage", 1);
+        int pageSize = getInt(request, "pageSize", 10);
+        Pageable pageable = PageRequest.of(currentPage - 1, pageSize);
+        Page<SysNotice> page = noticeService.findAll(pageable);
+        List<Map<String, Object>> list =
+                page.getContent().stream()
+                        .filter(n -> !Boolean.TRUE.equals(n.getDeleted()))
+                        .map(
+                                n -> {
+                                    Map<String, Object> m = new java.util.LinkedHashMap<>();
+                                    m.put("id", n.getNoticeId());
+                                    m.put("noticeTitle", n.getNoticeTitle());
+                                    m.put("noticeType", n.getNoticeType());
+                                    m.put("noticeContent", n.getNoticeContent());
+                                    m.put("status", n.getStatus());
+                                    m.put("remark", n.getRemark());
+                                    m.put("createTime", toEpochMilli(n.getCreateTime()));
+                                    return m;
+                                })
+                        .collect(Collectors.toList());
+        return AdminPageResult.of(list, page.getTotalElements(), pageSize, currentPage);
+    }
+
+    @Operation(summary = "创建通知公告")
+    @PostMapping("/notice/create")
+    public Long createNotice(@RequestBody Map<String, Object> data) {
+        SysNotice notice = new SysNotice();
+        notice.setNoticeTitle((String) data.get("noticeTitle"));
+        notice.setNoticeType(data.get("noticeType") != null ? ((Number) data.get("noticeType")).intValue() : 1);
+        notice.setNoticeContent((String) data.getOrDefault("noticeContent", ""));
+        notice.setStatus(data.get("status") != null ? ((Number) data.get("status")).intValue() : 1);
+        notice.setRemark((String) data.getOrDefault("remark", ""));
+        SysNotice saved = noticeService.create(notice);
+        return saved.getNoticeId();
+    }
+
+    @Operation(summary = "更新通知公告")
+    @PutMapping("/notice/update")
+    public Boolean updateNotice(@RequestBody Map<String, Object> data) {
+        Long id = ((Number) data.get("id")).longValue();
+        Optional<SysNotice> opt = noticeService.findById(id);
+        if (opt.isEmpty()) return false;
+        SysNotice notice = opt.get();
+        if (data.containsKey("noticeTitle")) notice.setNoticeTitle((String) data.get("noticeTitle"));
+        if (data.get("noticeType") != null) notice.setNoticeType(((Number) data.get("noticeType")).intValue());
+        if (data.containsKey("noticeContent")) notice.setNoticeContent((String) data.get("noticeContent"));
+        if (data.get("status") != null) notice.setStatus(((Number) data.get("status")).intValue());
+        if (data.containsKey("remark")) notice.setRemark((String) data.get("remark"));
+        noticeService.update(notice);
+        return true;
+    }
+
+    @Operation(summary = "删除通知公告")
+    @PostMapping("/notice/delete")
+    public Boolean deleteNotice(@RequestBody Map<String, Object> data) {
+        Long id = ((Number) data.get("id")).longValue();
+        noticeService.deleteById(id);
+        return true;
+    }
+
+    // ==================== Operation Log ====================
+
+    @Operation(summary = "获取操作日志列表")
+    @PostMapping("/operation-logs")
+    public AdminPageResult<Map<String, Object>> getOperationLogsList(
+            @RequestBody Map<String, Object> request) {
+        int currentPage = getInt(request, "currentPage", 1);
+        int pageSize = getInt(request, "pageSize", 10);
+        Pageable pageable = PageRequest.of(currentPage - 1, pageSize);
+        Page<SysOperLog> page = operLogService.findAll(pageable);
+        List<Map<String, Object>> list =
+                page.getContent().stream()
+                        .filter(o -> !Boolean.TRUE.equals(o.getDeleted()))
+                        .map(
+                                o -> {
+                                    Map<String, Object> m = new java.util.LinkedHashMap<>();
+                                    m.put("id", o.getOperId());
+                                    m.put("username", o.getUsername());
+                                    m.put("module", o.getModule());
+                                    m.put("summary", o.getSummary());
+                                    m.put("ip", o.getIp());
+                                    m.put("address", o.getAddress());
+                                    m.put("system", o.getSystemName());
+                                    m.put("browser", o.getBrowser());
+                                    m.put("status", o.getStatus());
+                                    m.put("operatingTime", toEpochMilli(o.getOperatingTime()));
+                                    return m;
+                                })
+                        .collect(Collectors.toList());
+        return AdminPageResult.of(list, page.getTotalElements(), pageSize, currentPage);
+    }
+
+    @Operation(summary = "删除操作日志")
+    @PostMapping("/operation-logs/delete")
+    public Boolean deleteOperLog(@RequestBody Map<String, Object> data) {
+        Long id = ((Number) data.get("id")).longValue();
+        operLogService.deleteById(id);
+        return true;
+    }
+
+    @Operation(summary = "清空操作日志")
+    @PostMapping("/operation-logs/clear")
+    public Boolean clearOperLogs() {
+        operLogService.clearAll();
+        return true;
+    }
+
+    // ==================== Login Log ====================
+
+    @Operation(summary = "获取登录日志列表")
+    @PostMapping("/login-logs")
+    public AdminPageResult<Map<String, Object>> getLoginLogsList(
+            @RequestBody Map<String, Object> request) {
+        int currentPage = getInt(request, "currentPage", 1);
+        int pageSize = getInt(request, "pageSize", 10);
+        Pageable pageable = PageRequest.of(currentPage - 1, pageSize);
+        Page<SysLoginLog> page = loginLogService.findAll(pageable);
+        List<Map<String, Object>> list =
+                page.getContent().stream()
+                        .filter(l -> !Boolean.TRUE.equals(l.getDeleted()))
+                        .map(
+                                l -> {
+                                    Map<String, Object> m = new java.util.LinkedHashMap<>();
+                                    m.put("id", l.getInfoId());
+                                    m.put("username", l.getUsername());
+                                    m.put("ip", l.getIp());
+                                    m.put("address", l.getAddress());
+                                    m.put("system", l.getSystemName());
+                                    m.put("browser", l.getBrowser());
+                                    m.put("status", l.getStatus());
+                                    m.put("behavior", l.getBehavior());
+                                    m.put("loginTime", toEpochMilli(l.getLoginTime()));
+                                    return m;
+                                })
+                        .collect(Collectors.toList());
+        return AdminPageResult.of(list, page.getTotalElements(), pageSize, currentPage);
+    }
+
+    @Operation(summary = "删除登录日志")
+    @PostMapping("/login-logs/delete")
+    public Boolean deleteLoginLog(@RequestBody Map<String, Object> data) {
+        Long id = ((Number) data.get("id")).longValue();
+        loginLogService.deleteById(id);
+        return true;
+    }
+
+    @Operation(summary = "清空登录日志")
+    @PostMapping("/login-logs/clear")
+    public Boolean clearLoginLogs() {
+        loginLogService.clearAll();
+        return true;
+    }
+
     // ==================== 私有转换方法 ====================
 
     private AdminUserItemDTO convertToUserItemDTO(SysUser user, Map<Long, String> deptNameMap) {
@@ -567,5 +804,13 @@ public class AdminApiController {
         menu.setMetaInfo(meta);
         if (data.containsKey("title")) menu.setMenuName((String) data.get("title"));
         if (menu.getStatus() == null) menu.setStatus(1);
+    }
+
+    private int getInt(Map<String, Object> map, String key, int defaultValue) {
+        Object val = map.get(key);
+        if (val instanceof Number) {
+            return ((Number) val).intValue();
+        }
+        return defaultValue;
     }
 }

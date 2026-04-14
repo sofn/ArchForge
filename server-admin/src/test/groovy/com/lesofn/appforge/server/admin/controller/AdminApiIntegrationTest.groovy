@@ -637,4 +637,236 @@ class AdminApiIntegrationTest extends Specification {
         response.code == 0
         !response.data.any { it.name == "测试部门-已修改" }
     }
+
+    // ==================== 6. 参数设置 CRUD ====================
+
+    def "6.1 查询参数列表"() {
+        when:
+        Map response = doPost("/config", [currentPage: 1, pageSize: 10], accessToken)
+
+        then:
+        response.code == 0
+        response.data.list instanceof List
+        response.data.list.size() > 0
+        response.data.total > 0
+    }
+
+    def "6.2 创建参数"() {
+        given: "clean up existing test config"
+        Map existing = doPost("/config", [currentPage: 1, pageSize: 100], accessToken)
+        existing.data.list.findAll { it.configKey == "test.config.key" }.each {
+            doPost("/config/delete", [id: it.id], accessToken)
+        }
+
+        when:
+        Map response = doPost("/config/create", [
+            configName : "测试参数",
+            configKey  : "test.config.key",
+            configValue: "test_value",
+            configType : 0,
+            remark     : "集成测试创建"
+        ], accessToken)
+
+        then:
+        response.code == 0
+        response.data != null
+    }
+
+    def "6.3 创建后查询验证参数存在"() {
+        when:
+        Map response = doPost("/config", [currentPage: 1, pageSize: 100], accessToken)
+
+        then:
+        response.code == 0
+        response.data.list.any { it.configKey == "test.config.key" }
+    }
+
+    def "6.4 修改参数"() {
+        given:
+        Map listResp = doPost("/config", [currentPage: 1, pageSize: 100], accessToken)
+        Long configId = listResp.data.list.find { it.configKey == "test.config.key" }?.id as Long
+
+        when:
+        Map response = doPut("/config/update", [
+            id         : configId,
+            configValue: "updated_value",
+            remark     : "修改后备注"
+        ], accessToken)
+
+        then:
+        response.code == 0
+        response.data == true
+    }
+
+    def "6.5 修改后查询验证参数值已变"() {
+        when:
+        Map response = doPost("/config", [currentPage: 1, pageSize: 100], accessToken)
+
+        then:
+        response.code == 0
+        Map config = response.data.list.find { it.configKey == "test.config.key" }
+        config.configValue == "updated_value"
+    }
+
+    def "6.6 删除参数"() {
+        given:
+        Map listResp = doPost("/config", [currentPage: 1, pageSize: 100], accessToken)
+        Long configId = listResp.data.list.find { it.configKey == "test.config.key" }?.id as Long
+
+        when:
+        Map response = doPost("/config/delete", [id: configId], accessToken)
+
+        then:
+        response.code == 0
+        response.data == true
+    }
+
+    // ==================== 7. 通知公告 CRUD ====================
+
+    def "7.1 查询通知公告列表"() {
+        when:
+        Map response = doPost("/notice", [currentPage: 1, pageSize: 10], accessToken)
+
+        then:
+        response.code == 0
+        response.data.list instanceof List
+        response.data.list.size() > 0
+    }
+
+    def "7.2 创建通知公告"() {
+        given: "clean up existing test notice"
+        Map existing = doPost("/notice", [currentPage: 1, pageSize: 100], accessToken)
+        existing.data.list.findAll { it.noticeTitle == "测试通知" }.each {
+            doPost("/notice/delete", [id: it.id], accessToken)
+        }
+
+        when:
+        Map response = doPost("/notice/create", [
+            noticeTitle  : "测试通知",
+            noticeType   : 1,
+            noticeContent: "这是一条测试通知内容",
+            status       : 1,
+            remark       : "集成测试创建"
+        ], accessToken)
+
+        then:
+        response.code == 0
+        response.data != null
+    }
+
+    def "7.3 创建后查询验证公告存在"() {
+        when:
+        Map response = doPost("/notice", [currentPage: 1, pageSize: 100], accessToken)
+
+        then:
+        response.code == 0
+        response.data.list.any { it.noticeTitle == "测试通知" }
+    }
+
+    def "7.4 修改通知公告"() {
+        given:
+        Map listResp = doPost("/notice", [currentPage: 1, pageSize: 100], accessToken)
+        Long noticeId = listResp.data.list.find { it.noticeTitle == "测试通知" }?.id as Long
+
+        when:
+        Map response = doPut("/notice/update", [
+            id           : noticeId,
+            noticeTitle  : "测试通知-已修改",
+            noticeContent: "修改后的通知内容"
+        ], accessToken)
+
+        then:
+        response.code == 0
+        response.data == true
+    }
+
+    def "7.5 修改后查询验证公告标题已变"() {
+        when:
+        Map response = doPost("/notice", [currentPage: 1, pageSize: 100], accessToken)
+
+        then:
+        response.code == 0
+        response.data.list.any { it.noticeTitle == "测试通知-已修改" }
+    }
+
+    def "7.6 删除通知公告"() {
+        given:
+        Map listResp = doPost("/notice", [currentPage: 1, pageSize: 100], accessToken)
+        Long noticeId = listResp.data.list.find { it.noticeTitle == "测试通知-已修改" }?.id as Long
+
+        when:
+        Map response = doPost("/notice/delete", [id: noticeId], accessToken)
+
+        then:
+        response.code == 0
+        response.data == true
+    }
+
+    // ==================== 8. 操作日志 ====================
+
+    def "8.1 查询操作日志列表"() {
+        when:
+        Map response = doPost("/operation-logs", [currentPage: 1, pageSize: 10], accessToken)
+
+        then:
+        response.code == 0
+        response.data.list instanceof List
+        response.data.list.size() > 0
+    }
+
+    def "8.2 删除操作日志"() {
+        given:
+        Map listResp = doPost("/operation-logs", [currentPage: 1, pageSize: 10], accessToken)
+        Long logId = listResp.data.list[0]?.id as Long
+
+        when:
+        Map response = doPost("/operation-logs/delete", [id: logId], accessToken)
+
+        then:
+        response.code == 0
+        response.data == true
+    }
+
+    def "8.3 清空操作日志"() {
+        when:
+        Map response = doPost("/operation-logs/clear", [:], accessToken)
+
+        then:
+        response.code == 0
+        response.data == true
+    }
+
+    // ==================== 9. 登录日志 ====================
+
+    def "9.1 查询登录日志列表"() {
+        when:
+        Map response = doPost("/login-logs", [currentPage: 1, pageSize: 10], accessToken)
+
+        then:
+        response.code == 0
+        response.data.list instanceof List
+        response.data.list.size() > 0
+    }
+
+    def "9.2 删除登录日志"() {
+        given:
+        Map listResp = doPost("/login-logs", [currentPage: 1, pageSize: 10], accessToken)
+        Long logId = listResp.data.list[0]?.id as Long
+
+        when:
+        Map response = doPost("/login-logs/delete", [id: logId], accessToken)
+
+        then:
+        response.code == 0
+        response.data == true
+    }
+
+    def "9.3 清空登录日志"() {
+        when:
+        Map response = doPost("/login-logs/clear", [:], accessToken)
+
+        then:
+        response.code == 0
+        response.data == true
+    }
 }
