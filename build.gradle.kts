@@ -43,10 +43,10 @@ subprojects {
             }
         }
 
-        // 配置 Java 21
+        // 配置 Java 25
         configure<JavaPluginExtension> {
             toolchain {
-                languageVersion.set(JavaLanguageVersion.of(21))
+                languageVersion.set(JavaLanguageVersion.of(25))
             }
         }
 

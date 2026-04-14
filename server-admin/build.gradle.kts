@@ -30,7 +30,7 @@ graalvmNative {
         named("main") {
             mainClass.set("com.lesofn.appforge.server.admin.Application")
             javaLauncher.set(javaToolchains.launcherFor {
-                languageVersion.set(JavaLanguageVersion.of(21))
+                languageVersion.set(JavaLanguageVersion.of(25))
             })
         }
     }
@@ -71,13 +71,14 @@ dependencies {
     
     // Flyway
     api("org.flywaydb:flyway-core")
-    api("org.flywaydb:flyway-mysql")
+    api("org.flywaydb:flyway-database-postgresql")
     
     // Oshi (系统监控)
     api("com.github.oshi:oshi-core")
     
-    // Testcontainers Redis for Dev environment
+    // Testcontainers Redis & PostgreSQL for Dev environment
     api("org.testcontainers:testcontainers")
+    api("org.testcontainers:testcontainers-postgresql")
     
     // Spring Boot DevTools - 开发环境自动重启和热部署
     developmentOnly("org.springframework.boot:spring-boot-devtools:4.0.5")

@@ -11,13 +11,6 @@ spring:
     livereload:
       enabled: true
       port: 35729
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
-      settings:
-        trace: false
-        web-allow-others: false
   data:
     redis:
       host: 127.0.0.1
@@ -30,30 +23,30 @@ spring:
           max-idle: 8
           max-active: 8
           max-wait: -1ms
-  # Database - H2 (dynamic-datasource)
+  # Database - PostgreSQL via Testcontainers (auto-configured by InitPostgreSQLServer)
   datasource:
     dynamic:
       datasource:
         user_master:
-          driver-class-name: org.h2.Driver
-          url: jdbc:h2:file:~/.h2/user;AUTO_SERVER=TRUE;MODE=MySQL;DATABASE_TO_LOWER=TRUE;DB_CLOSE_DELAY=-1
-          username: sa
-          password: ""
+          driver-class-name: org.postgresql.Driver
+          url: jdbc:postgresql://localhost:5432/appforge_user
+          username: appforge
+          password: appforge
         user_slave:
-          driver-class-name: org.h2.Driver
-          url: jdbc:h2:file:~/.h2/user;AUTO_SERVER=TRUE;MODE=MySQL;DATABASE_TO_LOWER=TRUE;DB_CLOSE_DELAY=-1
-          username: sa
-          password: ""
+          driver-class-name: org.postgresql.Driver
+          url: jdbc:postgresql://localhost:5432/appforge_user
+          username: appforge
+          password: appforge
         task_master:
-          driver-class-name: org.h2.Driver
-          url: jdbc:h2:file:~/.h2/task;AUTO_SERVER=TRUE;MODE=MySQL;DATABASE_TO_LOWER=TRUE;DB_CLOSE_DELAY=-1
-          username: sa
-          password: ""
+          driver-class-name: org.postgresql.Driver
+          url: jdbc:postgresql://localhost:5432/appforge_task
+          username: appforge
+          password: appforge
         task_slave:
-          driver-class-name: org.h2.Driver
-          url: jdbc:h2:file:~/.h2/task;AUTO_SERVER=TRUE;MODE=MySQL;DATABASE_TO_LOWER=TRUE;DB_CLOSE_DELAY=-1
-          username: sa
-          password: ""
+          driver-class-name: org.postgresql.Driver
+          url: jdbc:postgresql://localhost:5432/appforge_task
+          username: appforge
+          password: appforge
 
 # OpenTelemetry
 management:
@@ -69,7 +62,8 @@ management:
 app-forge:
   embedded:
     redis: true
-    h2-init: true
+    postgresql: true
+    db-init: true
   flyway:
     enabled: false
   monitor:

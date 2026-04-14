@@ -1,5 +1,6 @@
 package com.lesofn.appforge.server.admin;
 
+import com.lesofn.appforge.server.admin.config.InitPostgreSQLServer;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.hibernate.autoconfigure.HibernateJpaAutoConfiguration;
@@ -23,6 +24,8 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 public class Application {
 
     public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
+        SpringApplication app = new SpringApplication(Application.class);
+        app.addInitializers(new InitPostgreSQLServer());
+        app.run(args);
     }
 }

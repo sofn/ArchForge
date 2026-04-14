@@ -16,8 +16,7 @@ dependencies {
     constraints {
         // 数据库相关
         api("com.baomidou:dynamic-datasource-spring-boot4-starter:4.5.0")
-        api("com.mysql:mysql-connector-j:9.3.0")
-        api("com.h2database:h2:2.4.240")
+        api("org.postgresql:postgresql:42.7.7")
         
         // 常用工具类
         api("com.google.guava:guava:33.4.8-jre")
@@ -62,7 +61,7 @@ dependencies {
         api("org.junit.jupiter:junit-jupiter-engine:6.0.3")
         api("org.testcontainers:testcontainers:2.0.4")
         api("org.testcontainers:junit-jupiter:2.0.4")
-        api("org.testcontainers:mysql:2.0.4")
+        api("org.testcontainers:testcontainers-postgresql:2.0.4")
         // Spock 2.4 with Groovy 5.0
         api("org.spockframework:spock-core:2.4-groovy-5.0")
         api("org.spockframework:spock-spring:2.4-groovy-5.0")
@@ -84,7 +83,7 @@ dependencies {
 
         // Flyway
         api("org.flywaydb:flyway-core:11.8.0")
-        api("org.flywaydb:flyway-mysql:11.8.0")
+        api("org.flywaydb:flyway-database-postgresql:11.8.0")
 
         // Oshi (系统监控)
         api("com.github.oshi:oshi-core:6.8.1")

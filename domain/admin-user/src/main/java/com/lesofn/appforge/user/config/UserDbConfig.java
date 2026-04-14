@@ -42,7 +42,7 @@ public class UserDbConfig {
         HibernateJpaVendorAdapter jpaVendorAdapter = new HibernateJpaVendorAdapter();
         jpaVendorAdapter.setGenerateDdl(true);
         jpaVendorAdapter.setShowSql(false);
-        jpaVendorAdapter.setDatabasePlatform("org.hibernate.dialect.MySQLDialect");
+        jpaVendorAdapter.setDatabasePlatform("org.hibernate.dialect.PostgreSQLDialect");
 
         LocalContainerEntityManagerFactoryBean factoryBean =
                 new LocalContainerEntityManagerFactoryBean();
@@ -60,7 +60,7 @@ public class UserDbConfig {
         // Set JPA properties
         Map<String, Object> properties = new HashMap<>();
         properties.put("hibernate.hbm2ddl.auto", ddlAuto);
-        properties.put("hibernate.dialect", "org.hibernate.dialect.MySQLDialect");
+        properties.put("hibernate.dialect", "org.hibernate.dialect.PostgreSQLDialect");
         properties.put(
                 "hibernate.physical_naming_strategy",
                 "org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy");
