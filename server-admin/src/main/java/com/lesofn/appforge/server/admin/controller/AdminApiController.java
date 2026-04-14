@@ -2,6 +2,7 @@ package com.lesofn.appforge.server.admin.controller;
 
 import com.lesofn.appforge.common.enums.common.GenderEnum;
 import com.lesofn.appforge.server.admin.dto.*;
+import com.lesofn.appforge.server.admin.service.monitor.ServerMonitorService;
 import com.lesofn.appforge.user.dao.SysRoleMenuRepository;
 import com.lesofn.appforge.user.domain.SysDept;
 import com.lesofn.appforge.user.domain.SysMenu;
@@ -68,6 +69,9 @@ public class AdminApiController {
 
     @Autowired(required = false)
     private SysDeptService deptService;
+
+    @Autowired(required = false)
+    private ServerMonitorService serverMonitorService;
 
     // ==================== 列表查询 ====================
 
@@ -676,6 +680,17 @@ public class AdminApiController {
     public Boolean clearLoginLogs() {
         loginLogService.clearAll();
         return true;
+    }
+
+    // ==================== Server Monitor ====================
+
+    @Operation(summary = "获取服务器监控信息")
+    @GetMapping("/server-info")
+    public Map<String, Object> getServerInfo() {
+        if (serverMonitorService == null) {
+            return Collections.singletonMap("error", "服务器监控未启用");
+        }
+        return serverMonitorService.getServerInfo();
     }
 
     // ==================== 私有转换方法 ====================
