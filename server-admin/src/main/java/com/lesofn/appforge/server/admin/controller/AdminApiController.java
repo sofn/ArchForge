@@ -143,6 +143,7 @@ public class AdminApiController {
 
         List<AdminRoleItemDTO> roleItems =
                 rolePage.getContent().stream()
+                        .filter(role -> !Boolean.TRUE.equals(role.getDeleted()))
                         .map(this::convertToRoleItemDTO)
                         .collect(Collectors.toList());
 
@@ -214,6 +215,7 @@ public class AdminApiController {
         Optional<SysUser> opt = userService.findById(id);
         if (opt.isEmpty()) return false;
         SysUser user = opt.get();
+        if (data.containsKey("username")) user.setUsername((String) data.get("username"));
         if (data.containsKey("nickname")) user.setNickname((String) data.get("nickname"));
         if (data.containsKey("phone")) user.setPhoneNumber(String.valueOf(data.get("phone")));
         if (data.containsKey("email")) user.setEmail((String) data.get("email"));
