@@ -74,6 +74,7 @@ springdoc:
   api-docs:
     path: /v3/api-docs
     enabled: true
+    version: openapi_3_0
   swagger-ui:
     path: /swagger-ui.html
     enabled: true
@@ -85,6 +86,8 @@ springdoc:
   default-produces-media-type: application/json
   default-consumes-media-type: application/json
   show-actuator: false
+  pre-loading-enabled: true
+  writer-with-default-pretty-printer: true
 
 # 项目相关配置
 app-forge:
