@@ -15,7 +15,7 @@ import org.apache.commons.codec.binary.Base64;
 /**
  * RSA密钥对生成器
  *
- * @author agileboot
+ * @author sofn
  */
 public class RsaEncrypter {
 

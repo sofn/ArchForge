@@ -1,5 +1,6 @@
 package com.lesofn.appforge.server.admin.controller;
 
+import com.lesofn.appforge.common.enums.common.GenderEnum;
 import com.lesofn.appforge.server.admin.dto.*;
 import com.lesofn.appforge.user.dao.SysRoleMenuRepository;
 import com.lesofn.appforge.user.domain.SysDept;
@@ -22,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +31,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -47,16 +51,13 @@ public class AdminApiController {
     private final SysRoleService roleService;
     private final SysMenuService menuService;
     private final SysRoleMenuRepository roleMenuRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired(required = false)
     private SysDeptService deptService;
 
-    /**
-     * 获取用户列表（分页）
-     *
-     * @param request 查询条件
-     * @return 分页用户列表
-     */
+    // ==================== 列表查询 ====================
+
     @Operation(summary = "获取用户列表")
     @PostMapping("/user")
     public AdminPageResult<AdminUserItemDTO> getUserList(
@@ -72,8 +73,6 @@ public class AdminApiController {
 
         Pageable pageable = PageRequest.of(currentPage - 1, pageSize);
         Page<SysUser> userPage = userService.findAll(pageable);
-
-        // 构建部门ID到名称的映射
         Map<Long, String> deptNameMap = buildDeptNameMap();
 
         List<AdminUserItemDTO> userItems =
@@ -84,11 +83,6 @@ public class AdminApiController {
         return AdminPageResult.of(userItems, userPage.getTotalElements(), pageSize, currentPage);
     }
 
-    /**
-     * 获取全量角色列表
-     *
-     * @return 所有角色的简要信息
-     */
     @Operation(summary = "获取全量角色列表")
     @GetMapping("/list-all-role")
     public List<AdminRoleSimpleDTO> listAllRoles() {
@@ -98,12 +92,6 @@ public class AdminApiController {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * 获取用户的角色ID列表
-     *
-     * @param request 用户ID
-     * @return 角色ID列表
-     */
     @Operation(summary = "获取用户角色ID列表")
     @PostMapping("/list-role-ids")
     public List<Long> listRoleIds(@RequestBody AdminUserIdRequest request) {
@@ -123,12 +111,6 @@ public class AdminApiController {
                 .orElse(Collections.emptyList());
     }
 
-    /**
-     * 获取角色列表（分页）
-     *
-     * @param request 查询条件
-     * @return 分页角色列表
-     */
     @Operation(summary = "获取角色列表")
     @PostMapping("/role")
     public AdminPageResult<AdminRoleItemDTO> getRoleList(
@@ -153,11 +135,6 @@ public class AdminApiController {
         return AdminPageResult.of(roleItems, rolePage.getTotalElements(), pageSize, currentPage);
     }
 
-    /**
-     * 获取角色权限菜单树（全量菜单，供角色分配权限使用）
-     *
-     * @return 菜单列表（简化版）
-     */
     @Operation(summary = "获取角色权限菜单树")
     @PostMapping("/role-menu")
     public List<AdminRoleMenuItemDTO> getRoleMenuTree() {
@@ -165,12 +142,6 @@ public class AdminApiController {
         return allMenus.stream().map(this::convertToRoleMenuItemDTO).collect(Collectors.toList());
     }
 
-    /**
-     * 获取角色已分配的菜单ID列表
-     *
-     * @param request 角色ID
-     * @return 菜单ID列表
-     */
     @Operation(summary = "获取角色菜单ID列表")
     @PostMapping("/role-menu-ids")
     public List<Long> getRoleMenuIds(@RequestBody AdminRoleIdRequest request) {
@@ -181,11 +152,6 @@ public class AdminApiController {
         return roleMenus.stream().map(SysRoleMenu::getMenuId).collect(Collectors.toList());
     }
 
-    /**
-     * 获取全量菜单列表（扁平结构，前端构建树）
-     *
-     * @return 菜单列表
-     */
     @Operation(summary = "获取全量菜单列表")
     @PostMapping("/menu")
     public List<AdminMenuItemDTO> getMenuList() {
@@ -193,11 +159,6 @@ public class AdminApiController {
         return allMenus.stream().map(this::convertToMenuItemDTO).collect(Collectors.toList());
     }
 
-    /**
-     * 获取全量部门列表（扁平结构，前端构建树）
-     *
-     * @return 部门列表
-     */
     @Operation(summary = "获取全量部门列表")
     @PostMapping("/dept")
     public List<AdminDeptItemDTO> getDeptList() {
@@ -206,6 +167,259 @@ public class AdminApiController {
         }
         List<SysDept> allDepts = deptService.findAll();
         return allDepts.stream().map(this::convertToDeptItemDTO).collect(Collectors.toList());
+    }
+
+    // ==================== User CRUD ====================
+
+    @Operation(summary = "创建用户")
+    @PostMapping("/user/create")
+    @Transactional
+    public Long createUser(@RequestBody Map<String, Object> data) {
+        SysUser user = new SysUser();
+        user.setUsername((String) data.get("username"));
+        user.setNickname((String) data.get("nickname"));
+        user.setPhoneNumber(String.valueOf(data.getOrDefault("phone", "")));
+        user.setEmail((String) data.getOrDefault("email", ""));
+        if (data.get("sex") != null) {
+            user.setSex(GenderEnum.fromValue(((Number) data.get("sex")).intValue()));
+        }
+        user.setStatus((Integer) data.getOrDefault("status", 1));
+        user.setRemark((String) data.getOrDefault("remark", ""));
+        if (data.get("parentId") != null) {
+            user.setDeptId(((Number) data.get("parentId")).longValue());
+        }
+        String rawPassword = (String) data.getOrDefault("password", "admin123");
+        user.setPassword(passwordEncoder.encode(rawPassword));
+        SysUser saved = userService.create(user);
+        return saved.getUserId();
+    }
+
+    @Operation(summary = "更新用户")
+    @PutMapping("/user/update")
+    @Transactional
+    public Boolean updateUser(@RequestBody Map<String, Object> data) {
+        Long id = ((Number) data.get("id")).longValue();
+        Optional<SysUser> opt = userService.findById(id);
+        if (opt.isEmpty()) return false;
+        SysUser user = opt.get();
+        if (data.containsKey("nickname")) user.setNickname((String) data.get("nickname"));
+        if (data.containsKey("phone")) user.setPhoneNumber(String.valueOf(data.get("phone")));
+        if (data.containsKey("email")) user.setEmail((String) data.get("email"));
+        if (data.get("sex") != null)
+            user.setSex(GenderEnum.fromValue(((Number) data.get("sex")).intValue()));
+        if (data.containsKey("status")) user.setStatus((Integer) data.get("status"));
+        if (data.containsKey("remark")) user.setRemark((String) data.get("remark"));
+        if (data.get("parentId") != null)
+            user.setDeptId(((Number) data.get("parentId")).longValue());
+        userService.update(user);
+        return true;
+    }
+
+    @Operation(summary = "删除用户")
+    @PostMapping("/user/delete")
+    @Transactional
+    public Boolean deleteUser(@RequestBody Map<String, Object> data) {
+        Object idObj = data.get("id");
+        if (idObj instanceof Number) {
+            userService.softDeleteById(((Number) idObj).longValue());
+        }
+        return true;
+    }
+
+    @Operation(summary = "更新用户状态")
+    @PatchMapping("/user/status")
+    @Transactional
+    public Boolean updateUserStatus(@RequestBody Map<String, Object> data) {
+        Long id = ((Number) data.get("id")).longValue();
+        Integer status = (Integer) data.get("status");
+        userService.updateStatus(id, status);
+        return true;
+    }
+
+    @Operation(summary = "重置用户密码")
+    @PostMapping("/user/reset-password")
+    @Transactional
+    public Boolean resetUserPassword(@RequestBody Map<String, Object> data) {
+        Long id = ((Number) data.get("id")).longValue();
+        String newPwd = (String) data.getOrDefault("newPwd", "admin123");
+        userService.resetPassword(id, passwordEncoder.encode(newPwd));
+        return true;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Operation(summary = "分配用户角色")
+    @PostMapping("/user/assign-role")
+    @Transactional
+    public Boolean assignUserRole(@RequestBody Map<String, Object> data) {
+        Long userId = ((Number) data.get("id")).longValue();
+        List<Number> ids = (List<Number>) data.get("ids");
+        if (ids != null && !ids.isEmpty()) {
+            Long roleId = ids.get(0).longValue();
+            Optional<SysUser> opt = userService.findById(userId);
+            if (opt.isPresent()) {
+                SysUser user = opt.get();
+                user.setRoleId(roleId);
+                userService.update(user);
+            }
+        }
+        return true;
+    }
+
+    // ==================== Role CRUD ====================
+
+    @Operation(summary = "创建角色")
+    @PostMapping("/role/create")
+    @Transactional
+    public Long createRole(@RequestBody Map<String, Object> data) {
+        SysRole role = new SysRole();
+        role.setRoleName((String) data.get("name"));
+        role.setRoleKey((String) data.get("code"));
+        role.setRemark((String) data.getOrDefault("remark", ""));
+        role.setStatus((short) 1);
+        role.setRoleSort(0);
+        SysRole saved = roleService.create(role);
+        return saved.getRoleId();
+    }
+
+    @Operation(summary = "更新角色")
+    @PutMapping("/role/update")
+    @Transactional
+    public Boolean updateRole(@RequestBody Map<String, Object> data) {
+        Long id = ((Number) data.get("id")).longValue();
+        Optional<SysRole> opt = roleService.findById(id);
+        if (opt.isEmpty()) return false;
+        SysRole role = opt.get();
+        if (data.containsKey("name")) role.setRoleName((String) data.get("name"));
+        if (data.containsKey("code")) role.setRoleKey((String) data.get("code"));
+        if (data.containsKey("remark")) role.setRemark((String) data.get("remark"));
+        roleService.update(role);
+        return true;
+    }
+
+    @Operation(summary = "删除角色")
+    @PostMapping("/role/delete")
+    @Transactional
+    public Boolean deleteRole(@RequestBody Map<String, Object> data) {
+        Long id = ((Number) data.get("id")).longValue();
+        roleService.softDeleteById(id);
+        return true;
+    }
+
+    @Operation(summary = "更新角色状态")
+    @PatchMapping("/role/status")
+    @Transactional
+    public Boolean updateRoleStatus(@RequestBody Map<String, Object> data) {
+        Long id = ((Number) data.get("id")).longValue();
+        Integer status = (Integer) data.get("status");
+        Optional<SysRole> opt = roleService.findById(id);
+        if (opt.isPresent()) {
+            SysRole role = opt.get();
+            role.setStatus(status.shortValue());
+            roleService.update(role);
+        }
+        return true;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Operation(summary = "保存角色菜单权限")
+    @PostMapping("/role/save-menu")
+    @Transactional
+    public Boolean saveRoleMenu(@RequestBody Map<String, Object> data) {
+        Long roleId = ((Number) data.get("id")).longValue();
+        List<Number> menuIds = (List<Number>) data.get("menuIds");
+        roleMenuRepository.deleteByRoleId(roleId);
+        if (menuIds != null) {
+            for (Number menuId : menuIds) {
+                SysRoleMenu roleMenu = new SysRoleMenu();
+                roleMenu.setRoleId(roleId);
+                roleMenu.setMenuId(menuId.longValue());
+                roleMenuRepository.save(roleMenu);
+            }
+        }
+        return true;
+    }
+
+    // ==================== Menu CRUD ====================
+
+    @Operation(summary = "创建菜单")
+    @PostMapping("/menu/create")
+    @Transactional
+    public Long createMenu(@RequestBody Map<String, Object> data) {
+        SysMenu menu = buildMenuFromData(data);
+        SysMenu saved = menuService.create(menu);
+        return saved.getMenuId();
+    }
+
+    @Operation(summary = "更新菜单")
+    @PutMapping("/menu/update")
+    @Transactional
+    public Boolean updateMenu(@RequestBody Map<String, Object> data) {
+        Long id = ((Number) data.get("id")).longValue();
+        Optional<SysMenu> opt = menuService.findById(id);
+        if (opt.isEmpty()) return false;
+        SysMenu menu = opt.get();
+        updateMenuFromData(menu, data);
+        menuService.update(menu);
+        return true;
+    }
+
+    @Operation(summary = "删除菜单")
+    @PostMapping("/menu/delete")
+    @Transactional
+    public Boolean deleteMenu(@RequestBody Map<String, Object> data) {
+        Long id = ((Number) data.get("id")).longValue();
+        menuService.softDeleteById(id);
+        return true;
+    }
+
+    // ==================== Dept CRUD ====================
+
+    @Operation(summary = "创建部门")
+    @PostMapping("/dept/create")
+    @Transactional
+    public Long createDept(@RequestBody Map<String, Object> data) {
+        SysDept dept = new SysDept();
+        dept.setParentId(
+                data.get("parentId") != null ? ((Number) data.get("parentId")).longValue() : 0L);
+        dept.setName((String) data.get("name"));
+        dept.setPrincipal((String) data.getOrDefault("principal", ""));
+        dept.setPhone(String.valueOf(data.getOrDefault("phone", "")));
+        dept.setEmail((String) data.getOrDefault("email", ""));
+        dept.setSort(data.get("sort") != null ? ((Number) data.get("sort")).intValue() : 0);
+        dept.setStatus((Integer) data.getOrDefault("status", 1));
+        dept.setRemark((String) data.getOrDefault("remark", ""));
+        SysDept saved = deptService.create(dept);
+        return saved.getDeptId();
+    }
+
+    @Operation(summary = "更新部门")
+    @PutMapping("/dept/update")
+    @Transactional
+    public Boolean updateDept(@RequestBody Map<String, Object> data) {
+        Long id = ((Number) data.get("id")).longValue();
+        Optional<SysDept> opt = deptService.findById(id);
+        if (opt.isEmpty()) return false;
+        SysDept dept = opt.get();
+        if (data.containsKey("name")) dept.setName((String) data.get("name"));
+        if (data.containsKey("principal")) dept.setPrincipal((String) data.get("principal"));
+        if (data.containsKey("phone")) dept.setPhone(String.valueOf(data.get("phone")));
+        if (data.containsKey("email")) dept.setEmail((String) data.get("email"));
+        if (data.get("sort") != null) dept.setSort(((Number) data.get("sort")).intValue());
+        if (data.containsKey("status")) dept.setStatus((Integer) data.get("status"));
+        if (data.containsKey("remark")) dept.setRemark((String) data.get("remark"));
+        if (data.get("parentId") != null)
+            dept.setParentId(((Number) data.get("parentId")).longValue());
+        deptService.update(dept);
+        return true;
+    }
+
+    @Operation(summary = "删除部门")
+    @PostMapping("/dept/delete")
+    @Transactional
+    public Boolean deleteDept(@RequestBody Map<String, Object> data) {
+        Long id = ((Number) data.get("id")).longValue();
+        deptService.deleteById(id);
+        return true;
     }
 
     // ==================== 私有转换方法 ====================
@@ -222,13 +436,10 @@ public class AdminApiController {
         dto.setStatus(user.getStatus());
         dto.setRemark(user.getRemark());
         dto.setCreateTime(toEpochMilli(user.getCreateTime()));
-
-        // 设置部门信息
         if (user.getDeptId() != null) {
             String deptName = deptNameMap.getOrDefault(user.getDeptId(), "");
             dto.setDept(AdminUserItemDTO.DeptInfo.of(user.getDeptId(), deptName));
         }
-
         return dto;
     }
 
@@ -249,12 +460,10 @@ public class AdminApiController {
         dto.setParentId(menu.getParentId());
         dto.setId(menu.getMenuId());
         dto.setMenuType(menu.getMenuType());
-
         MetaDTO meta = menu.getMetaInfo();
         if (meta != null) {
             dto.setTitle(meta.getTitle());
         }
-
         return dto;
     }
 
@@ -270,7 +479,6 @@ public class AdminApiController {
         dto.setActivePath("");
         dto.setAuths(menu.getPermission() != null ? menu.getPermission() : "");
         dto.setFixedTag(false);
-
         MetaDTO meta = menu.getMetaInfo();
         if (meta != null) {
             dto.setTitle(meta.getTitle());
@@ -282,10 +490,8 @@ public class AdminApiController {
             dto.setHiddenTag(meta.getHiddenTag() != null ? meta.getHiddenTag() : false);
             dto.setShowLink(meta.getShowLink() != null ? meta.getShowLink() : true);
             dto.setShowParent(meta.getShowParent() != null ? meta.getShowParent() : false);
-
             ExtraIconDTO extraIcon = meta.getExtraIcon();
             dto.setExtraIcon(extraIcon != null ? extraIcon.getName() : "");
-
             TransitionDTO transition = meta.getTransition();
             if (transition != null) {
                 dto.setEnterTransition(
@@ -314,7 +520,6 @@ public class AdminApiController {
             dto.setShowLink(true);
             dto.setShowParent(false);
         }
-
         return dto;
     }
 
@@ -348,5 +553,38 @@ public class AdminApiController {
             return null;
         }
         return dateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+    }
+
+    // ==================== Menu Helper Methods ====================
+
+    private SysMenu buildMenuFromData(Map<String, Object> data) {
+        SysMenu menu = new SysMenu();
+        updateMenuFromData(menu, data);
+        return menu;
+    }
+
+    private void updateMenuFromData(SysMenu menu, Map<String, Object> data) {
+        if (data.containsKey("parentId"))
+            menu.setParentId(((Number) data.get("parentId")).longValue());
+        if (data.containsKey("menuType"))
+            menu.setMenuType(((Number) data.get("menuType")).intValue());
+        if (data.containsKey("name")) menu.setRouterName((String) data.get("name"));
+        if (data.containsKey("path")) menu.setPath((String) data.get("path"));
+        if (data.containsKey("auths")) menu.setPermission((String) data.get("auths"));
+        if (data.containsKey("status")) menu.setStatus(((Number) data.get("status")).intValue());
+        MetaDTO meta = menu.getMetaInfo() != null ? menu.getMetaInfo() : new MetaDTO();
+        if (data.containsKey("title")) meta.setTitle((String) data.get("title"));
+        if (data.containsKey("icon")) meta.setIcon((String) data.get("icon"));
+        if (data.get("rank") != null) meta.setRank(((Number) data.get("rank")).intValue());
+        if (data.containsKey("showLink")) meta.setShowLink((Boolean) data.get("showLink"));
+        if (data.containsKey("showParent")) meta.setShowParent((Boolean) data.get("showParent"));
+        if (data.containsKey("keepAlive")) meta.setKeepAlive((Boolean) data.get("keepAlive"));
+        if (data.containsKey("frameSrc")) meta.setFrameSrc((String) data.get("frameSrc"));
+        if (data.containsKey("frameLoading"))
+            meta.setFrameLoading((Boolean) data.get("frameLoading"));
+        if (data.containsKey("hiddenTag")) meta.setHiddenTag((Boolean) data.get("hiddenTag"));
+        menu.setMetaInfo(meta);
+        if (data.containsKey("title")) menu.setMenuName((String) data.get("title"));
+        if (menu.getStatus() == null) menu.setStatus(1);
     }
 }
