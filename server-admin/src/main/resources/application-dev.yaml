@@ -70,6 +70,8 @@ app-forge:
   embedded:
     redis: true
     h2-init: true
+  flyway:
+    enabled: false
   jwt:
     secret: 5/jDAWs7a63GRgjS+uF2mP7dcLwI6GAgxf+Z0+fOAbgMR/jksG5r0v10nDOkrM0btxtb2FAuol8fSzSJis8gIA==
     expire-seconds: 604800

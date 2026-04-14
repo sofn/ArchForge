@@ -2,7 +2,10 @@
 spring:
   sql:
     init:
-      mode: always
+      mode: never
+  jpa:
+    hibernate:
+      ddl-auto: validate
   data:
     redis:
       host: 127.0.0.1
@@ -53,6 +56,8 @@ management:
       endpoint: http://localhost:4318/v1/metrics
 
 app-forge:
+  flyway:
+    enabled: true
   jwt:
     secret: <your-jwt-secret>
     expire-seconds: 86400

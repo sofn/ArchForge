@@ -54,6 +54,8 @@ spring:
           log-slow-sql: true
   main:
     allow-bean-definition-overriding: true
+  flyway:
+    enabled: false
   sql:
     init:
       encoding: UTF-8

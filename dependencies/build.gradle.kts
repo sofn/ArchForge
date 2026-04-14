@@ -82,6 +82,10 @@ dependencies {
         api("io.micrometer:micrometer-tracing-bridge-otel:1.5.6")
         api("io.opentelemetry:opentelemetry-exporter-otlp:1.52.0")
 
+        // Flyway
+        api("org.flywaydb:flyway-core:11.8.0")
+        api("org.flywaydb:flyway-mysql:11.8.0")
+
     }
 }
 
