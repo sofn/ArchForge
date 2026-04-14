@@ -52,6 +52,9 @@ public class AppForgeConfig {
     /** 数据脱敏配置 */
     private Sensitive sensitive = new Sensitive();
 
+    /** 文件存储配置 */
+    private FileStorage fileStorage = new FileStorage();
+
     @Setter
     @Getter
     public static class Token {
@@ -98,8 +101,14 @@ public class AppForgeConfig {
         /** 是否启用嵌入式 Redis */
         private boolean redis = false;
 
-        /** 是否启用嵌入式 h2 */
-        private boolean h2Init = false;
+        /** 是否启用嵌入式 PostgreSQL */
+        private boolean postgresql = false;
+
+        /** 是否启用数据库初始化 */
+        private boolean dbInit = false;
+
+        /** 是否启用嵌入式 S3 (MinIO) */
+        private boolean s3 = false;
     }
 
     @Setter
@@ -107,5 +116,37 @@ public class AppForgeConfig {
     public static class Sensitive {
         /** 是否启用数据脱敏 */
         private boolean enabled = true;
+    }
+
+    @Setter
+    @Getter
+    public static class FileStorage {
+        /** 存储类型: local 或 s3 */
+        private String type = "local";
+
+        /** 本地存储基础目录 */
+        private String localDir = "uploads";
+
+        /** S3 配置 */
+        private S3Config s3 = new S3Config();
+    }
+
+    @Setter
+    @Getter
+    public static class S3Config {
+        /** S3 endpoint */
+        private String endpoint = "http://localhost:9000";
+
+        /** S3 access key */
+        private String accessKey = "minioadmin";
+
+        /** S3 secret key */
+        private String secretKey = "minioadmin";
+
+        /** S3 bucket name */
+        private String bucket = "appforge";
+
+        /** S3 region */
+        private String region = "us-east-1";
     }
 }

@@ -88,6 +88,12 @@ dependencies {
         // Oshi (系统监控)
         api("com.github.oshi:oshi-core:6.8.1")
 
+        // AWS S3 SDK (文件存储)
+        api("software.amazon.awssdk:s3:2.31.54")
+
+        // Testcontainers MinIO for S3 testing
+        api("org.testcontainers:testcontainers-minio:2.0.4")
+
     }
 }
 

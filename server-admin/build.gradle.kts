@@ -79,6 +79,10 @@ dependencies {
     // Testcontainers Redis & PostgreSQL for Dev environment
     api("org.testcontainers:testcontainers")
     api("org.testcontainers:testcontainers-postgresql")
+    api("org.testcontainers:testcontainers-minio")
+    
+    // AWS S3 SDK
+    api("software.amazon.awssdk:s3")
     
     // Spring Boot DevTools - 开发环境自动重启和热部署
     developmentOnly("org.springframework.boot:spring-boot-devtools:4.0.5")

@@ -50,6 +50,9 @@ dependencies {
     api("io.micrometer:micrometer-tracing-bridge-otel")
     api("io.opentelemetry:opentelemetry-exporter-otlp")
 
+    // AWS S3 SDK (文件存储)
+    api("software.amazon.awssdk:s3")
+
     // JUnit for tests
     testImplementation("org.junit.jupiter:junit-jupiter-api")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")

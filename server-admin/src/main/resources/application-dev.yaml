@@ -64,6 +64,7 @@ app-forge:
     redis: true
     postgresql: true
     db-init: true
+    s3: true
   flyway:
     enabled: false
   monitor:
