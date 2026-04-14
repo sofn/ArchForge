@@ -1,6 +1,8 @@
 package com.lesofn.appforge.common.repository;
 
 import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,4 +26,19 @@ public class BaseEntity<T> {
 
     /** deleted字段请在数据库中 设置为tinyInt 并且非null 默认值为0 */
     private Boolean deleted;
+
+    @PrePersist
+    public void prePersist() {
+        if (this.createTime == null) {
+            this.createTime = LocalDateTime.now();
+        }
+        if (this.deleted == null) {
+            this.deleted = false;
+        }
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        this.updateTime = LocalDateTime.now();
+    }
 }

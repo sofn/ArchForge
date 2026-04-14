@@ -88,13 +88,49 @@ public class AdminApiController {
         Page<SysUser> userPage = userService.findAll(pageable);
         Map<Long, String> deptNameMap = buildDeptNameMap();
 
+        // Apply filters: deptId, username, phone, status
         List<AdminUserItemDTO> userItems =
                 userPage.getContent().stream()
                         .filter(user -> !Boolean.TRUE.equals(user.getDeleted()))
+                        .filter(
+                                user -> {
+                                    Long deptId = request.getDeptIdAsLong();
+                                    if (deptId != null) {
+                                        return deptId.equals(user.getDeptId());
+                                    }
+                                    return true;
+                                })
+                        .filter(
+                                user -> {
+                                    String q = request.getUsername();
+                                    if (q != null && !q.isEmpty()) {
+                                        return user.getUsername() != null
+                                                && user.getUsername().contains(q);
+                                    }
+                                    return true;
+                                })
+                        .filter(
+                                user -> {
+                                    String q = request.getPhone();
+                                    if (q != null && !q.isEmpty()) {
+                                        return user.getPhoneNumber() != null
+                                                && user.getPhoneNumber().contains(q);
+                                    }
+                                    return true;
+                                })
+                        .filter(
+                                user -> {
+                                    Integer q = request.getStatusAsInt();
+                                    if (q != null) {
+                                        return q.equals(user.getStatus());
+                                    }
+                                    return true;
+                                })
                         .map(user -> convertToUserItemDTO(user, deptNameMap))
                         .collect(Collectors.toList());
 
-        return AdminPageResult.of(userItems, userPage.getTotalElements(), pageSize, currentPage);
+        return AdminPageResult.of(
+                userItems, (long) userItems.size(), pageSize, currentPage);
     }
 
     @Operation(summary = "获取全量角色列表")
