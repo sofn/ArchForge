@@ -8,6 +8,7 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.MediaType;
+import org.springframework.http.ProblemDetail;
 import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
@@ -50,6 +51,7 @@ public class ResultValueWrapper implements ResponseBodyAdvice<Object> {
 
         return switch (body) {
             case null -> ResponseResult.success(null);
+            case ProblemDetail p -> p; // RFC 9457: pass through without wrapping
             case ResponseResult<?> r -> r;
             case Result<?> r -> ResponseResult.success(r.getData());
             default -> {

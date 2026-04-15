@@ -8,6 +8,7 @@ import java.text.DecimalFormat;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
+import java.util.concurrent.StructuredTaskScope;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
@@ -41,11 +42,28 @@ public class ServerMonitorService {
             HardwareAbstractionLayer hal = si.getHardware();
             OperatingSystem os = si.getOperatingSystem();
 
-            result.put("cpu", getCpuInfo(hal.getProcessor()));
-            result.put("memory", getMemoryInfo(hal.getMemory()));
-            result.put("jvm", getJvmInfo());
-            result.put("os", getOsInfo(os));
-            result.put("disks", getDiskInfo(os));
+            CentralProcessor processor = hal.getProcessor();
+            GlobalMemory memory = hal.getMemory();
+
+            try (StructuredTaskScope<Object, Void> scope = StructuredTaskScope.open()) {
+                StructuredTaskScope.Subtask<Map<String, Object>> cpuTask =
+                        scope.fork(() -> getCpuInfo(processor));
+                StructuredTaskScope.Subtask<Map<String, Object>> memTask =
+                        scope.fork(() -> getMemoryInfo(memory));
+                StructuredTaskScope.Subtask<Map<String, Object>> jvmTask =
+                        scope.fork(() -> getJvmInfo());
+                StructuredTaskScope.Subtask<Map<String, Object>> osTask =
+                        scope.fork(() -> getOsInfo(os));
+                StructuredTaskScope.Subtask<List<Map<String, Object>>> diskTask =
+                        scope.fork(() -> getDiskInfo(os));
+                scope.join();
+
+                result.put("cpu", cpuTask.get());
+                result.put("memory", memTask.get());
+                result.put("jvm", jvmTask.get());
+                result.put("os", osTask.get());
+                result.put("disks", diskTask.get());
+            }
         } catch (Exception e) {
             log.error("获取服务器监控信息失败", e);
             result.put("error", e.getMessage());

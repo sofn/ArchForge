@@ -34,4 +34,9 @@ public class SysRole extends BaseEntity<SysRole> {
     private Short status;
 
     private String remark;
+
+    /** 角色是否启用 */
+    public boolean isEnabled() {
+        return this.status != null && this.status == 1 && !Boolean.TRUE.equals(this.getDeleted());
+    }
 }

@@ -7,18 +7,23 @@ import com.lesofn.archsmith.infrastructure.frame.context.RequestIDGenerator;
 import com.lesofn.archsmith.infrastructure.frame.context.ScopedValueContext;
 import com.lesofn.archsmith.infrastructure.frame.utils.RequestLogRecord;
 import com.lesofn.archsmith.infrastructure.frame.utils.ResponseWrapper;
+import io.micrometer.observation.Observation;
+import io.micrometer.observation.ObservationRegistry;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.Strings;
 import org.slf4j.MDC;
 
 @Slf4j
+@RequiredArgsConstructor
 public class RequestLogFilter implements Filter {
 
     private static final RequestIDGenerator requestIdGenerator = RequestIDGenerator.getInstance();
+    private final ObservationRegistry observationRegistry;
 
     @Override
     public void doFilter(
@@ -57,10 +62,14 @@ public class RequestLogFilter implements Filter {
             String path)
             throws IOException, ServletException {
         response = new ResponseWrapper(response);
+        Observation observation = Observation.start("http.server.requests", observationRegistry);
         long startTime = System.currentTimeMillis();
         try {
+            observation.lowCardinalityKeyValue("http.method", request.getMethod());
+            observation.lowCardinalityKeyValue("http.path", path);
             filterChain.doFilter(request, response);
         } catch (Exception e) {
+            observation.error(e);
             // 此处拦截也必须抛出，否则不执行ErrorHandlerResource
             if (e instanceof IErrorCodeException errorCodeEx) {
                 log.error(
@@ -115,6 +124,9 @@ public class RequestLogFilter implements Filter {
                     log.info(recordString);
                 }
                 MDC.remove("CUSTOM_LOG");
+                observation.lowCardinalityKeyValue(
+                        "http.status", String.valueOf(response.getStatus()));
+                observation.stop();
             }
         }
     }

@@ -29,6 +29,14 @@ tasks.bootRun {
     jvmArgs("--enable-preview", "--enable-native-access=ALL-UNNAMED")
 }
 
+// Spring AOT processing also needs --enable-preview
+tasks.named<JavaExec>("processAot") {
+    jvmArgs("--enable-preview")
+}
+tasks.named<JavaExec>("processTestAot") {
+    jvmArgs("--enable-preview")
+}
+
 // GraalVM Native Image 配置
 graalvmNative {
     binaries {
@@ -99,5 +107,49 @@ dependencies {
     // MapStruct注解处理器
     annotationProcessor("org.mapstruct:mapstruct-processor:1.6.3")
     compileOnly("org.mapstruct:mapstruct:1.6.3")
+}
+
+// jlink: 生成最小化 JRE (Spring Boot Web + Actuator + JPA 所需模块)
+val buildMinimalJre by tasks.registering(Exec::class) {
+    group = "build"
+    description = "Builds a minimal JRE using jlink for this Spring Boot application"
+
+    val requiredModules = listOf(
+        "java.base",
+        "java.compiler",
+        "java.desktop",
+        "java.instrument",
+        "java.management",
+        "java.prefs",
+        "java.rmi",
+        "java.scripting",
+        "java.security.jgss",
+        "java.sql",
+        "jdk.jfr",
+        "jdk.unsupported",
+        "jdk.crypto.ec",
+        "jdk.management",
+        "jdk.management.agent"
+    ).joinToString(",")
+
+    val javaHome = System.getProperty("java.home")
+    val jreOutputDir = layout.buildDirectory.dir("minimal-jre").get().asFile
+
+    inputs.property("modules", requiredModules)
+    outputs.dir(jreOutputDir)
+
+    doFirst {
+        jreOutputDir.deleteRecursively()
+    }
+
+    commandLine(
+        "$javaHome/bin/jlink",
+        "--add-modules", requiredModules,
+        "--strip-debug",
+        "--no-man-pages",
+        "--no-header-files",
+        "--compress", "zip-6",
+        "--output", jreOutputDir.absolutePath
+    )
 }
 

@@ -47,6 +47,9 @@ spring:
           log-slow-sql: true
   main:
     allow-bean-definition-overriding: true
+  mvc:
+    problemdetails:
+      enabled: true
   sql:
     init:
       encoding: UTF-8
