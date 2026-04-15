@@ -80,7 +80,7 @@ class DigestsTest extends Specification {
         then:
         salt != null
         salt.length == saltSize
-        salt.every { it != 0 } // Should not be all zeros
+        !salt.every { it == 0 } // Should not be all zeros
     }
 
     def "test generateSalt with different sizes"() {

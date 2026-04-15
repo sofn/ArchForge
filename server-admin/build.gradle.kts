@@ -24,6 +24,11 @@ tasks.jar {
     archiveClassifier.set("plain")
 }
 
+// JDK 25: suppress Netty native-access warning (System.loadLibrary is restricted)
+tasks.bootRun {
+    jvmArgs("--enable-native-access=ALL-UNNAMED")
+}
+
 // GraalVM Native Image 配置
 graalvmNative {
     binaries {

@@ -33,6 +33,7 @@ ENV JAVA_OPTS="-XX:AOTCache=app.aot \
     -XX:+UseZGC \
     -XX:MaxRAMPercentage=75.0 \
     -XX:InitialRAMPercentage=50.0 \
+    --enable-native-access=ALL-UNNAMED \
     -Djava.security.egd=file:/dev/./urandom"
 ENV SPRING_PROFILES_ACTIVE="prod"
 

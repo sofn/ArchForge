@@ -16,13 +16,13 @@ dependencies {
     constraints {
         // 数据库相关
         api("com.baomidou:dynamic-datasource-spring-boot4-starter:4.5.0")
-        api("org.postgresql:postgresql:42.7.7")
+        api("org.postgresql:postgresql:42.7.10")
         
         // 常用工具类
         api("com.google.guava:guava:33.4.8-jre")
-        api("commons-io:commons-io:2.19.0")
+        api("commons-io:commons-io:2.20.0")
         api("org.apache.commons:commons-lang3:3.20.0")
-        api("commons-codec:commons-codec:1.18.0")
+        api("commons-codec:commons-codec:1.19.0")
         api("org.apache.commons:commons-collections4:4.5.0")
         
         // 实用工具
@@ -59,17 +59,16 @@ dependencies {
         // 测试相关 (JUnit 6.x for Spring Boot 4)
         api("org.junit.jupiter:junit-jupiter-api:6.0.3")
         api("org.junit.jupiter:junit-jupiter-engine:6.0.3")
+        // Testcontainers
         api("org.testcontainers:testcontainers:2.0.4")
         api("org.testcontainers:junit-jupiter:2.0.4")
         api("org.testcontainers:testcontainers-postgresql:2.0.4")
+        api("org.testcontainers:testcontainers-minio:2.0.4")
         // Spock 2.4 with Groovy 5.0
         api("org.spockframework:spock-core:2.4-groovy-5.0")
         api("org.spockframework:spock-spring:2.4-groovy-5.0")
         api("org.apache.groovy:groovy:5.0.5")
 
-        // Testcontainers Redis for Dev environment
-        api("org.testcontainers:testcontainers:2.0.4")
-        
         // Kaptcha 验证码
         api("com.github.penggle:kaptcha:2.3.2")
 
@@ -77,22 +76,19 @@ dependencies {
         api("org.mapstruct:mapstruct:1.6.3")
         api("org.mapstruct:mapstruct-processor:1.6.3")
 
-        // Micrometer + OpenTelemetry
-        api("io.micrometer:micrometer-tracing-bridge-otel:1.5.6")
-        api("io.opentelemetry:opentelemetry-exporter-otlp:1.52.0")
+        // Micrometer + OpenTelemetry (versions aligned with Spring Boot 4.0.5 BOM)
+        api("io.micrometer:micrometer-tracing-bridge-otel:1.6.4")
+        api("io.opentelemetry:opentelemetry-exporter-otlp:1.55.0")
 
-        // Flyway
-        api("org.flywaydb:flyway-core:11.8.0")
-        api("org.flywaydb:flyway-database-postgresql:11.8.0")
+        // Flyway (versions aligned with Spring Boot 4.0.5 BOM)
+        api("org.flywaydb:flyway-core:11.14.1")
+        api("org.flywaydb:flyway-database-postgresql:11.14.1")
 
         // Oshi (系统监控)
         api("com.github.oshi:oshi-core:6.8.1")
 
         // AWS S3 SDK (文件存储)
         api("software.amazon.awssdk:s3:2.31.54")
-
-        // Testcontainers MinIO for S3 testing
-        api("org.testcontainers:testcontainers-minio:2.0.4")
 
     }
 }
