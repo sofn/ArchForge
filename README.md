@@ -21,7 +21,13 @@
 
 ArchSmith is a **production-ready, full-stack admin platform** that combines a Spring Boot 4 backend with a Vue 3 frontend. It provides complete user/role/menu/department management, file upload/download, server monitoring, JWT authentication, and more — all with clean architecture and modern tooling.
 
-> **Why ArchSmith?** Most similar projects (RuoYi, JeecgBoot) are still on Spring Boot 2.x/3.x. ArchSmith uses **Spring Boot 4 + Java 25 virtual threads + Native Image**, delivering ~100ms startup time and ~50MB memory footprint.
+### Why ArchSmith?
+
+- **Modern architecture**: JDK 25 + Spring Boot 4 + DDD + Clean Architecture — not a legacy codebase ported forward
+- **Team project standard**: Codified conventions (Spotless, JSpecify, Lombok), centralized dependency BOM, skill-based onboarding
+- **JDK 25 features in production**: ScopedValue, Structured Concurrency, Pattern Matching, Stream Gatherers, Virtual Threads
+- **Production-ready deployment**: Docker with jlink minimal JRE + Project Leyden CDS, Flyway migrations, multi-datasource, Micrometer observability
+- **Zero-config dev**: `./gradlew server-admin:bootRun` auto-starts PostgreSQL, Redis, MinIO via Testcontainers
 
 ## Features
 
@@ -40,7 +46,8 @@ ArchSmith is a **production-ready, full-stack admin platform** that combines a S
 
 ### Prerequisites
 
-- Java 25, Node.js 20+, pnpm 9+, Docker (for Testcontainers)
+- Java 25, Node.js 20+, pnpm 9+
+- **Docker** (required for dev mode — Testcontainers uses Docker to run PostgreSQL, Redis, MinIO)
 
 ### 1. Clone
 

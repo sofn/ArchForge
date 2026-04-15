@@ -21,19 +21,13 @@
 
 ArchSmith 是一个**开箱即用的全栈管理系统**，后端基于 Spring Boot 4，前端基于 Vue 3，提供完整的用户/角色/菜单/部门管理、文件上传下载、服务器监控、JWT 认证等功能。采用整洁架构，使用现代化技术栈。
 
-### 与同类项目对比
+### 为什么选择 ArchSmith？
 
-| 特性 | ArchSmith | RuoYi | JeecgBoot |
-|------|----------|-------|-----------|
-| Spring Boot | **4.0.5** | 2.x | 3.x |
-| Java | **25 (虚拟线程)** | 8/17 | 17 |
-| Native Image | **支持 (~100ms启动)** | 不支持 | 不支持 |
-| 前端框架 | **Vue 3 + Vite 8** | Vue 2/3 | Vue 3 |
-| 数据库 | **PostgreSQL** | MySQL | MySQL |
-| 数据库迁移 | **Flyway** | 手动SQL | 手动SQL |
-| 文件存储 | **本地 + S3 (MinIO)** | 本地 | 本地/OSS |
-| 服务器监控 | **Oshi 实时监控** | Sigar | 无 |
-| 部署方式 | **Docker (Leyden + Native)** | Docker | Docker |
+- **架构先进**：JDK 25 + Spring Boot 4 + DDD + 整洁架构，不是老项目的升级版
+- **团队标准**：规范化约定（Spotless、JSpecify、Lombok），统一依赖 BOM，Skill 化入门指引
+- **JDK 25 新能力**：ScopedValue、结构化并发、模式匹配、Stream Gatherers、虚拟线程
+- **生产就绪**：Docker（jlink 最小 JRE + Leyden CDS）、Flyway 迁移、多数据源、Micrometer 可观测性
+- **零配置开发**：`./gradlew server-admin:bootRun` 自动通过 Testcontainers 启动 PostgreSQL、Redis、MinIO
 
 ## 功能模块
 
@@ -54,7 +48,8 @@ ArchSmith 是一个**开箱即用的全栈管理系统**，后端基于 Spring B
 
 ### 环境要求
 
-- Java 25、Node.js 20+、pnpm 9+、Docker（Testcontainers 需要）
+- Java 25、Node.js 20+、pnpm 9+
+- **Docker**（开发模式必需 — Testcontainers 通过 Docker 运行 PostgreSQL、Redis、MinIO）
 
 ### 1. 克隆项目
 
