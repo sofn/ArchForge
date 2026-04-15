@@ -48,19 +48,18 @@ public class ResultValueWrapper implements ResponseBodyAdvice<Object> {
             return body;
         }
 
-        if (body == null) {
-            return ResponseResult.success(null);
-        } else if (body instanceof ResponseResult) {
-            return body;
-        } else if (body instanceof Result) {
-            Result<?> result = (Result<?>) body;
-            return ResponseResult.success(result.getData());
-        }
-
-        if (requestPath.equals("/error")) {
-            return ResponseResult.error(SystemErrorCode.SYSTEM_ERROR.getCode(), body.toString());
-        } else {
-            return ResponseResult.success(body);
-        }
+        return switch (body) {
+            case null -> ResponseResult.success(null);
+            case ResponseResult<?> r -> r;
+            case Result<?> r -> ResponseResult.success(r.getData());
+            default -> {
+                if (requestPath.equals("/error")) {
+                    yield ResponseResult.error(
+                            SystemErrorCode.SYSTEM_ERROR.getCode(), body.toString());
+                } else {
+                    yield ResponseResult.success(body);
+                }
+            }
+        };
     }
 }

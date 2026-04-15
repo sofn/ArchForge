@@ -567,28 +567,20 @@ public class JsonUtil {
 
     /** 向json中添加属性 */
     private static <V> void add(JsonNode jsonNode, String key, V value) {
-        if (value instanceof String) {
-            ((ObjectNode) jsonNode).put(key, (String) value);
-        } else if (value instanceof Short) {
-            ((ObjectNode) jsonNode).put(key, (Short) value);
-        } else if (value instanceof Integer) {
-            ((ObjectNode) jsonNode).put(key, (Integer) value);
-        } else if (value instanceof Long) {
-            ((ObjectNode) jsonNode).put(key, (Long) value);
-        } else if (value instanceof Float) {
-            ((ObjectNode) jsonNode).put(key, (Float) value);
-        } else if (value instanceof Double) {
-            ((ObjectNode) jsonNode).put(key, (Double) value);
-        } else if (value instanceof BigDecimal) {
-            ((ObjectNode) jsonNode).put(key, (BigDecimal) value);
-        } else if (value instanceof BigInteger) {
-            ((ObjectNode) jsonNode).put(key, (BigInteger) value);
-        } else if (value instanceof Boolean) {
-            ((ObjectNode) jsonNode).put(key, (Boolean) value);
-        } else if (value instanceof byte[]) {
-            ((ObjectNode) jsonNode).put(key, (byte[]) value);
-        } else {
-            ((ObjectNode) jsonNode).put(key, to(value));
+        ObjectNode node = (ObjectNode) jsonNode;
+        switch (value) {
+            case String s -> node.put(key, s);
+            case Short s -> node.put(key, s);
+            case Integer i -> node.put(key, i);
+            case Long l -> node.put(key, l);
+            case Float f -> node.put(key, f);
+            case Double d -> node.put(key, d);
+            case BigDecimal bd -> node.put(key, bd);
+            case BigInteger bi -> node.put(key, bi);
+            case Boolean b -> node.put(key, b);
+            case byte[] ba -> node.put(key, ba);
+            case null -> node.putNull(key);
+            default -> node.put(key, to(value));
         }
     }
 

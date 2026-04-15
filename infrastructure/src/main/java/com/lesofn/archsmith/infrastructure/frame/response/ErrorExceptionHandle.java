@@ -36,13 +36,13 @@ public class ErrorExceptionHandle {
     public ResponseEntity<ResponseResult<?>> processException(
             HttpServletRequest request, Exception e) {
         Pair<Throwable, String> pair = getExceptionMessage(e);
-        if (e instanceof IErrorCodeException) {
+        if (e instanceof IErrorCodeException errorCodeEx) {
             if (e.getCause() != null) {
                 log.error("error, request: {}", parseParam(request), e);
             } else {
                 log.error("error: {}, request: {}", pair.getRight(), parseParam(request), e);
             }
-            ErrorInfo errorInfo = ((IErrorCodeException) e).getErrorInfo();
+            ErrorInfo errorInfo = errorCodeEx.getErrorInfo();
             ResponseResult<?> apiResult;
             if (errorInfo == null) {
                 apiResult =

@@ -43,24 +43,30 @@ public class ErrorHandlerResource implements ErrorController {
         }
         IErrorCodeException apiException;
         String pageError = "500 - System error.";
-        if (exception instanceof IErrorCodeException) {
-            apiException = (IErrorCodeException) exception;
-        } else if (status == 405) {
-            apiException = new SystemException(SystemErrorCode.E_METHOD_ERROR);
-        } else if (status == 404) {
-            pageError = "404 - Page not Found: " + errorMsg;
-            apiException = new SystemException(SystemErrorCode.E_API_NOT_EXIST);
-        } else if (status == 415) {
-            apiException =
-                    new SystemException(
-                            SystemErrorCode.E_UNSUPPORT_MEDIATYPE_ERROR, new Object[] {"unknow"});
-        } else if (status >= 400 && status < 500) {
-            apiException = new SystemException(SystemErrorCode.E_ILLEGAL_REQUEST, errorMsg);
-        } else if (status == 503) {
-            apiException = new SystemException(SystemErrorCode.E_SERVICE_UNAVAILABLE);
+        if (exception instanceof IErrorCodeException errorCodeEx) {
+            apiException = errorCodeEx;
         } else {
-            apiException = new SystemException(SystemErrorCode.E_DEFAULT);
-            log.error(errorMsg, exception);
+            apiException =
+                    switch (status) {
+                        case 405 -> new SystemException(SystemErrorCode.E_METHOD_ERROR);
+                        case 404 -> {
+                            pageError = "404 - Page not Found: " + errorMsg;
+                            yield new SystemException(SystemErrorCode.E_API_NOT_EXIST);
+                        }
+                        case 415 ->
+                                new SystemException(
+                                        SystemErrorCode.E_UNSUPPORT_MEDIATYPE_ERROR,
+                                        new Object[] {"unknow"});
+                        case 503 -> new SystemException(SystemErrorCode.E_SERVICE_UNAVAILABLE);
+                        default -> {
+                            if (status >= 400 && status < 500) {
+                                yield new SystemException(
+                                        SystemErrorCode.E_ILLEGAL_REQUEST, errorMsg);
+                            }
+                            log.error(errorMsg, exception);
+                            yield new SystemException(SystemErrorCode.E_DEFAULT);
+                        }
+                    };
         }
         if (MediaType.TEXT_HTML.equals(mediaType)
                 || Strings.CS.endsWithAny(path, GlobalConstants.staticResourceArray)) {

@@ -41,16 +41,14 @@ public class RequestLogFilter implements Filter {
             filterChain.doFilter(request, response);
         } catch (Exception e) {
             // 此处拦截也必须抛出，否则不执行ErrorHandlerResource
-            if (e instanceof IErrorCodeException) {
+            if (e instanceof IErrorCodeException errorCodeEx) {
                 log.error(
                         "EngineException error",
-                        e.getMessage() + " " + ((IErrorCodeException) e).getErrorInfo().getMsg());
-            } else if (e.getCause() instanceof IErrorCodeException) {
+                        e.getMessage() + " " + errorCodeEx.getErrorInfo().getMsg());
+            } else if (e.getCause() instanceof IErrorCodeException causeErrorCodeEx) {
                 log.error(
                         "EngineException error",
-                        e.getCause().getMessage()
-                                + " "
-                                + ((IErrorCodeException) e.getCause()).getErrorInfo().getMsg());
+                        e.getCause().getMessage() + " " + causeErrorCodeEx.getErrorInfo().getMsg());
             } else {
                 log.error("filterChain.doFilter error", e);
             }
