@@ -1,5 +1,5 @@
 plugins {
-    id("com.diffplug.spotless") version "7.0.4" apply false
+    id("com.diffplug.spotless") version "8.4.0" apply false
 }
 
 group = "com.lesofn.archsmith"
@@ -36,7 +36,7 @@ subprojects {
             lineEndings = com.diffplug.spotless.LineEnding.UNIX
             java {
                 target("src/*/java/**/*.java")
-                googleJavaFormat().aosp()
+                googleJavaFormat("1.35.0").aosp()
                 removeUnusedImports()
                 trimTrailingWhitespace()
                 endWithNewline()

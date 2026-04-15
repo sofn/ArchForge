@@ -1,5 +1,7 @@
 package com.lesofn.archsmith.server.admin.config;
 
+import java.util.HashMap;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -7,12 +9,9 @@ import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MapPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
- * 使用 Testcontainers 启动 PostgreSQL 容器，替代 H2 文件数据库。
- * 作为 ApplicationContextInitializer 在 Spring 上下文加载前启动容器。
+ * 使用 Testcontainers 启动 PostgreSQL 容器，替代 H2 文件数据库。 作为 ApplicationContextInitializer 在 Spring
+ * 上下文加载前启动容器。
  *
  * @author sofn
  */
@@ -93,8 +92,7 @@ public class InitPostgreSQLServer
         Map<String, Object> props = new HashMap<>();
 
         props.put(
-                "spring.datasource.dynamic.datasource.user_master.url",
-                userContainer.getJdbcUrl());
+                "spring.datasource.dynamic.datasource.user_master.url", userContainer.getJdbcUrl());
         props.put(
                 "spring.datasource.dynamic.datasource.user_master.username",
                 userContainer.getUsername());
@@ -106,8 +104,7 @@ public class InitPostgreSQLServer
                 "org.postgresql.Driver");
 
         props.put(
-                "spring.datasource.dynamic.datasource.user_slave.url",
-                userContainer.getJdbcUrl());
+                "spring.datasource.dynamic.datasource.user_slave.url", userContainer.getJdbcUrl());
         props.put(
                 "spring.datasource.dynamic.datasource.user_slave.username",
                 userContainer.getUsername());
@@ -119,8 +116,7 @@ public class InitPostgreSQLServer
                 "org.postgresql.Driver");
 
         props.put(
-                "spring.datasource.dynamic.datasource.task_master.url",
-                taskContainer.getJdbcUrl());
+                "spring.datasource.dynamic.datasource.task_master.url", taskContainer.getJdbcUrl());
         props.put(
                 "spring.datasource.dynamic.datasource.task_master.username",
                 taskContainer.getUsername());
@@ -132,8 +128,7 @@ public class InitPostgreSQLServer
                 "org.postgresql.Driver");
 
         props.put(
-                "spring.datasource.dynamic.datasource.task_slave.url",
-                taskContainer.getJdbcUrl());
+                "spring.datasource.dynamic.datasource.task_slave.url", taskContainer.getJdbcUrl());
         props.put(
                 "spring.datasource.dynamic.datasource.task_slave.username",
                 taskContainer.getUsername());
@@ -144,7 +139,6 @@ public class InitPostgreSQLServer
                 "spring.datasource.dynamic.datasource.task_slave.driver-class-name",
                 "org.postgresql.Driver");
 
-        env.getPropertySources()
-                .addFirst(new MapPropertySource("testcontainersPostgresql", props));
+        env.getPropertySources().addFirst(new MapPropertySource("testcontainersPostgresql", props));
     }
 }

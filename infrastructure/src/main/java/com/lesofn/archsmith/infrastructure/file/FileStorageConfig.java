@@ -23,7 +23,10 @@ public class FileStorageConfig {
         ArchSmithConfig.FileStorage config = appForgeConfig.getFileStorage();
         if ("s3".equalsIgnoreCase(config.getType())) {
             ArchSmithConfig.S3Config s3 = config.getS3();
-            log.info("Using S3 file storage: endpoint={}, bucket={}", s3.getEndpoint(), s3.getBucket());
+            log.info(
+                    "Using S3 file storage: endpoint={}, bucket={}",
+                    s3.getEndpoint(),
+                    s3.getBucket());
             return new S3FileStorageService(
                     s3.getEndpoint(),
                     s3.getAccessKey(),
