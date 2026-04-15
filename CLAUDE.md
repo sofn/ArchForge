@@ -13,7 +13,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Development
 
-- Main application entry point: `server-admin/src/main/java/com/lesofn/appforge/server/admin/Application.java`
+- Main application entry point: `server-admin/src/main/java/com/lesofn/archsmith/server/admin/Application.java`
 - Default ports: Application (8080), Management (7002)
 - Development profile uses Testcontainers PostgreSQL (auto-started via `InitPostgreSQLServer`)
 - Testcontainers MinIO for S3-compatible file storage in dev
@@ -43,7 +43,7 @@ This is a multi-module Spring Boot 4 project with clean architecture principles:
   - `GroupDataSourceProxy` bridges dynamic-datasource groups with JPA EntityManagerFactories
   - `@DS("group_name")` annotation available for explicit datasource routing
 - Profile-based configuration (dev/test/prod) using standard Spring Boot `application-{profile}.yaml`
-- File storage abstraction: `FileStorageService` interface with `LocalFileStorageService` and `S3FileStorageService` implementations, configurable via `app-forge.file-storage.type` (local/s3)
+- File storage abstraction: `FileStorageService` interface with `LocalFileStorageService` and `S3FileStorageService` implementations, configurable via `arch-smith.file-storage.type` (local/s3)
 
 ## Dependencies
 
@@ -73,7 +73,7 @@ This is a multi-module Spring Boot 4 project with clean architecture principles:
   - Real `application-test.yaml` and `application-prod.yaml` are gitignored
 - Set active profile via `SPRING_PROFILES_ACTIVE` env var or JVM arg `-Dspring.profiles.active=...`
 - Logging: Single `log4j2-spring.xml` with `<SpringProfile>` — Console for dev, file-only for non-dev
-- Config prefix: `app-forge`
+- Config prefix: `arch-smith`
 
 ## Docker
 

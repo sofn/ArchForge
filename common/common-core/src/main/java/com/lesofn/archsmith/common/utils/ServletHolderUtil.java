@@ -1,0 +1,80 @@
+package com.lesofn.archsmith.common.utils;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.Strings;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+
+/**
+ * 客户端工具类
+ *
+ * @author ruoyi
+ */
+@Slf4j
+public class ServletHolderUtil {
+
+    private ServletHolderUtil() {}
+
+    /** 获取request */
+    public static HttpServletRequest getRequest() {
+        ServletRequestAttributes attributes = getRequestAttributes();
+        if (attributes == null) {
+            return null;
+        }
+        return attributes.getRequest();
+    }
+
+    /** 获取response */
+    public static HttpServletResponse getResponse() {
+        ServletRequestAttributes attributes = getRequestAttributes();
+        if (attributes == null) {
+            return null;
+        }
+        return attributes.getResponse();
+    }
+
+    public static ServletRequestAttributes getRequestAttributes() {
+        RequestAttributes attributes = RequestContextHolder.getRequestAttributes();
+        if (attributes == null || !(attributes instanceof ServletRequestAttributes)) {
+            return null;
+        }
+        return (ServletRequestAttributes) attributes;
+    }
+
+    /**
+     * 将字符串渲染到客户端
+     *
+     * @param response 渲染对象
+     * @param string 待渲染的字符串
+     */
+    public static void renderString(HttpServletResponse response, String string) {
+        try {
+            response.setStatus(200);
+            response.setContentType("application/json");
+            response.setCharacterEncoding("utf-8");
+            response.getWriter().print(string);
+        } catch (IOException e) {
+            log.error("返回response失败", e);
+        }
+    }
+
+    /**
+     * 获取仅含有项目根路径的url 比如 localhost:8080/archsmith/user/list 返回 localhost:8080/archsmith
+     *
+     * @return localhost:8080/archsmith
+     */
+    public static String getContextUrl() {
+        HttpServletRequest request = getRequest();
+        if (request == null) {
+            return "";
+        }
+        StringBuffer url = request.getRequestURL();
+        String contextPath = request.getServletContext().getContextPath();
+        String strip = Strings.CS.removeEnd(url.toString(), request.getRequestURI());
+        return strip + contextPath;
+    }
+}

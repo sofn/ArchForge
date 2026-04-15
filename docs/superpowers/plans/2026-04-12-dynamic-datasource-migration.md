@@ -13,28 +13,28 @@
 ## File Map
 
 ### New Files
-- `infrastructure/src/main/java/com/lesofn/appforge/infrastructure/frame/database/GroupDataSourceProxy.java` - DataSource proxy that pushes a group name before delegating to DynamicRoutingDataSource
+- `infrastructure/src/main/java/com/lesofn/archsmith/infrastructure/frame/database/GroupDataSourceProxy.java` - DataSource proxy that pushes a group name before delegating to DynamicRoutingDataSource
 
 ### Modified Files
 - `dependencies/build.gradle.kts` - Replace druid deps with dynamic-datasource
 - `common/common-core/build.gradle.kts` - Remove `com.alibaba:druid`
 - `server-admin/build.gradle.kts` - Remove `druid-spring-boot-3-starter`
-- `server-admin/src/main/java/com/lesofn/appforge/server/admin/Application.java` - Update excludes
-- `server-admin/src/main/java/com/lesofn/appforge/server/admin/config/SecurityConfig.java` - Remove druid path from security config
+- `server-admin/src/main/java/com/lesofn/archsmith/server/admin/Application.java` - Update excludes
+- `server-admin/src/main/java/com/lesofn/archsmith/server/admin/config/SecurityConfig.java` - Remove druid path from security config
 - `server-admin/src/main/resources/application.yaml` - Remove druid monitoring config, add dynamic-datasource base config
 - `server-admin/src/main/resources/application-dev.yaml` - Replace custom JDBC properties with dynamic-datasource format
 - `server-admin/src/main/resources/application-prod.yaml.example` - Same
-- `domain/admin-user/src/main/java/com/lesofn/appforge/user/config/UserDataSourceConfig.java` - Simplify to use GroupDataSourceProxy
-- `domain/admin-user/src/main/java/com/lesofn/appforge/user/config/UserDbConfig.java` - No changes needed (still references `userDataSource` bean)
-- `example/example-task/src/main/java/com/lesofn/appforge/demo/task/config/TaskDataSourceConfig.java` - Simplify to use GroupDataSourceProxy
-- `example/example-task/src/main/java/com/lesofn/appforge/demo/task/dao/TaskDbConfig.java` - No changes needed
-- `infrastructure/src/main/java/com/lesofn/appforge/infrastructure/frame/context/RequestContext.java` - Remove readMasterDB/shouldReadMasterDB fields
+- `domain/admin-user/src/main/java/com/lesofn/archsmith/user/config/UserDataSourceConfig.java` - Simplify to use GroupDataSourceProxy
+- `domain/admin-user/src/main/java/com/lesofn/archsmith/user/config/UserDbConfig.java` - No changes needed (still references `userDataSource` bean)
+- `example/example-task/src/main/java/com/lesofn/archsmith/demo/task/config/TaskDataSourceConfig.java` - Simplify to use GroupDataSourceProxy
+- `example/example-task/src/main/java/com/lesofn/archsmith/demo/task/dao/TaskDbConfig.java` - No changes needed
+- `infrastructure/src/main/java/com/lesofn/archsmith/infrastructure/frame/context/RequestContext.java` - Remove readMasterDB/shouldReadMasterDB fields
 - `CLAUDE.md` - Update docs
 
 ### Deleted Files
-- `infrastructure/src/main/java/com/lesofn/appforge/infrastructure/frame/database/ReadWriteDataSourceRouter.java`
-- `infrastructure/src/main/java/com/lesofn/appforge/infrastructure/frame/database/DataBaseAdvisor.java`
-- `infrastructure/src/main/java/com/lesofn/appforge/infrastructure/frame/database/DataBaseType.java`
+- `infrastructure/src/main/java/com/lesofn/archsmith/infrastructure/frame/database/ReadWriteDataSourceRouter.java`
+- `infrastructure/src/main/java/com/lesofn/archsmith/infrastructure/frame/database/DataBaseAdvisor.java`
+- `infrastructure/src/main/java/com/lesofn/archsmith/infrastructure/frame/database/DataBaseType.java`
 
 ---
 
@@ -81,7 +81,7 @@ api("com.alibaba:druid-spring-boot-3-starter")
 
 - [ ] **Step 4: Verify dependencies resolve**
 
-Run: `export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64 && cd /home/sofn/code/sofn/AppForge && ./gradlew :server-admin:dependencies --configuration compileClasspath 2>&1 | grep -E 'dynamic-datasource|druid|FAILED'`
+Run: `export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64 && cd /home/sofn/code/sofn/ArchSmith && ./gradlew :server-admin:dependencies --configuration compileClasspath 2>&1 | grep -E 'dynamic-datasource|druid|FAILED'`
 
 Expected: `dynamic-datasource-spring-boot4-starter` resolved, no `druid-spring-boot-3-starter`
 
@@ -96,14 +96,14 @@ git add -A && git commit -m "build: replace druid-spring-boot-3-starter with dyn
 ### Task 2: Create GroupDataSourceProxy
 
 **Files:**
-- Create: `infrastructure/src/main/java/com/lesofn/appforge/infrastructure/frame/database/GroupDataSourceProxy.java`
+- Create: `infrastructure/src/main/java/com/lesofn/archsmith/infrastructure/frame/database/GroupDataSourceProxy.java`
 
 - [ ] **Step 1: Create GroupDataSourceProxy**
 
 This is a lightweight `DataSource` wrapper that pushes a datasource group name onto `DynamicDataSourceContextHolder` before delegating to `DynamicRoutingDataSource`. This allows each JPA `EntityManagerFactory` to always connect to the correct database group.
 
 ```java
-package com.lesofn.appforge.infrastructure.frame.database;
+package com.lesofn.archsmith.infrastructure.frame.database;
 
 import com.baomidou.dynamic.datasource.toolkit.DynamicDataSourceContextHolder;
 import java.io.PrintWriter;
@@ -198,22 +198,22 @@ git add -A && git commit -m "feat: add GroupDataSourceProxy for dynamic-datasour
 ### Task 3: Delete Custom Read-Write Split Infrastructure
 
 **Files:**
-- Delete: `infrastructure/src/main/java/com/lesofn/appforge/infrastructure/frame/database/ReadWriteDataSourceRouter.java`
-- Delete: `infrastructure/src/main/java/com/lesofn/appforge/infrastructure/frame/database/DataBaseAdvisor.java`
-- Delete: `infrastructure/src/main/java/com/lesofn/appforge/infrastructure/frame/database/DataBaseType.java`
-- Modify: `infrastructure/src/main/java/com/lesofn/appforge/infrastructure/frame/context/RequestContext.java`
+- Delete: `infrastructure/src/main/java/com/lesofn/archsmith/infrastructure/frame/database/ReadWriteDataSourceRouter.java`
+- Delete: `infrastructure/src/main/java/com/lesofn/archsmith/infrastructure/frame/database/DataBaseAdvisor.java`
+- Delete: `infrastructure/src/main/java/com/lesofn/archsmith/infrastructure/frame/database/DataBaseType.java`
+- Modify: `infrastructure/src/main/java/com/lesofn/archsmith/infrastructure/frame/context/RequestContext.java`
 
 - [ ] **Step 1: Delete the three files**
 
 ```bash
-rm infrastructure/src/main/java/com/lesofn/appforge/infrastructure/frame/database/ReadWriteDataSourceRouter.java
-rm infrastructure/src/main/java/com/lesofn/appforge/infrastructure/frame/database/DataBaseAdvisor.java
-rm infrastructure/src/main/java/com/lesofn/appforge/infrastructure/frame/database/DataBaseType.java
+rm infrastructure/src/main/java/com/lesofn/archsmith/infrastructure/frame/database/ReadWriteDataSourceRouter.java
+rm infrastructure/src/main/java/com/lesofn/archsmith/infrastructure/frame/database/DataBaseAdvisor.java
+rm infrastructure/src/main/java/com/lesofn/archsmith/infrastructure/frame/database/DataBaseType.java
 ```
 
 - [ ] **Step 2: Remove readMasterDB/shouldReadMasterDB from RequestContext.java**
 
-In `/home/sofn/code/sofn/AppForge/infrastructure/src/main/java/com/lesofn/appforge/infrastructure/frame/context/RequestContext.java`:
+In `/home/sofn/code/sofn/ArchSmith/infrastructure/src/main/java/com/lesofn/archsmith/infrastructure/frame/context/RequestContext.java`:
 
 Remove these fields (lines 42-43):
 ```java
@@ -246,16 +246,16 @@ git add -A && git commit -m "refactor: remove custom ReadWriteDataSourceRouter, 
 ### Task 4: Simplify UserDataSourceConfig
 
 **Files:**
-- Modify: `domain/admin-user/src/main/java/com/lesofn/appforge/user/config/UserDataSourceConfig.java`
+- Modify: `domain/admin-user/src/main/java/com/lesofn/archsmith/user/config/UserDataSourceConfig.java`
 
 - [ ] **Step 1: Rewrite UserDataSourceConfig**
 
 Replace the entire file with:
 
 ```java
-package com.lesofn.appforge.user.config;
+package com.lesofn.archsmith.user.config;
 
-import com.lesofn.appforge.infrastructure.frame.database.GroupDataSourceProxy;
+import com.lesofn.archsmith.infrastructure.frame.database.GroupDataSourceProxy;
 import javax.sql.DataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -289,16 +289,16 @@ git add -A && git commit -m "refactor: simplify UserDataSourceConfig to use Grou
 ### Task 5: Simplify TaskDataSourceConfig
 
 **Files:**
-- Modify: `example/example-task/src/main/java/com/lesofn/appforge/demo/task/config/TaskDataSourceConfig.java`
+- Modify: `example/example-task/src/main/java/com/lesofn/archsmith/demo/task/config/TaskDataSourceConfig.java`
 
 - [ ] **Step 1: Rewrite TaskDataSourceConfig**
 
 Replace the entire file with:
 
 ```java
-package com.lesofn.appforge.demo.task.config;
+package com.lesofn.archsmith.demo.task.config;
 
-import com.lesofn.appforge.infrastructure.frame.database.GroupDataSourceProxy;
+import com.lesofn.archsmith.infrastructure.frame.database.GroupDataSourceProxy;
 import javax.sql.DataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -332,7 +332,7 @@ git add -A && git commit -m "refactor: simplify TaskDataSourceConfig to use Grou
 ### Task 6: Update Application.java
 
 **Files:**
-- Modify: `server-admin/src/main/java/com/lesofn/appforge/server/admin/Application.java`
+- Modify: `server-admin/src/main/java/com/lesofn/archsmith/server/admin/Application.java`
 
 - [ ] **Step 1: Update auto-configuration excludes**
 
@@ -341,7 +341,7 @@ The `DynamicDataSourceAutoConfiguration` from dynamic-datasource must NOT be exc
 Also add exclude for `DruidDataSourceAutoConfigure` in case the Druid dependency is pulled transitively by dynamic-datasource (this prevents the old incompatible Druid auto-config from running).
 
 ```java
-package com.lesofn.appforge.server.admin;
+package com.lesofn.archsmith.server.admin;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -355,7 +355,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  * @author sofn
  * @version 1.0 Created at: 2015-04-29 16:17
  */
-@ComponentScan(basePackages = "com.lesofn.appforge")
+@ComponentScan(basePackages = "com.lesofn.archsmith")
 @SpringBootApplication(
         exclude = {
             DataSourceAutoConfiguration.class,
@@ -514,7 +514,7 @@ git add -A && git commit -m "config: migrate datasource config to dynamic-dataso
 ### Task 8: Update SecurityConfig (Druid path removal)
 
 **Files:**
-- Modify: `server-admin/src/main/java/com/lesofn/appforge/server/admin/config/SecurityConfig.java`
+- Modify: `server-admin/src/main/java/com/lesofn/archsmith/server/admin/config/SecurityConfig.java`
 
 - [ ] **Step 1: Remove Druid path from security config**
 
@@ -536,7 +536,7 @@ git add -A && git commit -m "fix: remove druid path from security config"
 ### Task 9: Fix TaskDbConfig StringUtils deprecation
 
 **Files:**
-- Modify: `example/example-task/src/main/java/com/lesofn/appforge/demo/task/dao/TaskDbConfig.java`
+- Modify: `example/example-task/src/main/java/com/lesofn/archsmith/demo/task/dao/TaskDbConfig.java`
 
 - [ ] **Step 1: Replace deprecated StringUtils calls**
 
@@ -570,13 +570,13 @@ git add -A && git commit -m "fix: replace deprecated StringUtils calls in TaskDb
 - [ ] **Step 1: Run spotlessApply**
 
 ```bash
-export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64 && cd /home/sofn/code/sofn/AppForge && ./gradlew spotlessApply
+export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64 && cd /home/sofn/code/sofn/ArchSmith && ./gradlew spotlessApply
 ```
 
 - [ ] **Step 2: Run full build**
 
 ```bash
-export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64 && cd /home/sofn/code/sofn/AppForge && ./gradlew clean build
+export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64 && cd /home/sofn/code/sofn/ArchSmith && ./gradlew clean build
 ```
 
 Expected: BUILD SUCCESSFUL with no deprecation warnings related to datasource/druid.

@@ -20,8 +20,8 @@ FROM azul/zulu-openjdk-alpine:25-jre
 WORKDIR /app
 
 # 安全: 使用非 root 用户运行
-RUN addgroup -g 1001 appforge && adduser -u 1001 -G appforge -D appforge
-USER appforge
+RUN addgroup -g 1001 archsmith && adduser -u 1001 -G archsmith -D archsmith
+USER archsmith
 
 COPY --from=training /app/app.jar app.jar
 COPY --from=training /app/app.aot app.aot

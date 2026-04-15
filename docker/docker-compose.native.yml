@@ -8,15 +8,15 @@ services:
   postgres:
     image: postgres:17-alpine
     environment:
-      POSTGRES_USER: ${DB_USERNAME:-appforge}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-appforge}
+      POSTGRES_USER: ${DB_USERNAME:-archsmith}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-archsmith}
     ports:
       - "5432:5432"
     volumes:
       - postgres-data:/var/lib/postgresql/data
       - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-appforge}"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-archsmith}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -31,8 +31,8 @@ services:
       timeout: 5s
       retries: 5
 
-  appforge:
-    image: appforge:native
+  archsmith:
+    image: archsmith:native
     build:
       context: ..
       dockerfile: docker/native/Dockerfile
@@ -47,18 +47,18 @@ services:
       SPRING_PROFILES_ACTIVE: prod
       SPRING_DATA_REDIS_HOST: redis
       JWT_SECRET: ${JWT_SECRET:-5/jDAWs7a63GRgjS+uF2mP7dcLwI6GAgxf+Z0+fOAbgMR/jksG5r0v10nDOkrM0btxtb2FAuol8fSzSJis8gIA==}
-      SPRING_DATASOURCE_DYNAMIC_DATASOURCE_USER_MASTER_URL: jdbc:postgresql://postgres:5432/appforge_user
-      SPRING_DATASOURCE_DYNAMIC_DATASOURCE_USER_SLAVE_URL: jdbc:postgresql://postgres:5432/appforge_user
-      SPRING_DATASOURCE_DYNAMIC_DATASOURCE_TASK_MASTER_URL: jdbc:postgresql://postgres:5432/appforge_task
-      SPRING_DATASOURCE_DYNAMIC_DATASOURCE_TASK_SLAVE_URL: jdbc:postgresql://postgres:5432/appforge_task
-      SPRING_DATASOURCE_DYNAMIC_DATASOURCE_USER_MASTER_USERNAME: ${DB_USERNAME:-appforge}
-      SPRING_DATASOURCE_DYNAMIC_DATASOURCE_USER_MASTER_PASSWORD: ${DB_PASSWORD:-appforge}
-      SPRING_DATASOURCE_DYNAMIC_DATASOURCE_USER_SLAVE_USERNAME: ${DB_USERNAME:-appforge}
-      SPRING_DATASOURCE_DYNAMIC_DATASOURCE_USER_SLAVE_PASSWORD: ${DB_PASSWORD:-appforge}
-      SPRING_DATASOURCE_DYNAMIC_DATASOURCE_TASK_MASTER_USERNAME: ${DB_USERNAME:-appforge}
-      SPRING_DATASOURCE_DYNAMIC_DATASOURCE_TASK_MASTER_PASSWORD: ${DB_PASSWORD:-appforge}
-      SPRING_DATASOURCE_DYNAMIC_DATASOURCE_TASK_SLAVE_USERNAME: ${DB_USERNAME:-appforge}
-      SPRING_DATASOURCE_DYNAMIC_DATASOURCE_TASK_SLAVE_PASSWORD: ${DB_PASSWORD:-appforge}
+      SPRING_DATASOURCE_DYNAMIC_DATASOURCE_USER_MASTER_URL: jdbc:postgresql://postgres:5432/archsmith_user
+      SPRING_DATASOURCE_DYNAMIC_DATASOURCE_USER_SLAVE_URL: jdbc:postgresql://postgres:5432/archsmith_user
+      SPRING_DATASOURCE_DYNAMIC_DATASOURCE_TASK_MASTER_URL: jdbc:postgresql://postgres:5432/archsmith_task
+      SPRING_DATASOURCE_DYNAMIC_DATASOURCE_TASK_SLAVE_URL: jdbc:postgresql://postgres:5432/archsmith_task
+      SPRING_DATASOURCE_DYNAMIC_DATASOURCE_USER_MASTER_USERNAME: ${DB_USERNAME:-archsmith}
+      SPRING_DATASOURCE_DYNAMIC_DATASOURCE_USER_MASTER_PASSWORD: ${DB_PASSWORD:-archsmith}
+      SPRING_DATASOURCE_DYNAMIC_DATASOURCE_USER_SLAVE_USERNAME: ${DB_USERNAME:-archsmith}
+      SPRING_DATASOURCE_DYNAMIC_DATASOURCE_USER_SLAVE_PASSWORD: ${DB_PASSWORD:-archsmith}
+      SPRING_DATASOURCE_DYNAMIC_DATASOURCE_TASK_MASTER_USERNAME: ${DB_USERNAME:-archsmith}
+      SPRING_DATASOURCE_DYNAMIC_DATASOURCE_TASK_MASTER_PASSWORD: ${DB_PASSWORD:-archsmith}
+      SPRING_DATASOURCE_DYNAMIC_DATASOURCE_TASK_SLAVE_USERNAME: ${DB_USERNAME:-archsmith}
+      SPRING_DATASOURCE_DYNAMIC_DATASOURCE_TASK_SLAVE_PASSWORD: ${DB_PASSWORD:-archsmith}
       SPRING_DATASOURCE_DYNAMIC_DATASOURCE_USER_MASTER_DRIVER_CLASS_NAME: org.postgresql.Driver
       SPRING_DATASOURCE_DYNAMIC_DATASOURCE_USER_SLAVE_DRIVER_CLASS_NAME: org.postgresql.Driver
       SPRING_DATASOURCE_DYNAMIC_DATASOURCE_TASK_MASTER_DRIVER_CLASS_NAME: org.postgresql.Driver
@@ -66,12 +66,12 @@ services:
     volumes:
       - ./logs:/app/logs
 
-  appforge-admin:
+  archsmith-admin:
     build:
-      context: ../../AppForgeAdmin
+      context: ../../ArchSmithAdmin
       dockerfile: Dockerfile
     depends_on:
-      - appforge
+      - archsmith
     ports:
       - "80:80"
     volumes:

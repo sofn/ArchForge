@@ -1,16 +1,16 @@
-# Quick Reference for AppForge Development
+# Quick Reference for ArchSmith Development
 
 ## Most Important Rules
 
 ### 🚫 NEVER DO THIS
 - **NEVER use `var` or `val`** - always explicit types
-- **NEVER use `@Value`** - use AppForgeConfig bean
+- **NEVER use `@Value`** - use ArchSmithConfig bean
 - **NEVER import hutool** - use standard libraries
 - **NEVER use field injection** - use constructor injection
 
 ### ✅ ALWAYS DO THIS
 - **ALWAYS use Lombok annotations** for boilerplate reduction
-- **ALWAYS use AppForgeConfig** for configuration access
+- **ALWAYS use ArchSmithConfig** for configuration access
 - **ALWAYS use constructor injection** with `@RequiredArgsConstructor`
 - **ALWAYS specify explicit types** in variable declarations
 
@@ -37,7 +37,7 @@
 @Service
 @RequiredArgsConstructor
 public class MyService {
-    private final AppForgeConfig config;
+    private final ArchSmithConfig config;
     
     // Access configuration
     public void example() {
@@ -57,7 +57,7 @@ public class MyService {
 @Slf4j
 public class UserService {
     private final UserRepository repository;
-    private final AppForgeConfig config;
+    private final ArchSmithConfig config;
 }
 ```
 
@@ -90,7 +90,7 @@ public class User extends IdEntity {
 ## Module Structure Reference
 
 ```
-AppForge/
+ArchSmith/
 ├── common/
 │   ├── common-core/      # Utilities, constants
 │   └── common-error/      # Error handling
@@ -169,4 +169,4 @@ public interface UserRepository extends JpaRepository<User, Long> {
 ```
 
 ---
-Remember: When in doubt, check `AppForgeConfig` for configuration and use Lombok for cleaner code!
+Remember: When in doubt, check `ArchSmithConfig` for configuration and use Lombok for cleaner code!

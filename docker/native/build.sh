@@ -5,7 +5,7 @@ cd "${dir}/../.."
 
 echo "=== Building Native Image (BellSoft Liberica NIK 25) ==="
 echo "Note: This may take 10+ minutes on first build"
-docker build -f docker/native/Dockerfile -t appforge:native .
+docker build -f docker/native/Dockerfile -t archsmith:native .
 
 echo "=== Done ==="
 echo "Run with: cd docker && docker compose -f docker-compose.native.yml up -d"

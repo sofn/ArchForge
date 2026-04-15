@@ -28,7 +28,7 @@ tasks.jar {
 graalvmNative {
     binaries {
         named("main") {
-            mainClass.set("com.lesofn.appforge.server.admin.Application")
+            mainClass.set("com.lesofn.archsmith.server.admin.Application")
             javaLauncher.set(javaToolchains.launcherFor {
                 languageVersion.set(JavaLanguageVersion.of(25))
             })

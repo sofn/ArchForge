@@ -2,7 +2,7 @@
 
 -- 默认用户 (密码: admin123)
 INSERT INTO sys_user (user_id, post_id, role_id, dept_id, username, nickname, user_type, email, phone_number, sex, avatar, password, status, login_ip, login_date, is_admin, creator_id, create_time, remark, deleted) OVERRIDING SYSTEM VALUE
-VALUES (1, 1, 1, 103, 'admin', 'Admin', 0, 'admin@appforge.com', '15888888883', 0, '', '$2a$10$o55UFZAtyWnDpRV6dvQe8.c/MjlFacC49ASj2usNXm9BY74SYI/uG', 1, '127.0.0.1', NOW(), true, null, NOW(), '管理员', false);
+VALUES (1, 1, 1, 103, 'admin', 'Admin', 0, 'admin@archsmith.com', '15888888883', 0, '', '$2a$10$o55UFZAtyWnDpRV6dvQe8.c/MjlFacC49ASj2usNXm9BY74SYI/uG', 1, '127.0.0.1', NOW(), true, null, NOW(), '管理员', false);
 
 -- 默认角色
 INSERT INTO sys_role (role_id, role_name, role_key, role_sort, data_scope, status, creator_id, create_time, remark, deleted) OVERRIDING SYSTEM VALUE

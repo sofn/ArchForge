@@ -1,9 +1,9 @@
 <div align="center">
-  <h1>AppForge</h1>
+  <h1>ArchSmith</h1>
   <p><strong>Modern enterprise admin platform built with Spring Boot 4 + Vue 3</strong></p>
   <p>
-    <a href="https://appforge.lesofn.com">Documentation</a> ·
-    <a href="https://github.com/sofn/AppForgeAdmin">Frontend Repo</a> ·
+    <a href="https://archsmith.lesofn.com">Documentation</a> ·
+    <a href="https://github.com/sofn/ArchSmithAdmin">Frontend Repo</a> ·
     <a href="./README.zh-CN.md">中文</a>
   </p>
   <p>
@@ -17,11 +17,11 @@
 
 ---
 
-## What is AppForge?
+## What is ArchSmith?
 
-AppForge is a **production-ready, full-stack admin platform** that combines a Spring Boot 4 backend with a Vue 3 frontend. It provides complete user/role/menu/department management, file upload/download, server monitoring, JWT authentication, and more — all with clean architecture and modern tooling.
+ArchSmith is a **production-ready, full-stack admin platform** that combines a Spring Boot 4 backend with a Vue 3 frontend. It provides complete user/role/menu/department management, file upload/download, server monitoring, JWT authentication, and more — all with clean architecture and modern tooling.
 
-> **Why AppForge?** Most similar projects (RuoYi, JeecgBoot) are still on Spring Boot 2.x/3.x. AppForge uses **Spring Boot 4 + Java 25 virtual threads + Native Image**, delivering ~100ms startup time and ~50MB memory footprint.
+> **Why ArchSmith?** Most similar projects (RuoYi, JeecgBoot) are still on Spring Boot 2.x/3.x. ArchSmith uses **Spring Boot 4 + Java 25 virtual threads + Native Image**, delivering ~100ms startup time and ~50MB memory footprint.
 
 ## Features
 
@@ -45,14 +45,14 @@ AppForge is a **production-ready, full-stack admin platform** that combines a Sp
 ### 1. Clone
 
 ```bash
-git clone https://github.com/sofn/AppForge.git
-git clone https://github.com/sofn/AppForgeAdmin.git
+git clone https://github.com/sofn/ArchSmith.git
+git clone https://github.com/sofn/ArchSmithAdmin.git
 ```
 
 ### 2. Start Backend
 
 ```bash
-cd AppForge
+cd ArchSmith
 JAVA_HOME=/path/to/jdk25 ./gradlew server-admin:bootRun
 ```
 
@@ -61,7 +61,7 @@ JAVA_HOME=/path/to/jdk25 ./gradlew server-admin:bootRun
 ### 3. Start Frontend
 
 ```bash
-cd AppForgeAdmin
+cd ArchSmithAdmin
 pnpm install && pnpm dev
 ```
 
@@ -72,7 +72,7 @@ Visit `http://localhost:8848` and login with `admin / admin123`.
 ### Docker (Alternative)
 
 ```bash
-cd AppForge/docker
+cd ArchSmith/docker
 ./start.sh          # JVM mode (default, Project Leyden CDS)
 ./start.sh native   # Native Image mode (Liberica NIK 25)
 ```
@@ -80,7 +80,7 @@ cd AppForge/docker
 ## Project Structure
 
 ```
-AppForge (Backend)
+ArchSmith (Backend)
 ├── common/              # Shared utilities & error handling
 ├── infrastructure/      # Auth, filters, file storage, response wrapper
 ├── domain/admin-user/   # Domain entities & business logic
@@ -90,7 +90,7 @@ AppForge (Backend)
     ├── jvm/             # Leyden CDS optimized Dockerfile
     └── native/          # Liberica NIK 25 native Dockerfile
 
-AppForgeAdmin (Frontend)
+ArchSmithAdmin (Frontend)
 ├── src/api/             # API definitions
 ├── src/views/system/    # System management pages
 ├── src/views/monitor/   # Monitoring pages
@@ -112,7 +112,7 @@ AppForgeAdmin (Frontend)
 
 ## Documentation
 
-Full documentation: **[appforge.lesofn.com](https://appforge.lesofn.com)**
+Full documentation: **[archsmith.lesofn.com](https://archsmith.lesofn.com)**
 
 ## License
 
