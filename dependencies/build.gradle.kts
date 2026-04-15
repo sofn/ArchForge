@@ -50,6 +50,7 @@ dependencies {
         api("com.google.code.findbugs:annotations:3.0.1")
         api("org.lionsoul:ip2region:2.7.0")
         api("eu.bitwalker:UserAgentUtils:1.21")
+        api("org.jspecify:jspecify:1.0.0")
         
         // Lombok and SLF4J (versions managed by Spring Boot BOM)
         api("org.projectlombok:lombok:1.18.44")

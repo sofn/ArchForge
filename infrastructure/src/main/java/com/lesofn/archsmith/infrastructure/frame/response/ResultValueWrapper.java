@@ -3,8 +3,8 @@ package com.lesofn.archsmith.infrastructure.frame.response;
 import com.lesofn.archsmith.common.errors.SystemErrorCode;
 import com.lesofn.archsmith.infrastructure.frame.response.model.ResponseResult;
 import com.lesofn.archsmith.infrastructure.frame.response.model.Result;
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.MediaType;
@@ -24,7 +24,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 public class ResultValueWrapper implements ResponseBodyAdvice<Object> {
 
     @Override
-    public boolean supports(@Nullable MethodParameter returnType, @Nonnull Class converterType) {
+    public boolean supports(@Nullable MethodParameter returnType, @NonNull Class converterType) {
         return JacksonJsonHttpMessageConverter.class.isAssignableFrom(converterType);
     }
 
@@ -34,8 +34,8 @@ public class ResultValueWrapper implements ResponseBodyAdvice<Object> {
             @Nullable MethodParameter returnType,
             @Nullable MediaType selectedContentType,
             @Nullable Class selectedConverterType,
-            @Nonnull ServerHttpRequest request,
-            @Nonnull ServerHttpResponse response) {
+            @NonNull ServerHttpRequest request,
+            @NonNull ServerHttpResponse response) {
 
         String requestPath =
                 ((ServletServerHttpRequest) request).getServletRequest().getServletPath();
