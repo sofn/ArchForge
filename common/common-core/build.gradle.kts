@@ -15,8 +15,7 @@ dependencies {
         exclude(group = "org.springframework.boot", module = "spring-boot-starter-logging")
     }
     api("com.baomidou:dynamic-datasource-spring-boot4-starter")
-    api("com.mysql:mysql-connector-j")
-    api("com.h2database:h2")
+    api("org.postgresql:postgresql")
     
     // QueryDSL
     api("com.querydsl:querydsl-jpa:5.1.0:jakarta")

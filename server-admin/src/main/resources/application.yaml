@@ -101,3 +101,6 @@ app-forge:
   token:
     header: Authorization
     auto-refresh-time: 20
+  file-storage:
+    type: local
+    local-dir: uploads
