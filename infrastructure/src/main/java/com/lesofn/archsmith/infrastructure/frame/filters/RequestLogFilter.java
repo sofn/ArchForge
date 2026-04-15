@@ -3,7 +3,8 @@ package com.lesofn.archsmith.infrastructure.frame.filters;
 import com.lesofn.archsmith.common.error.exception.IErrorCodeException;
 import com.lesofn.archsmith.common.utils.GlobalConstants;
 import com.lesofn.archsmith.infrastructure.frame.context.RequestContext;
-import com.lesofn.archsmith.infrastructure.frame.context.ThreadLocalContext;
+import com.lesofn.archsmith.infrastructure.frame.context.RequestIDGenerator;
+import com.lesofn.archsmith.infrastructure.frame.context.ScopedValueContext;
 import com.lesofn.archsmith.infrastructure.frame.utils.RequestLogRecord;
 import com.lesofn.archsmith.infrastructure.frame.utils.ResponseWrapper;
 import jakarta.servlet.*;
@@ -16,6 +17,8 @@ import org.slf4j.MDC;
 
 @Slf4j
 public class RequestLogFilter implements Filter {
+
+    private static final RequestIDGenerator requestIdGenerator = RequestIDGenerator.getInstance();
 
     @Override
     public void doFilter(
@@ -32,9 +35,27 @@ public class RequestLogFilter implements Filter {
             return;
         }
 
-        RequestContext context = ThreadLocalContext.getRequestContext();
+        RequestContext context = new RequestContext(requestIdGenerator.nextId());
         MDC.put("requestId", context.getRequestId());
 
+        // ScopedValue: entire filter chain runs within context scope, auto-cleanup on exit
+        try {
+            ScopedValueContext.runInScope(
+                    context, () -> doFilterInScope(request, response, filterChain, context, path));
+        } catch (IOException | ServletException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new ServletException(e);
+        }
+    }
+
+    private void doFilterInScope(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            FilterChain filterChain,
+            RequestContext context,
+            String path)
+            throws IOException, ServletException {
         response = new ResponseWrapper(response);
         long startTime = System.currentTimeMillis();
         try {
@@ -94,7 +115,6 @@ public class RequestLogFilter implements Filter {
                     log.info(recordString);
                 }
                 MDC.remove("CUSTOM_LOG");
-                ThreadLocalContext.clear();
             }
         }
     }

@@ -3,7 +3,7 @@ package com.lesofn.archsmith.infrastructure.frame.utils.log;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.lesofn.archsmith.common.profile.DefaultProfileLoader;
-import com.lesofn.archsmith.infrastructure.frame.context.ThreadLocalContext;
+import com.lesofn.archsmith.infrastructure.frame.context.ScopedValueContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,14 +41,14 @@ public class ApiLogger {
     private static String formatMsg(Object msg) {
         return String.format(
                 "%s\t%s",
-                ThreadLocalContext.getRequestContext().getRequestId(),
+                ScopedValueContext.getRequestContext().getRequestId(),
                 msg == null ? "null" : msg.toString());
     }
 
     private static String formatMsg(String tag, Object msg) {
         return String.format(
                 "%s\t%s\t%s",
-                ThreadLocalContext.getRequestContext().getRequestId(),
+                ScopedValueContext.getRequestContext().getRequestId(),
                 tag,
                 msg == null ? "null" : msg.toString());
     }
@@ -86,7 +86,7 @@ public class ApiLogger {
         fireLog.warn(
                 String.format(
                         "%s\t%s\t%s\t%s\t%s\t%s",
-                        ThreadLocalContext.getRequestContext().getRequestId(),
+                        ScopedValueContext.getRequestContext().getRequestId(),
                         resourceType,
                         resourceId,
                         "slow",
@@ -104,7 +104,7 @@ public class ApiLogger {
         fireLog.error(
                 String.format(
                         "%s\t%s\t%s\t%s\t%s\t%s",
-                        ThreadLocalContext.getRequestContext().getRequestId(),
+                        ScopedValueContext.getRequestContext().getRequestId(),
                         resourceType,
                         resourceId,
                         "error",

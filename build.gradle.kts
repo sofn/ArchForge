@@ -51,12 +51,13 @@ subprojects {
         }
 
         tasks.withType<JavaCompile> {
-            options.compilerArgs.addAll(listOf("-Xlint:deprecation", "-parameters"))
+            options.compilerArgs.addAll(listOf("-Xlint:deprecation", "-parameters", "--enable-preview"))
         }
         
         // 配置测试任务使用JUnit Platform
         tasks.withType<Test> {
             useJUnitPlatform()
+            jvmArgs("--enable-preview")
         }
 
         // 全局排除冲突的日志依赖
