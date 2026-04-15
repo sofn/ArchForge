@@ -27,10 +27,23 @@ public class LocalFileStorageService implements FileStorageService {
         }
     }
 
+    /**
+     * 将用户提供的相对路径解析为安全的绝对路径，确保不会逃逸出 basePath。
+     *
+     * @throws IllegalArgumentException 如果路径包含路径遍历序列
+     */
+    private Path safePath(String relativePath) {
+        Path resolved = basePath.resolve(relativePath).normalize();
+        if (!resolved.startsWith(basePath)) {
+            throw new IllegalArgumentException("Path traversal detected: " + relativePath);
+        }
+        return resolved;
+    }
+
     @Override
     public String upload(String path, InputStream inputStream, String contentType, long size) {
         try {
-            Path targetPath = basePath.resolve(path).normalize();
+            Path targetPath = safePath(path);
             Files.createDirectories(targetPath.getParent());
             Files.copy(inputStream, targetPath, StandardCopyOption.REPLACE_EXISTING);
             return path;
@@ -42,7 +55,7 @@ public class LocalFileStorageService implements FileStorageService {
     @Override
     public InputStream download(String path) {
         try {
-            Path filePath = basePath.resolve(path).normalize();
+            Path filePath = safePath(path);
             return Files.newInputStream(filePath);
         } catch (IOException e) {
             throw new RuntimeException("Failed to read file: " + path, e);
@@ -52,7 +65,7 @@ public class LocalFileStorageService implements FileStorageService {
     @Override
     public void delete(String path) {
         try {
-            Path filePath = basePath.resolve(path).normalize();
+            Path filePath = safePath(path);
             Files.deleteIfExists(filePath);
         } catch (IOException e) {
             log.warn("Failed to delete file: {}", path, e);
@@ -61,7 +74,7 @@ public class LocalFileStorageService implements FileStorageService {
 
     @Override
     public boolean exists(String path) {
-        Path filePath = basePath.resolve(path).normalize();
+        Path filePath = safePath(path);
         return Files.exists(filePath);
     }
 }
