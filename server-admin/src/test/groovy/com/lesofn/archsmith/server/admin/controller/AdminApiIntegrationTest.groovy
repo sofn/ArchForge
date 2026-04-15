@@ -70,6 +70,7 @@ class AdminApiIntegrationTest extends Specification {
     def "1.1 登录成功并获取token"() {
         when:
         Map response = doPost("/login", [username: "admin", password: "admin123"])
+        accessToken = response.data.accessToken
 
         then:
         response.code == 0
@@ -81,9 +82,6 @@ class AdminApiIntegrationTest extends Specification {
         response.data.roles instanceof List
         response.data.roles.contains("admin")
         response.data.permissions instanceof List
-
-        cleanup:
-        accessToken = response.data.accessToken
     }
 
     def "1.2 错误密码登录失败"() {
