@@ -44,16 +44,12 @@ spring:
           username: ${DB_USERNAME}
           password: ${DB_PASSWORD}
 
-# OpenTelemetry
+# OpenTelemetry (tracing configured via OTel SDK env vars: OTEL_EXPORTER_OTLP_ENDPOINT, OTEL_TRACES_SAMPLER_ARG)
 management:
-  tracing:
-    sampling:
-      probability: 0.1
   otlp:
-    tracing:
-      endpoint: ${OTEL_EXPORTER_OTLP_ENDPOINT:http://localhost:4318/v1/traces}
     metrics:
-      endpoint: ${OTEL_EXPORTER_OTLP_ENDPOINT:http://localhost:4318/v1/metrics}
+      export:
+        url: ${OTEL_EXPORTER_OTLP_ENDPOINT:http://localhost:4318/v1/metrics}
 
 arch-smith:
   flyway:
