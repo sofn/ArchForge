@@ -21,7 +21,7 @@ spring:
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:dev}
   application:
-    name: AppForge
+    name: ArchSmith
     version: 1.0.0
   threads:
     virtual:
@@ -90,8 +90,8 @@ springdoc:
   writer-with-default-pretty-printer: true
 
 # 项目相关配置
-app-forge:
-  name: AppForge
+arch-smith:
+  name: ArchSmith
   version: 1.0.0
   copyright-year: 2025
   captcha-type: math

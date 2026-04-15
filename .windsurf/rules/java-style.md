@@ -98,7 +98,7 @@ private final MyService myService;  // With @RequiredArgsConstructor
 @Slf4j
 public class UserService {
     private final UserRepository userRepository;
-    private final AppForgeConfig appForgeConfig;
+    private final ArchSmithConfig appForgeConfig;
 }
 ```
 
@@ -107,9 +107,9 @@ public class UserService {
 // CORRECT - Use configuration beans
 @Component
 public class MyComponent {
-    private final AppForgeConfig appForgeConfig;
+    private final ArchSmithConfig appForgeConfig;
     
-    public MyComponent(AppForgeConfig appForgeConfig) {
+    public MyComponent(ArchSmithConfig appForgeConfig) {
         this.appForgeConfig = appForgeConfig;
     }
     

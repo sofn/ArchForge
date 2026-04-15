@@ -2,7 +2,7 @@ plugins {
     id("com.diffplug.spotless") version "7.0.4" apply false
 }
 
-group = "com.lesofn.appforge"
+group = "com.lesofn.archsmith"
 version = "0.1.SNAPSHOT"
 
 allprojects {

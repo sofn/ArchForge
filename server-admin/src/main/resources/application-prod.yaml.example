@@ -25,22 +25,22 @@ spring:
       datasource:
         user_master:
           driver-class-name: org.postgresql.Driver
-          url: jdbc:postgresql://<db-master-host>:5432/appforge_user?sslmode=require
+          url: jdbc:postgresql://<db-master-host>:5432/archsmith_user?sslmode=require
           username: ${DB_USERNAME}
           password: ${DB_PASSWORD}
         user_slave:
           driver-class-name: org.postgresql.Driver
-          url: jdbc:postgresql://<db-slave-host>:5432/appforge_user?sslmode=require
+          url: jdbc:postgresql://<db-slave-host>:5432/archsmith_user?sslmode=require
           username: ${DB_USERNAME}
           password: ${DB_PASSWORD}
         task_master:
           driver-class-name: org.postgresql.Driver
-          url: jdbc:postgresql://<db-master-host>:5432/appforge_task?sslmode=require
+          url: jdbc:postgresql://<db-master-host>:5432/archsmith_task?sslmode=require
           username: ${DB_USERNAME}
           password: ${DB_PASSWORD}
         task_slave:
           driver-class-name: org.postgresql.Driver
-          url: jdbc:postgresql://<db-slave-host>:5432/appforge_task?sslmode=require
+          url: jdbc:postgresql://<db-slave-host>:5432/archsmith_task?sslmode=require
           username: ${DB_USERNAME}
           password: ${DB_PASSWORD}
 
@@ -55,7 +55,7 @@ management:
     metrics:
       endpoint: ${OTEL_EXPORTER_OTLP_ENDPOINT:http://localhost:4318/v1/metrics}
 
-app-forge:
+arch-smith:
   flyway:
     enabled: true
   jwt:

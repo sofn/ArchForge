@@ -130,7 +130,7 @@
 
         <!-- dev: 项目代码 DEBUG，依赖包 INFO；输出到 Console + 文件 -->
         <SpringProfile name="dev">
-            <Logger name="com.lesofn.appforge" level="DEBUG"/>
+            <Logger name="com.lesofn.archsmith" level="DEBUG"/>
             <Root level="INFO">
                 <AppenderRef ref="Console"/>
                 <AppenderRef ref="ErrorConsole"/>
@@ -143,7 +143,7 @@
 
         <!-- test/prod: 所有日志 INFO 及以上；仅输出到文件 -->
         <SpringProfile name="!dev">
-            <Logger name="com.lesofn.appforge" level="INFO"/>
+            <Logger name="com.lesofn.archsmith" level="INFO"/>
             <Root level="INFO">
                 <AppenderRef ref="AsyncInfoFile"/>
                 <AppenderRef ref="AsyncWarnFile"/>

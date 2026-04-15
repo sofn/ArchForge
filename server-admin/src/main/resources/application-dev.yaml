@@ -29,24 +29,24 @@ spring:
       datasource:
         user_master:
           driver-class-name: org.postgresql.Driver
-          url: jdbc:postgresql://localhost:5432/appforge_user
-          username: appforge
-          password: appforge
+          url: jdbc:postgresql://localhost:5432/archsmith_user
+          username: archsmith
+          password: archsmith
         user_slave:
           driver-class-name: org.postgresql.Driver
-          url: jdbc:postgresql://localhost:5432/appforge_user
-          username: appforge
-          password: appforge
+          url: jdbc:postgresql://localhost:5432/archsmith_user
+          username: archsmith
+          password: archsmith
         task_master:
           driver-class-name: org.postgresql.Driver
-          url: jdbc:postgresql://localhost:5432/appforge_task
-          username: appforge
-          password: appforge
+          url: jdbc:postgresql://localhost:5432/archsmith_task
+          username: archsmith
+          password: archsmith
         task_slave:
           driver-class-name: org.postgresql.Driver
-          url: jdbc:postgresql://localhost:5432/appforge_task
-          username: appforge
-          password: appforge
+          url: jdbc:postgresql://localhost:5432/archsmith_task
+          username: archsmith
+          password: archsmith
 
 # OpenTelemetry
 management:
@@ -59,7 +59,7 @@ management:
     metrics:
       endpoint: http://localhost:4318/v1/metrics
 
-app-forge:
+arch-smith:
   embedded:
     redis: true
     postgresql: true

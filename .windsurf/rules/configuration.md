@@ -11,12 +11,12 @@ application-base.yaml     # Common configurations
 └── application-prod.yaml  # Production environment
 ```
 
-## AppForgeConfig Bean Usage
+## ArchSmithConfig Bean Usage
 
 ### Configuration Bean Structure
 ```java
-@ConfigurationProperties(prefix = "app-forge")
-public class AppForgeConfig {
+@ConfigurationProperties(prefix = "arch-smith")
+public class ArchSmithConfig {
     private String name;
     private String version;
     private Token token = new Token();
@@ -42,12 +42,12 @@ public class AppForgeConfig {
 }
 ```
 
-### ✅ CORRECT - Using AppForgeConfig
+### ✅ CORRECT - Using ArchSmithConfig
 ```java
 @Service
 @RequiredArgsConstructor
 public class TokenService {
-    private final AppForgeConfig appForgeConfig;
+    private final ArchSmithConfig appForgeConfig;
     
     public String getTokenHeader() {
         return appForgeConfig.getToken().getHeader();
@@ -88,8 +88,8 @@ management:
     port: 7002
 
 # Application properties
-app-forge:
-  name: AppForge
+arch-smith:
+  name: ArchSmith
   version: 1.0.0
   token:
     header: Authorization
@@ -111,7 +111,7 @@ spring:
       console:
         enabled: true
 
-app-forge:
+arch-smith:
   jwt:
     secret: dev-secret-key
     expire-seconds: 604800  # 7 days
@@ -125,7 +125,7 @@ spring:
   profiles:
     active: base,prod
 
-app-forge:
+arch-smith:
   jwt:
     secret: ${JWT_SECRET}  # From environment variable
     expire-seconds: 3600   # 1 hour
@@ -136,7 +136,7 @@ app-forge:
 ## Configuration Best Practices
 
 ### 1. Centralize Configuration Access
-- All configuration access should go through `AppForgeConfig`
+- All configuration access should go through `ArchSmithConfig`
 - Never scatter `@Value` annotations throughout the codebase
 - Create nested configuration classes for logical grouping
 
@@ -144,7 +144,7 @@ app-forge:
 ```yaml
 # Production configuration with env variable fallback
 database:
-  url: ${DATABASE_URL:jdbc:mysql://localhost:3306/appforge}
+  url: ${DATABASE_URL:jdbc:mysql://localhost:3306/archsmith}
   username: ${DB_USERNAME:root}
   password: ${DB_PASSWORD:}
   
@@ -154,9 +154,9 @@ jwt:
 
 ### 3. Configuration Validation
 ```java
-@ConfigurationProperties(prefix = "app-forge")
+@ConfigurationProperties(prefix = "arch-smith")
 @Validated
-public class AppForgeConfig {
+public class ArchSmithConfig {
     
     @NotBlank
     private String name;
@@ -177,7 +177,7 @@ public class AppForgeConfig {
 
 ### 4. Configuration Documentation
 ```java
-public class AppForgeConfig {
+public class ArchSmithConfig {
     
     /**
      * Application name displayed in UI and logs
@@ -207,17 +207,17 @@ public class AppForgeConfig {
 
 ## Migration Guide
 
-### Converting @Value to AppForgeConfig
+### Converting @Value to ArchSmithConfig
 
 #### Step 1: Identify @Value usage
 ```bash
 grep -r "@Value" --include="*.java" .
 ```
 
-#### Step 2: Add to AppForgeConfig
+#### Step 2: Add to ArchSmithConfig
 ```java
 // Add new configuration property
-public class AppForgeConfig {
+public class ArchSmithConfig {
     private NewConfig newConfig = new NewConfig();
     
     @Getter @Setter
@@ -229,7 +229,7 @@ public class AppForgeConfig {
 
 #### Step 3: Update YAML files
 ```yaml
-app-forge:
+arch-smith:
   new-config:
     property: value
 ```
@@ -241,7 +241,7 @@ app-forge:
 private String property;
 
 // After
-private final AppForgeConfig appForgeConfig;
+private final ArchSmithConfig appForgeConfig;
 
 public String getProperty() {
     return appForgeConfig.getNewConfig().getProperty();

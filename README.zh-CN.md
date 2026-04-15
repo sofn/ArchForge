@@ -1,9 +1,9 @@
 <div align="center">
-  <h1>AppForge</h1>
+  <h1>ArchSmith</h1>
   <p><strong>基于 Spring Boot 4 + Vue 3 的现代企业级管理平台</strong></p>
   <p>
-    <a href="https://appforge.lesofn.com">在线文档</a> ·
-    <a href="https://github.com/sofn/AppForgeAdmin">前端仓库</a> ·
+    <a href="https://archsmith.lesofn.com">在线文档</a> ·
+    <a href="https://github.com/sofn/ArchSmithAdmin">前端仓库</a> ·
     <a href="./README.md">English</a>
   </p>
   <p>
@@ -19,11 +19,11 @@
 
 ## 项目简介
 
-AppForge 是一个**开箱即用的全栈管理系统**，后端基于 Spring Boot 4，前端基于 Vue 3，提供完整的用户/角色/菜单/部门管理、文件上传下载、服务器监控、JWT 认证等功能。采用整洁架构，使用现代化技术栈。
+ArchSmith 是一个**开箱即用的全栈管理系统**，后端基于 Spring Boot 4，前端基于 Vue 3，提供完整的用户/角色/菜单/部门管理、文件上传下载、服务器监控、JWT 认证等功能。采用整洁架构，使用现代化技术栈。
 
 ### 与同类项目对比
 
-| 特性 | AppForge | RuoYi | JeecgBoot |
+| 特性 | ArchSmith | RuoYi | JeecgBoot |
 |------|----------|-------|-----------|
 | Spring Boot | **4.0.5** | 2.x | 3.x |
 | Java | **25 (虚拟线程)** | 8/17 | 17 |
@@ -59,14 +59,14 @@ AppForge 是一个**开箱即用的全栈管理系统**，后端基于 Spring Bo
 ### 1. 克隆项目
 
 ```bash
-git clone https://github.com/sofn/AppForge.git
-git clone https://github.com/sofn/AppForgeAdmin.git
+git clone https://github.com/sofn/ArchSmith.git
+git clone https://github.com/sofn/ArchSmithAdmin.git
 ```
 
 ### 2. 启动后端
 
 ```bash
-cd AppForge
+cd ArchSmith
 JAVA_HOME=/path/to/jdk25 ./gradlew server-admin:bootRun
 ```
 
@@ -75,7 +75,7 @@ JAVA_HOME=/path/to/jdk25 ./gradlew server-admin:bootRun
 ### 3. 启动前端
 
 ```bash
-cd AppForgeAdmin
+cd ArchSmithAdmin
 pnpm install && pnpm dev
 ```
 
@@ -86,7 +86,7 @@ pnpm install && pnpm dev
 ### Docker 部署
 
 ```bash
-cd AppForge/docker
+cd ArchSmith/docker
 ./start.sh          # JVM 模式（默认，Project Leyden CDS 优化）
 ./start.sh native   # Native Image 模式（Liberica NIK 25）
 ```
@@ -105,7 +105,7 @@ cd AppForge/docker
 
 ## 文档
 
-完整文档请访问: **[appforge.lesofn.com](https://appforge.lesofn.com)**
+完整文档请访问: **[archsmith.lesofn.com](https://archsmith.lesofn.com)**
 
 ## 许可证
 

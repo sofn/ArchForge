@@ -13,8 +13,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # 安全: 使用非 root 用户运行
-RUN groupadd -g 1001 appforge && useradd -u 1001 -g appforge -m appforge
-USER appforge
+RUN groupadd -g 1001 archsmith && useradd -u 1001 -g archsmith -m archsmith
+USER archsmith
 
 COPY --from=build /workspace/server-admin/build/native/nativeCompile/server-admin app
 
