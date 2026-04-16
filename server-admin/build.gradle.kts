@@ -89,10 +89,9 @@ dependencies {
     // Oshi (系统监控)
     api("com.github.oshi:oshi-core")
     
-    // Testcontainers Redis & PostgreSQL for Dev environment
+    // Testcontainers PostgreSQL for Dev environment
     api("org.testcontainers:testcontainers")
     api("org.testcontainers:testcontainers-postgresql")
-    api("org.testcontainers:testcontainers-minio")
     
     // AWS S3 SDK
     api("software.amazon.awssdk:s3")

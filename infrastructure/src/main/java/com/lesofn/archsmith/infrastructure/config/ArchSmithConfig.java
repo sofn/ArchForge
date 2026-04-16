@@ -113,7 +113,7 @@ public class ArchSmithConfig {
         /** 是否启用数据库初始化 */
         private boolean dbInit = false;
 
-        /** 是否启用嵌入式 S3 (MinIO) */
+        /** 是否启用嵌入式 S3 (RustFS) */
         private boolean s3 = false;
     }
 

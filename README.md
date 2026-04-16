@@ -27,7 +27,7 @@ ArchSmith is a **production-ready, full-stack admin platform** that combines a S
 - **Team project standard**: Codified conventions (Spotless, JSpecify, Lombok), centralized dependency BOM, skill-based onboarding
 - **JDK 25 features in production**: ScopedValue, Structured Concurrency, Pattern Matching, Stream Gatherers, Virtual Threads
 - **Production-ready deployment**: Docker with jlink minimal JRE + Project Leyden CDS, Flyway migrations, multi-datasource, Micrometer observability
-- **Zero-config dev**: `./gradlew server-admin:bootRun` auto-starts PostgreSQL, Redis, MinIO via Testcontainers
+- **Zero-config dev**: `./gradlew server-admin:bootRun` auto-starts PostgreSQL, Redis, RustFS via Testcontainers
 
 ## Features
 
@@ -36,7 +36,7 @@ ArchSmith is a **production-ready, full-stack admin platform** that combines a S
 | **Auth** | JWT + refresh token, Spring Security, BCrypt password, configurable captcha |
 | **RBAC** | Users, roles, menus, departments, button-level permissions |
 | **System** | Config management, notice/announcements, operation & login logs |
-| **File Storage** | Upload/download with local filesystem and S3 (MinIO) backends, configurable via YAML |
+| **File Storage** | Upload/download with local filesystem and S3 (RustFS) backends, configurable via YAML |
 | **Monitor** | Real-time CPU/memory/JVM/disk monitoring (Oshi), embedded Swagger UI |
 | **Database** | PostgreSQL, multi-datasource with read/write split, Flyway migration |
 | **Deploy** | Docker Compose (Leyden JVM + Native Image), Nginx reverse proxy |
@@ -47,7 +47,7 @@ ArchSmith is a **production-ready, full-stack admin platform** that combines a S
 ### Prerequisites
 
 - Java 25, Node.js 20+, pnpm 9+
-- **Docker** (required for dev mode — Testcontainers uses Docker to run PostgreSQL, Redis, MinIO)
+- **Docker** (required for dev mode — Testcontainers uses Docker to run PostgreSQL, Redis, RustFS)
 
 ### 1. Clone
 
@@ -63,7 +63,7 @@ cd ArchSmith
 JAVA_HOME=/path/to/jdk25 ./gradlew server-admin:bootRun
 ```
 
-> Dev profile auto-starts PostgreSQL, Redis, and MinIO via Testcontainers. No manual DB setup needed.
+> Dev profile auto-starts PostgreSQL, Redis, and RustFS via Testcontainers. No manual DB setup needed.
 
 ### 3. Start Frontend
 
@@ -112,7 +112,7 @@ ArchSmithAdmin (Frontend)
 | Backend | Java 25, Spring Boot 4.0.5, Spring Security, Spring Data JPA, QueryDSL |
 | Frontend | Vue 3.5, Vite 8, TypeScript 6, Element Plus, TailwindCSS 4 |
 | Database | PostgreSQL 17 (Testcontainers in dev), Redis, Flyway |
-| File Storage | Local filesystem, AWS S3 / MinIO (Testcontainers in dev) |
+| File Storage | Local filesystem, AWS S3 / RustFS (Testcontainers in dev) |
 | Monitoring | Oshi, SpringDoc OpenAPI, Micrometer + OpenTelemetry |
 | Build | Gradle 9.4.1, pnpm, Docker, Project Leyden, Liberica NIK 25 |
 | Testing | JUnit 6, Spock 2.4, RestClient, Testcontainers |

@@ -13,7 +13,7 @@
 ```
 
 - Requires **Java 25** — `JAVA_HOME` must point to JDK 25 (e.g. Azul Zulu)
-- Dev mode requires **Docker** — Testcontainers auto-starts PostgreSQL, Redis, MinIO
+- Dev mode requires **Docker** — Testcontainers auto-starts PostgreSQL, Redis, RustFS
 
 ## Architecture
 
@@ -78,7 +78,7 @@ ArchSmith/
 - **Spock 2.4** (Groovy 5.x) for BDD tests — `src/test/groovy/`
 - **JUnit 6** (Jupiter) for unit tests — `src/test/java/`
 - **RestClient integration tests** — `RestClientIntegrationTest.java` (15 API tests)
-- **Testcontainers** in dev: PostgreSQL 17, Redis 7, MinIO (auto-started)
+- **Testcontainers** in dev: PostgreSQL 17, Redis 7, RustFS (auto-started)
 - Test data: Flyway V2/V3 + `InitDbMockServer` SQL seed data
 
 ## Dependencies
