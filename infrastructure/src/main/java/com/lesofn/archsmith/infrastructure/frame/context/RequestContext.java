@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author sofn
@@ -45,11 +46,11 @@ public class RequestContext implements Serializable {
         attribute = new HashMap<>();
     }
 
-    public String getRequestId() {
+    public @Nullable String getRequestId() {
         return requestId;
     }
 
-    public void setRequestId(String requestId) {
+    public void setRequestId(@Nullable String requestId) {
         this.requestId = requestId;
     }
 
@@ -61,11 +62,11 @@ public class RequestContext implements Serializable {
         this.currentUid = currentUid;
     }
 
-    public String getIp() {
+    public @Nullable String getIp() {
         return ip;
     }
 
-    public void setIp(String ip) {
+    public void setIp(@Nullable String ip) {
         this.ip = ip;
     }
 
@@ -77,11 +78,11 @@ public class RequestContext implements Serializable {
         this.appId = appId;
     }
 
-    public ClientVersion getClientVersion() {
+    public @Nullable ClientVersion getClientVersion() {
         return clientVersion;
     }
 
-    public void setClientVersion(ClientVersion clientVersion) {
+    public void setClientVersion(@Nullable ClientVersion clientVersion) {
         if (clientVersion != null) {
             this.clientVersion = clientVersion;
         }
@@ -105,7 +106,7 @@ public class RequestContext implements Serializable {
         this.originRequest = originRequest;
     }
 
-    public Object getAttribute(String name) {
+    public @Nullable Object getAttribute(String name) {
         return this.attribute.get(name);
     }
 

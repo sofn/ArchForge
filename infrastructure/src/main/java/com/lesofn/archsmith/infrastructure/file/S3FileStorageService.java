@@ -65,8 +65,7 @@ public class S3FileStorageService implements FileStorageService {
 
     @Override
     public InputStream download(String path) {
-        GetObjectRequest request =
-                GetObjectRequest.builder().bucket(bucket).key(path).build();
+        GetObjectRequest request = GetObjectRequest.builder().bucket(bucket).key(path).build();
         return s3Client.getObject(request);
     }
 

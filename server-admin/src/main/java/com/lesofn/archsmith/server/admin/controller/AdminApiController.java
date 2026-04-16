@@ -2,6 +2,11 @@ package com.lesofn.archsmith.server.admin.controller;
 
 import com.lesofn.archsmith.common.enums.common.GenderEnum;
 import com.lesofn.archsmith.server.admin.dto.*;
+import com.lesofn.archsmith.server.admin.mapper.AdminDeptMapper;
+import com.lesofn.archsmith.server.admin.mapper.AdminMenuMapper;
+import com.lesofn.archsmith.server.admin.mapper.AdminRoleMapper;
+import com.lesofn.archsmith.server.admin.mapper.AdminRoleMenuMapper;
+import com.lesofn.archsmith.server.admin.mapper.AdminUserMapper;
 import com.lesofn.archsmith.server.admin.service.monitor.ServerMonitorService;
 import com.lesofn.archsmith.user.dao.SysRoleMenuRepository;
 import com.lesofn.archsmith.user.domain.SysConfig;
@@ -14,9 +19,7 @@ import com.lesofn.archsmith.user.domain.SysRole;
 import com.lesofn.archsmith.user.domain.SysRoleMenu;
 import com.lesofn.archsmith.user.domain.SysUser;
 import com.lesofn.archsmith.user.menu.SysMenuService;
-import com.lesofn.archsmith.user.menu.dto.ExtraIconDTO;
 import com.lesofn.archsmith.user.menu.dto.MetaDTO;
-import com.lesofn.archsmith.user.menu.dto.TransitionDTO;
 import com.lesofn.archsmith.user.service.SysConfigService;
 import com.lesofn.archsmith.user.service.SysDeptService;
 import com.lesofn.archsmith.user.service.SysLoginLogService;
@@ -66,6 +69,11 @@ public class AdminApiController {
     private final SysOperLogService operLogService;
     private final SysLoginLogService loginLogService;
     private final PasswordEncoder passwordEncoder;
+    private final AdminUserMapper userMapper;
+    private final AdminRoleMapper roleMapper;
+    private final AdminMenuMapper menuMapper;
+    private final AdminRoleMenuMapper roleMenuMapper;
+    private final AdminDeptMapper deptMapper;
 
     @Autowired(required = false)
     private SysDeptService deptService;
@@ -130,7 +138,7 @@ public class AdminApiController {
                                     }
                                     return true;
                                 })
-                        .map(user -> convertToUserItemDTO(user, deptNameMap))
+                        .map(user -> userMapper.toDto(user, deptNameMap))
                         .collect(Collectors.toList());
 
         return AdminPageResult.of(userItems, (long) userItems.size(), pageSize, currentPage);
@@ -183,7 +191,7 @@ public class AdminApiController {
         List<AdminRoleItemDTO> roleItems =
                 rolePage.getContent().stream()
                         .filter(role -> !Boolean.TRUE.equals(role.getDeleted()))
-                        .map(this::convertToRoleItemDTO)
+                        .map(roleMapper::toDto)
                         .collect(Collectors.toList());
 
         return AdminPageResult.of(roleItems, rolePage.getTotalElements(), pageSize, currentPage);
@@ -193,7 +201,7 @@ public class AdminApiController {
     @PostMapping("/role-menu")
     public List<AdminRoleMenuItemDTO> getRoleMenuTree() {
         List<SysMenu> allMenus = menuService.findAllActiveMenus();
-        return allMenus.stream().map(this::convertToRoleMenuItemDTO).collect(Collectors.toList());
+        return allMenus.stream().map(roleMenuMapper::toDto).collect(Collectors.toList());
     }
 
     @Operation(summary = "获取角色菜单ID列表")
@@ -210,7 +218,7 @@ public class AdminApiController {
     @PostMapping("/menu")
     public List<AdminMenuItemDTO> getMenuList() {
         List<SysMenu> allMenus = menuService.findAllActiveMenus();
-        return allMenus.stream().map(this::convertToMenuItemDTO).collect(Collectors.toList());
+        return allMenus.stream().map(menuMapper::toDto).collect(Collectors.toList());
     }
 
     @Operation(summary = "获取全量部门列表")
@@ -220,7 +228,7 @@ public class AdminApiController {
             return Collections.emptyList();
         }
         List<SysDept> allDepts = deptService.findAll();
-        return allDepts.stream().map(this::convertToDeptItemDTO).collect(Collectors.toList());
+        return allDepts.stream().map(deptMapper::toDto).collect(Collectors.toList());
     }
 
     // ==================== User CRUD ====================
@@ -699,122 +707,7 @@ public class AdminApiController {
         return serverMonitorService.getServerInfo();
     }
 
-    // ==================== 私有转换方法 ====================
-
-    private AdminUserItemDTO convertToUserItemDTO(SysUser user, Map<Long, String> deptNameMap) {
-        AdminUserItemDTO dto = new AdminUserItemDTO();
-        dto.setId(user.getUserId());
-        dto.setAvatar(user.getAvatar());
-        dto.setUsername(user.getUsername());
-        dto.setNickname(user.getNickname());
-        dto.setPhone(user.getPhoneNumber());
-        dto.setEmail(user.getEmail());
-        dto.setSex(user.getSex() != null ? user.getSex().getValue() : null);
-        dto.setStatus(user.getStatus());
-        dto.setRemark(user.getRemark());
-        dto.setCreateTime(toEpochMilli(user.getCreateTime()));
-        if (user.getDeptId() != null) {
-            String deptName = deptNameMap.getOrDefault(user.getDeptId(), "");
-            dto.setDept(AdminUserItemDTO.DeptInfo.of(user.getDeptId(), deptName));
-        }
-        return dto;
-    }
-
-    private AdminRoleItemDTO convertToRoleItemDTO(SysRole role) {
-        AdminRoleItemDTO dto = new AdminRoleItemDTO();
-        dto.setId(role.getRoleId());
-        dto.setName(role.getRoleName());
-        dto.setCode(role.getRoleKey());
-        dto.setStatus(role.getStatus() != null ? role.getStatus().intValue() : null);
-        dto.setRemark(role.getRemark());
-        dto.setCreateTime(toEpochMilli(role.getCreateTime()));
-        dto.setUpdateTime(toEpochMilli(role.getUpdateTime()));
-        return dto;
-    }
-
-    private AdminRoleMenuItemDTO convertToRoleMenuItemDTO(SysMenu menu) {
-        AdminRoleMenuItemDTO dto = new AdminRoleMenuItemDTO();
-        dto.setParentId(menu.getParentId());
-        dto.setId(menu.getMenuId());
-        dto.setMenuType(menu.getMenuType());
-        MetaDTO meta = menu.getMetaInfo();
-        if (meta != null) {
-            dto.setTitle(meta.getTitle());
-        }
-        return dto;
-    }
-
-    private AdminMenuItemDTO convertToMenuItemDTO(SysMenu menu) {
-        AdminMenuItemDTO dto = new AdminMenuItemDTO();
-        dto.setParentId(menu.getParentId());
-        dto.setId(menu.getMenuId());
-        dto.setMenuType(menu.getMenuType());
-        dto.setName(menu.getRouterName());
-        dto.setPath(menu.getPath());
-        dto.setComponent("");
-        dto.setRedirect("");
-        dto.setActivePath("");
-        dto.setAuths(menu.getPermission() != null ? menu.getPermission() : "");
-        dto.setFixedTag(false);
-        MetaDTO meta = menu.getMetaInfo();
-        if (meta != null) {
-            dto.setTitle(meta.getTitle());
-            dto.setRank(meta.getRank());
-            dto.setIcon(meta.getIcon() != null ? meta.getIcon() : "");
-            dto.setFrameSrc(meta.getFrameSrc() != null ? meta.getFrameSrc() : "");
-            dto.setFrameLoading(meta.getFrameLoading() != null ? meta.getFrameLoading() : true);
-            dto.setKeepAlive(meta.getKeepAlive() != null ? meta.getKeepAlive() : false);
-            dto.setHiddenTag(meta.getHiddenTag() != null ? meta.getHiddenTag() : false);
-            dto.setShowLink(meta.getShowLink() != null ? meta.getShowLink() : true);
-            dto.setShowParent(meta.getShowParent() != null ? meta.getShowParent() : false);
-            ExtraIconDTO extraIcon = meta.getExtraIcon();
-            dto.setExtraIcon(extraIcon != null ? extraIcon.getName() : "");
-            TransitionDTO transition = meta.getTransition();
-            if (transition != null) {
-                dto.setEnterTransition(
-                        transition.getEnterTransition() != null
-                                ? transition.getEnterTransition()
-                                : "");
-                dto.setLeaveTransition(
-                        transition.getLeaveTransition() != null
-                                ? transition.getLeaveTransition()
-                                : "");
-            } else {
-                dto.setEnterTransition("");
-                dto.setLeaveTransition("");
-            }
-        } else {
-            dto.setTitle("");
-            dto.setRank(0);
-            dto.setIcon("");
-            dto.setExtraIcon("");
-            dto.setEnterTransition("");
-            dto.setLeaveTransition("");
-            dto.setFrameSrc("");
-            dto.setFrameLoading(true);
-            dto.setKeepAlive(false);
-            dto.setHiddenTag(false);
-            dto.setShowLink(true);
-            dto.setShowParent(false);
-        }
-        return dto;
-    }
-
-    private AdminDeptItemDTO convertToDeptItemDTO(SysDept dept) {
-        AdminDeptItemDTO dto = new AdminDeptItemDTO();
-        dto.setId(dept.getDeptId());
-        dto.setParentId(dept.getParentId());
-        dto.setName(dept.getName());
-        dto.setPrincipal(dept.getPrincipal());
-        dto.setPhone(dept.getPhone());
-        dto.setEmail(dept.getEmail());
-        dto.setSort(dept.getSort());
-        dto.setStatus(dept.getStatus());
-        dto.setType(dept.getType());
-        dto.setRemark(dept.getRemark());
-        dto.setCreateTime(toEpochMilli(dept.getCreateTime()));
-        return dto;
-    }
+    // ==================== 私有辅助方法 ====================
 
     private Map<Long, String> buildDeptNameMap() {
         if (deptService == null) {

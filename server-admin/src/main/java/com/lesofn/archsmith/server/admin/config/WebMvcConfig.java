@@ -4,7 +4,7 @@ import java.util.List;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.ByteArrayHttpMessageConverter;
-import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.HttpMessageConverters;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
@@ -17,26 +17,20 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class WebMvcConfig implements WebMvcConfigurer {
 
     @Override
-    public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
-        // Remove existing ByteArrayHttpMessageConverter, reconfigure and add to front
-        ByteArrayHttpMessageConverter byteConverter = null;
-        for (int i = 0; i < converters.size(); i++) {
-            if (converters.get(i) instanceof ByteArrayHttpMessageConverter) {
-                byteConverter = (ByteArrayHttpMessageConverter) converters.remove(i);
-                break;
-            }
-        }
-        if (byteConverter == null) {
-            byteConverter = new ByteArrayHttpMessageConverter();
-        }
-        // Add application/json so it can handle SpringDoc byte[] JSON responses
-        List<MediaType> mediaTypes =
-                new java.util.ArrayList<>(byteConverter.getSupportedMediaTypes());
-        if (!mediaTypes.contains(MediaType.APPLICATION_JSON)) {
-            mediaTypes.add(MediaType.APPLICATION_JSON);
-        }
-        byteConverter.setSupportedMediaTypes(mediaTypes);
-        // Put at the front so it takes priority over Jackson for byte[] responses
-        converters.addFirst(byteConverter);
+    public void configureMessageConverters(HttpMessageConverters.ServerBuilder builder) {
+        builder.registerDefaults();
+        builder.configureMessageConvertersList(
+                converters -> {
+                    // Add a ByteArrayHttpMessageConverter with JSON support at the front
+                    ByteArrayHttpMessageConverter byteConverter =
+                            new ByteArrayHttpMessageConverter();
+                    List<MediaType> mediaTypes =
+                            new java.util.ArrayList<>(byteConverter.getSupportedMediaTypes());
+                    if (!mediaTypes.contains(MediaType.APPLICATION_JSON)) {
+                        mediaTypes.add(MediaType.APPLICATION_JSON);
+                    }
+                    byteConverter.setSupportedMediaTypes(mediaTypes);
+                    converters.addFirst(byteConverter);
+                });
     }
 }

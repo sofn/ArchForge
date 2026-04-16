@@ -1,7 +1,7 @@
 package com.lesofn.archsmith.infrastructure.frame.spring;
 
 import com.lesofn.archsmith.infrastructure.frame.context.RequestContext;
-import com.lesofn.archsmith.infrastructure.frame.context.ThreadLocalContext;
+import com.lesofn.archsmith.infrastructure.frame.context.ScopedValueContext;
 import org.springframework.core.MethodParameter;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
@@ -22,6 +22,6 @@ public class RequestContextMethodArgumentResolver implements HandlerMethodArgume
             NativeWebRequest nativeWebRequest,
             WebDataBinderFactory webDataBinderFactory)
             throws Exception {
-        return ThreadLocalContext.getRequestContext();
+        return ScopedValueContext.getRequestContext();
     }
 }

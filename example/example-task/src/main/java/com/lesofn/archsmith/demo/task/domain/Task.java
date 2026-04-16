@@ -1,5 +1,6 @@
 package com.lesofn.archsmith.demo.task.domain;
 
+import com.google.common.base.Preconditions;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -23,9 +24,41 @@ public class Task {
     @Column(name = "uid", nullable = false)
     public long uid;
 
+    @Enumerated(EnumType.STRING)
+    private TaskStatus status = TaskStatus.CREATED;
+
     public Task(String title, String description, long uid) {
         this.title = title;
         this.description = description;
         this.uid = uid;
+    }
+
+    public void start() {
+        transition(TaskStatus.IN_PROGRESS);
+    }
+
+    public void complete() {
+        transition(TaskStatus.COMPLETED);
+    }
+
+    public void cancel() {
+        transition(TaskStatus.CANCELLED);
+    }
+
+    public void reassign(long newUid) {
+        Preconditions.checkState(
+                this.status == TaskStatus.CREATED || this.status == TaskStatus.IN_PROGRESS,
+                "Cannot reassign task in status: %s",
+                this.status);
+        this.uid = newUid;
+    }
+
+    private void transition(TaskStatus target) {
+        Preconditions.checkState(
+                this.status.canTransitionTo(target),
+                "Cannot transition from %s to %s",
+                this.status,
+                target);
+        this.status = target;
     }
 }

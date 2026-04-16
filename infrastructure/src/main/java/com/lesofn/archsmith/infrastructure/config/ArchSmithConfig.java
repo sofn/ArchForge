@@ -55,6 +55,12 @@ public class ArchSmithConfig {
     /** 文件存储配置 */
     private FileStorage fileStorage = new FileStorage();
 
+    /** Flyway数据库迁移配置 */
+    private Flyway flyway = new Flyway();
+
+    /** 服务器监控配置 */
+    private Monitor monitor = new Monitor();
+
     @Setter
     @Getter
     public static class Token {
@@ -148,5 +154,19 @@ public class ArchSmithConfig {
 
         /** S3 region */
         private String region = "us-east-1";
+    }
+
+    @Setter
+    @Getter
+    public static class Flyway {
+        /** 是否启用Flyway数据库迁移 */
+        private boolean enabled = false;
+    }
+
+    @Setter
+    @Getter
+    public static class Monitor {
+        /** 是否启用服务器监控 */
+        private boolean enabled = true;
     }
 }

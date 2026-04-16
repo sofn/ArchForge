@@ -21,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.jspecify.annotations.Nullable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -93,7 +94,7 @@ public class AdminUserDetailsService implements UserDetailsService {
         return loginUser;
     }
 
-    public RoleInfo getRoleInfo(Long roleId, boolean isAdmin) {
+    public RoleInfo getRoleInfo(@Nullable Long roleId, boolean isAdmin) {
         if (roleId == null) {
             return RoleInfo.EMPTY_ROLE;
         }

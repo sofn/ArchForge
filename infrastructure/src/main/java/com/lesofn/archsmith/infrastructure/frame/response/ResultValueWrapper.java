@@ -3,11 +3,12 @@ package com.lesofn.archsmith.infrastructure.frame.response;
 import com.lesofn.archsmith.common.errors.SystemErrorCode;
 import com.lesofn.archsmith.infrastructure.frame.response.model.ResponseResult;
 import com.lesofn.archsmith.infrastructure.frame.response.model.Result;
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.MediaType;
+import org.springframework.http.ProblemDetail;
 import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
@@ -24,7 +25,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 public class ResultValueWrapper implements ResponseBodyAdvice<Object> {
 
     @Override
-    public boolean supports(@Nullable MethodParameter returnType, @Nonnull Class converterType) {
+    public boolean supports(@Nullable MethodParameter returnType, @NonNull Class converterType) {
         return JacksonJsonHttpMessageConverter.class.isAssignableFrom(converterType);
     }
 
@@ -34,8 +35,8 @@ public class ResultValueWrapper implements ResponseBodyAdvice<Object> {
             @Nullable MethodParameter returnType,
             @Nullable MediaType selectedContentType,
             @Nullable Class selectedConverterType,
-            @Nonnull ServerHttpRequest request,
-            @Nonnull ServerHttpResponse response) {
+            @NonNull ServerHttpRequest request,
+            @NonNull ServerHttpResponse response) {
 
         String requestPath =
                 ((ServletServerHttpRequest) request).getServletRequest().getServletPath();
@@ -48,19 +49,19 @@ public class ResultValueWrapper implements ResponseBodyAdvice<Object> {
             return body;
         }
 
-        if (body == null) {
-            return ResponseResult.success(null);
-        } else if (body instanceof ResponseResult) {
-            return body;
-        } else if (body instanceof Result) {
-            Result<?> result = (Result<?>) body;
-            return ResponseResult.success(result.getData());
-        }
-
-        if (requestPath.equals("/error")) {
-            return ResponseResult.error(SystemErrorCode.SYSTEM_ERROR.getCode(), body.toString());
-        } else {
-            return ResponseResult.success(body);
-        }
+        return switch (body) {
+            case null -> ResponseResult.success(null);
+            case ProblemDetail p -> p; // RFC 9457: pass through without wrapping
+            case ResponseResult<?> r -> r;
+            case Result<?> r -> ResponseResult.success(r.getData());
+            default -> {
+                if (requestPath.equals("/error")) {
+                    yield ResponseResult.error(
+                            SystemErrorCode.SYSTEM_ERROR.getCode(), body.toString());
+                } else {
+                    yield ResponseResult.success(body);
+                }
+            }
+        };
     }
 }

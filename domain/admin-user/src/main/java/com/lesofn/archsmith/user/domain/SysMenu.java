@@ -47,4 +47,24 @@ public class SysMenu extends BaseEntity<SysMenu> {
     private String remark;
 
     @Transient private List<SysMenu> children;
+
+    /** 是否可见 */
+    public boolean isVisible() {
+        return this.status != null && this.status == 1;
+    }
+
+    /** 是否为按钮类型 */
+    public boolean isButtonType() {
+        return Boolean.TRUE.equals(this.isButton);
+    }
+
+    /** 是否为目录类型 (menuType=0) */
+    public boolean isDirectory() {
+        return this.menuType != null && this.menuType == 0;
+    }
+
+    /** 是否为菜单类型 (menuType=1) */
+    public boolean isMenuType() {
+        return this.menuType != null && this.menuType == 1;
+    }
 }

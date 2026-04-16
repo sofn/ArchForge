@@ -58,10 +58,7 @@ class RestClientIntegrationTest {
         }
 
         RestClient.RequestBodySpec spec =
-                restClient
-                        .post()
-                        .uri(path)
-                        .header("Content-Type", "application/json");
+                restClient.post().uri(path).header("Content-Type", "application/json");
         if (accessToken != null) {
             spec = spec.header("Authorization", "Bearer " + accessToken);
         }
@@ -119,7 +116,8 @@ class RestClientIntegrationTest {
     @Test
     @Order(1)
     void login() {
-        Map<String, Object> response = post("/login", Map.of("username", "admin", "password", "admin123"));
+        Map<String, Object> response =
+                post("/login", Map.of("username", "admin", "password", "admin123"));
         assertEquals(0, response.get("code"));
         @SuppressWarnings("unchecked")
         Map<String, Object> data = (Map<String, Object>) response.get("data");
@@ -221,8 +219,7 @@ class RestClientIntegrationTest {
     @Order(21)
     @SuppressWarnings("unchecked")
     void listRoles() {
-        Map<String, Object> response =
-                post("/role", Map.of("currentPage", 1, "pageSize", 100));
+        Map<String, Object> response = post("/role", Map.of("currentPage", 1, "pageSize", 100));
         assertEquals(0, response.get("code"));
         Map<String, Object> data = (Map<String, Object>) response.get("data");
         List<Map<String, Object>> list = (List<Map<String, Object>>) data.get("list");
@@ -245,10 +242,14 @@ class RestClientIntegrationTest {
                 put(
                         "/role/update",
                         Map.of(
-                                "id", createdRoleId,
-                                "name", "RestClient测试角色-已修改",
-                                "code", "restclient_test_role",
-                                "status", 1));
+                                "id",
+                                createdRoleId,
+                                "name",
+                                "RestClient测试角色-已修改",
+                                "code",
+                                "restclient_test_role",
+                                "status",
+                                1));
         assertEquals(0, response.get("code"));
     }
 
@@ -284,8 +285,7 @@ class RestClientIntegrationTest {
     void listDepts() {
         Map<String, Object> response = post("/dept", Map.of());
         assertEquals(0, response.get("code"));
-        List<Map<String, Object>> data =
-                (List<Map<String, Object>>) response.get("data");
+        List<Map<String, Object>> data = (List<Map<String, Object>>) response.get("data");
         assertTrue(data.stream().anyMatch(d -> "测试部门".equals(d.get("name"))));
         createdDeptId =
                 data.stream()

@@ -1,6 +1,6 @@
 package com.lesofn.archsmith.infrastructure.frame.filters;
 
-import com.lesofn.archsmith.infrastructure.frame.context.ThreadLocalContext;
+import com.lesofn.archsmith.infrastructure.frame.context.ScopedValueContext;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -18,7 +18,7 @@ public class HeaderResponseFilter implements Filter {
         ((HttpServletResponse) response)
                 .setHeader(
                         "X-Engine-RequestID",
-                        ThreadLocalContext.getRequestContext().getRequestId());
+                        ScopedValueContext.getRequestContext().getRequestId());
         filterChain.doFilter(request, response);
     }
 

@@ -64,4 +64,19 @@ public class SysUser extends BaseEntity<SysUser> {
     private Boolean isAdmin;
 
     private String remark;
+
+    /** 用户是否激活 */
+    public boolean isActive() {
+        return this.status != null && this.status == 1;
+    }
+
+    /** 用户是否已删除 */
+    public boolean isDeleted() {
+        return Boolean.TRUE.equals(this.getDeleted());
+    }
+
+    /** 用户是否可以登录 */
+    public boolean canLogin() {
+        return isActive() && !isDeleted();
+    }
 }

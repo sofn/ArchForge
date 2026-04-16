@@ -1,5 +1,5 @@
 plugins {
-    id("com.diffplug.spotless") version "7.0.4" apply false
+    id("com.diffplug.spotless") version "8.4.0" apply false
 }
 
 group = "com.lesofn.archsmith"
@@ -36,7 +36,7 @@ subprojects {
             lineEndings = com.diffplug.spotless.LineEnding.UNIX
             java {
                 target("src/*/java/**/*.java")
-                googleJavaFormat().aosp()
+                googleJavaFormat("1.35.0").aosp()
                 removeUnusedImports()
                 trimTrailingWhitespace()
                 endWithNewline()
@@ -51,12 +51,13 @@ subprojects {
         }
 
         tasks.withType<JavaCompile> {
-            options.compilerArgs.addAll(listOf("-Xlint:deprecation", "-parameters"))
+            options.compilerArgs.addAll(listOf("-Xlint:deprecation", "-parameters", "--enable-preview"))
         }
         
         // 配置测试任务使用JUnit Platform
         tasks.withType<Test> {
             useJUnitPlatform()
+            jvmArgs("--enable-preview")
         }
 
         // 全局排除冲突的日志依赖

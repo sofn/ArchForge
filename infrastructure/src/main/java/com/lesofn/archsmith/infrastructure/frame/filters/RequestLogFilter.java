@@ -3,19 +3,27 @@ package com.lesofn.archsmith.infrastructure.frame.filters;
 import com.lesofn.archsmith.common.error.exception.IErrorCodeException;
 import com.lesofn.archsmith.common.utils.GlobalConstants;
 import com.lesofn.archsmith.infrastructure.frame.context.RequestContext;
-import com.lesofn.archsmith.infrastructure.frame.context.ThreadLocalContext;
+import com.lesofn.archsmith.infrastructure.frame.context.RequestIDGenerator;
+import com.lesofn.archsmith.infrastructure.frame.context.ScopedValueContext;
 import com.lesofn.archsmith.infrastructure.frame.utils.RequestLogRecord;
 import com.lesofn.archsmith.infrastructure.frame.utils.ResponseWrapper;
+import io.micrometer.observation.Observation;
+import io.micrometer.observation.ObservationRegistry;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.Strings;
 import org.slf4j.MDC;
 
 @Slf4j
+@RequiredArgsConstructor
 public class RequestLogFilter implements Filter {
+
+    private static final RequestIDGenerator requestIdGenerator = RequestIDGenerator.getInstance();
+    private final ObservationRegistry observationRegistry;
 
     @Override
     public void doFilter(
@@ -32,25 +40,45 @@ public class RequestLogFilter implements Filter {
             return;
         }
 
-        RequestContext context = ThreadLocalContext.getRequestContext();
+        RequestContext context = new RequestContext(requestIdGenerator.nextId());
         MDC.put("requestId", context.getRequestId());
 
+        // ScopedValue: entire filter chain runs within context scope, auto-cleanup on exit
+        try {
+            ScopedValueContext.runInScope(
+                    context, () -> doFilterInScope(request, response, filterChain, context, path));
+        } catch (IOException | ServletException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new ServletException(e);
+        }
+    }
+
+    private void doFilterInScope(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            FilterChain filterChain,
+            RequestContext context,
+            String path)
+            throws IOException, ServletException {
         response = new ResponseWrapper(response);
+        Observation observation = Observation.start("http.server.requests", observationRegistry);
         long startTime = System.currentTimeMillis();
         try {
+            observation.lowCardinalityKeyValue("http.method", request.getMethod());
+            observation.lowCardinalityKeyValue("http.path", path);
             filterChain.doFilter(request, response);
         } catch (Exception e) {
+            observation.error(e);
             // 此处拦截也必须抛出，否则不执行ErrorHandlerResource
-            if (e instanceof IErrorCodeException) {
+            if (e instanceof IErrorCodeException errorCodeEx) {
                 log.error(
                         "EngineException error",
-                        e.getMessage() + " " + ((IErrorCodeException) e).getErrorInfo().getMsg());
-            } else if (e.getCause() instanceof IErrorCodeException) {
+                        e.getMessage() + " " + errorCodeEx.getErrorInfo().getMsg());
+            } else if (e.getCause() instanceof IErrorCodeException causeErrorCodeEx) {
                 log.error(
                         "EngineException error",
-                        e.getCause().getMessage()
-                                + " "
-                                + ((IErrorCodeException) e.getCause()).getErrorInfo().getMsg());
+                        e.getCause().getMessage() + " " + causeErrorCodeEx.getErrorInfo().getMsg());
             } else {
                 log.error("filterChain.doFilter error", e);
             }
@@ -96,7 +124,9 @@ public class RequestLogFilter implements Filter {
                     log.info(recordString);
                 }
                 MDC.remove("CUSTOM_LOG");
-                ThreadLocalContext.clear();
+                observation.lowCardinalityKeyValue(
+                        "http.status", String.valueOf(response.getStatus()));
+                observation.stop();
             }
         }
     }

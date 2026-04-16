@@ -8,7 +8,7 @@ import com.lesofn.archsmith.infrastructure.auth.model.AuthRequest;
 import com.lesofn.archsmith.infrastructure.auth.model.AuthResponse;
 import com.lesofn.archsmith.infrastructure.auth.service.AuthService;
 import com.lesofn.archsmith.infrastructure.frame.context.RequestContext;
-import com.lesofn.archsmith.infrastructure.frame.context.ThreadLocalContext;
+import com.lesofn.archsmith.infrastructure.frame.context.ScopedValueContext;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -51,7 +51,7 @@ public class AuthResourceFilter extends RequestMappingHandlerAdapter {
             return super.handleInternal(request, response, handlerMethod);
         }
 
-        RequestContext context = ThreadLocalContext.getRequestContext();
+        RequestContext context = ScopedValueContext.getRequestContext();
         context.setOriginRequest(request);
 
         AuthRequest authRequest = new AuthRequest(request);

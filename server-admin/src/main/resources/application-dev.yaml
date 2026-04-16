@@ -48,16 +48,12 @@ spring:
           username: archsmith
           password: archsmith
 
-# OpenTelemetry
+# OpenTelemetry (tracing configured via OTel SDK env vars: OTEL_EXPORTER_OTLP_ENDPOINT, OTEL_TRACES_SAMPLER_ARG)
 management:
-  tracing:
-    sampling:
-      probability: 1.0
   otlp:
-    tracing:
-      endpoint: http://localhost:4318/v1/traces
     metrics:
-      endpoint: http://localhost:4318/v1/metrics
+      export:
+        url: http://localhost:4318/v1/metrics
 
 arch-smith:
   embedded:

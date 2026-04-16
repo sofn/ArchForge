@@ -48,6 +48,7 @@ dependencies {
     api("com.google.code.findbugs:annotations")
     api("org.lionsoul:ip2region")
     api("eu.bitwalker:UserAgentUtils")
+    api("org.jspecify:jspecify")
     
     // Lombok
     compileOnly("org.projectlombok:lombok")
