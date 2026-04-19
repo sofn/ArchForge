@@ -1,6 +1,7 @@
 package com.lesofn.archsmith.server.admin.controller;
 
 import com.lesofn.archsmith.common.utils.jackson.JsonUtil;
+import com.lesofn.archsmith.infrastructure.annotation.RateLimit;
 import com.lesofn.archsmith.infrastructure.auth.AuthenticationUtils;
 import com.lesofn.archsmith.infrastructure.auth.errors.AdminAuthErrorCode;
 import com.lesofn.archsmith.infrastructure.auth.errors.AdminAuthException;
@@ -87,6 +88,7 @@ public class LoginController {
      */
     @Operation(summary = "登录")
     @PostMapping("/login")
+    @RateLimit(key = "login", time = 60, maxCount = 10, limitType = RateLimit.LimitType.IP)
     public LoginResponseDTO login(
             @Parameter(description = "登录信息", required = true) @RequestBody @Valid
                     LoginCommand loginCommand) {

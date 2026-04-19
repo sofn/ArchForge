@@ -46,6 +46,8 @@ public enum AdminAuthErrorCode implements ErrorCode {
     USER_FAIL_TO_GET_USER_ID(30, "获取用户ID失败"),
     USER_FAIL_TO_GET_USER_INFO(31, "获取用户信息失败"),
     LOGIN_ERROR(32, "登录失败"),
+    E_LOGIN_ACCOUNT_LOCKED(33, "账户已锁定，请 {} 分钟后重试"),
+    E_PASSWORD_POLICY_VIOLATION(34, "密码不符合安全策略"),
     ;
 
     private final int nodeNum;

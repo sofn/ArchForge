@@ -41,6 +41,7 @@ public class LoginService {
     private final AuthenticationManager authenticationManager;
     private final TokenService tokenService;
     private final RedisCacheService redisCacheService;
+    private final LoginAttemptService loginAttemptService;
     private final ArchSmithConfig appForgeConfig;
 
     @Resource(name = "captchaProducer")
@@ -56,6 +57,9 @@ public class LoginService {
      * @return LoginResult 包含token和用户信息
      */
     public LoginResult login(LoginCommand loginCommand) {
+        // 登录失败锁定检查
+        loginAttemptService.checkNotLocked(loginCommand.getUsername());
+
         // 验证码校验
         validateCaptcha(loginCommand.getCaptchaCodeKey(), loginCommand.getCaptchaCode());
 
@@ -69,13 +73,17 @@ public class LoginService {
                                     loginCommand.getUsername(), decryptedPassword));
         } catch (BadCredentialsException e) {
             log.info("用户[{}]登录失败，用户名或密码错误", loginCommand.getUsername());
+            loginAttemptService.recordFailure(loginCommand.getUsername());
             throw new AdminAuthException(USERNAME_PASSWORD_ERROR);
         } catch (Exception e) {
             log.error("用户[{}]登录失败", loginCommand.getUsername(), e);
+            loginAttemptService.recordFailure(loginCommand.getUsername());
             throw new AdminAuthException(LOGIN_ERROR);
         }
 
         SystemLoginUser loginUser = (SystemLoginUser) authentication.getPrincipal();
+        // 登录成功，清除失败计数
+        loginAttemptService.clearAttempts(loginCommand.getUsername());
         // 生成token
         String token = tokenService.createTokenAndPutUserInCache(loginUser);
 

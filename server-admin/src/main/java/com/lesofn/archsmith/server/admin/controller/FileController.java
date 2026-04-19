@@ -1,5 +1,7 @@
 package com.lesofn.archsmith.server.admin.controller;
 
+import com.lesofn.archsmith.common.error.system.SystemException;
+import com.lesofn.archsmith.common.errors.SystemErrorCode;
 import com.lesofn.archsmith.infrastructure.config.ArchSmithConfig;
 import com.lesofn.archsmith.infrastructure.file.FileStorageService;
 import com.lesofn.archsmith.user.dao.SysFileRepository;
@@ -10,6 +12,7 @@ import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -42,6 +45,7 @@ public class FileController {
     @Operation(summary = "上传文件")
     @PostMapping("/file/upload")
     public Map<String, Object> uploadFile(@RequestParam("file") MultipartFile file) {
+        validateUploadFile(file);
         String originalName = file.getOriginalFilename();
         String extension = getExtension(originalName);
         String storageName = UUID.randomUUID().toString().replace("-", "") + "." + extension;
@@ -112,9 +116,41 @@ public class FileController {
     }
 
     private String getExtension(String filename) {
-        if (filename == null || !filename.contains(".")) {
+        if (filename == null || filename.isBlank()) {
             return "";
         }
-        return filename.substring(filename.lastIndexOf('.') + 1).toLowerCase();
+        int dot = filename.lastIndexOf('.');
+        return dot >= 0 && dot < filename.length() - 1
+                ? filename.substring(dot + 1).toLowerCase()
+                : "";
+    }
+
+    private void validateUploadFile(MultipartFile file) {
+        ArchSmithConfig.FileStorage fileStorage = appForgeConfig.getFileStorage();
+
+        long maxFileSize = fileStorage.getMaxFileSize();
+        if (file.getSize() > maxFileSize) {
+            throw new SystemException(SystemErrorCode.E_FILE_SIZE_EXCEEDED);
+        }
+
+        String extension = getExtension(file.getOriginalFilename());
+        List<String> allowedExtensions = fileStorage.getAllowedExtensions();
+        if (allowedExtensions != null && !allowedExtensions.isEmpty()) {
+            boolean allowed =
+                    allowedExtensions.stream().anyMatch(ext -> ext.equalsIgnoreCase(extension));
+            if (!allowed) {
+                throw new SystemException(SystemErrorCode.E_FILE_TYPE_NOT_ALLOWED);
+            }
+        }
+
+        String contentType = file.getContentType();
+        List<String> blockedMimeTypes = fileStorage.getBlockedMimeTypes();
+        if (contentType != null && blockedMimeTypes != null) {
+            boolean blocked =
+                    blockedMimeTypes.stream().anyMatch(mime -> mime.equalsIgnoreCase(contentType));
+            if (blocked) {
+                throw new SystemException(SystemErrorCode.E_FILE_TYPE_NOT_ALLOWED);
+            }
+        }
     }
 }

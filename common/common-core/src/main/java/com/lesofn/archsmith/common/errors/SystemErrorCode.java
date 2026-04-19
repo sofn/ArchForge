@@ -52,7 +52,11 @@ public enum SystemErrorCode implements ErrorCode {
     E_BAN_USER(33, "forbid this operation."),
     SOMETHING_ERROR(34, "service is maintain"),
     E_EXCLUSIVE_PARAMS_ERROR(35, "exclusive params error."),
-    COMMON_REQUEST_FORBIDDEN(36, "common request forbidden");
+    COMMON_REQUEST_FORBIDDEN(36, "common request forbidden"),
+    E_RATE_LIMIT_EXCEEDED(37, "请求过于频繁，请稍后重试"),
+    E_DUPLICATE_REQUEST(38, "请勿重复提交"),
+    E_FILE_SIZE_EXCEEDED(39, "文件大小超过限制"),
+    E_FILE_TYPE_NOT_ALLOWED(40, "不允许的文件类型");
 
     private final int nodeNum;
     private final String msg;

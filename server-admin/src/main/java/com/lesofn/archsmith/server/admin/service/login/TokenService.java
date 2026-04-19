@@ -11,6 +11,7 @@ import com.lesofn.archsmith.server.admin.util.JwtTokenUtil;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
+import java.time.Duration;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import javax.crypto.SecretKey;
@@ -18,6 +19,7 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
 /**
@@ -31,9 +33,12 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class TokenService {
 
+    private static final String BLACKLIST_KEY_PREFIX = "token:blacklist:";
+
     private final ArchSmithConfig appForgeConfig;
     private final RedisCacheService redisCacheService;
     private final JwtTokenUtil jwtTokenUtil;
+    private final StringRedisTemplate redisTemplate;
 
     /**
      * 获取用户身份信息
@@ -46,10 +51,18 @@ public class TokenService {
         if (StringUtils.isNotEmpty(token)) {
             try {
                 Claims claims = parseToken(token);
+                // 校验 JTI 黑名单（登出后的 token 不可再用）
+                String jti = claims.getId();
+                if (jti != null && isTokenBlacklisted(jti)) {
+                    log.info("Token in blacklist: jti={}", jti);
+                    throw new AdminAuthException(TOKEN_INVALID);
+                }
                 // 解析对应的权限以及用户信息
                 String uuid = (String) claims.get(Constants.Token.LOGIN_USER_KEY);
 
                 return redisCacheService.loginUserCache.get(uuid);
+            } catch (AdminAuthException e) {
+                throw e;
             } catch (MalformedJwtException
                     | UnsupportedJwtException
                     | IllegalArgumentException jwtException) {
@@ -138,7 +151,7 @@ public class TokenService {
     }
 
     /**
-     * 删除用户身份信息
+     * 删除用户身份信息，并将 token JTI 加入黑名单
      *
      * @param token 令牌
      */
@@ -150,10 +163,33 @@ public class TokenService {
                 String uuid = (String) claims.get(Constants.Token.LOGIN_USER_KEY);
                 // 删除用户缓存记录
                 redisCacheService.loginUserCache.delete(uuid);
+                // 将 JTI 加入黑名单，TTL 为 token 剩余过期时间
+                String jti = claims.getId();
+                if (jti != null) {
+                    long remainingMs =
+                            claims.getExpiration().getTime() - System.currentTimeMillis();
+                    if (remainingMs > 0) {
+                        addToBlacklist(jti, Duration.ofMillis(remainingMs));
+                    }
+                }
             } catch (Exception e) {
                 log.warn("Failed to remove token from cache", e);
             }
         }
+    }
+
+    /** 将 JTI 加入黑名单。 */
+    private void addToBlacklist(String jti, Duration ttl) {
+        redisTemplate.opsForValue().set(BLACKLIST_KEY_PREFIX + jti, "1", ttl);
+    }
+
+    /** 检查 JTI 是否在黑名单。 */
+    public boolean isTokenBlacklisted(String jti) {
+        if (jti == null || jti.isBlank()) {
+            return false;
+        }
+        Boolean exists = redisTemplate.hasKey(BLACKLIST_KEY_PREFIX + jti);
+        return Boolean.TRUE.equals(exists);
     }
 
     /**
