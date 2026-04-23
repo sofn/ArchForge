@@ -2,6 +2,7 @@ package com.lesofn.archsmith.server.admin.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lesofn.archsmith.infrastructure.auth.errors.AdminAuthErrorCode;
+import com.lesofn.archsmith.infrastructure.config.ArchSmithConfig;
 import com.lesofn.archsmith.infrastructure.frame.response.model.ResponseResult;
 import com.lesofn.archsmith.server.admin.filter.JwtAuthenticationFilter;
 import com.lesofn.archsmith.server.admin.service.login.AdminUserDetailsService;
@@ -10,11 +11,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -33,6 +34,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
+import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
@@ -57,6 +59,8 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final TokenService tokenService;
     private final ObjectMapper objectMapper;
+    private final ArchSmithConfig archSmithConfig;
+    private final Environment environment;
 
     /** 配置密码加密器 */
     @Bean
@@ -94,7 +98,7 @@ public class SecurityConfig {
             String authHeader = request.getHeader("Authorization");
             if (authHeader != null && authHeader.startsWith("Bearer ")) {
                 String token = authHeader.substring(7);
-                // 清除token相关缓存
+                // 清除token相关缓存，并将 JTI 加入黑名单
                 tokenService.removeToken(token);
                 log.info("User logged out successfully");
             }
@@ -102,22 +106,26 @@ public class SecurityConfig {
         };
     }
 
-    /** 配置CORS跨域 */
+    /** 配置CORS跨域（从 arch-smith.cors 配置读取白名单） */
     @Bean
     public CorsFilter corsFilter() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowCredentials(true);
-        // 设置访问源地址
-        config.addAllowedOriginPattern("*");
-        // 设置访问源请求头
-        config.addAllowedHeader("*");
-        // 设置访问源请求方法
-        config.addAllowedMethod("*");
-        // 暴露哪些头部信息
-        config.setExposedHeaders(Arrays.asList("Authorization", "Content-Type"));
-        // 有效期 1800秒
-        config.setMaxAge(1800L);
-        // 添加映射路径，拦截一切请求
+        ArchSmithConfig.Cors corsConfig = archSmithConfig.getCors();
+
+        config.setAllowCredentials(corsConfig.isAllowCredentials());
+
+        // 白名单来源：如果配置了 "*" 且 allowCredentials=true，改用 AllowedOriginPattern
+        if (corsConfig.getAllowedOrigins().size() == 1
+                && "*".equals(corsConfig.getAllowedOrigins().getFirst())) {
+            config.addAllowedOriginPattern("*");
+        } else {
+            corsConfig.getAllowedOrigins().forEach(config::addAllowedOrigin);
+        }
+        corsConfig.getAllowedMethods().forEach(config::addAllowedMethod);
+        corsConfig.getAllowedHeaders().forEach(config::addAllowedHeader);
+        config.setExposedHeaders(corsConfig.getExposedHeaders());
+        config.setMaxAge(corsConfig.getMaxAge());
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
         return new CorsFilter(source);
@@ -127,6 +135,8 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, CorsFilter corsFilter)
             throws Exception {
+        boolean isProdProfile = environment.matchesProfiles("prod");
+
         http
                 // 禁用CSRF保护，因为使用JWT不需要session
                 .csrf(AbstractHttpConfigurer::disable)
@@ -189,11 +199,38 @@ public class SecurityConfig {
                                         // 其他所有请求都需要认证
                                         .anyRequest()
                                         .authenticated())
-                // 禁用 X-Frame-Options 响应头，允许在frame中显示（用于H2控制台等）
+                // 安全响应头
                 .headers(
-                        headers ->
-                                headers.frameOptions(
-                                        HeadersConfigurer.FrameOptionsConfig::disable));
+                        headers -> {
+                            headers
+                                    // X-Content-Type-Options: nosniff (防止 MIME 嗅探)
+                                    .contentTypeOptions(cto -> {})
+                                    // X-Frame-Options: 禁用（H2 控制台等需要 iframe）
+                                    .frameOptions(HeadersConfigurer.FrameOptionsConfig::disable)
+                                    // Referrer-Policy: strict-origin-when-cross-origin
+                                    .referrerPolicy(
+                                            rp ->
+                                                    rp.policy(
+                                                            ReferrerPolicyHeaderWriter
+                                                                    .ReferrerPolicy
+                                                                    .STRICT_ORIGIN_WHEN_CROSS_ORIGIN));
+                            // Content-Security-Policy: 基础策略
+                            headers.contentSecurityPolicy(
+                                    csp ->
+                                            csp.policyDirectives(
+                                                    "default-src 'self'; "
+                                                            + "script-src 'self' 'unsafe-inline' 'unsafe-eval'; "
+                                                            + "style-src 'self' 'unsafe-inline'; "
+                                                            + "img-src 'self' data: blob:; "
+                                                            + "connect-src 'self'"));
+                            // HSTS 仅在 prod profile 启用
+                            if (isProdProfile) {
+                                headers.httpStrictTransportSecurity(
+                                        hsts ->
+                                                hsts.includeSubDomains(true)
+                                                        .maxAgeInSeconds(31536000L));
+                            }
+                        });
 
         // 添加CORS filter
         http.addFilterBefore(corsFilter, LogoutFilter.class);

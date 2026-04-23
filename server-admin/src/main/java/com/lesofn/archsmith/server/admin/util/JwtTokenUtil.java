@@ -6,6 +6,7 @@ import io.jsonwebtoken.security.Keys;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.Function;
 import javax.crypto.SecretKey;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -35,6 +36,11 @@ public class JwtTokenUtil {
         return getClaimFromToken(token, Claims::getExpiration);
     }
 
+    /** 从token中获取JWT ID (jti)，用于黑名单识别 */
+    public String getJtiFromToken(String token) {
+        return getClaimFromToken(token, Claims::getId);
+    }
+
     /** 从token中获取自定义声明 */
     public <T> T getClaimFromToken(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = getAllClaimsFromToken(token);
@@ -62,10 +68,11 @@ public class JwtTokenUtil {
         return doGenerateToken(claims, userDetails.getUsername());
     }
 
-    /** 创建token (JJWT 0.12.x API) */
+    /** 创建token (JJWT 0.12.x API)，包含 jti 用于黑名单机制 */
     private String doGenerateToken(Map<String, Object> claims, String subject) {
         return Jwts.builder()
                 .claims(claims)
+                .id(UUID.randomUUID().toString())
                 .subject(subject)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(

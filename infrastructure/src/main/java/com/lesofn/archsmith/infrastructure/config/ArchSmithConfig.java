@@ -1,5 +1,6 @@
 package com.lesofn.archsmith.infrastructure.config;
 
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -61,6 +62,12 @@ public class ArchSmithConfig {
     /** 服务器监控配置 */
     private Monitor monitor = new Monitor();
 
+    /** 登录安全配置 */
+    private Login login = new Login();
+
+    /** CORS 跨域配置 */
+    private Cors cors = new Cors();
+
     @Setter
     @Getter
     public static class Token {
@@ -113,7 +120,7 @@ public class ArchSmithConfig {
         /** 是否启用数据库初始化 */
         private boolean dbInit = false;
 
-        /** 是否启用嵌入式 S3 (MinIO) */
+        /** 是否启用嵌入式 S3 (RustFS) */
         private boolean s3 = false;
     }
 
@@ -132,6 +139,26 @@ public class ArchSmithConfig {
 
         /** 本地存储基础目录 */
         private String localDir = "uploads";
+
+        /** 最大文件大小 (字节，默认 10MB) */
+        private long maxFileSize = 10L * 1024 * 1024;
+
+        /** 允许的文件扩展名白名单（不带点号） */
+        private List<String> allowedExtensions =
+                List.of(
+                        "jpg", "jpeg", "png", "gif", "webp", "bmp", "svg", "pdf", "doc", "docx",
+                        "xls", "xlsx", "ppt", "pptx", "txt", "csv", "zip", "rar", "7z", "mp3",
+                        "mp4", "avi", "mov", "json", "xml");
+
+        /** 禁用的 MIME 类型黑名单 */
+        private List<String> blockedMimeTypes =
+                List.of(
+                        "application/x-msdownload",
+                        "application/x-sh",
+                        "application/x-executable",
+                        "application/x-ms-installer",
+                        "application/x-bat",
+                        "application/javascript");
 
         /** S3 配置 */
         private S3Config s3 = new S3Config();
@@ -168,5 +195,37 @@ public class ArchSmithConfig {
     public static class Monitor {
         /** 是否启用服务器监控 */
         private boolean enabled = true;
+    }
+
+    @Setter
+    @Getter
+    public static class Login {
+        /** 登录失败最大尝试次数（达到后锁定账户） */
+        private int maxAttempts = 5;
+
+        /** 账户锁定时长（秒，默认 10 分钟） */
+        private int lockoutSeconds = 600;
+    }
+
+    @Setter
+    @Getter
+    public static class Cors {
+        /** 允许的来源列表（生产环境应设置具体域名，dev 可用 "*"） */
+        private List<String> allowedOrigins = List.of("*");
+
+        /** 允许的 HTTP 方法 */
+        private List<String> allowedMethods = List.of("GET", "POST", "PUT", "DELETE", "OPTIONS");
+
+        /** 允许的请求头 */
+        private List<String> allowedHeaders = List.of("*");
+
+        /** 暴露给浏览器的响应头 */
+        private List<String> exposedHeaders = List.of("Authorization");
+
+        /** 是否允许携带凭证 */
+        private boolean allowCredentials = true;
+
+        /** 预检请求缓存时长（秒） */
+        private long maxAge = 3600L;
     }
 }

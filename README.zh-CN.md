@@ -27,7 +27,7 @@ ArchSmith 是一个**开箱即用的全栈管理系统**，后端基于 Spring B
 - **团队标准**：规范化约定（Spotless、JSpecify、Lombok），统一依赖 BOM，Skill 化入门指引
 - **JDK 25 新能力**：ScopedValue、结构化并发、模式匹配、Stream Gatherers、虚拟线程
 - **生产就绪**：Docker（jlink 最小 JRE + Leyden CDS）、Flyway 迁移、多数据源、Micrometer 可观测性
-- **零配置开发**：`./gradlew server-admin:bootRun` 自动通过 Testcontainers 启动 PostgreSQL、Redis、MinIO
+- **零配置开发**：`./gradlew server-admin:bootRun` 自动通过 Testcontainers 启动 PostgreSQL、Redis、RustFS
 
 ## 功能模块
 
@@ -37,7 +37,7 @@ ArchSmith 是一个**开箱即用的全栈管理系统**，后端基于 Spring B
 | 角色管理 | 角色增删改查、菜单权限分配、按钮级权限控制 |
 | 菜单管理 | 动态菜单树、多级菜单、iframe/外链支持 |
 | 部门管理 | 组织架构树形管理 |
-| 文件管理 | 文件/图片上传下载，支持本地存储和 S3 (MinIO) |
+| 文件管理 | 文件/图片上传下载，支持本地存储和 S3 (RustFS) |
 | 参数设置 | 系统参数配置管理 |
 | 通知公告 | 通知/公告发布管理 |
 | 日志管理 | 操作日志、登录日志查看与清理 |
@@ -49,7 +49,7 @@ ArchSmith 是一个**开箱即用的全栈管理系统**，后端基于 Spring B
 ### 环境要求
 
 - Java 25、Node.js 20+、pnpm 9+
-- **Docker**（开发模式必需 — Testcontainers 通过 Docker 运行 PostgreSQL、Redis、MinIO）
+- **Docker**（开发模式必需 — Testcontainers 通过 Docker 运行 PostgreSQL、Redis、RustFS）
 
 ### 1. 克隆项目
 
@@ -65,7 +65,7 @@ cd ArchSmith
 JAVA_HOME=/path/to/jdk25 ./gradlew server-admin:bootRun
 ```
 
-> 开发环境自动通过 Testcontainers 启动 PostgreSQL、Redis、MinIO，无需手动安装。
+> 开发环境自动通过 Testcontainers 启动 PostgreSQL、Redis、RustFS，无需手动安装。
 
 ### 3. 启动前端
 
@@ -93,7 +93,7 @@ cd ArchSmith/docker
 | 后端 | Java 25, Spring Boot 4.0.5, Spring Security, Spring Data JPA, QueryDSL |
 | 前端 | Vue 3.5, Vite 8, TypeScript 6, Element Plus, TailwindCSS 4 |
 | 数据库 | PostgreSQL 17 (开发环境 Testcontainers), Redis, Flyway |
-| 文件存储 | 本地文件系统, AWS S3 / MinIO (开发环境 Testcontainers) |
+| 文件存储 | 本地文件系统, AWS S3 / RustFS (开发环境 Testcontainers) |
 | 监控 | Oshi, SpringDoc OpenAPI, Micrometer + OpenTelemetry |
 | 构建 | Gradle 9.4.1, pnpm, Docker, Project Leyden, Liberica NIK 25 |
 | 测试 | JUnit 6, Spock 2.4, RestClient, Testcontainers |

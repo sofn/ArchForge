@@ -17,7 +17,7 @@ import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 /**
- * S3 文件存储实现（兼容 MinIO、AWS S3 等）
+ * S3 文件存储实现（兼容 RustFS、AWS S3 等）
  *
  * @author sofn
  */

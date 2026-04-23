@@ -360,7 +360,7 @@ src/test/
 
 ### 5.4 Testcontainers Usage
 
-Dev profile auto-starts Testcontainers for PostgreSQL, Redis, and MinIO via embedded configuration flags:
+Dev profile auto-starts Testcontainers for PostgreSQL, Redis, and RustFS via embedded configuration flags:
 
 ```yaml
 arch-smith:
