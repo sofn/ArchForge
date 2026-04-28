@@ -7,8 +7,8 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 /**
- * Per-execution audit log of a {@link SysQuartzJob}. Persisted by the reflective job runner with
- * status, duration, and any error message.
+ * Per-execution audit log of a SysQuartzJob. Persisted by the reflective job runner with status,
+ * duration, and any error message.
  *
  * @author sofn
  */
