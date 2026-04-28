@@ -226,10 +226,10 @@ CREATE TABLE IF NOT EXISTS sys_quartz_job (
     misfire_policy  SMALLINT     NOT NULL DEFAULT 1,
     concurrent      BOOLEAN      NOT NULL DEFAULT FALSE,
     status          SMALLINT     NOT NULL DEFAULT 1, -- 1=PAUSED, 2=RUNNING
-    create_time     TIMESTAMP    NOT NULL DEFAULT now(),
-    update_time     TIMESTAMP    NOT NULL DEFAULT now(),
-    creator         VARCHAR(64),
-    updater         VARCHAR(64),
+    creator_id      BIGINT,
+    create_time     TIMESTAMP,
+    updater_id      BIGINT,
+    update_time     TIMESTAMP,
     deleted         BOOLEAN      NOT NULL DEFAULT FALSE,
     UNIQUE (job_name, job_group)
 );
