@@ -19,6 +19,28 @@ spring:
   threads:
     virtual:
       enabled: true
+  quartz:
+    job-store-type: jdbc
+    scheduler-name: ArchSmithScheduler
+    overwrite-existing-jobs: true
+    jdbc:
+      initialize-schema: never
+    properties:
+      org:
+        quartz:
+          scheduler:
+            instanceId: AUTO
+          jobStore:
+            class: org.springframework.scheduling.quartz.LocalDataSourceJobStore
+            driverDelegateClass: org.quartz.impl.jdbcjobstore.PostgreSQLDelegate
+            tablePrefix: QRTZ_
+            isClustered: true
+            clusterCheckinInterval: 15000
+            useProperties: false
+          threadPool:
+            class: org.quartz.simpl.SimpleThreadPool
+            threadCount: 10
+            threadPriority: 5
   jpa:
     hibernate:
       naming:
