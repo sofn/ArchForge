@@ -90,6 +90,12 @@ dependencies {
         // AWS S3 SDK (文件存储)
         api("software.amazon.awssdk:s3:2.31.54")
 
+        // FastExcel (Excel I/O — 替代 EasyExcel/POI 的高性能 Excel 读写库)
+        api("org.dhatim:fastexcel:0.18.5")
+        api("org.dhatim:fastexcel-reader:0.18.5")
+
+        // Quartz (调度 — Spring Boot 4.0.5 BOM 已托管 quartz 版本，但显式声明 starter 便于追踪)
+        api("org.springframework.boot:spring-boot-starter-quartz:4.0.5")
     }
 }
 
