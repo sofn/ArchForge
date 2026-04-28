@@ -35,6 +35,7 @@ public class InitDbMockServer {
             populator.addScript(new ClassPathResource("sql/data-admin-user.sql"));
             populator.addScript(new ClassPathResource("sql/data-admin-dept.sql"));
             populator.addScript(new ClassPathResource("sql/data-admin-config.sql"));
+            populator.addScript(new ClassPathResource("sql/data-admin-quartz.sql"));
             populator.setSqlScriptEncoding("UTF-8");
             populator.setContinueOnError(true);
 
