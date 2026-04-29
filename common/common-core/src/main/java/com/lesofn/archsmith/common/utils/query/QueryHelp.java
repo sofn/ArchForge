@@ -83,7 +83,7 @@ public final class QueryHelp {
             Object value) {
         Path<Object> path = expression(attribute, join, root);
         return switch (type) {
-            case EQUAL -> cb.equal(path.as((Class<Comparable>) fieldType), value);
+            case EQUAL -> cb.equal(path, value);
             case NOT_EQUAL -> cb.notEqual(path, value);
             case GREATER_THAN ->
                     cb.greaterThanOrEqualTo(

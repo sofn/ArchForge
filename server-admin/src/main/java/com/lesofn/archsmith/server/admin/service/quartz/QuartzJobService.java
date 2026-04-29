@@ -1,12 +1,11 @@
 package com.lesofn.archsmith.server.admin.service.quartz;
 
+import com.lesofn.archsmith.common.utils.query.QueryHelp;
+import com.lesofn.archsmith.server.admin.dto.quartz.SysQuartzJobQueryCriteria;
 import com.lesofn.archsmith.user.dao.SysQuartzJobRepository;
 import com.lesofn.archsmith.user.dao.SysQuartzLogRepository;
 import com.lesofn.archsmith.user.domain.SysQuartzJob;
 import com.lesofn.archsmith.user.domain.SysQuartzLog;
-import jakarta.persistence.criteria.Predicate;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.CronExpression;
@@ -22,7 +21,6 @@ import org.quartz.TriggerBuilder;
 import org.quartz.TriggerKey;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,20 +40,14 @@ public class QuartzJobService {
     private final Scheduler scheduler;
 
     @Transactional(readOnly = true)
-    public Page<SysQuartzJob> page(String jobName, Short status, Pageable pageable) {
-        Specification<SysQuartzJob> spec =
-                (root, query, cb) -> {
-                    List<Predicate> predicates = new ArrayList<>();
-                    predicates.add(cb.isFalse(root.get("deleted")));
-                    if (jobName != null && !jobName.isBlank()) {
-                        predicates.add(cb.like(root.get("jobName"), "%" + jobName + "%"));
-                    }
-                    if (status != null) {
-                        predicates.add(cb.equal(root.get("status"), status));
-                    }
-                    return cb.and(predicates.toArray(new Predicate[0]));
-                };
-        return jobRepository.findAll(spec, pageable);
+    public Page<SysQuartzJob> page(SysQuartzJobQueryCriteria criteria, Pageable pageable) {
+        SysQuartzJobQueryCriteria effective =
+                criteria == null ? new SysQuartzJobQueryCriteria() : criteria;
+        if (effective.getDeleted() == null) {
+            effective.setDeleted(false);
+        }
+        return jobRepository.findAll(
+                (root, q, cb) -> QueryHelp.getPredicate(root, effective, cb), pageable);
     }
 
     @Transactional(readOnly = true)

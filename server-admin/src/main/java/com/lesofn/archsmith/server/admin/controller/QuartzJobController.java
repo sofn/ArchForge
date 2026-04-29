@@ -5,6 +5,7 @@ import com.lesofn.archsmith.server.admin.dto.quartz.QuartzJobQuery;
 import com.lesofn.archsmith.server.admin.dto.quartz.QuartzJobResponse;
 import com.lesofn.archsmith.server.admin.dto.quartz.QuartzJobUpsertRequest;
 import com.lesofn.archsmith.server.admin.dto.quartz.QuartzLogResponse;
+import com.lesofn.archsmith.server.admin.dto.quartz.SysQuartzJobQueryCriteria;
 import com.lesofn.archsmith.server.admin.service.quartz.QuartzJobService;
 import com.lesofn.archsmith.user.domain.SysQuartzJob;
 import com.lesofn.archsmith.user.domain.SysQuartzLog;
@@ -42,8 +43,10 @@ public class QuartzJobController {
                 query.getPageSize() != null && query.getPageSize() > 0 ? query.getPageSize() : 10;
         Pageable pageable =
                 PageRequest.of(currentPage - 1, pageSize, Sort.by(Sort.Direction.DESC, "id"));
-        Page<SysQuartzJob> page =
-                quartzJobService.page(query.getJobName(), query.getStatus(), pageable);
+        SysQuartzJobQueryCriteria criteria = new SysQuartzJobQueryCriteria();
+        criteria.setJobName(query.getJobName());
+        criteria.setStatus(query.getStatus());
+        Page<SysQuartzJob> page = quartzJobService.page(criteria, pageable);
         return AdminPageResult.of(
                 page.getContent().stream().map(QuartzJobResponse::from).toList(),
                 page.getTotalElements(),
