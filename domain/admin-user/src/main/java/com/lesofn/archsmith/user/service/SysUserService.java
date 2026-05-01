@@ -9,6 +9,7 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,6 +37,10 @@ public class SysUserService {
 
     public Page<SysUser> findAll(Pageable pageable) {
         return userRepository.findAll(pageable);
+    }
+
+    public Page<SysUser> findAll(Specification<SysUser> spec, Pageable pageable) {
+        return userRepository.findAll(spec, pageable);
     }
 
     public List<SysUser> findAll() {

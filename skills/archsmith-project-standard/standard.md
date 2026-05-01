@@ -281,6 +281,72 @@ public class DemoQuartzJobBean {
 // → QuartzReflectionJob fires it on schedule, no extra Java class needed.
 ```
 
+### 3.9 Query Pattern (Declarative JPA Filters)
+
+For paged search endpoints, prefer **declarative criteria DTOs** over hand-rolled
+`Specification` lambdas.
+
+**Components:**
+
+- **`@Query`** (`com.lesofn.archsmith.common.annotation.Query`) — field-level annotation
+- **`QueryHelp.getPredicate(root, criteria, cb)`** (`com.lesofn.archsmith.common.utils.query.QueryHelp`) — reflection-driven predicate builder
+- **Repository** must `extends JpaSpecificationExecutor<T>`
+
+**Quick example:**
+
+```java
+// 1. Annotate the criteria DTO
+@Data
+public class SysUserQueryCriteria {
+    @Query(blurry = "username,nickname,email") private String blurry;
+    @Query(type = Query.Type.INNER_LIKE)       private String username;
+    @Query                                      private Integer status;
+    @Query(type = Query.Type.BETWEEN)          private List<LocalDateTime> createTime;
+    @Query(propName = "id", type = Query.Type.IN, joinName = "dept")
+    private Set<Long> deptIds;
+}
+
+// 2. Build a Specification from the criteria in the controller
+Specification<SysUser> spec = (root, q, cb) -> QueryHelp.getPredicate(root, criteria, cb);
+Page<SysUser> page = userRepository.findAll(spec, pageable);
+```
+
+**Supported operators (`Query.Type`):**
+
+| Operator | SQL equivalent |
+|---|---|
+| `EQUAL` | `= value` |
+| `NOT_EQUAL` | `<> value` |
+| `GREATER_THAN` | `>= value` (inclusive) |
+| `LESS_THAN` | `<= value` (inclusive) |
+| `LESS_THAN_NQ` | `< value` (strict) |
+| `INNER_LIKE` | `LIKE '%value%'` |
+| `LEFT_LIKE` | `LIKE '%value'` |
+| `RIGHT_LIKE` | `LIKE 'value%'` |
+| `IN` | `IN (collection)` |
+| `NOT_IN` | `NOT IN (collection)` |
+| `IS_NULL` | `IS NULL` |
+| `NOT_NULL` | `IS NOT NULL` |
+| `BETWEEN` | `BETWEEN bounds[0] AND bounds[1]` (value must be a `List` of size 2) |
+| `FIND_IN_SET` | `FIND_IN_SET(value, column) > 0` |
+
+**Blurry multi-field LIKE:** set `blurry = "fieldA,fieldB"` on a `String` field; the field
+value is wrapped as `(fieldA LIKE %v% OR fieldB LIKE %v%)`. The `type` attribute is ignored
+when `blurry` is non-empty.
+
+**Joins:** `joinName = "dept"` performs a LEFT JOIN (configurable via `join = Query.Join.INNER`
+etc.); nested paths use `>` separator (e.g. `joinName = "dept>parent"`). Joins are cached
+per-invocation so repeating the same `joinName` reuses the join.
+
+**Empty values are silently skipped** — `null`, blank `String`, and empty `Collection`/`array`
+contribute no predicate. This means a fully-null criteria object returns an unconditional
+`AND()` (select all).
+
+**Boundary between layers:** the criteria DTO lives in `server-admin` (transport concern).
+`SysUserService.findAll(Specification<SysUser>, Pageable)` accepts a `Specification` so
+`domain/admin-user` has no dependency on `server-admin` types. The translation from DTO →
+`Specification` happens in the controller.
+
 ---
 
 ## 4. Configuration Standards
