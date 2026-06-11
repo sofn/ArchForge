@@ -32,6 +32,8 @@
 - **`cn.hutool:hutool-all`** — Use JDK standard library, Apache Commons, Guava, or Spring utilities instead.
 - **Logback** — Excluded globally; use Log4j2.
 - **`var` keyword** — Always use explicit types for readability and team consistency.
+- **`com.alibaba:easyexcel*`** — Forbidden by Gradle build guard (root `build.gradle.kts`). The project standard Excel I/O library is `org.dhatim:fastexcel` + `fastexcel-reader`. See §3.7 Excel I/O.
+- **`org.apache.poi:*` (direct use)** — Pulled in only as a FastExcel transitive when strictly needed. Application code should use `FastExcelUtil` (in `common-core`) rather than POI APIs.
 
 ---
 
@@ -239,6 +241,111 @@ public class User extends BaseEntity {
     }
 }
 ```
+
+### 3.7 Excel I/O
+
+- **Library**: `org.dhatim:fastexcel` (writer) + `org.dhatim:fastexcel-reader` (reader).
+- **Forbidden**: `com.alibaba:easyexcel*` is rejected at Gradle resolution time (see root `build.gradle.kts`). Direct use of `org.apache.poi:*` is also discouraged — go through `FastExcelUtil` in `common-core`.
+- **Streaming**: FastExcel is streaming by default — large workbooks must not be materialized in memory. Pass an `OutputStream` to `FastExcelUtil.write(out, sheetName, headers, rows)` and stream rows from a `Stream`/`Iterable`.
+- **Headers**: Always include a header row; readers should skip it via `FastExcelUtil.readFirstSheet(in)` (skips row 0 by convention).
+
+```java
+@GetMapping("/user/export")
+public void export(HttpServletResponse response) throws IOException {
+    response.setContentType(
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+    response.setHeader("Content-Disposition", "attachment; filename=users.xlsx");
+    userExportService.exportTo(response.getOutputStream());
+}
+```
+
+### 3.8 Scheduling (Quartz)
+
+- **Library**: `org.springframework.boot:spring-boot-starter-quartz` (Quartz 2.5.x).
+- **JobStore**: JDBC (`LocalDataSourceJobStore`) over the existing PostgreSQL master DataSource, **clustered** (`org.quartz.jobStore.isClustered=true`). Schema is the upstream `tables_postgres.sql` plus ArchSmith metadata tables `sys_quartz_job` and `sys_quartz_log` (created by `V4__quartz_schema.sql`).
+- **Reflective dispatch pattern**: a single Quartz `Job` class — `QuartzReflectionJob` — reads `beanName`/`methodName`/`methodParams` from the trigger `JobDataMap`, resolves the Spring bean via `ApplicationContext`, invokes the method by reflection (arity-matched), and persists a `SysQuartzLog` row capturing duration and any error. New scheduled tasks therefore require only a metadata row and a Spring bean — **no new `Job` class per task**.
+- **Method params**: stored as a JSON array of primitives (`["foo", 42, true]`) for transparency.
+- **REST surface** (`server-admin`):
+  - `POST /quartz/list` paged query · `POST /quartz/add` · `PUT /quartz/update/{id}` · `DELETE /quartz/delete/{id}`
+  - `POST /quartz/pause/{id}` · `POST /quartz/resume/{id}` · `POST /quartz/run/{id}` (one-shot trigger)
+  - `POST /quartz/log/list` · `POST /quartz/validate-cron`
+- **UI**: `AppForgeAdmin` → System → 定时任务 (`/system/quartz/index`).
+
+```java
+@Component("demoQuartzJob")
+@Slf4j
+public class DemoQuartzJobBean {
+    public void helloWorld() { log.info("hello @ {}", Instant.now()); }
+}
+// Persist a SysQuartzJob row { beanName: "demoQuartzJob", methodName: "helloWorld", cron: "0/30 * * * * ?" }
+// → QuartzReflectionJob fires it on schedule, no extra Java class needed.
+```
+
+### 3.9 Query Pattern (Declarative JPA Filters)
+
+For paged search endpoints, prefer **declarative criteria DTOs** over hand-rolled
+`Specification` lambdas.
+
+**Components:**
+
+- **`@Query`** (`com.lesofn.archsmith.common.annotation.Query`) — field-level annotation
+- **`QueryHelp.getPredicate(root, criteria, cb)`** (`com.lesofn.archsmith.common.utils.query.QueryHelp`) — reflection-driven predicate builder
+- **Repository** must `extends JpaSpecificationExecutor<T>`
+
+**Quick example:**
+
+```java
+// 1. Annotate the criteria DTO
+@Data
+public class SysUserQueryCriteria {
+    @Query(blurry = "username,nickname,email") private String blurry;
+    @Query(type = Query.Type.INNER_LIKE)       private String username;
+    @Query                                      private Integer status;
+    @Query(type = Query.Type.BETWEEN)          private List<LocalDateTime> createTime;
+    @Query(propName = "id", type = Query.Type.IN, joinName = "dept")
+    private Set<Long> deptIds;
+}
+
+// 2. Build a Specification from the criteria in the controller
+Specification<SysUser> spec = (root, q, cb) -> QueryHelp.getPredicate(root, criteria, cb);
+Page<SysUser> page = userRepository.findAll(spec, pageable);
+```
+
+**Supported operators (`Query.Type`):**
+
+| Operator | SQL equivalent |
+|---|---|
+| `EQUAL` | `= value` |
+| `NOT_EQUAL` | `<> value` |
+| `GREATER_THAN` | `>= value` (inclusive) |
+| `LESS_THAN` | `<= value` (inclusive) |
+| `LESS_THAN_NQ` | `< value` (strict) |
+| `INNER_LIKE` | `LIKE '%value%'` |
+| `LEFT_LIKE` | `LIKE '%value'` |
+| `RIGHT_LIKE` | `LIKE 'value%'` |
+| `IN` | `IN (collection)` |
+| `NOT_IN` | `NOT IN (collection)` |
+| `IS_NULL` | `IS NULL` |
+| `NOT_NULL` | `IS NOT NULL` |
+| `BETWEEN` | `BETWEEN bounds[0] AND bounds[1]` (value must be a `List` of size 2) |
+| `FIND_IN_SET` | `FIND_IN_SET(value, column) > 0` |
+
+**Blurry multi-field LIKE:** set `blurry = "fieldA,fieldB"` on a `String` field; the field
+value is wrapped as `(fieldA LIKE %v% OR fieldB LIKE %v%)`. The `type` attribute is ignored
+when `blurry` is non-empty.
+
+**Joins:** `joinName = "dept"` performs a LEFT JOIN (configurable via `join = Query.Join.INNER`
+etc.); nested paths use `>` separator (e.g. `joinName = "dept>parent"`). Joins are cached
+per-invocation so repeating the same `joinName` reuses the join.
+
+**Empty values are silently skipped** — `null`, blank `String`, and empty `Collection`/`array`
+contribute no predicate. This means a fully-null criteria object returns an unconditional
+`AND()` (select all).
+
+**Boundary between layers:** the criteria DTO lives in `server-admin` (transport concern).
+`SysUserService.findAll(Specification<SysUser>, Pageable)` accepts a `Specification` so
+`domain/admin-user` has no dependency on `server-admin` types. The translation from DTO →
+`Specification` happens in the controller.
 
 ---
 

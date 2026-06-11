@@ -11,6 +11,12 @@ spring:
     livereload:
       enabled: true
       port: 35729
+  # Dev: Testcontainers spins up a fresh PostgreSQL each restart, so let the
+  # Quartz starter run org/quartz/impl/jdbcjobstore/tables_postgres.sql to
+  # create QRTZ_* tables. sys_quartz_* are created by Hibernate auto-DDL.
+  quartz:
+    jdbc:
+      initialize-schema: always
   data:
     redis:
       host: 127.0.0.1

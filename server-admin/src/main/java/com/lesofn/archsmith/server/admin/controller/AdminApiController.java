@@ -1,7 +1,9 @@
 package com.lesofn.archsmith.server.admin.controller;
 
 import com.lesofn.archsmith.common.enums.common.GenderEnum;
+import com.lesofn.archsmith.common.utils.query.QueryHelp;
 import com.lesofn.archsmith.server.admin.dto.*;
+import com.lesofn.archsmith.server.admin.dto.user.SysUserQueryCriteria;
 import com.lesofn.archsmith.server.admin.mapper.AdminDeptMapper;
 import com.lesofn.archsmith.server.admin.mapper.AdminMenuMapper;
 import com.lesofn.archsmith.server.admin.mapper.AdminRoleMapper;
@@ -44,6 +46,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -96,52 +99,34 @@ public class AdminApiController {
                         ? request.getPageSize()
                         : 10;
 
-        Pageable pageable = PageRequest.of(currentPage - 1, pageSize);
-        Page<SysUser> userPage = userService.findAll(pageable);
-        Map<Long, String> deptNameMap = buildDeptNameMap();
+        SysUserQueryCriteria criteria = new SysUserQueryCriteria();
+        criteria.setBlurry(request.getBlurry());
+        criteria.setUsername(request.getUsername());
+        criteria.setEmail(request.getEmail());
+        criteria.setPhoneNumber(request.getPhone());
+        criteria.setStatus(request.getStatusAsInt());
+        criteria.setDeptId(request.getDeptIdAsLong());
+        criteria.setDeleted(false);
+        if (request.getCreateTime() != null && request.getCreateTime().size() == 2) {
+            criteria.setCreateTime(request.getCreateTime());
+        }
 
-        // Apply filters: deptId, username, phone, status
+        Pageable pageable =
+                PageRequest.of(
+                        currentPage - 1,
+                        pageSize,
+                        org.springframework.data.domain.Sort.by(
+                                org.springframework.data.domain.Sort.Direction.DESC, "userId"));
+        Specification<SysUser> spec =
+                (root, q, cb) -> QueryHelp.getPredicate(root, criteria, cb);
+        Page<SysUser> userPage = userService.findAll(spec, pageable);
+
+        Map<Long, String> deptNameMap = buildDeptNameMap();
         List<AdminUserItemDTO> userItems =
                 userPage.getContent().stream()
-                        .filter(user -> !Boolean.TRUE.equals(user.getDeleted()))
-                        .filter(
-                                user -> {
-                                    Long deptId = request.getDeptIdAsLong();
-                                    if (deptId != null) {
-                                        return deptId.equals(user.getDeptId());
-                                    }
-                                    return true;
-                                })
-                        .filter(
-                                user -> {
-                                    String q = request.getUsername();
-                                    if (q != null && !q.isEmpty()) {
-                                        return user.getUsername() != null
-                                                && user.getUsername().contains(q);
-                                    }
-                                    return true;
-                                })
-                        .filter(
-                                user -> {
-                                    String q = request.getPhone();
-                                    if (q != null && !q.isEmpty()) {
-                                        return user.getPhoneNumber() != null
-                                                && user.getPhoneNumber().contains(q);
-                                    }
-                                    return true;
-                                })
-                        .filter(
-                                user -> {
-                                    Integer q = request.getStatusAsInt();
-                                    if (q != null) {
-                                        return q.equals(user.getStatus());
-                                    }
-                                    return true;
-                                })
                         .map(user -> userMapper.toDto(user, deptNameMap))
                         .collect(Collectors.toList());
-
-        return AdminPageResult.of(userItems, (long) userItems.size(), pageSize, currentPage);
+        return AdminPageResult.of(userItems, userPage.getTotalElements(), pageSize, currentPage);
     }
 
     @Operation(summary = "获取全量角色列表")

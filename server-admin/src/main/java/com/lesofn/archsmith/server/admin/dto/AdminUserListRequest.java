@@ -1,5 +1,7 @@
 package com.lesofn.archsmith.server.admin.dto;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import lombok.Data;
 
 /**
@@ -16,11 +18,20 @@ public class AdminUserListRequest {
     /** 手机号 */
     private String phone;
 
+    /** 邮箱 */
+    private String email;
+
+    /** 多字段模糊搜索（username/nickname/email） */
+    private String blurry;
+
     /** 状态 */
     private String status;
 
     /** 部门ID */
     private String deptId;
+
+    /** 创建时间区间 [start, end] (ISO-8601) */
+    private List<LocalDateTime> createTime;
 
     /** 当前页码（从1开始） */
     private Integer currentPage = 1;

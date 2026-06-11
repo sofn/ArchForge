@@ -66,6 +66,19 @@ subprojects {
             exclude(group = "ch.qos.logback", module = "logback-classic")
             exclude(group = "ch.qos.logback", module = "logback-core")
             exclude(group = "org.apache.logging.log4j", module = "log4j-to-slf4j")
+
+            // 项目标准: 禁止 EasyExcel - 必须使用 org.dhatim:fastexcel
+            // 任何模块（包括传递依赖）引入 com.alibaba:easyexcel* 都会导致构建失败
+            exclude(group = "com.alibaba", module = "easyexcel")
+            exclude(group = "com.alibaba", module = "easyexcel-core")
+            resolutionStrategy.eachDependency {
+                if (requested.group == "com.alibaba" && requested.name.startsWith("easyexcel")) {
+                    throw GradleException(
+                        "EasyExcel is forbidden in ArchSmith. Use org.dhatim:fastexcel instead. " +
+                            "Pulled in: ${requested.group}:${requested.name}:${requested.version}"
+                    )
+                }
+            }
         }
         
         dependencies {

@@ -49,6 +49,10 @@ dependencies {
     api("org.lionsoul:ip2region")
     api("eu.bitwalker:UserAgentUtils")
     api("org.jspecify:jspecify")
+
+    // Excel I/O - FastExcel (高性能、无 POI 依赖；项目标准 Excel 库)
+    api("org.dhatim:fastexcel")
+    api("org.dhatim:fastexcel-reader")
     
     // Lombok
     compileOnly("org.projectlombok:lombok")
