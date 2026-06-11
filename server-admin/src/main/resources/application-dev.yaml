@@ -35,24 +35,24 @@ spring:
       datasource:
         user_master:
           driver-class-name: org.postgresql.Driver
-          url: jdbc:postgresql://localhost:5432/archsmith_user
-          username: archsmith
-          password: archsmith
+          url: jdbc:postgresql://localhost:5432/archforge_user
+          username: archforge
+          password: archforge
         user_slave:
           driver-class-name: org.postgresql.Driver
-          url: jdbc:postgresql://localhost:5432/archsmith_user
-          username: archsmith
-          password: archsmith
+          url: jdbc:postgresql://localhost:5432/archforge_user
+          username: archforge
+          password: archforge
         task_master:
           driver-class-name: org.postgresql.Driver
-          url: jdbc:postgresql://localhost:5432/archsmith_task
-          username: archsmith
-          password: archsmith
+          url: jdbc:postgresql://localhost:5432/archforge_task
+          username: archforge
+          password: archforge
         task_slave:
           driver-class-name: org.postgresql.Driver
-          url: jdbc:postgresql://localhost:5432/archsmith_task
-          username: archsmith
-          password: archsmith
+          url: jdbc:postgresql://localhost:5432/archforge_task
+          username: archforge
+          password: archforge
 
 # OpenTelemetry (tracing configured via OTel SDK env vars: OTEL_EXPORTER_OTLP_ENDPOINT, OTEL_TRACES_SAMPLER_ARG)
 management:
@@ -61,7 +61,7 @@ management:
       export:
         url: http://localhost:4318/v1/metrics
 
-arch-smith:
+arch-forge:
   embedded:
     redis: true
     postgresql: true

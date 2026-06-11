@@ -3,7 +3,7 @@ plugins {
     `maven-publish`
 }
 
-group = "com.lesofn.archsmith"
+group = "com.lesofn.archforge"
 version = "0.1.SNAPSHOT"
 
 // 配置平台，允许定义依赖约束
@@ -103,7 +103,7 @@ publishing {
     publications {
         create<MavenPublication>("bom") {
             from(components["javaPlatform"])
-            artifactId = "archsmith-dependencies"
+            artifactId = "archforge-dependencies"
         }
     }
 }

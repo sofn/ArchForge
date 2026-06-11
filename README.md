@@ -1,9 +1,9 @@
 <div align="center">
-  <h1>ArchSmith</h1>
+  <h1>ArchForge</h1>
   <p><strong>Modern enterprise admin platform built with Spring Boot 4 + Vue 3</strong></p>
   <p>
-    <a href="https://archsmith.lesofn.com">Documentation</a> ·
-    <a href="https://github.com/sofn/ArchSmithAdmin">Frontend Repo</a> ·
+    <a href="https://archforge.lesofn.com">Documentation</a> ·
+    <a href="https://github.com/sofn/ArchForgeAdmin">Frontend Repo</a> ·
     <a href="./README.zh-CN.md">中文</a>
   </p>
   <p>
@@ -17,11 +17,11 @@
 
 ---
 
-## What is ArchSmith?
+## What is ArchForge?
 
-ArchSmith is a **production-ready, full-stack admin platform** that combines a Spring Boot 4 backend with a Vue 3 frontend. It provides complete user/role/menu/department management, file upload/download, server monitoring, JWT authentication, and more — all with clean architecture and modern tooling.
+ArchForge is a **production-ready, full-stack admin platform** that combines a Spring Boot 4 backend with a Vue 3 frontend. It provides complete user/role/menu/department management, file upload/download, server monitoring, JWT authentication, and more — all with clean architecture and modern tooling.
 
-### Why ArchSmith?
+### Why ArchForge?
 
 - **Modern architecture**: JDK 25 + Spring Boot 4 + DDD + Clean Architecture — not a legacy codebase ported forward
 - **Team project standard**: Codified conventions (Spotless, JSpecify, Lombok), centralized dependency BOM, skill-based onboarding
@@ -52,14 +52,14 @@ ArchSmith is a **production-ready, full-stack admin platform** that combines a S
 ### 1. Clone
 
 ```bash
-git clone https://github.com/sofn/ArchSmith.git
-git clone https://github.com/sofn/ArchSmithAdmin.git
+git clone https://github.com/sofn/ArchForge.git
+git clone https://github.com/sofn/ArchForgeAdmin.git
 ```
 
 ### 2. Start Backend
 
 ```bash
-cd ArchSmith
+cd ArchForge
 JAVA_HOME=/path/to/jdk25 ./gradlew server-admin:bootRun
 ```
 
@@ -68,7 +68,7 @@ JAVA_HOME=/path/to/jdk25 ./gradlew server-admin:bootRun
 ### 3. Start Frontend
 
 ```bash
-cd ArchSmithAdmin
+cd ArchForgeAdmin
 pnpm install && pnpm dev
 ```
 
@@ -79,7 +79,7 @@ Visit `http://localhost:8848` and login with `admin / admin123`.
 ### Docker (Alternative)
 
 ```bash
-cd ArchSmith/docker
+cd ArchForge/docker
 ./start.sh          # JVM mode (default, Project Leyden CDS)
 ./start.sh native   # Native Image mode (Liberica NIK 25)
 ```
@@ -87,7 +87,7 @@ cd ArchSmith/docker
 ## Project Structure
 
 ```
-ArchSmith (Backend)
+ArchForge (Backend)
 ├── common/              # Shared utilities & error handling
 ├── infrastructure/      # Auth, filters, file storage, response wrapper
 ├── domain/admin-user/   # Domain entities & business logic
@@ -97,7 +97,7 @@ ArchSmith (Backend)
     ├── jvm/             # Leyden CDS optimized Dockerfile
     └── native/          # Liberica NIK 25 native Dockerfile
 
-ArchSmithAdmin (Frontend)
+ArchForgeAdmin (Frontend)
 ├── src/api/             # API definitions
 ├── src/views/system/    # System management pages
 ├── src/views/monitor/   # Monitoring pages
@@ -119,7 +119,7 @@ ArchSmithAdmin (Frontend)
 
 ## Documentation
 
-Full documentation: **[archsmith.lesofn.com](https://archsmith.lesofn.com)**
+Full documentation: **[archforge.lesofn.com](https://archforge.lesofn.com)**
 
 ## License
 

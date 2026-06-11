@@ -1,9 +1,9 @@
 <div align="center">
-  <h1>ArchSmith</h1>
+  <h1>ArchForge</h1>
   <p><strong>基于 Spring Boot 4 + Vue 3 的现代企业级管理平台</strong></p>
   <p>
-    <a href="https://archsmith.lesofn.com">在线文档</a> ·
-    <a href="https://github.com/sofn/ArchSmithAdmin">前端仓库</a> ·
+    <a href="https://archforge.lesofn.com">在线文档</a> ·
+    <a href="https://github.com/sofn/ArchForgeAdmin">前端仓库</a> ·
     <a href="./README.md">English</a>
   </p>
   <p>
@@ -19,9 +19,9 @@
 
 ## 项目简介
 
-ArchSmith 是一个**开箱即用的全栈管理系统**，后端基于 Spring Boot 4，前端基于 Vue 3，提供完整的用户/角色/菜单/部门管理、文件上传下载、服务器监控、JWT 认证等功能。采用整洁架构，使用现代化技术栈。
+ArchForge 是一个**开箱即用的全栈管理系统**，后端基于 Spring Boot 4，前端基于 Vue 3，提供完整的用户/角色/菜单/部门管理、文件上传下载、服务器监控、JWT 认证等功能。采用整洁架构，使用现代化技术栈。
 
-### 为什么选择 ArchSmith？
+### 为什么选择 ArchForge？
 
 - **架构先进**：JDK 25 + Spring Boot 4 + DDD + 整洁架构，不是老项目的升级版
 - **团队标准**：规范化约定（Spotless、JSpecify、Lombok），统一依赖 BOM，Skill 化入门指引
@@ -54,14 +54,14 @@ ArchSmith 是一个**开箱即用的全栈管理系统**，后端基于 Spring B
 ### 1. 克隆项目
 
 ```bash
-git clone https://github.com/sofn/ArchSmith.git
-git clone https://github.com/sofn/ArchSmithAdmin.git
+git clone https://github.com/sofn/ArchForge.git
+git clone https://github.com/sofn/ArchForgeAdmin.git
 ```
 
 ### 2. 启动后端
 
 ```bash
-cd ArchSmith
+cd ArchForge
 JAVA_HOME=/path/to/jdk25 ./gradlew server-admin:bootRun
 ```
 
@@ -70,7 +70,7 @@ JAVA_HOME=/path/to/jdk25 ./gradlew server-admin:bootRun
 ### 3. 启动前端
 
 ```bash
-cd ArchSmithAdmin
+cd ArchForgeAdmin
 pnpm install && pnpm dev
 ```
 
@@ -81,7 +81,7 @@ pnpm install && pnpm dev
 ### Docker 部署
 
 ```bash
-cd ArchSmith/docker
+cd ArchForge/docker
 ./start.sh          # JVM 模式（默认，Project Leyden CDS 优化）
 ./start.sh native   # Native Image 模式（Liberica NIK 25）
 ```
@@ -100,7 +100,7 @@ cd ArchSmith/docker
 
 ## 文档
 
-完整文档请访问: **[archsmith.lesofn.com](https://archsmith.lesofn.com)**
+完整文档请访问: **[archforge.lesofn.com](https://archforge.lesofn.com)**
 
 ## 许可证
 

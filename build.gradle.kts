@@ -2,7 +2,7 @@ plugins {
     id("com.diffplug.spotless") version "8.4.0" apply false
 }
 
-group = "com.lesofn.archsmith"
+group = "com.lesofn.archforge"
 version = "0.1.SNAPSHOT"
 
 allprojects {
@@ -74,7 +74,7 @@ subprojects {
             resolutionStrategy.eachDependency {
                 if (requested.group == "com.alibaba" && requested.name.startsWith("easyexcel")) {
                     throw GradleException(
-                        "EasyExcel is forbidden in ArchSmith. Use org.dhatim:fastexcel instead. " +
+                        "EasyExcel is forbidden in ArchForge. Use org.dhatim:fastexcel instead. " +
                             "Pulled in: ${requested.group}:${requested.name}:${requested.version}"
                     )
                 }

@@ -14,14 +14,14 @@ spring:
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:dev}
   application:
-    name: ArchSmith
+    name: ArchForge
     version: 1.0.0
   threads:
     virtual:
       enabled: true
   quartz:
     job-store-type: jdbc
-    scheduler-name: ArchSmithScheduler
+    scheduler-name: ArchForgeScheduler
     overwrite-existing-jobs: true
     jdbc:
       initialize-schema: never
@@ -106,8 +106,8 @@ springdoc:
   writer-with-default-pretty-printer: true
 
 # 项目相关配置
-arch-smith:
-  name: ArchSmith
+arch-forge:
+  name: ArchForge
   version: 1.0.0
   copyright-year: 2025
   captcha-type: math

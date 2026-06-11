@@ -1,6 +1,6 @@
--- V4: Quartz schema + ArchSmith quartz job metadata
+-- V4: Quartz schema + ArchForge quartz job metadata
 -- - QRTZ_* tables: official org.quartz.impl.jdbcjobstore.tables_postgres.sql (Quartz 2.5.x)
--- - sys_quartz_job / sys_quartz_log: ArchSmith-managed metadata layered on top of the JDBC store
+-- - sys_quartz_job / sys_quartz_log: ArchForge-managed metadata layered on top of the JDBC store
 
 -- Thanks to Patrick Lightbody for submitting this...
 --
@@ -211,7 +211,7 @@ CREATE INDEX IDX_QRTZ_FT_TG
 COMMIT;
 
 -- ====================================================================
--- ArchSmith-managed metadata
+-- ArchForge-managed metadata
 -- ====================================================================
 
 CREATE TABLE IF NOT EXISTS sys_quartz_job (

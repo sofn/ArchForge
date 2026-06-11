@@ -41,7 +41,7 @@ tasks.named<JavaExec>("processTestAot") {
 graalvmNative {
     binaries {
         named("main") {
-            mainClass.set("com.lesofn.archsmith.server.admin.Application")
+            mainClass.set("com.lesofn.archforge.server.admin.Application")
             javaLauncher.set(javaToolchains.launcherFor {
                 languageVersion.set(JavaLanguageVersion.of(25))
             })

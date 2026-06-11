@@ -25,22 +25,22 @@ spring:
       datasource:
         user_master:
           driver-class-name: org.postgresql.Driver
-          url: jdbc:postgresql://localhost:5432/archsmith_user_test
+          url: jdbc:postgresql://localhost:5432/archforge_user_test
           username: <your-db-username>
           password: <your-db-password>
         user_slave:
           driver-class-name: org.postgresql.Driver
-          url: jdbc:postgresql://localhost:5432/archsmith_user_test
+          url: jdbc:postgresql://localhost:5432/archforge_user_test
           username: <your-db-username>
           password: <your-db-password>
         task_master:
           driver-class-name: org.postgresql.Driver
-          url: jdbc:postgresql://localhost:5432/archsmith_task_test
+          url: jdbc:postgresql://localhost:5432/archforge_task_test
           username: <your-db-username>
           password: <your-db-password>
         task_slave:
           driver-class-name: org.postgresql.Driver
-          url: jdbc:postgresql://localhost:5432/archsmith_task_test
+          url: jdbc:postgresql://localhost:5432/archforge_task_test
           username: <your-db-username>
           password: <your-db-password>
 
@@ -51,7 +51,7 @@ management:
       export:
         url: http://localhost:4318/v1/metrics
 
-arch-smith:
+arch-forge:
   flyway:
     enabled: true
   jwt:

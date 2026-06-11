@@ -20,7 +20,7 @@
 Multi-module Spring Boot 4 project with DDD + Clean Architecture:
 
 ```
-ArchSmith/
+ArchForge/
 ├── common/common-core        # Utilities, enums, encryption, Jackson, base entities
 ├── common/common-error       # ErrorCode, exceptions, error manager
 ├── infrastructure/           # Auth, config, filters, file storage, database proxy
@@ -56,7 +56,7 @@ ArchSmith/
 
 ## Configuration
 
-- Config prefix: `arch-smith` — mapped to `ArchSmithConfig` bean
+- Config prefix: `arch-forge` — mapped to `ArchForgeConfig` bean
 - Profiles: `dev` (default), `test`, `prod`
   - `application.yaml`: base config
   - `application-dev.yaml`: Testcontainers + DevTools

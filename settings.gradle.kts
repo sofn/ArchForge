@@ -20,7 +20,7 @@ pluginManagement {
     }
 }
 
-rootProject.name = "ArchSmith"
+rootProject.name = "ArchForge"
 
 include("common:common-core")
 include("common:common-error")

@@ -32,8 +32,8 @@ WORKDIR /app
 RUN apk add --no-cache gcompat libstdc++
 
 # 安全: 使用非 root 用户运行
-RUN addgroup -g 1001 archsmith && adduser -u 1001 -G archsmith -D archsmith
-USER archsmith
+RUN addgroup -g 1001 archforge && adduser -u 1001 -G archforge -D archforge
+USER archforge
 
 COPY --from=training /app/minimal-jre /app/jre
 COPY --from=training /app/app.jar app.jar

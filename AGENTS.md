@@ -8,7 +8,7 @@
 
 For every new requirement:
 
-1. **Write a plan first** — save to `/home/sofn/code/sofn/codeplans/ArchSmith/<date>-<topic>.md`
+1. **Write a plan first** — save to `/home/sofn/code/sofn/codeplans/ArchForge/<date>-<topic>.md`
 2. **Wait for user review** — do NOT start implementation until approved
 3. **Track progress** — update plan file status after each step (pending / in_progress / done)
 4. **Verify each step** — run `./gradlew build` after each change

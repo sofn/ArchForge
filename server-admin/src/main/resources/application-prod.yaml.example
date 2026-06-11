@@ -25,22 +25,22 @@ spring:
       datasource:
         user_master:
           driver-class-name: org.postgresql.Driver
-          url: jdbc:postgresql://<db-master-host>:5432/archsmith_user?sslmode=require
+          url: jdbc:postgresql://<db-master-host>:5432/archforge_user?sslmode=require
           username: ${DB_USERNAME}
           password: ${DB_PASSWORD}
         user_slave:
           driver-class-name: org.postgresql.Driver
-          url: jdbc:postgresql://<db-slave-host>:5432/archsmith_user?sslmode=require
+          url: jdbc:postgresql://<db-slave-host>:5432/archforge_user?sslmode=require
           username: ${DB_USERNAME}
           password: ${DB_PASSWORD}
         task_master:
           driver-class-name: org.postgresql.Driver
-          url: jdbc:postgresql://<db-master-host>:5432/archsmith_task?sslmode=require
+          url: jdbc:postgresql://<db-master-host>:5432/archforge_task?sslmode=require
           username: ${DB_USERNAME}
           password: ${DB_PASSWORD}
         task_slave:
           driver-class-name: org.postgresql.Driver
-          url: jdbc:postgresql://<db-slave-host>:5432/archsmith_task?sslmode=require
+          url: jdbc:postgresql://<db-slave-host>:5432/archforge_task?sslmode=require
           username: ${DB_USERNAME}
           password: ${DB_PASSWORD}
 
@@ -51,7 +51,7 @@ management:
       export:
         url: ${OTEL_EXPORTER_OTLP_ENDPOINT:http://localhost:4318/v1/metrics}
 
-arch-smith:
+arch-forge:
   # RSA 私钥（生产环境必须通过环境变量 ARCH_SMITH_RSA_PRIVATE_KEY 注入）
   rsa-private-key: ${ARCH_SMITH_RSA_PRIVATE_KEY}
   flyway:
@@ -68,8 +68,8 @@ arch-smith:
   # CORS 白名单（生产环境必须配置具体域名）
   cors:
     allowed-origins:
-      - https://admin.archsmith.example.com
-      - https://archsmith.example.com
+      - https://admin.archforge.example.com
+      - https://archforge.example.com
     allow-credentials: true
   # 文件上传安全策略
   file-storage:

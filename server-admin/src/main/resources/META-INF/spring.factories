@@ -1,2 +1,2 @@
 org.springframework.context.ApplicationContextInitializer=\
-com.lesofn.archsmith.server.admin.config.InitPostgreSQLServer
+com.lesofn.archforge.server.admin.config.InitPostgreSQLServer
