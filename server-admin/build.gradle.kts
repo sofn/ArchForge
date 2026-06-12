@@ -49,6 +49,9 @@ graalvmNative {
             })
             // JDK 25 preview features (StructuredTaskScope, ScopedValue, etc.)
             buildArgs.add("--enable-preview")
+            sharedLibrary.set(false)
+            // Cap native-image heap to avoid OOM on constrained hosts (default is 75% of RAM)
+            buildArgs.add("-J-Xmx8g")
         }
     }
 }

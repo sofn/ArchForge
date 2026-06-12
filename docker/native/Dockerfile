@@ -4,7 +4,9 @@
 FROM bellsoft/liberica-native-image-kit-container:jdk-25-nik-25-stream-glibc AS build
 WORKDIR /workspace
 COPY . .
-RUN ./gradlew :server-admin:nativeCompile -x test -x spotlessCheck --no-daemon
+# Limit Gradle/AOT JVM memory to leave headroom for native-image (needs ~6GB)
+ENV GRADLE_OPTS="-Xmx512m" JAVA_TOOL_OPTIONS="-Xmx1g"
+RUN ./gradlew :server-admin:nativeCompile -x test -x spotlessCheck --no-daemon -Dorg.gradle.jvmargs="-Xmx1g"
 
 # ---- Runtime Stage ----
 FROM debian:trixie-slim
