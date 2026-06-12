@@ -1,5 +1,5 @@
 plugins {
-    id("com.diffplug.spotless") version "8.4.0" apply false
+    id("com.diffplug.spotless") version "8.6.0" apply false
 }
 
 group = "com.lesofn.archforge"
@@ -83,13 +83,13 @@ subprojects {
         
         dependencies {
             // 引入 Spring Boot dependencies
-            add("implementation", platform("org.springframework.boot:spring-boot-dependencies:4.0.5"))
+            add("implementation", platform("org.springframework.boot:spring-boot-dependencies:4.0.7"))
             // 引入自定义 dependencies
             add("implementation", platform(project(":dependencies")))
 
             // compile - Lombok配置
-            add("annotationProcessor", "org.projectlombok:lombok:1.18.44")
-            add("testAnnotationProcessor", "org.projectlombok:lombok:1.18.44")
+            add("annotationProcessor", "org.projectlombok:lombok:1.18.46")
+            add("testAnnotationProcessor", "org.projectlombok:lombok:1.18.46")
 
             // 全局测试依赖 - Spock 2.4 (Groovy 5.x)
             add("testImplementation", "org.junit.jupiter:junit-jupiter-api")

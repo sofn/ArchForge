@@ -8,7 +8,7 @@ pluginManagement {
         mavenCentral()
     }
     plugins {
-        id("org.graalvm.buildtools.native") version "0.10.6"
+        id("org.graalvm.buildtools.native") version "0.11.5"
     }
     // Ensure Spring Boot plugin can be resolved even if the plugin marker isn't available on the portal
     resolutionStrategy {

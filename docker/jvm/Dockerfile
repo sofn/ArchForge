@@ -4,12 +4,17 @@
 
 FROM azul/zulu-openjdk:25 AS training
 WORKDIR /app
+
+# binutils provides objcopy (needed by jlink --strip-debug)
+RUN apt-get update && apt-get install -y --no-install-recommends binutils && rm -rf /var/lib/apt/lists/*
+
 ARG JAR_FILE=server-admin/build/libs/server-admin.jar
 COPY ${JAR_FILE} app.jar
 
 # 生成 CDS 归档 (Project Leyden AOT 缓存)
 RUN java --enable-preview -XX:AOTMode=record -XX:AOTConfiguration=app.aotconf \
     -Dspring.context.exit=onRefresh \
+    -Dspring.profiles.active=prod \
     -jar app.jar || true
 RUN java --enable-preview -XX:AOTMode=create -XX:AOTConfiguration=app.aotconf \
     -XX:AOTCache=app.aot \
@@ -25,14 +30,12 @@ RUN jlink \
     --output /app/minimal-jre
 
 # ---- Runtime Stage (minimal JRE from jlink) ----
-FROM alpine:3.21
+FROM debian:trixie-slim
 WORKDIR /app
 
-# 安装 glibc (Zulu JDK 需要)
-RUN apk add --no-cache gcompat libstdc++
-
 # 安全: 使用非 root 用户运行
-RUN addgroup -g 1001 archforge && adduser -u 1001 -G archforge -D archforge
+RUN groupadd -g 1001 archforge && useradd -u 1001 -g archforge -m archforge \
+    && mkdir -p /app/logs && chown archforge:archforge /app/logs
 USER archforge
 
 COPY --from=training /app/minimal-jre /app/jre

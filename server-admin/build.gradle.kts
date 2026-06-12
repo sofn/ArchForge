@@ -1,5 +1,5 @@
 plugins {
-    id("org.springframework.boot") version "4.0.5"
+    id("org.springframework.boot") version "4.0.7"
     id("org.graalvm.buildtools.native")
 }
 
@@ -30,8 +30,10 @@ tasks.bootRun {
 }
 
 // Spring AOT processing also needs --enable-preview
+// Use 'prod' profile during AOT to skip Testcontainers (no Docker in CI/native builds)
 tasks.named<JavaExec>("processAot") {
     jvmArgs("--enable-preview")
+    systemProperty("spring.profiles.active", "prod")
 }
 tasks.named<JavaExec>("processTestAot") {
     jvmArgs("--enable-preview")
@@ -45,13 +47,15 @@ graalvmNative {
             javaLauncher.set(javaToolchains.launcherFor {
                 languageVersion.set(JavaLanguageVersion.of(25))
             })
+            // JDK 25 preview features (StructuredTaskScope, ScopedValue, etc.)
+            buildArgs.add("--enable-preview")
         }
     }
 }
 
 dependencies {
     // 引入 Spring Boot dependencies BOM
-    implementation(platform("org.springframework.boot:spring-boot-dependencies:4.0.5"))
+    implementation(platform("org.springframework.boot:spring-boot-dependencies:4.0.7"))
     // 引入项目统一版本管理平台
     implementation(platform(project(":dependencies")))
     
@@ -100,10 +104,10 @@ dependencies {
     api("org.springframework.boot:spring-boot-starter-quartz")
     
     // Spring Boot DevTools - 开发环境自动重启和热部署
-    developmentOnly("org.springframework.boot:spring-boot-devtools:4.0.5")
+    developmentOnly("org.springframework.boot:spring-boot-devtools:4.0.7")
     
     // Lombok注解处理器
-    annotationProcessor("org.projectlombok:lombok:1.18.44")
+    annotationProcessor("org.projectlombok:lombok:1.18.46")
     compileOnly("org.projectlombok:lombok")
 
     // MapStruct注解处理器

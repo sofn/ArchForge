@@ -16,30 +16,30 @@ dependencies {
     constraints {
         // 数据库相关
         api("com.baomidou:dynamic-datasource-spring-boot4-starter:4.5.0")
-        api("org.postgresql:postgresql:42.7.10")
+        api("org.postgresql:postgresql:42.7.11")
         
         // 常用工具类
-        api("com.google.guava:guava:33.4.8-jre")
-        api("commons-io:commons-io:2.20.0")
+        api("com.google.guava:guava:33.6.0-jre")
+        api("commons-io:commons-io:2.22.0")
         api("org.apache.commons:commons-lang3:3.20.0")
-        api("commons-codec:commons-codec:1.19.0")
+        api("commons-codec:commons-codec:1.22.0")
         api("org.apache.commons:commons-collections4:4.5.0")
         
         // 实用工具
         api("org.javatuples:javatuples:1.2")
         
         // HTTP客户端
-        api("com.konghq:unirest-java-core:4.4.7")
+        api("com.konghq:unirest-java-core:4.10.0")
         
         // Web相关
-        api("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.11")
+        api("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.3")
 
         api("org.jolokia:jolokia-core:1.7.2")
         
         // JWT
-        api("io.jsonwebtoken:jjwt-api:0.12.6")
-        api("io.jsonwebtoken:jjwt-impl:0.12.6")
-        api("io.jsonwebtoken:jjwt-jackson:0.12.6")
+        api("io.jsonwebtoken:jjwt-api:0.12.7")
+        api("io.jsonwebtoken:jjwt-impl:0.12.7")
+        api("io.jsonwebtoken:jjwt-jackson:0.12.7")
         
         // QueryDSL
         api("com.querydsl:querydsl-jpa:5.1.0")
@@ -53,21 +53,21 @@ dependencies {
         api("org.jspecify:jspecify:1.0.0")
         
         // Lombok and SLF4J (versions managed by Spring Boot BOM)
-        api("org.projectlombok:lombok:1.18.44")
-        api("org.slf4j:slf4j-api:2.0.17")
-        api("org.slf4j:slf4j-simple:2.0.17")
+        api("org.projectlombok:lombok:1.18.46")
+        api("org.slf4j:slf4j-api:2.0.18")
+        api("org.slf4j:slf4j-simple:2.0.18")
         
         // 测试相关 (JUnit 6.x for Spring Boot 4)
         api("org.junit.jupiter:junit-jupiter-api:6.0.3")
         api("org.junit.jupiter:junit-jupiter-engine:6.0.3")
         // Testcontainers
-        api("org.testcontainers:testcontainers:2.0.4")
-        api("org.testcontainers:junit-jupiter:2.0.4")
-        api("org.testcontainers:testcontainers-postgresql:2.0.4")
+        api("org.testcontainers:testcontainers:2.0.5")
+        api("org.testcontainers:junit-jupiter:2.0.5")
+        api("org.testcontainers:testcontainers-postgresql:2.0.5")
         // Spock 2.4 with Groovy 5.0
         api("org.spockframework:spock-core:2.4-groovy-5.0")
         api("org.spockframework:spock-spring:2.4-groovy-5.0")
-        api("org.apache.groovy:groovy:5.0.5")
+        api("org.apache.groovy:groovy:5.0.6")
 
         // Kaptcha 验证码
         api("com.github.penggle:kaptcha:2.3.2")
@@ -76,11 +76,11 @@ dependencies {
         api("org.mapstruct:mapstruct:1.6.3")
         api("org.mapstruct:mapstruct-processor:1.6.3")
 
-        // Micrometer + OpenTelemetry (versions aligned with Spring Boot 4.0.5 BOM)
-        api("io.micrometer:micrometer-tracing-bridge-otel:1.6.4")
+        // Micrometer + OpenTelemetry (versions aligned with Spring Boot 4.0.7 BOM)
+        api("io.micrometer:micrometer-tracing-bridge-otel:1.6.6")
         api("io.opentelemetry:opentelemetry-exporter-otlp:1.55.0")
 
-        // Flyway (versions aligned with Spring Boot 4.0.5 BOM)
+        // Flyway (versions aligned with Spring Boot 4.0.7 BOM)
         api("org.flywaydb:flyway-core:11.14.1")
         api("org.flywaydb:flyway-database-postgresql:11.14.1")
 
@@ -88,14 +88,14 @@ dependencies {
         api("com.github.oshi:oshi-core:6.8.1")
 
         // AWS S3 SDK (文件存储)
-        api("software.amazon.awssdk:s3:2.31.54")
+        api("software.amazon.awssdk:s3:2.46.8")
 
         // FastExcel (Excel I/O — 替代 EasyExcel/POI 的高性能 Excel 读写库)
-        api("org.dhatim:fastexcel:0.19.0")
-        api("org.dhatim:fastexcel-reader:0.19.0")
+        api("org.dhatim:fastexcel:0.20.2")
+        api("org.dhatim:fastexcel-reader:0.20.2")
 
-        // Quartz (调度 — Spring Boot 4.0.5 BOM 已托管 quartz 版本，但显式声明 starter 便于追踪)
-        api("org.springframework.boot:spring-boot-starter-quartz:4.0.5")
+        // Quartz (调度 — Spring Boot 4.0.7 BOM 已托管 quartz 版本，但显式声明 starter 便于追踪)
+        api("org.springframework.boot:spring-boot-starter-quartz:4.0.7")
     }
 }
 
