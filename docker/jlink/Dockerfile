@@ -1,7 +1,6 @@
-# ---- JVM Build Stage (Project Leyden / CDS + jlink optimized) ----
-# 先在宿主机上执行: ./gradlew :server-admin:bootJar -x test
-# 然后使用此 Dockerfile 构建运行时镜像
-
+# ---- JVM Build Stage (Project Leyden CDS + jlink minimal JRE) ----
+# Pre-requisite: ./gradlew :server-admin:bootJar -x test
+# Build with: docker build -f docker/jlink/Dockerfile -t archforge:jlink .
 FROM azul/zulu-openjdk:25 AS training
 WORKDIR /app
 
@@ -11,7 +10,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends binutils && rm 
 ARG JAR_FILE=server-admin/build/libs/server-admin.jar
 COPY ${JAR_FILE} app.jar
 
-# 生成 CDS 归档 (Project Leyden AOT 缓存)
+# Generate CDS archive (Project Leyden AOT cache)
 RUN java --enable-preview -XX:AOTMode=record -XX:AOTConfiguration=app.aotconf \
     -Dspring.context.exit=onRefresh \
     -Dspring.profiles.active=prod \
@@ -20,7 +19,7 @@ RUN java --enable-preview -XX:AOTMode=create -XX:AOTConfiguration=app.aotconf \
     -XX:AOTCache=app.aot \
     -jar app.jar || true
 
-# jlink: 生成最小化 JRE (仅包含 Spring Boot 所需模块)
+# jlink: build minimal JRE (only modules needed by Spring Boot)
 RUN jlink \
     --add-modules java.base,java.compiler,java.desktop,java.instrument,java.management,java.prefs,java.rmi,java.scripting,java.security.jgss,java.sql,jdk.jfr,jdk.unsupported,jdk.crypto.ec,jdk.management,jdk.management.agent \
     --strip-debug \
@@ -33,7 +32,6 @@ RUN jlink \
 FROM debian:trixie-slim
 WORKDIR /app
 
-# 安全: 使用非 root 用户运行
 RUN groupadd -g 1001 archforge && useradd -u 1001 -g archforge -m archforge \
     && mkdir -p /app/logs && chown archforge:archforge /app/logs
 USER archforge

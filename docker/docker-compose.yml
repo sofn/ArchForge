@@ -1,5 +1,6 @@
-# docker-compose.yml — JVM 模式 (Project Leyden / CDS 优化)
-# 使用方式: docker compose up -d --build
+# docker-compose.yml — Default: jlink mode (minimal JRE + Project Leyden CDS)
+# Usage: docker compose up -d
+# For other modes: docker compose -f docker-compose.<mode>.yml up -d
 
 services:
   postgres:
@@ -29,10 +30,10 @@ services:
       retries: 5
 
   archforge:
-    image: archforge:jvm
+    image: archforge:jlink
     build:
       context: ..
-      dockerfile: docker/jvm/Dockerfile
+      dockerfile: docker/jlink/Dockerfile
     depends_on:
       postgres:
         condition: service_healthy
@@ -62,17 +63,6 @@ services:
       SPRING_DATASOURCE_DYNAMIC_DATASOURCE_TASK_SLAVE_DRIVER_CLASS_NAME: org.postgresql.Driver
     volumes:
       - ./logs:/app/logs
-
-  archforge-admin:
-    build:
-      context: ../../ArchForgeAdmin
-      dockerfile: Dockerfile
-    depends_on:
-      - archforge
-    ports:
-      - "80:80"
-    volumes:
-      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
 
 volumes:
   postgres-data:

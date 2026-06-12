@@ -1,6 +1,5 @@
-# docker-compose.native.yml — Native Image mode (BellSoft Liberica NIK 25)
-# Usage: docker compose -f docker-compose.native.yml up -d
-# Startup ~100ms, memory ~50MB. First build takes ~10min and requires 8GB+ RAM.
+# docker-compose.fulljre.yml — JVM mode (full JRE, simplest)
+# Usage: docker compose -f docker-compose.fulljre.yml up -d
 
 services:
   postgres:
@@ -30,11 +29,10 @@ services:
       retries: 5
 
   archforge:
-    image: archforge:native
+    image: archforge:fulljre
     build:
       context: ..
-      dockerfile: docker/native/Dockerfile
-      network: host
+      dockerfile: docker/fulljre/Dockerfile
     depends_on:
       postgres:
         condition: service_healthy
