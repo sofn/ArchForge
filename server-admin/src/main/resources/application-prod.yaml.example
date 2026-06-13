@@ -52,8 +52,8 @@ management:
         url: ${OTEL_EXPORTER_OTLP_ENDPOINT:http://localhost:4318/v1/metrics}
 
 arch-forge:
-  # RSA 私钥（生产环境必须通过环境变量 ARCH_SMITH_RSA_PRIVATE_KEY 注入）
-  rsa-private-key: ${ARCH_SMITH_RSA_PRIVATE_KEY}
+  # RSA 私钥（生产环境必须通过环境变量 ARCH_FORGE_RSA_PRIVATE_KEY 注入）
+  rsa-private-key: ${ARCH_FORGE_RSA_PRIVATE_KEY}
   flyway:
     enabled: true
   jwt:
