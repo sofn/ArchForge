@@ -117,8 +117,7 @@ public class AdminApiController {
                         pageSize,
                         org.springframework.data.domain.Sort.by(
                                 org.springframework.data.domain.Sort.Direction.DESC, "userId"));
-        Specification<SysUser> spec =
-                (root, q, cb) -> QueryHelp.getPredicate(root, criteria, cb);
+        Specification<SysUser> spec = (root, q, cb) -> QueryHelp.getPredicate(root, criteria, cb);
         Page<SysUser> userPage = userService.findAll(spec, pageable);
 
         Map<Long, String> deptNameMap = buildDeptNameMap();

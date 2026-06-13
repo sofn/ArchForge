@@ -104,9 +104,7 @@ class QueryHelpIntegrationTest {
     void innerLikeUsernameExcludesNonMatchingUsers() {
         // "zzz_no_match" should not match any seeded user
         Map<String, Object> resp =
-                post(
-                        "/user",
-                        Map.of("username", "zzz_no_match", "currentPage", 1, "pageSize", 10));
+                post("/user", Map.of("username", "zzz_no_match", "currentPage", 1, "pageSize", 10));
         assertEquals(0, resp.get("code"));
 
         Map<String, Object> data = (Map<String, Object>) resp.get("data");

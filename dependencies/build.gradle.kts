@@ -41,11 +41,6 @@ dependencies {
         api("io.jsonwebtoken:jjwt-impl:0.12.7")
         api("io.jsonwebtoken:jjwt-jackson:0.12.7")
         
-        // QueryDSL
-        api("com.querydsl:querydsl-jpa:5.1.0")
-        api("com.querydsl:querydsl-apt:5.1.0")
-        api("jakarta.persistence:jakarta.persistence-api:3.2.0")
-        
         // 其他
         api("com.google.code.findbugs:annotations:3.0.1")
         api("org.lionsoul:ip2region:2.7.0")

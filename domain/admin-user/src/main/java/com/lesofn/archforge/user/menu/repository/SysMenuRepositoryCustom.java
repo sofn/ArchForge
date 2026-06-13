@@ -2,16 +2,13 @@ package com.lesofn.archforge.user.menu.repository;
 
 import com.lesofn.archforge.user.domain.SysMenu;
 import java.util.List;
-import org.springframework.stereotype.Repository;
 
-/**
- * SysMenuRepository接口，定义Spring Data JPA方法 实际使用请注入SysMenuRepositoryImpl类，它同时支持Spring Data
- * JPA和QueryDSL
- */
-@Repository
+/** Type-safe query methods for {@link SysMenu} using JPA Criteria API + Hibernate Metamodel. */
 public interface SysMenuRepositoryCustom {
 
-    List<SysMenu> selectMenuListByUserId(Long userId);
+    List<SysMenu> findAllActiveMenus();
 
     List<SysMenu> findMenusByRoleId(Long roleId);
+
+    List<SysMenu> selectMenuListByUserId(Long userId);
 }

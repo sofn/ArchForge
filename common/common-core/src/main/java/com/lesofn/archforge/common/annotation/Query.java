@@ -56,15 +56,20 @@ public @interface Query {
      */
     String blurry() default "";
 
+    /** When {@code true}, LIKE comparisons use {@code LOWER()} for case-insensitive matching. */
+    boolean ignoreCase() default false;
+
     enum Type {
         EQUAL,
         NOT_EQUAL,
         /** Inclusive {@code >=}. */
-        GREATER_THAN,
+        GREATER_THAN_OR_EQUAL,
         /** Inclusive {@code <=}. */
-        LESS_THAN,
+        LESS_THAN_OR_EQUAL,
+        /** Strict {@code >}. */
+        GREATER_THAN,
         /** Strict {@code <}. */
-        LESS_THAN_NQ,
+        LESS_THAN,
         /** {@code %v%}. */
         INNER_LIKE,
         /** {@code %v}. */

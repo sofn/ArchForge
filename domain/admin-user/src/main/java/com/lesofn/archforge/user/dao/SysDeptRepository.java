@@ -4,8 +4,6 @@ import com.lesofn.archforge.user.domain.SysDept;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -17,10 +15,7 @@ import org.springframework.stereotype.Repository;
 public interface SysDeptRepository
         extends JpaRepository<SysDept, Long>,
                 JpaSpecificationExecutor<SysDept>,
-                QuerydslPredicateExecutor<SysDept> {
+                SysDeptRepositoryCustom {
 
     List<SysDept> findByParentId(Long parentId);
-
-    @Query("SELECT d FROM SysDept d WHERE d.deleted = false ORDER BY d.sort ASC")
-    List<SysDept> findAllActiveDepts();
 }

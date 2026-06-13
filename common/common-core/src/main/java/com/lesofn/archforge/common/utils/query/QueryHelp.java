@@ -2,6 +2,7 @@ package com.lesofn.archforge.common.utils.query;
 
 import com.lesofn.archforge.common.annotation.Query;
 import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Path;
@@ -37,6 +38,28 @@ public final class QueryHelp {
 
     private QueryHelp() {}
 
+    // Fix 2: ClassValue cache — parse field metadata once per criteria class
+    private static final ClassValue<List<FieldMeta>> FIELD_CACHE =
+            new ClassValue<>() {
+                @Override
+                protected List<FieldMeta> computeValue(Class<?> type) {
+                    List<FieldMeta> metas = new ArrayList<>();
+                    for (Field f : getAllFields(type, new ArrayList<>())) {
+                        if (f.isSynthetic()) {
+                            // Fix 7: skip synthetic fields ($jacocoData, etc.)
+                            continue;
+                        }
+                        Query q = f.getAnnotation(Query.class);
+                        if (q == null) {
+                            continue;
+                        }
+                        f.setAccessible(true);
+                        metas.add(new FieldMeta(f, q));
+                    }
+                    return List.copyOf(metas);
+                }
+            };
+
     public static <R, Q> Predicate getPredicate(
             Root<R> root, @Nullable Q criteria, CriteriaBuilder cb) {
         List<Predicate> predicates = new ArrayList<>();
@@ -45,26 +68,36 @@ public final class QueryHelp {
         }
         Map<String, Join<R, ?>> joinCache = new HashMap<>();
         try {
-            for (Field field : getAllFields(criteria.getClass(), new ArrayList<>())) {
-                Query q = field.getAnnotation(Query.class);
-                if (q == null) {
-                    continue;
-                }
-                field.setAccessible(true);
-                Object value = field.get(criteria);
+            for (FieldMeta fm : FIELD_CACHE.get(criteria.getClass())) {
+                Object value = fm.field().get(criteria);
                 if (isEmpty(value)) {
                     continue;
                 }
+                Query q = fm.query();
                 if (!q.blurry().isEmpty()) {
-                    predicates.add(buildBlurry(root, cb, q.blurry().split(","), value.toString()));
+                    predicates.add(
+                            buildBlurry(
+                                    root,
+                                    cb,
+                                    q.blurry().split(","),
+                                    value.toString(),
+                                    q.ignoreCase()));
                     continue;
                 }
-                String attribute = q.propName().isEmpty() ? field.getName() : q.propName();
+                String attribute = q.propName().isEmpty() ? fm.field().getName() : q.propName();
                 @Nullable Join<R, ?> join =
                         q.joinName().isEmpty() ? null : resolveJoin(root, joinCache, q);
-                Class<?> fieldType = field.getType();
+                Class<?> fieldType = fm.field().getType();
                 predicates.add(
-                        buildPredicate(root, cb, join, attribute, fieldType, q.type(), value));
+                        buildPredicate(
+                                root,
+                                cb,
+                                join,
+                                attribute,
+                                fieldType,
+                                q.type(),
+                                value,
+                                q.ignoreCase()));
             }
         } catch (ReflectiveOperationException e) {
             log.error("QueryHelp reflection failure on {}", criteria.getClass(), e);
@@ -80,53 +113,91 @@ public final class QueryHelp {
             String attribute,
             Class<?> fieldType,
             Query.Type type,
-            Object value) {
+            Object value,
+            boolean ignoreCase) {
+        // Fix 6: FIND_IN_SET now goes through the same expression() path as other types
         Path<Object> path = expression(attribute, join, root);
         return switch (type) {
             case EQUAL -> cb.equal(path, value);
             case NOT_EQUAL -> cb.notEqual(path, value);
-            case GREATER_THAN ->
+            // Fix 5: renamed — inclusive >=
+            case GREATER_THAN_OR_EQUAL ->
                     cb.greaterThanOrEqualTo(
                             path.as((Class<Comparable>) fieldType), (Comparable) value);
-            case LESS_THAN ->
+            // Fix 5: renamed — inclusive <=
+            case LESS_THAN_OR_EQUAL ->
                     cb.lessThanOrEqualTo(
                             path.as((Class<Comparable>) fieldType), (Comparable) value);
-            case LESS_THAN_NQ ->
+            // Fix 5: strict >
+            case GREATER_THAN ->
+                    cb.greaterThan(path.as((Class<Comparable>) fieldType), (Comparable) value);
+            // Fix 5: strict <
+            case LESS_THAN ->
                     cb.lessThan(path.as((Class<Comparable>) fieldType), (Comparable) value);
-            case INNER_LIKE -> cb.like(path.as(String.class), "%" + value + "%");
-            case LEFT_LIKE -> cb.like(path.as(String.class), "%" + value);
-            case RIGHT_LIKE -> cb.like(path.as(String.class), value + "%");
+            // Fix 1 + Fix 4: LIKE with escape + optional ignoreCase
+            case INNER_LIKE -> buildLike(cb, path, "%" + escapeLike(value) + "%", ignoreCase);
+            case LEFT_LIKE -> buildLike(cb, path, "%" + escapeLike(value), ignoreCase);
+            case RIGHT_LIKE -> buildLike(cb, path, escapeLike(value) + "%", ignoreCase);
             case IN -> path.in((Collection<?>) value);
             case NOT_IN -> path.in((Collection<?>) value).not();
-            case IS_NULL -> cb.isNull(path);
-            case NOT_NULL -> cb.isNotNull(path);
             case BETWEEN -> {
+                // Fix 3: throw instead of returning silent empty predicate
                 List<?> bounds = (List<?>) value;
                 if (bounds.size() != 2) {
-                    yield cb.and();
+                    throw new IllegalArgumentException(
+                            "BETWEEN requires exactly 2 elements, got "
+                                    + bounds.size()
+                                    + " for attribute '"
+                                    + attribute
+                                    + "'");
                 }
                 Comparable lo = (Comparable) bounds.get(0);
                 Comparable hi = (Comparable) bounds.get(1);
                 yield cb.between(path.as((Class<Comparable>) lo.getClass()), lo, hi);
             }
+            case IS_NULL -> cb.isNull(path);
+            case NOT_NULL -> cb.isNotNull(path);
             case FIND_IN_SET ->
                     cb.greaterThan(
                             cb.function(
                                     "FIND_IN_SET",
                                     Integer.class,
                                     cb.literal(value.toString()),
-                                    root.get(attribute)),
+                                    path),
                             0);
         };
     }
 
+    // Fix 4: ignoreCase support for blurry
     private static <R> Predicate buildBlurry(
-            Root<R> root, CriteriaBuilder cb, String[] attributes, String value) {
+            Root<R> root,
+            CriteriaBuilder cb,
+            String[] attributes,
+            String value,
+            boolean ignoreCase) {
+        // Fix 1: escape LIKE wildcards in blurry value
+        String escaped = "%" + escapeLike(value) + "%";
         List<Predicate> ors = new ArrayList<>(attributes.length);
         for (String a : attributes) {
-            ors.add(cb.like(root.get(a.trim()).as(String.class), "%" + value + "%"));
+            Path<?> attrPath = root.get(a.trim());
+            ors.add(buildLike(cb, attrPath, escaped, ignoreCase));
         }
         return cb.or(ors.toArray(new Predicate[0]));
+    }
+
+    // Fix 1: escape LIKE wildcards (%, _, \) in user input
+    private static String escapeLike(Object value) {
+        return value.toString().replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_");
+    }
+
+    // Fix 4: build a LIKE predicate, optionally case-insensitive via LOWER()
+    private static Predicate buildLike(
+            CriteriaBuilder cb, Path<?> path, String pattern, boolean ignoreCase) {
+        Expression<String> expr = path.as(String.class);
+        if (ignoreCase) {
+            return cb.like(cb.lower(expr), pattern.toLowerCase(), '\\');
+        }
+        return cb.like(expr, pattern, '\\');
     }
 
     @SuppressWarnings("unchecked")
@@ -166,6 +237,7 @@ public final class QueryHelp {
         };
     }
 
+    // Fix 7: filtering of synthetic fields is done in FIELD_CACHE.computeValue
     static List<Field> getAllFields(@Nullable Class<?> type, List<Field> acc) {
         if (type == null || type == Object.class) {
             return acc;
@@ -175,4 +247,7 @@ public final class QueryHelp {
         }
         return getAllFields(type.getSuperclass(), acc);
     }
+
+    /** Cached field metadata — parsed once per criteria class. */
+    private record FieldMeta(Field field, Query query) {}
 }

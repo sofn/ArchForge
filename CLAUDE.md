@@ -33,6 +33,7 @@ ArchForge/
 ### Key Patterns
 
 - **DDD rich domain model**: entities have business methods + state machines (e.g. `Task.complete()`, `OrderStatus.canTransitionTo()`)
+- **Type-safe queries**: Hibernate Static Metamodel (`Entity_` classes) + `SafeExpr`/`AliasExpr` for compile-time field validation; `QueryHelp` + JPA Specifications for dynamic filtering
 - **ScopedValue context**: `ScopedValueContext` replaces ThreadLocal for request context propagation (JDK 25)
 - **Structured Concurrency**: `StructuredTaskScope` for parallel operations (e.g. ServerMonitorService)
 - **Pattern Matching**: switch expressions with type patterns throughout error handling and JSON utils

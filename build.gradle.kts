@@ -1,5 +1,6 @@
 plugins {
     id("com.diffplug.spotless") version "8.6.0" apply false
+    idea
 }
 
 group = "com.lesofn.archforge"
@@ -30,6 +31,14 @@ subprojects {
         apply(plugin = "java-library")
         apply(plugin = "groovy")
         apply(plugin = "com.diffplug.spotless")
+        apply(plugin = "idea")
+
+        // 让 IDEA 自动识别 annotation processor 生成的源码目录 (Hibernate Metamodel 等)
+        configure<org.gradle.plugins.ide.idea.model.IdeaModel> {
+            module {
+                generatedSourceDirs.add(file("build/generated/sources/annotationProcessor/java/main"))
+            }
+        }
 
         // Spotless 代码格式化 - Google Java Style (AOSP: 4-space indent)
         configure<com.diffplug.gradle.spotless.SpotlessExtension> {
