@@ -1,4 +1,5 @@
 plugins {
+    id("org.sonarqube") version "3.5.0.2730"
     id("com.diffplug.spotless") version "8.6.0" apply false
     idea
 }
@@ -22,6 +23,12 @@ allprojects {
         // 原始仓库（如果镜像源找不到依赖，回退到中央仓库）
         mavenCentral()
         google()
+    }
+}
+
+sonarqube {
+    properties {
+        property("sonar.projectKey", "ArchForge")
     }
 }
 
