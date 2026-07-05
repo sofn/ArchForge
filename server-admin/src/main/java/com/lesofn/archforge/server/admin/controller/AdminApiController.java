@@ -368,10 +368,22 @@ public class AdminApiController {
         Optional<SysMenu> opt = menuService.findById(request.getId());
         if (opt.isEmpty()) return false;
         SysMenu menu = opt.get();
-        applyMenuFields(menu, request.getParentId(), request.getMenuType(), request.getName(),
-                request.getPath(), request.getAuths(), request.getStatus(), request.getTitle(),
-                request.getIcon(), request.getRank(), request.getShowLink(), request.getShowParent(),
-                request.getKeepAlive(), request.getFrameSrc(), request.getFrameLoading(),
+        applyMenuFields(
+                menu,
+                request.getParentId(),
+                request.getMenuType(),
+                request.getName(),
+                request.getPath(),
+                request.getAuths(),
+                request.getStatus(),
+                request.getTitle(),
+                request.getIcon(),
+                request.getRank(),
+                request.getShowLink(),
+                request.getShowParent(),
+                request.getKeepAlive(),
+                request.getFrameSrc(),
+                request.getFrameLoading(),
                 request.getHiddenTag());
         menu.setStatus(menu.getStatus() != null ? menu.getStatus() : 1);
         menuService.update(menu);
@@ -683,19 +695,44 @@ public class AdminApiController {
 
     private SysMenu buildMenuFromCreateRequest(MenuCreateRequest request) {
         SysMenu menu = new SysMenu();
-        applyMenuFields(menu, request.getParentId(), request.getMenuType(), request.getName(),
-                request.getPath(), request.getAuths(), request.getStatus(), request.getTitle(),
-                request.getIcon(), request.getRank(), request.getShowLink(), request.getShowParent(),
-                request.getKeepAlive(), request.getFrameSrc(), request.getFrameLoading(),
+        applyMenuFields(
+                menu,
+                request.getParentId(),
+                request.getMenuType(),
+                request.getName(),
+                request.getPath(),
+                request.getAuths(),
+                request.getStatus(),
+                request.getTitle(),
+                request.getIcon(),
+                request.getRank(),
+                request.getShowLink(),
+                request.getShowParent(),
+                request.getKeepAlive(),
+                request.getFrameSrc(),
+                request.getFrameLoading(),
                 request.getHiddenTag());
         menu.setStatus(menu.getStatus() != null ? menu.getStatus() : 1);
         return menu;
     }
 
-    private void applyMenuFields(SysMenu menu, Long parentId, Integer menuType, String name,
-            String path, String auths, Integer status, String title, String icon, Integer rank,
-            Boolean showLink, Boolean showParent, Boolean keepAlive, String frameSrc,
-            Boolean frameLoading, Boolean hiddenTag) {
+    private void applyMenuFields(
+            SysMenu menu,
+            Long parentId,
+            Integer menuType,
+            String name,
+            String path,
+            String auths,
+            Integer status,
+            String title,
+            String icon,
+            Integer rank,
+            Boolean showLink,
+            Boolean showParent,
+            Boolean keepAlive,
+            String frameSrc,
+            Boolean frameLoading,
+            Boolean hiddenTag) {
         if (parentId != null) menu.setParentId(parentId);
         if (menuType != null) menu.setMenuType(menuType);
         if (name != null) menu.setRouterName(name);
