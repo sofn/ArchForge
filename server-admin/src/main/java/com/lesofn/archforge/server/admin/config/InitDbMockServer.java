@@ -3,6 +3,7 @@ package com.lesofn.archforge.server.admin.config;
 import com.lesofn.archforge.infrastructure.frame.database.GroupDataSourceProxy;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
+import java.nio.charset.StandardCharsets;
 import javax.sql.DataSource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -36,7 +37,7 @@ public class InitDbMockServer {
             populator.addScript(new ClassPathResource("sql/data-admin-dept.sql"));
             populator.addScript(new ClassPathResource("sql/data-admin-config.sql"));
             populator.addScript(new ClassPathResource("sql/data-admin-quartz.sql"));
-            populator.setSqlScriptEncoding("UTF-8");
+            populator.setSqlScriptEncoding(StandardCharsets.UTF_8.name());
             populator.setContinueOnError(true);
 
             populator.execute(userDs);

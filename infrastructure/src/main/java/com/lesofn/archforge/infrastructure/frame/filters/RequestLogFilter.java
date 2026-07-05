@@ -13,6 +13,7 @@ import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.Strings;
@@ -105,7 +106,7 @@ public class RequestLogFilter implements Filter {
                 record.setResponse(
                         new String(
                                 ((ResponseWrapper) response).toByteArray(),
-                                response.getCharacterEncoding()));
+                                StandardCharsets.UTF_8));
                 // text/html不打印body
                 if (!Strings.CS.contains(response.getContentType(), "application/json")) {
                     record.setWriteBody(false);

@@ -26,7 +26,16 @@ tasks.jar {
 
 // JDK 25: enable preview features (StructuredTaskScope) + suppress Netty native-access warning
 tasks.bootRun {
-    jvmArgs("--enable-preview", "--enable-native-access=ALL-UNNAMED")
+    jvmArgs(
+        "--enable-preview",
+        "--enable-native-access=ALL-UNNAMED",
+        "-Dfile.encoding=UTF-8",
+        "-Dconsole.encoding=UTF-8",
+        "-Dsun.jnu.encoding=UTF-8",
+        "-Ddefault.client.encoding=UTF-8"
+    )
+    systemProperty("file.encoding", "UTF-8")
+    systemProperty("sun.jnu.encoding", "UTF-8")
 }
 
 // Spring AOT processing also needs --enable-preview

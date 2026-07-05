@@ -7,14 +7,14 @@
 
     <Appenders>
         <Console name="Console" target="SYSTEM_OUT">
-            <PatternLayout pattern="${LOG_PATTERN}"/>
+            <PatternLayout pattern="${LOG_PATTERN}" charset="UTF-8"/>
             <Filters>
                 <ThresholdFilter level="ERROR" onMatch="DENY" onMismatch="NEUTRAL"/>
             </Filters>
         </Console>
 
         <Console name="ErrorConsole" target="SYSTEM_ERR">
-            <PatternLayout pattern="${LOG_PATTERN}"/>
+            <PatternLayout pattern="${LOG_PATTERN}" charset="UTF-8"/>
             <Filters>
                 <ThresholdFilter level="ERROR" onMatch="ACCEPT" onMismatch="DENY"/>
             </Filters>

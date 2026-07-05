@@ -2,6 +2,7 @@ package com.lesofn.archforge.server.admin.config;
 
 import com.lesofn.archforge.infrastructure.frame.database.GroupDataSourceProxy;
 import jakarta.annotation.Resource;
+import java.nio.charset.StandardCharsets;
 import javax.sql.DataSource;
 import lombok.extern.slf4j.Slf4j;
 import org.flywaydb.core.Flyway;
@@ -40,7 +41,7 @@ public class FlywayConfig {
                         .locations("classpath:db/migration")
                         .baselineOnMigrate(true)
                         .baselineVersion("0")
-                        .encoding("UTF-8")
+                        .encoding(StandardCharsets.UTF_8.name())
                         .validateOnMigrate(true)
                         .outOfOrder(false)
                         .load();
