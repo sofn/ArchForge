@@ -3,6 +3,7 @@ package com.lesofn.archforge.server.admin.controller;
 import com.lesofn.archforge.common.enums.common.GenderEnum;
 import com.lesofn.archforge.common.utils.query.QueryHelp;
 import com.lesofn.archforge.server.admin.dto.*;
+import com.lesofn.archforge.server.admin.dto.request.*;
 import com.lesofn.archforge.server.admin.dto.user.SysUserQueryCriteria;
 import com.lesofn.archforge.server.admin.mapper.AdminDeptMapper;
 import com.lesofn.archforge.server.admin.mapper.AdminMenuMapper;
@@ -32,6 +33,7 @@ import com.lesofn.archforge.user.service.SysRoleService;
 import com.lesofn.archforge.user.service.SysUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -219,84 +221,72 @@ public class AdminApiController {
 
     @Operation(summary = "创建用户")
     @PostMapping("/user/create")
-    public Long createUser(@RequestBody Map<String, Object> data) {
+    public Long createUser(@RequestBody @Valid UserCreateRequest request) {
         SysUser user = new SysUser();
-        user.setUsername((String) data.get("username"));
-        user.setNickname((String) data.get("nickname"));
-        user.setPhoneNumber(String.valueOf(data.getOrDefault("phone", "")));
-        user.setEmail((String) data.getOrDefault("email", ""));
-        if (data.get("sex") != null) {
-            user.setSex(GenderEnum.fromValue(((Number) data.get("sex")).intValue()));
+        user.setUsername(request.getUsername());
+        user.setNickname(request.getNickname());
+        user.setPhoneNumber(request.getPhone() != null ? request.getPhone() : "");
+        user.setEmail(request.getEmail() != null ? request.getEmail() : "");
+        if (request.getSex() != null) {
+            user.setSex(GenderEnum.fromValue(request.getSex()));
         }
-        user.setStatus((Integer) data.getOrDefault("status", 1));
-        user.setRemark((String) data.getOrDefault("remark", ""));
-        if (data.get("parentId") != null) {
-            user.setDeptId(((Number) data.get("parentId")).longValue());
+        user.setStatus(request.getStatus());
+        user.setRemark(request.getRemark() != null ? request.getRemark() : "");
+        if (request.getParentId() != null) {
+            user.setDeptId(request.getParentId());
         }
-        String rawPassword = (String) data.getOrDefault("password", "admin123");
-        user.setPassword(passwordEncoder.encode(rawPassword));
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
         SysUser saved = userService.create(user);
         return saved.getUserId();
     }
 
     @Operation(summary = "更新用户")
     @PutMapping("/user/update")
-    public Boolean updateUser(@RequestBody Map<String, Object> data) {
-        Long id = ((Number) data.get("id")).longValue();
-        Optional<SysUser> opt = userService.findById(id);
+    public Boolean updateUser(@RequestBody @Valid UserUpdateRequest request) {
+        Optional<SysUser> opt = userService.findById(request.getId());
         if (opt.isEmpty()) return false;
         SysUser user = opt.get();
-        if (data.containsKey("username")) user.setUsername((String) data.get("username"));
-        if (data.containsKey("nickname")) user.setNickname((String) data.get("nickname"));
-        if (data.containsKey("phone")) user.setPhoneNumber(String.valueOf(data.get("phone")));
-        if (data.containsKey("email")) user.setEmail((String) data.get("email"));
-        if (data.get("sex") != null)
-            user.setSex(GenderEnum.fromValue(((Number) data.get("sex")).intValue()));
-        if (data.containsKey("status")) user.setStatus((Integer) data.get("status"));
-        if (data.containsKey("remark")) user.setRemark((String) data.get("remark"));
-        if (data.get("parentId") != null)
-            user.setDeptId(((Number) data.get("parentId")).longValue());
+        if (request.getUsername() != null) user.setUsername(request.getUsername());
+        if (request.getNickname() != null) user.setNickname(request.getNickname());
+        if (request.getPhone() != null) user.setPhoneNumber(request.getPhone());
+        if (request.getEmail() != null) user.setEmail(request.getEmail());
+        if (request.getSex() != null) user.setSex(GenderEnum.fromValue(request.getSex()));
+        if (request.getStatus() != null) user.setStatus(request.getStatus());
+        if (request.getRemark() != null) user.setRemark(request.getRemark());
+        if (request.getParentId() != null) user.setDeptId(request.getParentId());
         userService.update(user);
         return true;
     }
 
     @Operation(summary = "删除用户")
     @PostMapping("/user/delete")
-    public Boolean deleteUser(@RequestBody Map<String, Object> data) {
-        Object idObj = data.get("id");
-        if (idObj instanceof Number) {
-            userService.softDeleteById(((Number) idObj).longValue());
-        }
+    public Boolean deleteUser(@RequestBody @Valid UserDeleteRequest request) {
+        userService.softDeleteById(request.getId());
         return true;
     }
 
     @Operation(summary = "更新用户状态")
     @PostMapping("/user/status")
-    public Boolean updateUserStatus(@RequestBody Map<String, Object> data) {
-        Long id = ((Number) data.get("id")).longValue();
-        Integer status = (Integer) data.get("status");
-        userService.updateStatus(id, status);
+    public Boolean updateUserStatus(@RequestBody @Valid UserStatusRequest request) {
+        userService.updateStatus(request.getId(), request.getStatus());
         return true;
     }
 
     @Operation(summary = "重置用户密码")
     @PostMapping("/user/reset-password")
-    public Boolean resetUserPassword(@RequestBody Map<String, Object> data) {
-        Long id = ((Number) data.get("id")).longValue();
-        String newPwd = (String) data.getOrDefault("newPwd", "admin123");
-        userService.resetPassword(id, passwordEncoder.encode(newPwd));
+    public Boolean resetUserPassword(@RequestBody @Valid UserPasswordRequest request) {
+        String newPwd = request.getNewPwd() != null ? request.getNewPwd() : "admin123";
+        userService.resetPassword(request.getId(), passwordEncoder.encode(newPwd));
         return true;
     }
 
-    @SuppressWarnings("unchecked")
     @Operation(summary = "分配用户角色")
     @PostMapping("/user/assign-role")
-    public Boolean assignUserRole(@RequestBody Map<String, Object> data) {
-        Long userId = ((Number) data.get("id")).longValue();
-        List<Number> ids = (List<Number>) data.get("ids");
+    public Boolean assignUserRole(@RequestBody @Valid UserRoleRequest request) {
+        List<Long> ids = request.getIds();
         if (ids != null && !ids.isEmpty()) {
-            Long roleId = ids.get(0).longValue();
-            Optional<SysUser> opt = userService.findById(userId);
+            Long roleId = ids.get(0);
+            Optional<SysUser> opt = userService.findById(request.getId());
             if (opt.isPresent()) {
                 SysUser user = opt.get();
                 user.setRoleId(roleId);
@@ -310,11 +300,11 @@ public class AdminApiController {
 
     @Operation(summary = "创建角色")
     @PostMapping("/role/create")
-    public Long createRole(@RequestBody Map<String, Object> data) {
+    public Long createRole(@RequestBody @Valid RoleCreateRequest request) {
         SysRole role = new SysRole();
-        role.setRoleName((String) data.get("name"));
-        role.setRoleKey((String) data.get("code"));
-        role.setRemark((String) data.getOrDefault("remark", ""));
+        role.setRoleName(request.getName());
+        role.setRoleKey(request.getCode());
+        role.setRemark(request.getRemark() != null ? request.getRemark() : "");
         role.setStatus((short) 1);
         role.setRoleSort(0);
         SysRole saved = roleService.create(role);
@@ -323,51 +313,42 @@ public class AdminApiController {
 
     @Operation(summary = "更新角色")
     @PutMapping("/role/update")
-    public Boolean updateRole(@RequestBody Map<String, Object> data) {
-        Long id = ((Number) data.get("id")).longValue();
-        Optional<SysRole> opt = roleService.findById(id);
+    public Boolean updateRole(@RequestBody @Valid RoleUpdateRequest request) {
+        Optional<SysRole> opt = roleService.findById(request.getId());
         if (opt.isEmpty()) return false;
         SysRole role = opt.get();
-        if (data.containsKey("name")) role.setRoleName((String) data.get("name"));
-        if (data.containsKey("code")) role.setRoleKey((String) data.get("code"));
-        if (data.containsKey("remark")) role.setRemark((String) data.get("remark"));
+        if (request.getName() != null) role.setRoleName(request.getName());
+        if (request.getCode() != null) role.setRoleKey(request.getCode());
+        if (request.getRemark() != null) role.setRemark(request.getRemark());
         roleService.update(role);
         return true;
     }
 
     @Operation(summary = "删除角色")
     @PostMapping("/role/delete")
-    public Boolean deleteRole(@RequestBody Map<String, Object> data) {
-        Long id = ((Number) data.get("id")).longValue();
-        roleService.softDeleteById(id);
+    public Boolean deleteRole(@RequestBody @Valid RoleDeleteRequest request) {
+        roleService.softDeleteById(request.getId());
         return true;
     }
 
     @Operation(summary = "更新角色状态")
     @PostMapping("/role/status")
-    public Boolean updateRoleStatus(@RequestBody Map<String, Object> data) {
-        Long id = ((Number) data.get("id")).longValue();
-        Integer status = (Integer) data.get("status");
-        Optional<SysRole> opt = roleService.findById(id);
+    public Boolean updateRoleStatus(@RequestBody @Valid RoleStatusRequest request) {
+        Optional<SysRole> opt = roleService.findById(request.getId());
         if (opt.isPresent()) {
             SysRole role = opt.get();
-            role.setStatus(status.shortValue());
+            role.setStatus(request.getStatus().shortValue());
             roleService.update(role);
         }
         return true;
     }
 
-    @SuppressWarnings("unchecked")
     @Operation(summary = "保存角色菜单权限")
     @PostMapping("/role/save-menu")
-    public Boolean saveRoleMenu(@RequestBody Map<String, Object> data) {
-        Long roleId = ((Number) data.get("id")).longValue();
-        List<Number> menuIds = (List<Number>) data.get("menuIds");
+    public Boolean saveRoleMenu(@RequestBody @Valid RoleMenuRequest request) {
         List<Long> menuIdList =
-                menuIds != null
-                        ? menuIds.stream().map(Number::longValue).collect(Collectors.toList())
-                        : Collections.emptyList();
-        roleMenuService.updateRoleMenus(roleId, menuIdList);
+                request.getMenuIds() != null ? request.getMenuIds() : Collections.emptyList();
+        roleMenuService.updateRoleMenus(request.getId(), menuIdList);
         return true;
     }
 
@@ -375,29 +356,32 @@ public class AdminApiController {
 
     @Operation(summary = "创建菜单")
     @PostMapping("/menu/create")
-    public Long createMenu(@RequestBody Map<String, Object> data) {
-        SysMenu menu = buildMenuFromData(data);
+    public Long createMenu(@RequestBody @Valid MenuCreateRequest request) {
+        SysMenu menu = buildMenuFromCreateRequest(request);
         SysMenu saved = menuService.create(menu);
         return saved.getMenuId();
     }
 
     @Operation(summary = "更新菜单")
     @PutMapping("/menu/update")
-    public Boolean updateMenu(@RequestBody Map<String, Object> data) {
-        Long id = ((Number) data.get("id")).longValue();
-        Optional<SysMenu> opt = menuService.findById(id);
+    public Boolean updateMenu(@RequestBody @Valid MenuUpdateRequest request) {
+        Optional<SysMenu> opt = menuService.findById(request.getId());
         if (opt.isEmpty()) return false;
         SysMenu menu = opt.get();
-        updateMenuFromData(menu, data);
+        applyMenuFields(menu, request.getParentId(), request.getMenuType(), request.getName(),
+                request.getPath(), request.getAuths(), request.getStatus(), request.getTitle(),
+                request.getIcon(), request.getRank(), request.getShowLink(), request.getShowParent(),
+                request.getKeepAlive(), request.getFrameSrc(), request.getFrameLoading(),
+                request.getHiddenTag());
+        menu.setStatus(menu.getStatus() != null ? menu.getStatus() : 1);
         menuService.update(menu);
         return true;
     }
 
     @Operation(summary = "删除菜单")
     @PostMapping("/menu/delete")
-    public Boolean deleteMenu(@RequestBody Map<String, Object> data) {
-        Long id = ((Number) data.get("id")).longValue();
-        menuService.softDeleteById(id);
+    public Boolean deleteMenu(@RequestBody @Valid MenuDeleteRequest request) {
+        menuService.softDeleteById(request.getId());
         return true;
     }
 
@@ -405,46 +389,42 @@ public class AdminApiController {
 
     @Operation(summary = "创建部门")
     @PostMapping("/dept/create")
-    public Long createDept(@RequestBody Map<String, Object> data) {
+    public Long createDept(@RequestBody @Valid DeptCreateRequest request) {
         SysDept dept = new SysDept();
-        dept.setParentId(
-                data.get("parentId") != null ? ((Number) data.get("parentId")).longValue() : 0L);
-        dept.setName((String) data.get("name"));
-        dept.setPrincipal((String) data.getOrDefault("principal", ""));
-        dept.setPhone(String.valueOf(data.getOrDefault("phone", "")));
-        dept.setEmail((String) data.getOrDefault("email", ""));
-        dept.setSort(data.get("sort") != null ? ((Number) data.get("sort")).intValue() : 0);
-        dept.setStatus((Integer) data.getOrDefault("status", 1));
-        dept.setRemark((String) data.getOrDefault("remark", ""));
+        dept.setParentId(request.getParentId() != null ? request.getParentId() : 0L);
+        dept.setName(request.getName());
+        dept.setPrincipal(request.getPrincipal() != null ? request.getPrincipal() : "");
+        dept.setPhone(request.getPhone() != null ? request.getPhone() : "");
+        dept.setEmail(request.getEmail() != null ? request.getEmail() : "");
+        dept.setSort(request.getSort() != null ? request.getSort() : 0);
+        dept.setStatus(request.getStatus() != null ? request.getStatus() : 1);
+        dept.setRemark(request.getRemark() != null ? request.getRemark() : "");
         SysDept saved = deptService.create(dept);
         return saved.getDeptId();
     }
 
     @Operation(summary = "更新部门")
     @PutMapping("/dept/update")
-    public Boolean updateDept(@RequestBody Map<String, Object> data) {
-        Long id = ((Number) data.get("id")).longValue();
-        Optional<SysDept> opt = deptService.findById(id);
+    public Boolean updateDept(@RequestBody @Valid DeptUpdateRequest request) {
+        Optional<SysDept> opt = deptService.findById(request.getId());
         if (opt.isEmpty()) return false;
         SysDept dept = opt.get();
-        if (data.containsKey("name")) dept.setName((String) data.get("name"));
-        if (data.containsKey("principal")) dept.setPrincipal((String) data.get("principal"));
-        if (data.containsKey("phone")) dept.setPhone(String.valueOf(data.get("phone")));
-        if (data.containsKey("email")) dept.setEmail((String) data.get("email"));
-        if (data.get("sort") != null) dept.setSort(((Number) data.get("sort")).intValue());
-        if (data.containsKey("status")) dept.setStatus((Integer) data.get("status"));
-        if (data.containsKey("remark")) dept.setRemark((String) data.get("remark"));
-        if (data.get("parentId") != null)
-            dept.setParentId(((Number) data.get("parentId")).longValue());
+        if (request.getName() != null) dept.setName(request.getName());
+        if (request.getPrincipal() != null) dept.setPrincipal(request.getPrincipal());
+        if (request.getPhone() != null) dept.setPhone(request.getPhone());
+        if (request.getEmail() != null) dept.setEmail(request.getEmail());
+        if (request.getSort() != null) dept.setSort(request.getSort());
+        if (request.getStatus() != null) dept.setStatus(request.getStatus());
+        if (request.getRemark() != null) dept.setRemark(request.getRemark());
+        if (request.getParentId() != null) dept.setParentId(request.getParentId());
         deptService.update(dept);
         return true;
     }
 
     @Operation(summary = "删除部门")
     @PostMapping("/dept/delete")
-    public Boolean deleteDept(@RequestBody Map<String, Object> data) {
-        Long id = ((Number) data.get("id")).longValue();
-        deptService.deleteById(id);
+    public Boolean deleteDept(@RequestBody @Valid DeptDeleteRequest request) {
+        deptService.deleteById(request.getId());
         return true;
     }
 
@@ -479,41 +459,36 @@ public class AdminApiController {
 
     @Operation(summary = "创建参数")
     @PostMapping("/config/create")
-    public Long createConfig(@RequestBody Map<String, Object> data) {
+    public Long createConfig(@RequestBody @Valid ConfigCreateRequest request) {
         SysConfig config = new SysConfig();
-        config.setConfigName((String) data.get("configName"));
-        config.setConfigKey((String) data.get("configKey"));
-        config.setConfigValue((String) data.get("configValue"));
-        config.setConfigType(
-                data.get("configType") != null ? ((Number) data.get("configType")).intValue() : 0);
-        config.setRemark((String) data.getOrDefault("remark", ""));
+        config.setConfigName(request.getConfigName());
+        config.setConfigKey(request.getConfigKey());
+        config.setConfigValue(request.getConfigValue());
+        config.setConfigType(request.getConfigType() != null ? request.getConfigType() : 0);
+        config.setRemark(request.getRemark() != null ? request.getRemark() : "");
         SysConfig saved = configService.create(config);
         return saved.getConfigId();
     }
 
     @Operation(summary = "更新参数")
     @PutMapping("/config/update")
-    public Boolean updateConfig(@RequestBody Map<String, Object> data) {
-        Long id = ((Number) data.get("id")).longValue();
-        Optional<SysConfig> opt = configService.findById(id);
+    public Boolean updateConfig(@RequestBody @Valid ConfigUpdateRequest request) {
+        Optional<SysConfig> opt = configService.findById(request.getId());
         if (opt.isEmpty()) return false;
         SysConfig config = opt.get();
-        if (data.containsKey("configName")) config.setConfigName((String) data.get("configName"));
-        if (data.containsKey("configKey")) config.setConfigKey((String) data.get("configKey"));
-        if (data.containsKey("configValue"))
-            config.setConfigValue((String) data.get("configValue"));
-        if (data.get("configType") != null)
-            config.setConfigType(((Number) data.get("configType")).intValue());
-        if (data.containsKey("remark")) config.setRemark((String) data.get("remark"));
+        if (request.getConfigName() != null) config.setConfigName(request.getConfigName());
+        if (request.getConfigKey() != null) config.setConfigKey(request.getConfigKey());
+        if (request.getConfigValue() != null) config.setConfigValue(request.getConfigValue());
+        if (request.getConfigType() != null) config.setConfigType(request.getConfigType());
+        if (request.getRemark() != null) config.setRemark(request.getRemark());
         configService.update(config);
         return true;
     }
 
     @Operation(summary = "删除参数")
     @PostMapping("/config/delete")
-    public Boolean deleteConfig(@RequestBody Map<String, Object> data) {
-        Long id = ((Number) data.get("id")).longValue();
-        configService.deleteById(id);
+    public Boolean deleteConfig(@RequestBody @Valid ConfigDeleteRequest request) {
+        configService.deleteById(request.getId());
         return true;
     }
 
@@ -548,42 +523,37 @@ public class AdminApiController {
 
     @Operation(summary = "创建通知公告")
     @PostMapping("/notice/create")
-    public Long createNotice(@RequestBody Map<String, Object> data) {
+    public Long createNotice(@RequestBody @Valid NoticeCreateRequest request) {
         SysNotice notice = new SysNotice();
-        notice.setNoticeTitle((String) data.get("noticeTitle"));
-        notice.setNoticeType(
-                data.get("noticeType") != null ? ((Number) data.get("noticeType")).intValue() : 1);
-        notice.setNoticeContent((String) data.getOrDefault("noticeContent", ""));
-        notice.setStatus(data.get("status") != null ? ((Number) data.get("status")).intValue() : 1);
-        notice.setRemark((String) data.getOrDefault("remark", ""));
+        notice.setNoticeTitle(request.getNoticeTitle());
+        notice.setNoticeType(request.getNoticeType() != null ? request.getNoticeType() : 1);
+        notice.setNoticeContent(
+                request.getNoticeContent() != null ? request.getNoticeContent() : "");
+        notice.setStatus(request.getStatus() != null ? request.getStatus() : 1);
+        notice.setRemark(request.getRemark() != null ? request.getRemark() : "");
         SysNotice saved = noticeService.create(notice);
         return saved.getNoticeId();
     }
 
     @Operation(summary = "更新通知公告")
     @PutMapping("/notice/update")
-    public Boolean updateNotice(@RequestBody Map<String, Object> data) {
-        Long id = ((Number) data.get("id")).longValue();
-        Optional<SysNotice> opt = noticeService.findById(id);
+    public Boolean updateNotice(@RequestBody @Valid NoticeUpdateRequest request) {
+        Optional<SysNotice> opt = noticeService.findById(request.getId());
         if (opt.isEmpty()) return false;
         SysNotice notice = opt.get();
-        if (data.containsKey("noticeTitle"))
-            notice.setNoticeTitle((String) data.get("noticeTitle"));
-        if (data.get("noticeType") != null)
-            notice.setNoticeType(((Number) data.get("noticeType")).intValue());
-        if (data.containsKey("noticeContent"))
-            notice.setNoticeContent((String) data.get("noticeContent"));
-        if (data.get("status") != null) notice.setStatus(((Number) data.get("status")).intValue());
-        if (data.containsKey("remark")) notice.setRemark((String) data.get("remark"));
+        if (request.getNoticeTitle() != null) notice.setNoticeTitle(request.getNoticeTitle());
+        if (request.getNoticeType() != null) notice.setNoticeType(request.getNoticeType());
+        if (request.getNoticeContent() != null) notice.setNoticeContent(request.getNoticeContent());
+        if (request.getStatus() != null) notice.setStatus(request.getStatus());
+        if (request.getRemark() != null) notice.setRemark(request.getRemark());
         noticeService.update(notice);
         return true;
     }
 
     @Operation(summary = "删除通知公告")
     @PostMapping("/notice/delete")
-    public Boolean deleteNotice(@RequestBody Map<String, Object> data) {
-        Long id = ((Number) data.get("id")).longValue();
-        noticeService.deleteById(id);
+    public Boolean deleteNotice(@RequestBody @Valid NoticeDeleteRequest request) {
+        noticeService.deleteById(request.getId());
         return true;
     }
 
@@ -711,42 +681,46 @@ public class AdminApiController {
 
     // ==================== Menu Helper Methods ====================
 
-    private SysMenu buildMenuFromData(Map<String, Object> data) {
+    private SysMenu buildMenuFromCreateRequest(MenuCreateRequest request) {
         SysMenu menu = new SysMenu();
-        updateMenuFromData(menu, data);
+        applyMenuFields(menu, request.getParentId(), request.getMenuType(), request.getName(),
+                request.getPath(), request.getAuths(), request.getStatus(), request.getTitle(),
+                request.getIcon(), request.getRank(), request.getShowLink(), request.getShowParent(),
+                request.getKeepAlive(), request.getFrameSrc(), request.getFrameLoading(),
+                request.getHiddenTag());
+        menu.setStatus(menu.getStatus() != null ? menu.getStatus() : 1);
         return menu;
     }
 
-    private void updateMenuFromData(SysMenu menu, Map<String, Object> data) {
-        if (data.containsKey("parentId"))
-            menu.setParentId(((Number) data.get("parentId")).longValue());
-        if (data.containsKey("menuType"))
-            menu.setMenuType(((Number) data.get("menuType")).intValue());
-        if (data.containsKey("name")) menu.setRouterName((String) data.get("name"));
-        if (data.containsKey("path")) menu.setPath((String) data.get("path"));
-        if (data.containsKey("auths")) menu.setPermission((String) data.get("auths"));
-        if (data.containsKey("status")) menu.setStatus(((Number) data.get("status")).intValue());
+    private void applyMenuFields(SysMenu menu, Long parentId, Integer menuType, String name,
+            String path, String auths, Integer status, String title, String icon, Integer rank,
+            Boolean showLink, Boolean showParent, Boolean keepAlive, String frameSrc,
+            Boolean frameLoading, Boolean hiddenTag) {
+        if (parentId != null) menu.setParentId(parentId);
+        if (menuType != null) menu.setMenuType(menuType);
+        if (name != null) menu.setRouterName(name);
+        if (path != null) menu.setPath(path);
+        if (auths != null) menu.setPermission(auths);
+        if (status != null) menu.setStatus(status);
         MetaDTO meta = menu.getMetaInfo() != null ? menu.getMetaInfo() : new MetaDTO();
-        if (data.containsKey("title")) meta.setTitle((String) data.get("title"));
-        if (data.containsKey("icon")) meta.setIcon((String) data.get("icon"));
-        if (data.get("rank") != null) meta.setRank(((Number) data.get("rank")).intValue());
-        if (data.containsKey("showLink")) meta.setShowLink((Boolean) data.get("showLink"));
-        if (data.containsKey("showParent")) meta.setShowParent((Boolean) data.get("showParent"));
-        if (data.containsKey("keepAlive")) meta.setKeepAlive((Boolean) data.get("keepAlive"));
-        if (data.containsKey("frameSrc")) meta.setFrameSrc((String) data.get("frameSrc"));
-        if (data.containsKey("frameLoading"))
-            meta.setFrameLoading((Boolean) data.get("frameLoading"));
-        if (data.containsKey("hiddenTag")) meta.setHiddenTag((Boolean) data.get("hiddenTag"));
+        if (title != null) meta.setTitle(title);
+        if (icon != null) meta.setIcon(icon);
+        if (rank != null) meta.setRank(rank);
+        if (showLink != null) meta.setShowLink(showLink);
+        if (showParent != null) meta.setShowParent(showParent);
+        if (keepAlive != null) meta.setKeepAlive(keepAlive);
+        if (frameSrc != null) meta.setFrameSrc(frameSrc);
+        if (frameLoading != null) meta.setFrameLoading(frameLoading);
+        if (hiddenTag != null) meta.setHiddenTag(hiddenTag);
         menu.setMetaInfo(meta);
-        if (data.containsKey("title")) menu.setMenuName((String) data.get("title"));
-        if (menu.getStatus() == null) menu.setStatus(1);
+        if (title != null) menu.setMenuName(title);
     }
 
     private int getInt(Map<String, Object> map, String key, int defaultValue) {
-        Object val = map.get(key);
-        if (val instanceof Number) {
-            return ((Number) val).intValue();
-        }
-        return defaultValue;
+        return Optional.ofNullable(map.get(key))
+                .filter(Number.class::isInstance)
+                .map(Number.class::cast)
+                .map(Number::intValue)
+                .orElse(defaultValue);
     }
 }
