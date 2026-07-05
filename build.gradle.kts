@@ -52,6 +52,7 @@ subprojects {
             lineEndings = com.diffplug.spotless.LineEnding.UNIX
             java {
                 target("src/*/java/**/*.java")
+                targetExclude("src/*/java/**/dto/request/**/*.java")
                 googleJavaFormat("1.35.0").aosp()
                 removeUnusedImports()
                 trimTrailingWhitespace()
