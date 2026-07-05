@@ -18,12 +18,6 @@ public class UserDTO {
     /** 用户ID */
     private Long userId;
 
-    /** 职位ID */
-    private Long postId;
-
-    /** 职位名称 */
-    private String postName;
-
     /** 角色ID */
     private Long roleId;
 
@@ -109,9 +103,6 @@ public class UserDTO {
             this.updateTime = user.getUpdateTime();
             this.remark = user.getRemark();
 
-            // 职位ID
-            this.postId = user.getPostId();
-
             // 部门ID
             this.deptId = user.getDeptId();
 
@@ -122,7 +113,7 @@ public class UserDTO {
             this.creatorId = user.getCreatorId();
             this.updaterId = user.getUpdaterId();
 
-            // 注意：部门名称、角色名称、职位名称、创建者名称、修改者名称需要额外查询获取
+            // 注意：部门名称、角色名称、创建者名称、修改者名称需要额外查询获取
             // 这些字段暂时保留为null，需要在业务层通过额外查询填充
         }
     }

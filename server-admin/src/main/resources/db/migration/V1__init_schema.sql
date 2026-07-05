@@ -4,7 +4,6 @@
 CREATE TABLE IF NOT EXISTS sys_user
 (
     user_id      BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    post_id      BIGINT,
     role_id      BIGINT,
     dept_id      BIGINT,
     username     VARCHAR(64)             NOT NULL,

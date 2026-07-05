@@ -27,8 +27,6 @@ public class SysUser extends BaseEntity<SysUser> {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
 
-    private Long postId;
-
     private Long roleId;
 
     private Long deptId;
