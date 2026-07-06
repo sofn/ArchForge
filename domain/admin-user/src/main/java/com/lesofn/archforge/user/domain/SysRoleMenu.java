@@ -16,9 +16,11 @@ import org.hibernate.annotations.DynamicUpdate;
 @IdClass(SysRoleMenu.SysRoleMenuId.class)
 public class SysRoleMenu {
 
-    @Id private Long roleId;
+    @Id
+    private Long roleId;
 
-    @Id private Long menuId;
+    @Id
+    private Long menuId;
 
     @Data
     @Accessors(chain = true)

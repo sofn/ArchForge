@@ -5,23 +5,28 @@ import jakarta.persistence.metamodel.SingularAttribute;
 /**
  * Alias-aware, type-safe JPQL expression factory using JPA Static Metamodel.
  *
- * <p>Unlike {@link SafeExpr} (which produces bare attribute names), {@code AliasExpr} prefixes
+ * <p>
+ * Unlike {@link SafeExpr} (which produces bare attribute names), {@code AliasExpr} prefixes
  * every path with the query alias, so the generated fragments can be embedded directly into JPQL.
  *
- * <p>Usage:
+ * <p>
+ * Usage:
  *
- * <pre>{@code
- * AliasExpr o = AliasExpr.of("o");
+ * <pre>
+ * {
+ *     &#64;code
+ *     AliasExpr o = AliasExpr.of("o");
  *
- * // "COUNT(DISTINCT o.customer)" instead of "COUNT(DISTINCT customer)"
- * o.countDistinct(Order_.customer);
+ *     // "COUNT(DISTINCT o.customer)" instead of "COUNT(DISTINCT customer)"
+ *     o.countDistinct(Order_.customer);
  *
- * // "COALESCE(o.discountRate, 0)"
- * o.coalesce(Order_.discountRate, 0);
+ *     // "COALESCE(o.discountRate, 0)"
+ *     o.coalesce(Order_.discountRate, 0);
  *
- * // "UPPER(o.orderNo)"
- * o.upper(Order_.orderNo);
- * }</pre>
+ *     // "UPPER(o.orderNo)"
+ *     o.upper(Order_.orderNo);
+ * }
+ * </pre>
  *
  * @author sofn
  * @see SafeExpr

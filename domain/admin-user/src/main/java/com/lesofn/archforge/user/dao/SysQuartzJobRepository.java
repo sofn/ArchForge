@@ -7,8 +7,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface SysQuartzJobRepository
-        extends JpaRepository<SysQuartzJob, Long>, JpaSpecificationExecutor<SysQuartzJob> {
+public interface SysQuartzJobRepository extends JpaRepository<SysQuartzJob, Long>, JpaSpecificationExecutor<SysQuartzJob> {
 
     Optional<SysQuartzJob> findByJobNameAndJobGroup(String jobName, String jobGroup);
 

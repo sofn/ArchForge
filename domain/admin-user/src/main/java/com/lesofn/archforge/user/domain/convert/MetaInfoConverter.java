@@ -9,7 +9,5 @@ import jakarta.persistence.Converter;
 public class MetaInfoConverter extends AbstractJsonConverter<MetaDTO> {
 
     @Override
-    protected Class<MetaDTO> getTargetType() {
-        return MetaDTO.class;
-    }
+    protected Class<MetaDTO> getTargetType() { return MetaDTO.class; }
 }

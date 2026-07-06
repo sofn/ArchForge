@@ -19,11 +19,7 @@ public enum ApiStatus {
         this.desc = desc;
     }
 
-    public int getId() {
-        return id;
-    }
+    public int getId() { return id; }
 
-    public String getDesc() {
-        return desc;
-    }
+    public String getDesc() { return desc; }
 }

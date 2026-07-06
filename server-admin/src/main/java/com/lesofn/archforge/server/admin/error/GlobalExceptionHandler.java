@@ -10,8 +10,7 @@ import org.springframework.web.servlet.ModelAndView;
 @Component
 public class GlobalExceptionHandler implements HandlerExceptionResolver {
 
-    public static final String GlobalExceptionAttribute =
-            GlobalExceptionHandler.class.getName() + ".ERROR";
+    public static final String GlobalExceptionAttribute = GlobalExceptionHandler.class.getName() + ".ERROR";
 
     public ModelAndView resolveException(
             HttpServletRequest request,

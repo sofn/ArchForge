@@ -36,20 +36,18 @@ public class RedisCacheService {
 
         refreshTokenCache = new RedisCacheTemplate<>(redisUtil, CacheKeyEnum.REFRESH_TOKEN);
 
-        userCache =
-                new RedisCacheTemplate<>(redisUtil, CacheKeyEnum.USER_ENTITY_KEY) {
-                    @Override
-                    public SysUser getObjectFromDb(Object id) {
-                        return sysUserService.findById((Long) id).orElse(null);
-                    }
-                };
+        userCache = new RedisCacheTemplate<>(redisUtil, CacheKeyEnum.USER_ENTITY_KEY) {
+            @Override
+            public SysUser getObjectFromDb(Object id) {
+                return sysUserService.findById((Long) id).orElse(null);
+            }
+        };
 
-        roleCache =
-                new RedisCacheTemplate<>(redisUtil, CacheKeyEnum.ROLE_ENTITY_KEY) {
-                    @Override
-                    public SysRole getObjectFromDb(Object id) {
-                        return sysRoleService.findById((Long) id).orElse(null);
-                    }
-                };
+        roleCache = new RedisCacheTemplate<>(redisUtil, CacheKeyEnum.ROLE_ENTITY_KEY) {
+            @Override
+            public SysRole getObjectFromDb(Object id) {
+                return sysRoleService.findById((Long) id).orElse(null);
+            }
+        };
     }
 }

@@ -40,10 +40,9 @@ public class AccessDeniedHandlerImpl implements AccessDeniedHandler {
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding(StandardCharsets.UTF_8.name());
 
-        ResponseResult<String> result =
-                ResponseResult.error(
-                        SystemErrorCode.COMMON_REQUEST_FORBIDDEN.getCode(),
-                        SystemErrorCode.COMMON_REQUEST_FORBIDDEN.getMsg());
+        ResponseResult<String> result = ResponseResult.error(
+                SystemErrorCode.COMMON_REQUEST_FORBIDDEN.getCode(),
+                SystemErrorCode.COMMON_REQUEST_FORBIDDEN.getMsg());
 
         ObjectMapper objectMapper = new ObjectMapper();
         String jsonResult = objectMapper.writeValueAsString(result);

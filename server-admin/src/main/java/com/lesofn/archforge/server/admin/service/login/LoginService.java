@@ -67,10 +67,8 @@ public class LoginService {
         Authentication authentication;
         try {
             String decryptedPassword = decryptPassword(loginCommand.getPassword());
-            authentication =
-                    authenticationManager.authenticate(
-                            new UsernamePasswordAuthenticationToken(
-                                    loginCommand.getUsername(), decryptedPassword));
+            authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(loginCommand.getUsername(), decryptedPassword));
         } catch (BadCredentialsException e) {
             log.info("用户[{}]登录失败，用户名或密码错误", loginCommand.getUsername());
             loginAttemptService.recordFailure(loginCommand.getUsername());
@@ -100,13 +98,9 @@ public class LoginService {
             this.loginUser = loginUser;
         }
 
-        public String getToken() {
-            return token;
-        }
+        public String getToken() { return token; }
 
-        public SystemLoginUser getLoginUser() {
-            return loginUser;
-        }
+        public SystemLoginUser getLoginUser() { return loginUser; }
     }
 
     private void validateCaptcha(String uuid, String code) {

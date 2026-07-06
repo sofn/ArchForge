@@ -16,7 +16,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
  */
 public class AuthenticationUtils {
 
-    private AuthenticationUtils() {}
+    private AuthenticationUtils() {
+    }
 
     /** 用户ID */
     public static Long getUserId() {

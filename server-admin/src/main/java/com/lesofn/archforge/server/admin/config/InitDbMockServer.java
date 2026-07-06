@@ -23,7 +23,8 @@ import org.springframework.stereotype.Component;
 @ConditionalOnProperty(name = "arch-forge.embedded.db-init", havingValue = "true")
 public class InitDbMockServer {
 
-    @Resource private DataSource dataSource;
+    @Resource
+    private DataSource dataSource;
 
     @PostConstruct
     public void init() {
@@ -55,41 +56,40 @@ public class InitDbMockServer {
     private void resetSequences(DataSource ds) {
         JdbcTemplate jdbc = new JdbcTemplate(ds);
         String[] sequences = {
-            "sys_user_user_id_seq",
-            "sys_menu_menu_id_seq",
-            "sys_role_role_id_seq",
-            "sys_dept_dept_id_seq",
-            "sys_config_config_id_seq",
-            "sys_notice_notice_id_seq",
-            "sys_oper_log_oper_id_seq",
-            "sys_login_log_info_id_seq"
+                "sys_user_user_id_seq",
+                "sys_menu_menu_id_seq",
+                "sys_role_role_id_seq",
+                "sys_dept_dept_id_seq",
+                "sys_config_config_id_seq",
+                "sys_notice_notice_id_seq",
+                "sys_oper_log_oper_id_seq",
+                "sys_login_log_info_id_seq"
         };
         String[] tables = {
-            "sys_user",
-            "sys_menu",
-            "sys_role",
-            "sys_dept",
-            "sys_config",
-            "sys_notice",
-            "sys_oper_log",
-            "sys_login_log"
+                "sys_user",
+                "sys_menu",
+                "sys_role",
+                "sys_dept",
+                "sys_config",
+                "sys_notice",
+                "sys_oper_log",
+                "sys_login_log"
         };
         String[] idCols = {
-            "user_id",
-            "menu_id",
-            "role_id",
-            "dept_id",
-            "config_id",
-            "notice_id",
-            "oper_id",
-            "info_id"
+                "user_id",
+                "menu_id",
+                "role_id",
+                "dept_id",
+                "config_id",
+                "notice_id",
+                "oper_id",
+                "info_id"
         };
         for (int i = 0; i < sequences.length; i++) {
             try {
-                String sql =
-                        String.format(
-                                "SELECT setval('%s', COALESCE((SELECT MAX(%s) FROM %s), 1))",
-                                sequences[i], idCols[i], tables[i]);
+                String sql = String.format(
+                        "SELECT setval('%s', COALESCE((SELECT MAX(%s) FROM %s), 1))",
+                        sequences[i], idCols[i], tables[i]);
                 jdbc.execute(sql);
             } catch (Exception e) {
                 log.warn("重置序列 {} 失败: {}", sequences[i], e.getMessage());

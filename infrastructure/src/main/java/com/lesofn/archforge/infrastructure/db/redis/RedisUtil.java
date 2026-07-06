@@ -17,7 +17,9 @@ import org.springframework.stereotype.Component;
  *
  * @author sofn
  */
-@SuppressWarnings(value = {"unchecked", "rawtypes"})
+@SuppressWarnings(value = {
+        "unchecked", "rawtypes"
+})
 @Component
 public class RedisUtil {
 

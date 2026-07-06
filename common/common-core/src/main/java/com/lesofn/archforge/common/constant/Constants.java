@@ -6,7 +6,8 @@ package com.lesofn.archforge.common.constant;
  * @author sofn
  */
 public class Constants {
-    private Constants() {}
+    private Constants() {
+    }
 
     public static final int KB = 1024;
 
@@ -22,7 +23,8 @@ public class Constants {
 
     public static class Token {
 
-        private Token() {}
+        private Token() {
+        }
 
         /** 令牌前缀 */
         public static final String PREFIX = "Bearer ";
@@ -33,7 +35,8 @@ public class Constants {
 
     public static class Captcha {
 
-        private Captcha() {}
+        private Captcha() {
+        }
 
         /** 令牌 */
         public static final String MATH_TYPE = "math";
@@ -47,7 +50,8 @@ public class Constants {
 
     public static class UploadSubDir {
 
-        private UploadSubDir() {}
+        private UploadSubDir() {
+        }
 
         public static final String IMPORT_PATH = "import";
 

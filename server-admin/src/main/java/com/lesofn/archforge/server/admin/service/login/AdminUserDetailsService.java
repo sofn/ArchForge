@@ -60,14 +60,8 @@ public class AdminUserDetailsService implements UserDetailsService {
         }
 
         RoleInfo roleInfo = getRoleInfo(user.getRoleId(), user.getIsAdmin());
-        SystemLoginUser loginUser =
-                new SystemLoginUser(
-                        user.getUserId(),
-                        user.getIsAdmin(),
-                        user.getUsername(),
-                        user.getPassword(),
-                        roleInfo,
-                        user.getDeptId());
+        SystemLoginUser loginUser = new SystemLoginUser(user.getUserId(), user.getIsAdmin(), user.getUsername(), user
+                .getPassword(), roleInfo, user.getDeptId());
 
         // 填充用户权限信息到authorities中
         if (roleInfo != null && roleInfo.getMenuPermissions() != null) {
@@ -88,9 +82,8 @@ public class AdminUserDetailsService implements UserDetailsService {
 
         loginUser.fillLoginInfo();
         loginUser.setAutoRefreshCacheTime(
-                loginUser.getLoginInfo().getLoginTime()
-                        + TimeUnit.MINUTES.toMillis(
-                                appForgeConfig.getToken().getAutoRefreshTime()));
+                loginUser.getLoginInfo().getLoginTime() + TimeUnit.MINUTES.toMillis(
+                        appForgeConfig.getToken().getAutoRefreshTime()));
         return loginUser;
     }
 
@@ -102,16 +95,10 @@ public class AdminUserDetailsService implements UserDetailsService {
         if (isAdmin) {
             List<SysMenu> allMenus = menuService.findAllActiveMenus();
 
-            Set<Long> allMenuIds =
-                    allMenus.stream().map(SysMenu::getMenuId).collect(Collectors.toSet());
+            Set<Long> allMenuIds = allMenus.stream().map(SysMenu::getMenuId).collect(Collectors.toSet());
 
-            return new RoleInfo(
-                    RoleInfo.ADMIN_ROLE_ID,
-                    RoleInfo.ADMIN_ROLE_KEY,
-                    DataScopeEnum.ALL,
-                    Collections.emptySet(),
-                    RoleInfo.ADMIN_PERMISSIONS,
-                    allMenuIds);
+            return new RoleInfo(RoleInfo.ADMIN_ROLE_ID, RoleInfo.ADMIN_ROLE_KEY, DataScopeEnum.ALL, Collections
+                    .emptySet(), RoleInfo.ADMIN_PERMISSIONS, allMenuIds);
         }
 
         SysRole role = roleService.getById(roleId);
@@ -123,21 +110,17 @@ public class AdminUserDetailsService implements UserDetailsService {
         List<SysMenu> menuList = roleService.getMenuListByRoleId(roleId);
 
         Set<Long> menuIds = menuList.stream().map(SysMenu::getMenuId).collect(Collectors.toSet());
-        Set<String> permissions =
-                menuList.stream().map(SysMenu::getPermission).collect(Collectors.toSet());
+        Set<String> permissions = menuList.stream().map(SysMenu::getPermission).collect(Collectors.toSet());
 
-        DataScopeEnum dataScopeEnum =
-                BasicEnumUtil.fromValue(DataScopeEnum.class, role.getDataScope());
+        DataScopeEnum dataScopeEnum = BasicEnumUtil.fromValue(DataScopeEnum.class, role.getDataScope());
 
         Set<Long> deptIdSet = Collections.emptySet();
         if (StringUtils.isNotEmpty(role.getDeptIdSet())) {
-            deptIdSet =
-                    Arrays.stream(StringUtils.split(role.getDeptIdSet(), ","))
-                            .map(NumberUtils::toLong)
-                            .collect(Collectors.toSet());
+            deptIdSet = Arrays.stream(StringUtils.split(role.getDeptIdSet(), ","))
+                    .map(NumberUtils::toLong)
+                    .collect(Collectors.toSet());
         }
 
-        return new RoleInfo(
-                roleId, role.getRoleKey(), dataScopeEnum, deptIdSet, permissions, menuIds);
+        return new RoleInfo(roleId, role.getRoleKey(), dataScopeEnum, deptIdSet, permissions, menuIds);
     }
 }

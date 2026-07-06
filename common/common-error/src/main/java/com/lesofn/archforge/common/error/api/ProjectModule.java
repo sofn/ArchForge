@@ -28,24 +28,9 @@ public interface ProjectModule {
         if (input != SystemProjectModule.INSTANCE) {
             Preconditions.checkState(
                     required == input,
-                    "module not match, need: "
-                            + required.getProjectName()
-                            + "-"
-                            + required.getModuleName()
-                            + "("
-                            + required.getProjectCode()
-                            + "-"
-                            + required.getModuleCode()
-                            + ")"
-                            + " but input: "
-                            + input.getProjectName()
-                            + "-"
-                            + input.getModuleName()
-                            + "("
-                            + input.getProjectCode()
-                            + "-"
-                            + input.getModuleCode()
-                            + ")");
+                    "module not match, need: " + required.getProjectName() + "-" + required.getModuleName() + "(" + required
+                            .getProjectCode() + "-" + required.getModuleCode() + ")" + " but input: " + input.getProjectName() +
+                            "-" + input.getModuleName() + "(" + input.getProjectCode() + "-" + input.getModuleCode() + ")");
         }
     }
 }

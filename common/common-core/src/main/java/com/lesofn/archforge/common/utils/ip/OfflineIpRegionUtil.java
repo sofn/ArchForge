@@ -15,11 +15,11 @@ public class OfflineIpRegionUtil {
 
     private static Searcher searcher;
 
-    private OfflineIpRegionUtil() {}
+    private OfflineIpRegionUtil() {
+    }
 
     static {
-        InputStream resourceAsStream =
-                OfflineIpRegionUtil.class.getResourceAsStream("/ip2region.xdb");
+        InputStream resourceAsStream = OfflineIpRegionUtil.class.getResourceAsStream("/ip2region.xdb");
 
         byte[] bytes = null;
         try {

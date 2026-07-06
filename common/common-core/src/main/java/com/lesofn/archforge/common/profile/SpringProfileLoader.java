@@ -10,7 +10,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class SpringProfileLoader {
 
-    @Autowired private Environment env;
+    @Autowired
+    private Environment env;
 
     private Env envVar;
 
@@ -29,17 +30,11 @@ public class SpringProfileLoader {
         return envVar;
     }
 
-    public boolean isDev() {
-        return this.getEnv() == Env.dev;
-    }
+    public boolean isDev() { return this.getEnv() == Env.dev; }
 
-    public boolean isTest() {
-        return this.getEnv() == Env.test;
-    }
+    public boolean isTest() { return this.getEnv() == Env.test; }
 
-    public boolean isProd() {
-        return this.getEnv() == Env.prod;
-    }
+    public boolean isProd() { return this.getEnv() == Env.prod; }
 
     public boolean accept(Env env) {
         return this.getEnv() == env;

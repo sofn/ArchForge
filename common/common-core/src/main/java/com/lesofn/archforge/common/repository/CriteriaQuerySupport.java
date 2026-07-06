@@ -14,7 +14,8 @@ import java.util.List;
  * Base class for custom repository implementations that use JPA Criteria API + Hibernate Static
  * Metamodel for type-safe queries.
  *
- * <p>Subclasses are auto-instantiated by Spring Data JPA. The correct {@link EntityManager} is
+ * <p>
+ * Subclasses are auto-instantiated by Spring Data JPA. The correct {@link EntityManager} is
  * injected based on the {@code entityManagerFactoryRef} configured in
  * {@code @EnableJpaRepositories}.
  *

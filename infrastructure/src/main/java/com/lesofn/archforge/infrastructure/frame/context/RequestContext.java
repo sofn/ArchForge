@@ -46,41 +46,23 @@ public class RequestContext implements Serializable {
         attribute = new HashMap<>();
     }
 
-    public @Nullable String getRequestId() {
-        return requestId;
-    }
+    public @Nullable String getRequestId() { return requestId; }
 
-    public void setRequestId(@Nullable String requestId) {
-        this.requestId = requestId;
-    }
+    public void setRequestId(@Nullable String requestId) { this.requestId = requestId; }
 
-    public long getCurrentUid() {
-        return currentUid;
-    }
+    public long getCurrentUid() { return currentUid; }
 
-    public void setCurrentUid(long currentUid) {
-        this.currentUid = currentUid;
-    }
+    public void setCurrentUid(long currentUid) { this.currentUid = currentUid; }
 
-    public @Nullable String getIp() {
-        return ip;
-    }
+    public @Nullable String getIp() { return ip; }
 
-    public void setIp(@Nullable String ip) {
-        this.ip = ip;
-    }
+    public void setIp(@Nullable String ip) { this.ip = ip; }
 
-    public int getAppId() {
-        return appId;
-    }
+    public int getAppId() { return appId; }
 
-    public void setAppId(int appId) {
-        this.appId = appId;
-    }
+    public void setAppId(int appId) { this.appId = appId; }
 
-    public @Nullable ClientVersion getClientVersion() {
-        return clientVersion;
-    }
+    public @Nullable ClientVersion getClientVersion() { return clientVersion; }
 
     public void setClientVersion(@Nullable ClientVersion clientVersion) {
         if (clientVersion != null) {
@@ -88,23 +70,15 @@ public class RequestContext implements Serializable {
         }
     }
 
-    public boolean isOfficialApp() {
-        return isOfficialApp;
-    }
+    public boolean isOfficialApp() { return isOfficialApp; }
 
-    public void setOfficialApp(boolean isOfficialApp) {
-        this.isOfficialApp = isOfficialApp;
-    }
+    public void setOfficialApp(boolean isOfficialApp) { this.isOfficialApp = isOfficialApp; }
 
     // 貌似是jackson的bug,transient 变量的 annotation必须加到方法上才起作用
     @JsonIgnore
-    public HttpServletRequest getOriginRequest() {
-        return originRequest;
-    }
+    public HttpServletRequest getOriginRequest() { return originRequest; }
 
-    public void setOriginRequest(HttpServletRequest originRequest) {
-        this.originRequest = originRequest;
-    }
+    public void setOriginRequest(HttpServletRequest originRequest) { this.originRequest = originRequest; }
 
     public @Nullable Object getAttribute(String name) {
         return this.attribute.get(name);
@@ -128,21 +102,32 @@ public class RequestContext implements Serializable {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null) return false;
-        if (getClass() != obj.getClass()) return false;
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
         RequestContext other = (RequestContext) obj;
-        if (appId != other.appId) return false;
+        if (appId != other.appId)
+            return false;
         if (clientVersion == null) {
-            if (other.clientVersion != null) return false;
-        } else if (!clientVersion.equals(other.clientVersion)) return false;
-        if (currentUid != other.currentUid) return false;
+            if (other.clientVersion != null)
+                return false;
+        } else if (!clientVersion.equals(other.clientVersion))
+            return false;
+        if (currentUid != other.currentUid)
+            return false;
         if (ip == null) {
-            if (other.ip != null) return false;
-        } else if (!ip.equals(other.ip)) return false;
+            if (other.ip != null)
+                return false;
+        } else if (!ip.equals(other.ip))
+            return false;
         if (requestId == null) {
-            if (other.requestId != null) return false;
-        } else if (!requestId.equals(other.requestId)) return false;
+            if (other.requestId != null)
+                return false;
+        } else if (!requestId.equals(other.requestId))
+            return false;
         return true;
     }
 
@@ -155,11 +140,7 @@ public class RequestContext implements Serializable {
         }
     }
 
-    public String getPlatform() {
-        return platform;
-    }
+    public String getPlatform() { return platform; }
 
-    public void setPlatform(String platform) {
-        this.platform = platform;
-    }
+    public void setPlatform(String platform) { this.platform = platform; }
 }

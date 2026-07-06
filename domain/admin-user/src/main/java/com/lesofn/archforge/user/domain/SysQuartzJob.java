@@ -20,10 +20,11 @@ import org.hibernate.annotations.DynamicUpdate;
 @Entity
 @Table(
         name = "sys_quartz_job",
-        uniqueConstraints =
-                @UniqueConstraint(
-                        name = "uk_sys_quartz_job_name_group",
-                        columnNames = {"job_name", "job_group"}))
+        uniqueConstraints = @UniqueConstraint(
+                name = "uk_sys_quartz_job_name_group",
+                columnNames = {
+                        "job_name", "job_group"
+                }))
 @DynamicInsert
 @DynamicUpdate
 public class SysQuartzJob extends BaseEntity<SysQuartzJob> {
@@ -59,13 +60,9 @@ public class SysQuartzJob extends BaseEntity<SysQuartzJob> {
 
     private Short status;
 
-    public boolean isPaused() {
-        return status != null && status == STATUS_PAUSED;
-    }
+    public boolean isPaused() { return status != null && status == STATUS_PAUSED; }
 
-    public boolean isRunning() {
-        return status != null && status == STATUS_RUNNING;
-    }
+    public boolean isRunning() { return status != null && status == STATUS_RUNNING; }
 
     public SysQuartzJob pause() {
         this.status = STATUS_PAUSED;

@@ -19,7 +19,8 @@ import org.springframework.transaction.PlatformTransactionManager;
         transactionManagerRef = "taskTransactionManager")
 public class TaskDbConfig {
 
-    @Resource private DataSource dataSource;
+    @Resource
+    private DataSource dataSource;
 
     @Bean
     PlatformTransactionManager taskTransactionManager() {
@@ -34,8 +35,7 @@ public class TaskDbConfig {
         jpaVendorAdapter.setShowSql(false);
         jpaVendorAdapter.setDatabasePlatform("org.hibernate.dialect.PostgreSQLDialect");
 
-        LocalContainerEntityManagerFactoryBean factoryBean =
-                new LocalContainerEntityManagerFactoryBean();
+        LocalContainerEntityManagerFactoryBean factoryBean = new LocalContainerEntityManagerFactoryBean();
 
         factoryBean.setDataSource(new GroupDataSourceProxy(dataSource, "task"));
         factoryBean.setJpaVendorAdapter(jpaVendorAdapter);

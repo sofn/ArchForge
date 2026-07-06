@@ -22,10 +22,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
         builder.configureMessageConvertersList(
                 converters -> {
                     // Add a ByteArrayHttpMessageConverter with JSON support at the front
-                    ByteArrayHttpMessageConverter byteConverter =
-                            new ByteArrayHttpMessageConverter();
-                    List<MediaType> mediaTypes =
-                            new java.util.ArrayList<>(byteConverter.getSupportedMediaTypes());
+                    ByteArrayHttpMessageConverter byteConverter = new ByteArrayHttpMessageConverter();
+                    List<MediaType> mediaTypes = new java.util.ArrayList<>(byteConverter.getSupportedMediaTypes());
                     if (!mediaTypes.contains(MediaType.APPLICATION_JSON)) {
                         mediaTypes.add(MediaType.APPLICATION_JSON);
                     }

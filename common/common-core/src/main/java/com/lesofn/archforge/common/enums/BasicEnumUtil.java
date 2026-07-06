@@ -10,7 +10,8 @@ import org.apache.commons.lang3.BooleanUtils;
  */
 public class BasicEnumUtil {
 
-    private BasicEnumUtil() {}
+    private BasicEnumUtil() {
+    }
 
     public static final String UNKNOWN = "未知";
 

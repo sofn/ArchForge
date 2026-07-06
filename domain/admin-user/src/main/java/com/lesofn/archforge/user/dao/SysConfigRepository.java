@@ -7,8 +7,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface SysConfigRepository
-        extends JpaRepository<SysConfig, Long>, JpaSpecificationExecutor<SysConfig> {
+public interface SysConfigRepository extends JpaRepository<SysConfig, Long>, JpaSpecificationExecutor<SysConfig> {
 
     Optional<SysConfig> findByConfigKey(String configKey);
 }

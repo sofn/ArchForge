@@ -46,16 +46,11 @@ public class ServerMonitorService {
             GlobalMemory memory = hal.getMemory();
 
             try (StructuredTaskScope<Object, Void> scope = StructuredTaskScope.open()) {
-                StructuredTaskScope.Subtask<Map<String, Object>> cpuTask =
-                        scope.fork(() -> getCpuInfo(processor));
-                StructuredTaskScope.Subtask<Map<String, Object>> memTask =
-                        scope.fork(() -> getMemoryInfo(memory));
-                StructuredTaskScope.Subtask<Map<String, Object>> jvmTask =
-                        scope.fork(() -> getJvmInfo());
-                StructuredTaskScope.Subtask<Map<String, Object>> osTask =
-                        scope.fork(() -> getOsInfo(os));
-                StructuredTaskScope.Subtask<List<Map<String, Object>>> diskTask =
-                        scope.fork(() -> getDiskInfo(os));
+                StructuredTaskScope.Subtask<Map<String, Object>> cpuTask = scope.fork(() -> getCpuInfo(processor));
+                StructuredTaskScope.Subtask<Map<String, Object>> memTask = scope.fork(() -> getMemoryInfo(memory));
+                StructuredTaskScope.Subtask<Map<String, Object>> jvmTask = scope.fork(() -> getJvmInfo());
+                StructuredTaskScope.Subtask<Map<String, Object>> osTask = scope.fork(() -> getOsInfo(os));
+                StructuredTaskScope.Subtask<List<Map<String, Object>>> diskTask = scope.fork(() -> getDiskInfo(os));
                 scope.join();
 
                 result.put("cpu", cpuTask.get());
@@ -86,27 +81,15 @@ public class ServerMonitorService {
         }
         long[] ticks = processor.getSystemCpuLoadTicks();
 
-        long user =
-                ticks[CentralProcessor.TickType.USER.getIndex()]
-                        - prevTicks[CentralProcessor.TickType.USER.getIndex()];
-        long nice =
-                ticks[CentralProcessor.TickType.NICE.getIndex()]
-                        - prevTicks[CentralProcessor.TickType.NICE.getIndex()];
-        long sys =
-                ticks[CentralProcessor.TickType.SYSTEM.getIndex()]
-                        - prevTicks[CentralProcessor.TickType.SYSTEM.getIndex()];
-        long idle =
-                ticks[CentralProcessor.TickType.IDLE.getIndex()]
-                        - prevTicks[CentralProcessor.TickType.IDLE.getIndex()];
-        long iowait =
-                ticks[CentralProcessor.TickType.IOWAIT.getIndex()]
-                        - prevTicks[CentralProcessor.TickType.IOWAIT.getIndex()];
-        long irq =
-                ticks[CentralProcessor.TickType.IRQ.getIndex()]
-                        - prevTicks[CentralProcessor.TickType.IRQ.getIndex()];
-        long softirq =
-                ticks[CentralProcessor.TickType.SOFTIRQ.getIndex()]
-                        - prevTicks[CentralProcessor.TickType.SOFTIRQ.getIndex()];
+        long user = ticks[CentralProcessor.TickType.USER.getIndex()] - prevTicks[CentralProcessor.TickType.USER.getIndex()];
+        long nice = ticks[CentralProcessor.TickType.NICE.getIndex()] - prevTicks[CentralProcessor.TickType.NICE.getIndex()];
+        long sys = ticks[CentralProcessor.TickType.SYSTEM.getIndex()] - prevTicks[CentralProcessor.TickType.SYSTEM.getIndex()];
+        long idle = ticks[CentralProcessor.TickType.IDLE.getIndex()] - prevTicks[CentralProcessor.TickType.IDLE.getIndex()];
+        long iowait = ticks[CentralProcessor.TickType.IOWAIT.getIndex()] - prevTicks[CentralProcessor.TickType.IOWAIT
+                .getIndex()];
+        long irq = ticks[CentralProcessor.TickType.IRQ.getIndex()] - prevTicks[CentralProcessor.TickType.IRQ.getIndex()];
+        long softirq = ticks[CentralProcessor.TickType.SOFTIRQ.getIndex()] - prevTicks[CentralProcessor.TickType.SOFTIRQ
+                .getIndex()];
         long total = user + nice + sys + idle + iowait + irq + softirq;
 
         cpu.put("userUsage", total > 0 ? Double.parseDouble(DF.format(100.0 * user / total)) : 0);
@@ -186,7 +169,8 @@ public class ServerMonitorService {
             long total = store.getTotalSpace();
             long usable = store.getUsableSpace();
             long used = total - usable;
-            if (total <= 0) continue;
+            if (total <= 0)
+                continue;
 
             Map<String, Object> disk = new LinkedHashMap<>();
             disk.put("name", store.getName());
@@ -202,9 +186,12 @@ public class ServerMonitorService {
     }
 
     private String formatBytes(long bytes) {
-        if (bytes < 1024) return bytes + " B";
-        if (bytes < 1024 * 1024) return DF.format(bytes / 1024.0) + " KB";
-        if (bytes < 1024L * 1024 * 1024) return DF.format(bytes / (1024.0 * 1024)) + " MB";
+        if (bytes < 1024)
+            return bytes + " B";
+        if (bytes < 1024 * 1024)
+            return DF.format(bytes / 1024.0) + " KB";
+        if (bytes < 1024L * 1024 * 1024)
+            return DF.format(bytes / (1024.0 * 1024)) + " MB";
         return DF.format(bytes / (1024.0 * 1024 * 1024)) + " GB";
     }
 }

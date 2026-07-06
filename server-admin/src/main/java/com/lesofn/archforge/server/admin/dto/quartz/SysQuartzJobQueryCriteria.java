@@ -15,9 +15,12 @@ public class SysQuartzJobQueryCriteria {
     @Query(type = Query.Type.INNER_LIKE)
     private String jobName;
 
-    @Query private String jobGroup;
+    @Query
+    private String jobGroup;
 
-    @Query private Short status;
+    @Query
+    private Short status;
 
-    @Query private Boolean deleted;
+    @Query
+    private Boolean deleted;
 }

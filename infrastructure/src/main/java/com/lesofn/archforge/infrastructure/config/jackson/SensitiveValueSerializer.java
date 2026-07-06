@@ -9,7 +9,8 @@ import tools.jackson.databind.ser.std.StdSerializer;
 /**
  * 数据脱敏Jackson序列化器（Jackson 3.x）
  *
- * <p>将标注了 @Sensitive 注解的 String 字段在 JSON 序列化时自动进行脱敏处理
+ * <p>
+ * 将标注了 @Sensitive 注解的 String 字段在 JSON 序列化时自动进行脱敏处理
  *
  * @author sofn
  */

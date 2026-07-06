@@ -40,8 +40,7 @@ public class UserServiceImpl implements UserService {
         }
 
         // 设置权限列表
-        if (loginUser.getRoleInfo() != null
-                && loginUser.getRoleInfo().getMenuPermissions() != null) {
+        if (loginUser.getRoleInfo() != null && loginUser.getRoleInfo().getMenuPermissions() != null) {
             currentUserDTO.setPermissions(loginUser.getRoleInfo().getMenuPermissions());
         } else {
             currentUserDTO.setPermissions(new HashSet<>());

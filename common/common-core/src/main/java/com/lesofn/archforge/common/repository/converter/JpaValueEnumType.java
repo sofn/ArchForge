@@ -15,15 +15,15 @@ import org.hibernate.usertype.UserType;
  * @author sofn
  * @version 1.0 Created at: 2021-01-29 14:53 Updated for Hibernate 7.x compatibility
  */
-@SuppressWarnings({"rawtypes", "unchecked", "removal"})
+@SuppressWarnings({
+        "rawtypes", "unchecked", "removal"
+})
 public class JpaValueEnumType implements DynamicParameterizedType, UserType<Enum> {
 
     private Class<Enum> enumClass;
 
     @Override
-    public int getSqlType() {
-        return Types.INTEGER;
-    }
+    public int getSqlType() { return Types.INTEGER; }
 
     @Override
     public Class<Enum> returnedClass() {
@@ -55,8 +55,7 @@ public class JpaValueEnumType implements DynamicParameterizedType, UserType<Enum
                 }
             }
         }
-        throw new IllegalStateException(
-                "Unknown " + returnedClass().getSimpleName() + " value: " + value);
+        throw new IllegalStateException("Unknown " + returnedClass().getSimpleName() + " value: " + value);
     }
 
     @Override
@@ -75,9 +74,7 @@ public class JpaValueEnumType implements DynamicParameterizedType, UserType<Enum
     }
 
     @Override
-    public boolean isMutable() {
-        return false;
-    }
+    public boolean isMutable() { return false; }
 
     @Override
     public Serializable disassemble(Enum value) {
@@ -97,8 +94,7 @@ public class JpaValueEnumType implements DynamicParameterizedType, UserType<Enum
     @Override
     @SuppressWarnings("unchecked")
     public void setParameterValues(Properties parameters) {
-        ParameterType params =
-                (ParameterType) parameters.get(DynamicParameterizedType.PARAMETER_TYPE);
+        ParameterType params = (ParameterType) parameters.get(DynamicParameterizedType.PARAMETER_TYPE);
         enumClass = (Class<Enum>) params.getReturnedClass();
     }
 }

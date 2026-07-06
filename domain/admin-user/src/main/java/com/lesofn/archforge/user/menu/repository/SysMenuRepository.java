@@ -8,10 +8,7 @@ import org.springframework.stereotype.Repository;
 
 /** SysMenuRepository接口，定义Spring Data JPA方法 */
 @Repository
-public interface SysMenuRepository
-        extends JpaRepository<SysMenu, Long>,
-                JpaSpecificationExecutor<SysMenu>,
-                SysMenuRepositoryCustom {
+public interface SysMenuRepository extends JpaRepository<SysMenu, Long>, JpaSpecificationExecutor<SysMenu>, SysMenuRepositoryCustom {
 
     List<SysMenu> findByParentId(Long parentId);
 

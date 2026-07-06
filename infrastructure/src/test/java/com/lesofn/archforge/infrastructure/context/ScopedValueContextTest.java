@@ -39,24 +39,20 @@ public class ScopedValueContextTest {
                 () -> {
                     // ScopedValue automatically propagates to StructuredTaskScope child threads
                     try (var scope = StructuredTaskScope.open()) {
-                        var task1 =
-                                scope.fork(
-                                        () -> {
-                                            RequestContext childCtx =
-                                                    ScopedValueContext.getRequestContext();
-                                            assertNotNull(childCtx);
-                                            assertEquals("parent-request", childCtx.getRequestId());
-                                            return childCtx.getRequestId();
-                                        });
-                        var task2 =
-                                scope.fork(
-                                        () -> {
-                                            RequestContext childCtx =
-                                                    ScopedValueContext.getRequestContext();
-                                            assertNotNull(childCtx);
-                                            assertEquals(100, childCtx.getCurrentUid());
-                                            return childCtx.getCurrentUid();
-                                        });
+                        var task1 = scope.fork(
+                                () -> {
+                                    RequestContext childCtx = ScopedValueContext.getRequestContext();
+                                    assertNotNull(childCtx);
+                                    assertEquals("parent-request", childCtx.getRequestId());
+                                    return childCtx.getRequestId();
+                                });
+                        var task2 = scope.fork(
+                                () -> {
+                                    RequestContext childCtx = ScopedValueContext.getRequestContext();
+                                    assertNotNull(childCtx);
+                                    assertEquals(100, childCtx.getCurrentUid());
+                                    return childCtx.getCurrentUid();
+                                });
                         scope.join();
                         assertEquals("parent-request", task1.get());
                         assertEquals(100L, task2.get());

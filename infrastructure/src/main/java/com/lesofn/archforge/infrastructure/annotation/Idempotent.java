@@ -8,7 +8,8 @@ import java.lang.annotation.Target;
 /**
  * 防重复提交注解。
  *
- * <p>AOP 切面基于 Redis SETNX + TTL 实现，key 由用户标识 + 方法签名 + 参数哈希组成。
+ * <p>
+ * AOP 切面基于 Redis SETNX + TTL 实现，key 由用户标识 + 方法签名 + 参数哈希组成。
  *
  * @author sofn
  */

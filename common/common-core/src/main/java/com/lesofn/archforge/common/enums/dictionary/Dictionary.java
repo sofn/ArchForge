@@ -7,7 +7,9 @@ import java.lang.annotation.*;
  *
  * @author sofn
  */
-@Target({ElementType.TYPE})
+@Target({
+        ElementType.TYPE
+})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface Dictionary {

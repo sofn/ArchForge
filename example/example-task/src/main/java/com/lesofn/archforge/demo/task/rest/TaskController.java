@@ -22,7 +22,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class TaskController {
     private static Logger logger = LoggerFactory.getLogger(TaskController.class);
 
-    @Resource private TaskService taskService;
+    @Resource
+    private TaskService taskService;
 
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     public Page<Task> list(

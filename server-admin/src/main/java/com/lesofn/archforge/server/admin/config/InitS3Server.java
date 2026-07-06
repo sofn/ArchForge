@@ -29,17 +29,15 @@ public class InitS3Server {
     public InitS3Server() {
         try {
             log.info("Starting RustFS (S3) container via Testcontainers...");
-            s3Container =
-                    new GenericContainer<>(RUSTFS_IMAGE)
-                            .withExposedPorts(S3_PORT)
-                            .withEnv("RUSTFS_ROOT_USER", ACCESS_KEY)
-                            .withEnv("RUSTFS_ROOT_PASSWORD", SECRET_KEY)
-                            .withCommand("server", "/data")
-                            .waitingFor(new HttpWaitStrategy().forPort(S3_PORT).forPath("/health"));
+            s3Container = new GenericContainer<>(RUSTFS_IMAGE)
+                    .withExposedPorts(S3_PORT)
+                    .withEnv("RUSTFS_ROOT_USER", ACCESS_KEY)
+                    .withEnv("RUSTFS_ROOT_PASSWORD", SECRET_KEY)
+                    .withCommand("server", "/data")
+                    .waitingFor(new HttpWaitStrategy().forPort(S3_PORT).forPath("/health"));
             s3Container.start();
 
-            String endpoint =
-                    "http://" + s3Container.getHost() + ":" + s3Container.getMappedPort(S3_PORT);
+            String endpoint = "http://" + s3Container.getHost() + ":" + s3Container.getMappedPort(S3_PORT);
 
             System.setProperty("arch-forge.file-storage.type", "s3");
             System.setProperty("arch-forge.file-storage.s3.endpoint", endpoint);

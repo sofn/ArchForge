@@ -16,13 +16,9 @@ public class ApiLogger {
 
     private static Logger fireLog = LoggerFactory.getLogger("fire");
 
-    public static boolean isTraceEnabled() {
-        return log.isTraceEnabled() && !DefaultProfileLoader.isProd();
-    }
+    public static boolean isTraceEnabled() { return log.isTraceEnabled() && !DefaultProfileLoader.isProd(); }
 
-    public static boolean isDebugEnabled() {
-        return log.isDebugEnabled() && !DefaultProfileLoader.isProd();
-    }
+    public static boolean isDebugEnabled() { return log.isDebugEnabled() && !DefaultProfileLoader.isProd(); }
 
     public static void trace(Object msg) {
         log.trace(formatMsg(msg));

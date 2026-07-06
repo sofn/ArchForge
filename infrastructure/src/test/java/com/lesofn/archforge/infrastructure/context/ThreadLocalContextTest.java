@@ -28,13 +28,11 @@ public class ThreadLocalContextTest {
     public void testThreadLocalContextMultiThread() {
         final RequestContext context = ThreadLocalContext.getRequestContext();
         System.out.println(context.getRequestId());
-        Thread thread =
-                new Thread(
-                        () -> {
-                            RequestContext context2 = ThreadLocalContext.getRequestContext();
-                            System.out.println(context2.getRequestId());
-                            assertEquals(context.getRequestId(), context2.getRequestId());
-                        });
+        Thread thread = new Thread(() -> {
+            RequestContext context2 = ThreadLocalContext.getRequestContext();
+            System.out.println(context2.getRequestId());
+            assertEquals(context.getRequestId(), context2.getRequestId());
+        });
         thread.start();
         try {
             Thread.sleep(1000);
@@ -47,28 +45,25 @@ public class ThreadLocalContextTest {
         final RequestContext context = ThreadLocalContext.getRequestContext();
 
         ExecutorService executor = Executors.newFixedThreadPool(2);
-        Future<RequestContext> future =
-                executor.submit(
-                        () -> {
-                            Thread.sleep(1000);
-                            return ThreadLocalContext.getRequestContext();
-                        });
+        Future<RequestContext> future = executor.submit(
+                () -> {
+                    Thread.sleep(1000);
+                    return ThreadLocalContext.getRequestContext();
+                });
         ThreadLocalContext.clear();
 
         RequestContext context2 = ThreadLocalContext.getRequestContext();
 
-        Future<RequestContext> future2 =
-                executor.submit(
-                        () -> {
-                            Thread.sleep(1000);
-                            return ThreadLocalContext.getRequestContext();
-                        });
-        Future<RequestContext> future3 =
-                executor.submit(
-                        () -> {
-                            Thread.sleep(1000);
-                            return ThreadLocalContext.getRequestContext();
-                        });
+        Future<RequestContext> future2 = executor.submit(
+                () -> {
+                    Thread.sleep(1000);
+                    return ThreadLocalContext.getRequestContext();
+                });
+        Future<RequestContext> future3 = executor.submit(
+                () -> {
+                    Thread.sleep(1000);
+                    return ThreadLocalContext.getRequestContext();
+                });
         RequestContext context3 = future.get();
         RequestContext context4 = future2.get();
         RequestContext context5 = future3.get();

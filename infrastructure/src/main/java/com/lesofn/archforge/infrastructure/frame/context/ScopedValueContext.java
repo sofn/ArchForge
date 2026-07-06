@@ -5,7 +5,8 @@ import jakarta.servlet.http.HttpServletRequest;
 /**
  * JDK 25 ScopedValue-based request context propagation.
  *
- * <p>Replaces ThreadLocal-based context: automatic cleanup, virtual-thread friendly, no memory
+ * <p>
+ * Replaces ThreadLocal-based context: automatic cleanup, virtual-thread friendly, no memory
  * leaks.
  *
  * @author sofn
@@ -14,7 +15,8 @@ public final class ScopedValueContext {
 
     private static final ScopedValue<RequestContext> CONTEXT = ScopedValue.newInstance();
 
-    private ScopedValueContext() {}
+    private ScopedValueContext() {
+    }
 
     /**
      * Run an action within a request context scope. The context is automatically unbound when the
@@ -41,9 +43,7 @@ public final class ScopedValueContext {
     }
 
     /** Check if a request context is currently bound. */
-    public static boolean isBound() {
-        return CONTEXT.isBound();
-    }
+    public static boolean isBound() { return CONTEXT.isBound(); }
 
     /** Functional interface that allows checked exceptions. */
     @FunctionalInterface

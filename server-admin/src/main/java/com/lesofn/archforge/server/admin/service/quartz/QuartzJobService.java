@@ -41,8 +41,7 @@ public class QuartzJobService {
 
     @Transactional(readOnly = true)
     public Page<SysQuartzJob> page(SysQuartzJobQueryCriteria criteria, Pageable pageable) {
-        SysQuartzJobQueryCriteria effective =
-                criteria == null ? new SysQuartzJobQueryCriteria() : criteria;
+        SysQuartzJobQueryCriteria effective = criteria == null ? new SysQuartzJobQueryCriteria() : criteria;
         if (effective.getDeleted() == null) {
             effective.setDeleted(false);
         }
@@ -66,12 +65,14 @@ public class QuartzJobService {
     public Long add(SysQuartzJob input) {
         validateInput(input);
         if (jobRepository.existsByJobNameAndJobGroup(input.getJobName(), input.getJobGroup())) {
-            throw new IllegalArgumentException(
-                    "Quartz job already exists: " + input.getJobName() + "." + input.getJobGroup());
+            throw new IllegalArgumentException("Quartz job already exists: " + input.getJobName() + "." + input.getJobGroup());
         }
-        if (input.getStatus() == null) input.setStatus(SysQuartzJob.STATUS_PAUSED);
-        if (input.getMisfirePolicy() == null) input.setMisfirePolicy((short) 1);
-        if (input.getConcurrent() == null) input.setConcurrent(false);
+        if (input.getStatus() == null)
+            input.setStatus(SysQuartzJob.STATUS_PAUSED);
+        if (input.getMisfirePolicy() == null)
+            input.setMisfirePolicy((short) 1);
+        if (input.getConcurrent() == null)
+            input.setConcurrent(false);
         SysQuartzJob saved = jobRepository.save(input);
         try {
             schedule(saved);
@@ -92,8 +93,10 @@ public class QuartzJobService {
         existing.setMethodName(input.getMethodName());
         existing.setMethodParams(input.getMethodParams());
         existing.setCron(input.getCron());
-        if (input.getMisfirePolicy() != null) existing.setMisfirePolicy(input.getMisfirePolicy());
-        if (input.getConcurrent() != null) existing.setConcurrent(input.getConcurrent());
+        if (input.getMisfirePolicy() != null)
+            existing.setMisfirePolicy(input.getMisfirePolicy());
+        if (input.getConcurrent() != null)
+            existing.setConcurrent(input.getConcurrent());
         SysQuartzJob saved = jobRepository.save(existing);
         try {
             unschedule(saved);
@@ -161,23 +164,20 @@ public class QuartzJobService {
     // ---------- internal scheduler wiring ----------
 
     private void schedule(SysQuartzJob job) throws SchedulerException {
-        JobDetail detail =
-                JobBuilder.newJob(QuartzReflectionJob.class)
-                        .withIdentity(jobKey(job))
-                        .withDescription(job.getDescription())
-                        .storeDurably(false)
-                        .usingJobData(jobDataMap(job))
-                        .build();
+        JobDetail detail = JobBuilder.newJob(QuartzReflectionJob.class)
+                .withIdentity(jobKey(job))
+                .withDescription(job.getDescription())
+                .storeDurably(false)
+                .usingJobData(jobDataMap(job))
+                .build();
 
-        CronScheduleBuilder cronSchedule =
-                applyMisfirePolicy(
-                        CronScheduleBuilder.cronSchedule(job.getCron()), job.getMisfirePolicy());
+        CronScheduleBuilder cronSchedule = applyMisfirePolicy(
+                CronScheduleBuilder.cronSchedule(job.getCron()), job.getMisfirePolicy());
 
-        CronTrigger trigger =
-                TriggerBuilder.newTrigger()
-                        .withIdentity(triggerKey(job))
-                        .withSchedule(cronSchedule)
-                        .build();
+        CronTrigger trigger = TriggerBuilder.newTrigger()
+                .withIdentity(triggerKey(job))
+                .withSchedule(cronSchedule)
+                .build();
 
         scheduler.scheduleJob(detail, trigger);
 
@@ -213,7 +213,8 @@ public class QuartzJobService {
 
     private static CronScheduleBuilder applyMisfirePolicy(
             CronScheduleBuilder builder, Short policy) {
-        if (policy == null) return builder;
+        if (policy == null)
+            return builder;
         return switch (policy.intValue()) {
             case 1 -> builder.withMisfireHandlingInstructionDoNothing();
             case 2 -> builder.withMisfireHandlingInstructionFireAndProceed();

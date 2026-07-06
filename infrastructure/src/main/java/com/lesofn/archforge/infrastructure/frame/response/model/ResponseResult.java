@@ -19,9 +19,7 @@ public class ResponseResult<T> extends ErrorInfo {
     }
 
     public static <T> ResponseResult<T> success(T data) {
-        ResponseResult<T> result =
-                new ResponseResult<>(
-                        SystemErrorCode.SUCCESS.getCode(), SystemErrorCode.SUCCESS.getMsg());
+        ResponseResult<T> result = new ResponseResult<>(SystemErrorCode.SUCCESS.getCode(), SystemErrorCode.SUCCESS.getMsg());
         result.data = data;
         return result;
     }

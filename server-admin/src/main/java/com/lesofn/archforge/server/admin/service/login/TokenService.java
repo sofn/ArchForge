@@ -97,9 +97,8 @@ public class TokenService {
         long currentTime = System.currentTimeMillis();
         if (currentTime > loginUser.getAutoRefreshCacheTime()) {
             loginUser.setAutoRefreshCacheTime(
-                    currentTime
-                            + TimeUnit.MINUTES.toMillis(
-                                    appForgeConfig.getToken().getAutoRefreshTime()));
+                    currentTime + TimeUnit.MINUTES.toMillis(
+                            appForgeConfig.getToken().getAutoRefreshTime()));
             // 根据uuid将loginUser存入缓存
             redisCacheService.loginUserCache.set(loginUser.getCachedKey(), loginUser);
         }
@@ -146,9 +145,7 @@ public class TokenService {
      *
      * @return 过期时间秒数
      */
-    public long getExpireSeconds() {
-        return appForgeConfig.getJwt().getExpireSeconds();
-    }
+    public long getExpireSeconds() { return appForgeConfig.getJwt().getExpireSeconds(); }
 
     /**
      * 删除用户身份信息，并将 token JTI 加入黑名单
@@ -166,8 +163,7 @@ public class TokenService {
                 // 将 JTI 加入黑名单，TTL 为 token 剩余过期时间
                 String jti = claims.getId();
                 if (jti != null) {
-                    long remainingMs =
-                            claims.getExpiration().getTime() - System.currentTimeMillis();
+                    long remainingMs = claims.getExpiration().getTime() - System.currentTimeMillis();
                     if (remainingMs > 0) {
                         addToBlacklist(jti, Duration.ofMillis(remainingMs));
                     }

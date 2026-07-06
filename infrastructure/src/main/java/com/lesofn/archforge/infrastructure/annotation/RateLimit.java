@@ -8,7 +8,8 @@ import java.lang.annotation.Target;
 /**
  * API 限流注解。
  *
- * <p>AOP 切面基于 Redis + Lua 脚本原子自增实现，支持按全局/IP/用户维度限流。
+ * <p>
+ * AOP 切面基于 Redis + Lua 脚本原子自增实现，支持按全局/IP/用户维度限流。
  *
  * @author sofn
  */

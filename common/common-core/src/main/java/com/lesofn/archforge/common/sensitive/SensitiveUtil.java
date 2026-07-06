@@ -133,8 +133,6 @@ public final class SensitiveUtil {
             return value;
         }
         int maskLength = length - prefixLength - suffixLength;
-        return value.substring(0, prefixLength)
-                + MASK_CHAR.repeat(maskLength)
-                + value.substring(length - suffixLength);
+        return value.substring(0, prefixLength) + MASK_CHAR.repeat(maskLength) + value.substring(length - suffixLength);
     }
 }

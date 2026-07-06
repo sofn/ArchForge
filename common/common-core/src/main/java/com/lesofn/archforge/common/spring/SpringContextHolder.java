@@ -35,8 +35,7 @@ public class SpringContextHolder implements ApplicationContextAware, DisposableB
 
     public static ApplicationContext getApplicationContext() {
         if (SpringContextHolder.applicationContext == null) {
-            throw new IllegalStateException(
-                    "applicaitonContext未注入,请在applicationContext.xml中定义SpringContextHolder");
+            throw new IllegalStateException("applicaitonContext未注入,请在applicationContext.xml中定义SpringContextHolder");
         }
         return applicationContext;
     }
@@ -81,29 +80,21 @@ public class SpringContextHolder implements ApplicationContextAware, DisposableB
                 .orElse(
                         Optional.ofNullable(applicationContext)
                                 .map(
-                                        it ->
-                                                it.getBeansOfType(
-                                                                PropertySourcesPlaceholderConfigurer
-                                                                        .class)
-                                                        .values())
+                                        it -> it.getBeansOfType(
+                                                PropertySourcesPlaceholderConfigurer.class)
+                                                .values())
                                 .flatMap(
-                                        it ->
-                                                it.stream()
-                                                        .map(
-                                                                PropertySourcesPlaceholderConfigurer
-                                                                        ::getAppliedPropertySources)
-                                                        .map(aps -> aps.get("localProperties"))
-                                                        .filter(Objects::nonNull)
-                                                        .filter(
-                                                                p ->
-                                                                        p.getProperty(property)
-                                                                                != null)
-                                                        .findFirst())
+                                        it -> it.stream()
+                                                .map(
+                                                        PropertySourcesPlaceholderConfigurer::getAppliedPropertySources)
+                                                .map(aps -> aps.get("localProperties"))
+                                                .filter(Objects::nonNull)
+                                                .filter(
+                                                        p -> p.getProperty(property) != null)
+                                                .findFirst())
                                 .map(it -> (T) it.getProperty(property))
                                 .orElse(defaultValue));
     }
 
-    public static boolean isInjectedApplicationContext() {
-        return SpringContextHolder.applicationContext != null;
-    }
+    public static boolean isInjectedApplicationContext() { return SpringContextHolder.applicationContext != null; }
 }

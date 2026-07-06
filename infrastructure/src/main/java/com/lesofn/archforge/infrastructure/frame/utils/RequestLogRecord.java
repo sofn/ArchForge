@@ -62,35 +62,22 @@ public class RequestLogRecord {
 
     private boolean writeBody = true;
 
-    public RequestLogRecord() {}
-
-    public String getApi() {
-        return api;
+    public RequestLogRecord() {
     }
 
-    public void setApi(String api) {
-        this.api = api;
-    }
+    public String getApi() { return api; }
 
-    public String getMethod() {
-        return method;
-    }
+    public void setApi(String api) { this.api = api; }
 
-    public void setMethod(String method) {
-        this.method = method;
-    }
+    public String getMethod() { return method; }
 
-    public int getResponseStatus() {
-        return responseStatus;
-    }
+    public void setMethod(String method) { this.method = method; }
 
-    public void setResponseStatus(int responseStatus) {
-        this.responseStatus = responseStatus;
-    }
+    public int getResponseStatus() { return responseStatus; }
 
-    public String getSource() {
-        return source;
-    }
+    public void setResponseStatus(int responseStatus) { this.responseStatus = responseStatus; }
+
+    public String getSource() { return source; }
 
     public void setSource(String source) {
         if (source != null) {
@@ -98,61 +85,33 @@ public class RequestLogRecord {
         }
     }
 
-    public long getUid() {
-        return uid;
-    }
+    public long getUid() { return uid; }
 
-    public void setUid(long uid) {
-        this.uid = uid;
-    }
+    public void setUid(long uid) { this.uid = uid; }
 
-    public String getIp() {
-        return ip;
-    }
+    public String getIp() { return ip; }
 
-    public void setIp(String ip) {
-        this.ip = ip;
-    }
+    public void setIp(String ip) { this.ip = ip; }
 
-    public String getUserAgent() {
-        return userAgent;
-    }
+    public String getUserAgent() { return userAgent; }
 
-    public void setUserAgent(String userAgent) {
-        this.userAgent = userAgent;
-    }
+    public void setUserAgent(String userAgent) { this.userAgent = userAgent; }
 
-    public Map<String, String[]> getParameters() {
-        return parameters;
-    }
+    public Map<String, String[]> getParameters() { return parameters; }
 
-    public void setParameters(Map<String, String[]> parameters) {
-        this.parameters = parameters;
-    }
+    public void setParameters(Map<String, String[]> parameters) { this.parameters = parameters; }
 
-    public void setParameterString(String parameterString) {
-        this.parameterString = parameterString;
-    }
+    public void setParameterString(String parameterString) { this.parameterString = parameterString; }
 
-    public long getUseTime() {
-        return useTime;
-    }
+    public long getUseTime() { return useTime; }
 
-    public void setUseTime(long useTime) {
-        this.useTime = useTime;
-    }
+    public void setUseTime(long useTime) { this.useTime = useTime; }
 
-    public String getResponse() {
-        return response;
-    }
+    public String getResponse() { return response; }
 
-    public void setResponse(String response) {
-        this.response = response;
-    }
+    public void setResponse(String response) { this.response = response; }
 
-    public ClientVersion getClientVersion() {
-        return clientVersion;
-    }
+    public ClientVersion getClientVersion() { return clientVersion; }
 
     public void setClientVersion(ClientVersion clientVersion) {
         if (clientVersion != null) {
@@ -167,17 +126,11 @@ public class RequestLogRecord {
         return this.responseSize;
     }
 
-    public void setResponseSize(long responseSize) {
-        this.responseSize = responseSize;
-    }
+    public void setResponseSize(long responseSize) { this.responseSize = responseSize; }
 
-    public boolean isWriteBody() {
-        return writeBody;
-    }
+    public boolean isWriteBody() { return writeBody; }
 
-    public void setWriteBody(boolean writeBody) {
-        this.writeBody = writeBody;
-    }
+    public void setWriteBody(boolean writeBody) { this.writeBody = writeBody; }
 
     public ObjectNode toJSONObject() {
         ObjectMapper mapper = new ObjectMapper();
@@ -261,19 +214,11 @@ public class RequestLogRecord {
         return value;
     }
 
-    public String getRequestId() {
-        return requestId;
-    }
+    public String getRequestId() { return requestId; }
 
-    public void setRequestId(String requestId) {
-        this.requestId = requestId;
-    }
+    public void setRequestId(String requestId) { this.requestId = requestId; }
 
-    public String getPlatform() {
-        return platform;
-    }
+    public String getPlatform() { return platform; }
 
-    public void setPlatform(String platform) {
-        this.platform = platform;
-    }
+    public void setPlatform(String platform) { this.platform = platform; }
 }

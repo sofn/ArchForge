@@ -5,8 +5,7 @@ import com.lesofn.archforge.user.domain.SysRoleMenu;
 import com.lesofn.archforge.user.domain.SysRoleMenu_;
 
 /** Criteria API implementation — no raw JPQL strings. */
-public class SysRoleMenuRepositoryImpl extends CriteriaQuerySupport
-        implements SysRoleMenuRepositoryCustom {
+public class SysRoleMenuRepositoryImpl extends CriteriaQuerySupport implements SysRoleMenuRepositoryCustom {
 
     @Override
     public void deleteByRoleId(Long roleId) {

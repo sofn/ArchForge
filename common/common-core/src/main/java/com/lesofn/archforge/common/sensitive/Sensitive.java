@@ -5,7 +5,8 @@ import java.lang.annotation.*;
 /**
  * 数据脱敏注解，标注在需要脱敏的字段上
  *
- * <p>示例：
+ * <p>
+ * 示例：
  *
  * <pre>
  * &#64;Sensitive(SensitiveType.PHONE)
@@ -14,7 +15,9 @@ import java.lang.annotation.*;
  *
  * @author sofn
  */
-@Target({ElementType.FIELD, ElementType.METHOD})
+@Target({
+        ElementType.FIELD, ElementType.METHOD
+})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface Sensitive {

@@ -20,23 +20,19 @@ public class ResponseWrapper extends HttpServletResponseWrapper {
     }
 
     @Override
-    public ServletResponse getResponse() {
-        return this;
-    }
+    public ServletResponse getResponse() { return this; }
 
     @Override
     public ServletOutputStream getOutputStream() throws IOException {
         return new ServletOutputStream() {
-            private final TeeOutputStream tee =
-                    new TeeOutputStream(ResponseWrapper.super.getOutputStream(), bos);
+            private final TeeOutputStream tee = new TeeOutputStream(ResponseWrapper.super.getOutputStream(), bos);
 
             @Override
-            public boolean isReady() {
-                return true;
+            public boolean isReady() { return true; }
+
+            @Override
+            public void setWriteListener(WriteListener writeListener) {
             }
-
-            @Override
-            public void setWriteListener(WriteListener writeListener) {}
 
             @Override
             public void write(int b) throws IOException {
@@ -46,9 +42,7 @@ public class ResponseWrapper extends HttpServletResponseWrapper {
     }
 
     @Override
-    public PrintWriter getWriter() throws IOException {
-        return new TeePrintWriter(super.getWriter(), writer);
-    }
+    public PrintWriter getWriter() throws IOException { return new TeePrintWriter(super.getWriter(), writer); }
 
     public byte[] toByteArray() {
         return bos.toByteArray();

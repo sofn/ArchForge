@@ -12,7 +12,8 @@ import tools.jackson.databind.ser.ValueSerializerModifier;
 /**
  * 数据脱敏Jackson模块（Jackson 3.x）
  *
- * <p>自动扫描Bean属性上的 @Sensitive 注解，为匹配的String字段注册脱敏序列化器。 作为Spring Bean暴露后，Spring Boot 4 会自动将其注册到
+ * <p>
+ * 自动扫描Bean属性上的 @Sensitive 注解，为匹配的String字段注册脱敏序列化器。 作为Spring Bean暴露后，Spring Boot 4 会自动将其注册到
  * JsonMapper 中。
  *
  * @author sofn
@@ -36,8 +37,7 @@ public class SensitiveJacksonModule extends SimpleModule {
             for (BeanPropertyWriter writer : beanProperties) {
                 Sensitive sensitive = writer.getMember().getAnnotation(Sensitive.class);
                 if (sensitive != null && String.class.equals(writer.getType().getRawClass())) {
-                    SensitiveValueSerializer serializer =
-                            new SensitiveValueSerializer(sensitive.value());
+                    SensitiveValueSerializer serializer = new SensitiveValueSerializer(sensitive.value());
                     writer.assignSerializer((ValueSerializer) serializer);
                 }
             }

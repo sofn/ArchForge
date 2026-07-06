@@ -40,14 +40,12 @@ public class AuthResourceFilter extends RequestMappingHandlerAdapter {
     protected ModelAndView handleInternal(
             HttpServletRequest request, HttpServletResponse response, HandlerMethod handlerMethod)
             throws Exception {
-        if (Strings.CS.equals(request.getRequestURI(), "/error")
-                || Strings.CS.startsWith(request.getRequestURI(), "/swagger-resources")
-                || Strings.CS.startsWith(request.getRequestURI(), "/v3/api-docs")
-                || Strings.CS.startsWith(request.getRequestURI(), "/swagger-ui")
-                || Strings.CS.equals(request.getRequestURI(), "/swagger-ui.html")
-                || Strings.CS.endsWithAny(
-                        request.getRequestURI(), GlobalConstants.staticResourceArray)
-                || !Strings.CS.equals(profile, "prod")) {
+        if (Strings.CS.equals(request.getRequestURI(), "/error") || Strings.CS.startsWith(request.getRequestURI(),
+                "/swagger-resources") || Strings.CS.startsWith(request.getRequestURI(), "/v3/api-docs") || Strings.CS
+                        .startsWith(request.getRequestURI(), "/swagger-ui") || Strings.CS.equals(request.getRequestURI(),
+                                "/swagger-ui.html") || Strings.CS.endsWithAny(
+                                        request.getRequestURI(), GlobalConstants.staticResourceArray) || !Strings.CS.equals(
+                                                profile, "prod")) {
             return super.handleInternal(request, response, handlerMethod);
         }
 
@@ -67,12 +65,8 @@ public class AuthResourceFilter extends RequestMappingHandlerAdapter {
             authResponse = authService.auth(authRequest, Optional.ofNullable(baseInfo));
         } catch (AdminAuthException e) {
             LOGGER.debug(
-                    "auth failed! path: "
-                            + request.getRequestURI()
-                            + " appId: "
-                            + request.getHeader(AuthService.ENGINE_APPID_HEADER)
-                            + " version: "
-                            + ClientVersion.valueOf(
+                    "auth failed! path: " + request.getRequestURI() + " appId: " + request.getHeader(
+                            AuthService.ENGINE_APPID_HEADER) + " version: " + ClientVersion.valueOf(
                                     request.getHeader(ClientVersion.VERSION_HEADER)));
             throw e;
         }

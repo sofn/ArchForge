@@ -34,9 +34,7 @@ public class AuthResponse implements Serializable {
         this.clientVersion = clientVersion;
     }
 
-    public long getUid() {
-        return uid;
-    }
+    public long getUid() { return uid; }
 
     public void setAttribute(String name, Object value) {
         this.attributes.put(name, value);
@@ -46,27 +44,15 @@ public class AuthResponse implements Serializable {
         return this.attributes.get(name);
     }
 
-    public Set<Map.Entry<String, Object>> getAttributes() {
-        return attributes.entrySet();
-    }
+    public Set<Map.Entry<String, Object>> getAttributes() { return attributes.entrySet(); }
 
-    public String getIp() {
-        return ip;
-    }
+    public String getIp() { return ip; }
 
-    public int getAppId() {
-        return appId;
-    }
+    public int getAppId() { return appId; }
 
-    public String getAuthedBy() {
-        return authedBy;
-    }
+    public String getAuthedBy() { return authedBy; }
 
-    public String getPlatform() {
-        return platform;
-    }
+    public String getPlatform() { return platform; }
 
-    public ClientVersion getClientVersion() {
-        return clientVersion;
-    }
+    public ClientVersion getClientVersion() { return clientVersion; }
 }

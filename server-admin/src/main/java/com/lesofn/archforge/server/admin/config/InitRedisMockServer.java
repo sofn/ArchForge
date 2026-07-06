@@ -35,9 +35,8 @@ public class InitRedisMockServer {
     public InitRedisMockServer() {
         try {
             log.info("Starting Redis container via Testcontainers...");
-            redisContainer =
-                    new GenericContainer<>(DockerImageName.parse(REDIS_IMAGE))
-                            .withExposedPorts(REDIS_PORT);
+            redisContainer = new GenericContainer<>(DockerImageName.parse(REDIS_IMAGE))
+                    .withExposedPorts(REDIS_PORT);
             redisContainer.start();
 
             redisPort = redisContainer.getMappedPort(REDIS_PORT);
@@ -52,8 +51,7 @@ public class InitRedisMockServer {
     @Bean
     @Primary
     public RedisConnectionFactory redisConnectionFactory() {
-        RedisStandaloneConfiguration configuration =
-                new RedisStandaloneConfiguration(redisHost, redisPort);
+        RedisStandaloneConfiguration configuration = new RedisStandaloneConfiguration(redisHost, redisPort);
         return new LettuceConnectionFactory(configuration);
     }
 

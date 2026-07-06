@@ -32,27 +32,22 @@ public class MAuthSpi extends AbstractAuthSpi {
     }
 
     @Override
-    public String getName() {
-        return SPI_NAME;
-    }
+    public String getName() { return SPI_NAME; }
 
     @Override
     protected boolean checkCanAuth(AuthRequest request) {
-        String authHeader =
-                StringUtils.isBlank(request.getHeader(AUTH_HEADER))
-                        ? request.getHeader(AUTH_HEADER_OTHER)
-                        : request.getHeader(AUTH_HEADER);
-        if (!StringUtils.isBlank(authHeader)
-                && authHeader.toLowerCase().startsWith(SPI_NAME.toLowerCase() + " ")) {
+        String authHeader = StringUtils.isBlank(request.getHeader(AUTH_HEADER))
+                ? request.getHeader(AUTH_HEADER_OTHER)
+                : request.getHeader(AUTH_HEADER);
+        if (!StringUtils.isBlank(authHeader) && authHeader.toLowerCase().startsWith(SPI_NAME.toLowerCase() + " ")) {
             if (ApiLogger.isDebugEnabled()) {
                 ApiLogger.debug("find mauth parameter in header:" + authHeader);
             }
             return true;
         }
         String param_auth = request.getParameter(AUTH_PARAM);
-        if (StringUtils.isNotBlank(param_auth)
-                && Strings.CI.startsWith(param_auth, SPI_NAME + "")
-                && param_auth.length() == 70) {
+        if (StringUtils.isNotBlank(param_auth) && Strings.CI.startsWith(param_auth, SPI_NAME + "") && param_auth
+                .length() == 70) {
             if (ApiLogger.isDebugEnabled()) {
                 ApiLogger.debug("find mauth parameter in param:" + authHeader);
             }
@@ -63,10 +58,9 @@ public class MAuthSpi extends AbstractAuthSpi {
 
     @Override
     public long auth(AuthRequest request) throws AdminAuthException {
-        String authHeader =
-                StringUtils.isBlank(request.getHeader(AUTH_HEADER))
-                        ? request.getHeader(AUTH_HEADER_OTHER)
-                        : request.getHeader(AUTH_HEADER);
+        String authHeader = StringUtils.isBlank(request.getHeader(AUTH_HEADER))
+                ? request.getHeader(AUTH_HEADER_OTHER)
+                : request.getHeader(AUTH_HEADER);
         if (StringUtils.isBlank(authHeader)) {
             authHeader = request.getParameter(AUTH_PARAM);
         }

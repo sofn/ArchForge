@@ -9,7 +9,5 @@ import jakarta.persistence.Converter;
 public class ExtraIconConverter extends AbstractJsonConverter<ExtraIconDTO> {
 
     @Override
-    protected Class<ExtraIconDTO> getTargetType() {
-        return ExtraIconDTO.class;
-    }
+    protected Class<ExtraIconDTO> getTargetType() { return ExtraIconDTO.class; }
 }

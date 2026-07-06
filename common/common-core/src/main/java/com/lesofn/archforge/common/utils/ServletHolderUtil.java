@@ -17,7 +17,8 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 @Slf4j
 public class ServletHolderUtil {
 
-    private ServletHolderUtil() {}
+    private ServletHolderUtil() {
+    }
 
     /** 获取request */
     public static HttpServletRequest getRequest() {

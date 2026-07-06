@@ -13,7 +13,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @RequestMapping("/web")
 public class WebUserController {
 
-    @Resource private UserService userService;
+    @Resource
+    private UserService userService;
 
     @BaseInfo(needAuth = AuthType.OPTION)
     @RequestMapping(value = "register", method = RequestMethod.GET)

@@ -21,13 +21,10 @@ public class BasicAuthSpi extends AbstractAuthSpi {
     public static final String SPI_NAME = "basic";
 
     @Override
-    public String getName() {
-        return SPI_NAME;
-    }
+    public String getName() { return SPI_NAME; }
 
     public static String generateBasicAuthHeader(String username, String password) {
-        return "Basic "
-                + new String(Base64.encodeBase64((username + ":" + password).getBytes(), false));
+        return "Basic " + new String(Base64.encodeBase64((username + ":" + password).getBytes(), false));
     }
 
     @Override
@@ -69,8 +66,7 @@ public class BasicAuthSpi extends AbstractAuthSpi {
             uid = provider.get().authUser(username, password);
         }
         if (uid <= 0) {
-            throw new AdminAuthException(
-                    AdminAuthErrorCode.USERNAME_PASSWORD_ERROR, "username or password error");
+            throw new AdminAuthException(AdminAuthErrorCode.USERNAME_PASSWORD_ERROR, "username or password error");
         }
         return uid;
     }

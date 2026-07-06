@@ -28,9 +28,9 @@ public class IpRegion {
 
     public String briefLocation() {
         return String.format(
-                        "%s %s",
-                        Objects.requireNonNullElse(province, UNKNOWN),
-                        Objects.requireNonNullElse(city, UNKNOWN))
+                "%s %s",
+                Objects.requireNonNullElse(province, UNKNOWN),
+                Objects.requireNonNullElse(city, UNKNOWN))
                 .trim();
     }
 }

@@ -29,7 +29,8 @@ import org.springframework.web.client.RestClient;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class UserExportIntegrationTest {
 
-    @LocalServerPort int port;
+    @LocalServerPort
+    int port;
 
     private RestClient restClient;
     private String accessToken;
@@ -39,14 +40,13 @@ class UserExportIntegrationTest {
     @SuppressWarnings("unchecked")
     void setup() {
         restClient = RestClient.builder().baseUrl("http://localhost:" + port).build();
-        String resp =
-                restClient
-                        .post()
-                        .uri("/login")
-                        .header("Content-Type", "application/json")
-                        .body(Map.of("username", "admin", "password", "admin123"))
-                        .retrieve()
-                        .body(String.class);
+        String resp = restClient
+                .post()
+                .uri("/login")
+                .header("Content-Type", "application/json")
+                .body(Map.of("username", "admin", "password", "admin123"))
+                .retrieve()
+                .body(String.class);
         try {
             Map<String, Object> body = MAPPER.readValue(resp, Map.class);
             Map<String, Object> data = (Map<String, Object>) body.get("data");
@@ -59,13 +59,12 @@ class UserExportIntegrationTest {
 
     @Test
     void exportReturnsXlsxWithUserRows() throws Exception {
-        byte[] bytes =
-                restClient
-                        .get()
-                        .uri("/user/export")
-                        .header("Authorization", "Bearer " + accessToken)
-                        .retrieve()
-                        .body(byte[].class);
+        byte[] bytes = restClient
+                .get()
+                .uri("/user/export")
+                .header("Authorization", "Bearer " + accessToken)
+                .retrieve()
+                .body(byte[].class);
 
         assertNotNull(bytes);
         assertTrue(bytes.length > 0, "xlsx bytes should not be empty");

@@ -12,13 +12,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 /**
  * 任务界面跳转Controller
  *
- * <p>Authors: sofn Version: 1.0 Created at 2015-10-22 00:11.
+ * <p>
+ * Authors: sofn Version: 1.0 Created at 2015-10-22 00:11.
  */
 @Controller
 @RequestMapping("/web/task")
 public class WebTaskController {
 
-    @Resource private TaskService taskService;
+    @Resource
+    private TaskService taskService;
 
     @RequestMapping(method = RequestMethod.GET)
     public String list() {

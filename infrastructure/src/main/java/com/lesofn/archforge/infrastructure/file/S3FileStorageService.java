@@ -30,15 +30,14 @@ public class S3FileStorageService implements FileStorageService {
     public S3FileStorageService(
             String endpoint, String accessKey, String secretKey, String bucket, String region) {
         this.bucket = bucket;
-        this.s3Client =
-                S3Client.builder()
-                        .endpointOverride(URI.create(endpoint))
-                        .credentialsProvider(
-                                StaticCredentialsProvider.create(
-                                        AwsBasicCredentials.create(accessKey, secretKey)))
-                        .region(Region.of(region))
-                        .forcePathStyle(true)
-                        .build();
+        this.s3Client = S3Client.builder()
+                .endpointOverride(URI.create(endpoint))
+                .credentialsProvider(
+                        StaticCredentialsProvider.create(
+                                AwsBasicCredentials.create(accessKey, secretKey)))
+                .region(Region.of(region))
+                .forcePathStyle(true)
+                .build();
         ensureBucketExists();
     }
 
@@ -53,12 +52,11 @@ public class S3FileStorageService implements FileStorageService {
 
     @Override
     public String upload(String path, InputStream inputStream, String contentType, long size) {
-        PutObjectRequest request =
-                PutObjectRequest.builder()
-                        .bucket(bucket)
-                        .key(path)
-                        .contentType(contentType)
-                        .build();
+        PutObjectRequest request = PutObjectRequest.builder()
+                .bucket(bucket)
+                .key(path)
+                .contentType(contentType)
+                .build();
         s3Client.putObject(request, RequestBody.fromInputStream(inputStream, size));
         return path;
     }
@@ -71,16 +69,14 @@ public class S3FileStorageService implements FileStorageService {
 
     @Override
     public void delete(String path) {
-        DeleteObjectRequest request =
-                DeleteObjectRequest.builder().bucket(bucket).key(path).build();
+        DeleteObjectRequest request = DeleteObjectRequest.builder().bucket(bucket).key(path).build();
         s3Client.deleteObject(request);
     }
 
     @Override
     public boolean exists(String path) {
         try {
-            HeadObjectRequest request =
-                    HeadObjectRequest.builder().bucket(bucket).key(path).build();
+            HeadObjectRequest request = HeadObjectRequest.builder().bucket(bucket).key(path).build();
             s3Client.headObject(request);
             return true;
         } catch (NoSuchKeyException e) {

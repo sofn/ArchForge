@@ -27,9 +27,7 @@ public class DefaultProfileLoader {
 
     private Env envVar;
 
-    public static DefaultProfileLoader getInstance() {
-        return loader;
-    }
+    public static DefaultProfileLoader getInstance() { return loader; }
 
     public Env getEnv() {
         if (envVar != null) {
@@ -66,9 +64,8 @@ public class DefaultProfileLoader {
     private Optional<String> readFromProperties() {
         String env = null;
         try {
-            env =
-                    PropertiesLoaderUtils.loadAllProperties("application.properties")
-                            .getProperty("profile");
+            env = PropertiesLoaderUtils.loadAllProperties("application.properties")
+                    .getProperty("profile");
             env = StringUtils.strip(env);
         } catch (IOException e) {
             log.error(e.getMessage());
@@ -86,12 +83,9 @@ public class DefaultProfileLoader {
             }
             String fileContent = IOUtils.toString(url, StandardCharsets.UTF_8);
             Map<?, ?> map = ya.load(fileContent);
-            if (map.get("spring") != null
-                    && ((Map<?, ?>) map.get("spring")).get("profiles") != null) {
-                String active =
-                        (String)
-                                ((Map<?, ?>) ((Map<?, ?>) map.get("spring")).get("profiles"))
-                                        .get("active");
+            if (map.get("spring") != null && ((Map<?, ?>) map.get("spring")).get("profiles") != null) {
+                String active = (String) ((Map<?, ?>) ((Map<?, ?>) map.get("spring")).get("profiles"))
+                        .get("active");
 
                 if (StringUtils.isEmpty(active)) {
                     return Optional.empty();
@@ -110,17 +104,11 @@ public class DefaultProfileLoader {
         return Optional.empty();
     }
 
-    public static boolean isDev() {
-        return loader.getEnv() == Env.dev;
-    }
+    public static boolean isDev() { return loader.getEnv() == Env.dev; }
 
-    public static boolean isTest() {
-        return loader.getEnv() == Env.test;
-    }
+    public static boolean isTest() { return loader.getEnv() == Env.test; }
 
-    public static boolean isProd() {
-        return loader.getEnv() == Env.prod;
-    }
+    public static boolean isProd() { return loader.getEnv() == Env.prod; }
 
     public static boolean accept(Env env) {
         return loader.getEnv() == env;

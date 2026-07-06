@@ -8,7 +8,8 @@ import org.springframework.context.annotation.Configuration;
 /**
  * 数据脱敏配置
  *
- * <p>当 arch-forge.sensitive.enabled=true 时，注册脱敏Jackson模块
+ * <p>
+ * 当 arch-forge.sensitive.enabled=true 时，注册脱敏Jackson模块
  *
  * @author sofn
  */

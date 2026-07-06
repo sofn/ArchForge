@@ -6,7 +6,5 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface SysLoginLogRepository
-        extends JpaRepository<SysLoginLog, Long>,
-                JpaSpecificationExecutor<SysLoginLog>,
-                SysLoginLogRepositoryCustom {}
+public interface SysLoginLogRepository extends JpaRepository<SysLoginLog, Long>, JpaSpecificationExecutor<SysLoginLog>, SysLoginLogRepositoryCustom {
+}

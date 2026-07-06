@@ -76,9 +76,7 @@ public class JwtTokenUtil {
                 .subject(subject)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(
-                        new Date(
-                                System.currentTimeMillis()
-                                        + appForgeConfig.getJwt().getExpireSeconds() * 1000))
+                        new Date(System.currentTimeMillis() + appForgeConfig.getJwt().getExpireSeconds() * 1000))
                 .signWith(getSigningKey(), Jwts.SIG.HS512)
                 .compact();
     }

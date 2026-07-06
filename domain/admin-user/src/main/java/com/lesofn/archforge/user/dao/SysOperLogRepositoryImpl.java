@@ -5,8 +5,7 @@ import com.lesofn.archforge.common.repository.CriteriaQuerySupport;
 import com.lesofn.archforge.user.domain.SysOperLog;
 
 /** Criteria API implementation — no raw JPQL strings. */
-public class SysOperLogRepositoryImpl extends CriteriaQuerySupport
-        implements SysOperLogRepositoryCustom {
+public class SysOperLogRepositoryImpl extends CriteriaQuerySupport implements SysOperLogRepositoryCustom {
 
     @Override
     public void clearAll() {

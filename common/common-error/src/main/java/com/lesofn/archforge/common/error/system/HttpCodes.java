@@ -132,9 +132,7 @@ public enum HttpCodes implements ErrorCode {
         return this.series() == Series.SERVER_ERROR;
     }
 
-    public boolean isError() {
-        return this.is4xxClientError() || this.is5xxServerError();
-    }
+    public boolean isError() { return this.is4xxClientError() || this.is5xxServerError(); }
 
     public String toString() {
         return Integer.toString(this.status);
@@ -164,9 +162,7 @@ public enum HttpCodes implements ErrorCode {
     }
 
     @Override
-    public int getNodeNum() {
-        return this.status;
-    }
+    public int getNodeNum() { return this.status; }
 
     public static enum Series {
         INFORMATIONAL(1),

@@ -12,7 +12,8 @@ import org.springframework.stereotype.Service;
 /**
  * 登录失败计数 + 锁定服务。
  *
- * <p>使用 Redis 计数器，失败 {@code arch-forge.login.max-attempts} 次后锁定 {@code
+ * <p>
+ * 使用 Redis 计数器，失败 {@code arch-forge.login.max-attempts} 次后锁定 {@code
  * arch-forge.login.lockout-seconds} 秒。
  *
  * @author sofn

@@ -1,6 +1,6 @@
 plugins {
     id("org.sonarqube") version "7.3.0.8198"
-    id("com.diffplug.spotless") version "8.6.0" apply false
+    id("com.diffplug.spotless") version "6.13.0" apply false
     idea
 }
 
@@ -47,13 +47,12 @@ subprojects {
             }
         }
 
-        // Spotless 代码格式化 - Google Java Style (AOSP: 4-space indent)
+        // Spotless 代码格式化 - Eclipse JDT Formatter
         configure<com.diffplug.gradle.spotless.SpotlessExtension> {
             lineEndings = com.diffplug.spotless.LineEnding.UNIX
             java {
                 target("src/*/java/**/*.java")
-                targetExclude("src/*/java/**/dto/request/**/*.java")
-                googleJavaFormat("1.35.0").aosp()
+                eclipse().configFile(rootProject.file("config/spotless/eclipse-format.xml"))
                 removeUnusedImports()
                 trimTrailingWhitespace()
                 endWithNewline()

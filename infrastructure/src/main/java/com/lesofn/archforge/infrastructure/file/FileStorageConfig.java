@@ -27,12 +27,8 @@ public class FileStorageConfig {
                     "Using S3 file storage: endpoint={}, bucket={}",
                     s3.getEndpoint(),
                     s3.getBucket());
-            return new S3FileStorageService(
-                    s3.getEndpoint(),
-                    s3.getAccessKey(),
-                    s3.getSecretKey(),
-                    s3.getBucket(),
-                    s3.getRegion());
+            return new S3FileStorageService(s3.getEndpoint(), s3.getAccessKey(), s3.getSecretKey(), s3.getBucket(), s3
+                    .getRegion());
         } else {
             log.info("Using local file storage: dir={}", config.getLocalDir());
             return new LocalFileStorageService(config.getLocalDir());

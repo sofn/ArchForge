@@ -7,10 +7,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface SysRoleRepository
-        extends JpaRepository<SysRole, Long>,
-                JpaSpecificationExecutor<SysRole>,
-                SysRoleRepositoryCustom {
+public interface SysRoleRepository extends JpaRepository<SysRole, Long>, JpaSpecificationExecutor<SysRole>, SysRoleRepositoryCustom {
 
     SysRole findByRoleKey(String roleKey);
 

@@ -21,9 +21,7 @@ public class ApplicationContextHolder implements ApplicationContextAware {
 
     private static ApplicationContext context;
 
-    public static ApplicationContext getApplicationContext() {
-        return context;
-    }
+    public static ApplicationContext getApplicationContext() { return context; }
 
     /** 将该对象中的带有Autowired annotation的属性自动注入 */
     public static void autowireBean(Object obj) {
@@ -50,7 +48,8 @@ public class ApplicationContextHolder implements ApplicationContextAware {
     @SuppressWarnings("unchecked")
     public static <T> List<T> getBeans(Class<T> clazz) {
         List<T> ret = new ArrayList<>();
-        if (context == null) return ret;
+        if (context == null)
+            return ret;
         String[] names = context.getBeanNamesForType(clazz);
         if (names == null || names.length == 0) {
             return ret;

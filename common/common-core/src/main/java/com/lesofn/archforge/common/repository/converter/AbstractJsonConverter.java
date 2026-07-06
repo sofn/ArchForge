@@ -12,7 +12,8 @@ import org.springframework.util.StringUtils;
  * 通用JSON转换器基类 使用方式：为每个需要转换的类型创建一个具体的Converter类 @Converter public class MetaInfoConverter extends
  * AbstractJsonConverter<MetaDTO> {}
  *
- * <p>然后在entity字段上使用： @Convert(converter = MetaInfoConverter.class) @Column(columnDefinition =
+ * <p>
+ * 然后在entity字段上使用： @Convert(converter = MetaInfoConverter.class) @Column(columnDefinition =
  * "TEXT") private MetaDTO metaInfo;
  */
 @Slf4j

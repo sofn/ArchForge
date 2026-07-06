@@ -16,22 +16,24 @@ import org.apache.commons.lang3.StringUtils;
 @Slf4j
 public class IpUtil {
 
-    public static final String INNER_IP_REGEX =
-            "^(127\\.0\\.0\\.\\d{1,3})|(localhost)|(10\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})|(172\\.((1[6-9])|(2\\d)|(3[01]))\\.\\d{1,3}\\.\\d{1,3})|(192\\.168\\.\\d{1,3}\\.\\d{1,3})$";
+    public static final String INNER_IP_REGEX = "^(127\\.0\\.0\\.\\d{1,3})|(localhost)|(10\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})|(172\\.((1[6-9])|(2\\d)|(3[01]))\\.\\d{1,3}\\.\\d{1,3})|(192\\.168\\.\\d{1,3}\\.\\d{1,3})$";
     public static final Pattern INNER_IP_PATTERN = Pattern.compile(INNER_IP_REGEX);
-    public static final String IPV4 =
-            "^(25[0-5]|2[0-4]\\d|[0-1]?\\d?\\d)\\.(25[0-5]|2[0-4]\\d|[0-1]?\\d?\\d)\\.(25[0-5]|2[0-4]\\d|[0-1]?\\d?\\d)\\.(25[0-5]|2[0-4]\\d|[0-1]?\\d?\\d)$";
+    public static final String IPV4 = "^(25[0-5]|2[0-4]\\d|[0-1]?\\d?\\d)\\.(25[0-5]|2[0-4]\\d|[0-1]?\\d?\\d)\\.(25[0-5]|2[0-4]\\d|[0-1]?\\d?\\d)\\.(25[0-5]|2[0-4]\\d|[0-1]?\\d?\\d)$";
     public static final Pattern IPV4_PATTERN = Pattern.compile(IPV4);
-    public static final String IPV6 =
-            "(([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]+|::(ffff(:0{1,4})?:)?((25[0-5]|(2[0-4]|1?[0-9])?[0-9])\\.){3}(25[0-5]|(2[0-4]|1?[0-9])?[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1?[0-9])?[0-9])\\.){3}(25[0-5]|(2[0-4]|1?[0-9])?[0-9]))";
+    public static final String IPV6 = "(([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]+|::(ffff(:0{1,4})?:)?((25[0-5]|(2[0-4]|1?[0-9])?[0-9])\\.){3}(25[0-5]|(2[0-4]|1?[0-9])?[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1?[0-9])?[0-9])\\.){3}(25[0-5]|(2[0-4]|1?[0-9])?[0-9]))";
     public static final Pattern IPV6_PATTERN = Pattern.compile(IPV6);
 
-    private static long[][] INTRANET_IP_RANGES =
-            new long[][] {
-                {ipToInt("10.0.0.0"), ipToInt("10.255.255.255")},
-                {ipToInt("172.16.0.0"), ipToInt("172.31.255.255")},
-                {ipToInt("192.168.0.0"), ipToInt("192.168.255.255")}
-            };
+    private static long[][] INTRANET_IP_RANGES = new long[][] {
+            {
+                    ipToInt("10.0.0.0"), ipToInt("10.255.255.255")
+            },
+            {
+                    ipToInt("172.16.0.0"), ipToInt("172.31.255.255")
+            },
+            {
+                    ipToInt("192.168.0.0"), ipToInt("192.168.255.255")
+            }
+    };
 
     public static boolean isInnerIp(String ip) {
         return INNER_IP_PATTERN.matcher(ip).matches() || isLocalHost(ip);
@@ -131,9 +133,7 @@ public class IpUtil {
     public static int randomAvailablePort() {
         int port;
         do {
-            port =
-                    (int) ((MAX_USER_PORT_NUMBER - MIN_USER_PORT_NUMBER) * Math.random())
-                            + MIN_USER_PORT_NUMBER;
+            port = (int) ((MAX_USER_PORT_NUMBER - MIN_USER_PORT_NUMBER) * Math.random()) + MIN_USER_PORT_NUMBER;
         } while (!availablePort(port));
         return port;
     }
@@ -194,14 +194,8 @@ public class IpUtil {
             ip = request.getRemoteAddr();
         }
         log.debug(
-                "x-forwarded-for:"
-                        + request.getHeader("x-forwarded-for")
-                        + ",Proxy-Client-IP:"
-                        + request.getHeader("Proxy-Client-IP")
-                        + ",WL-Proxy-Client-IP:"
-                        + request.getHeader("WL-Proxy-Client-IP")
-                        + ",ip:"
-                        + ip);
+                "x-forwarded-for:" + request.getHeader("x-forwarded-for") + ",Proxy-Client-IP:" + request.getHeader(
+                        "Proxy-Client-IP") + ",WL-Proxy-Client-IP:" + request.getHeader("WL-Proxy-Client-IP") + ",ip:" + ip);
         if (ip != null) {
             // 为了解决移动网关的问题。移动网关过来的请求，第二个ip是真实ip
             int idx = ip.indexOf(",");

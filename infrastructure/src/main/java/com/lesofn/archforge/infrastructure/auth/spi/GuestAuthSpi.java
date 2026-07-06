@@ -24,19 +24,15 @@ public class GuestAuthSpi extends AbstractAuthSpi {
 
     @Override
     public long auth(AuthRequest request) throws AdminAuthException {
-        ClientVersion version =
-                ClientVersion.valueOf(request.getHeader(ClientVersion.VERSION_HEADER));
-        if ((version.sdkVersion.equals(ClientVersion.Version.NULL)
-                        || version.clientVersion.equals(ClientVersion.Version.NULL)
-                        || version.udid.equals(ClientVersion.DEFAULT_UNKNOW))
-                && request.getFrom() != AuthRequest.RequestFrom.INNER) {
+        ClientVersion version = ClientVersion.valueOf(request.getHeader(ClientVersion.VERSION_HEADER));
+        if ((version.sdkVersion.equals(ClientVersion.Version.NULL) || version.clientVersion.equals(
+                ClientVersion.Version.NULL) || version.udid.equals(ClientVersion.DEFAULT_UNKNOW)) && request
+                        .getFrom() != AuthRequest.RequestFrom.INNER) {
             throw new AdminAuthException(AdminAuthErrorCode.ILLEGAL_GUEST);
         }
         return 0;
     }
 
     @Override
-    public String getName() {
-        return SPI_NAME;
-    }
+    public String getName() { return SPI_NAME; }
 }

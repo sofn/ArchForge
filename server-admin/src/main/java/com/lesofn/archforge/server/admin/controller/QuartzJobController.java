@@ -35,14 +35,11 @@ public class QuartzJobController {
     @Operation(summary = "查询 Quartz 任务列表")
     @PostMapping("/list")
     public AdminPageResult<QuartzJobResponse> list(@RequestBody QuartzJobQuery query) {
-        int currentPage =
-                query.getCurrentPage() != null && query.getCurrentPage() > 0
-                        ? query.getCurrentPage()
-                        : 1;
-        int pageSize =
-                query.getPageSize() != null && query.getPageSize() > 0 ? query.getPageSize() : 10;
-        Pageable pageable =
-                PageRequest.of(currentPage - 1, pageSize, Sort.by(Sort.Direction.DESC, "id"));
+        int currentPage = query.getCurrentPage() != null && query.getCurrentPage() > 0
+                ? query.getCurrentPage()
+                : 1;
+        int pageSize = query.getPageSize() != null && query.getPageSize() > 0 ? query.getPageSize() : 10;
+        Pageable pageable = PageRequest.of(currentPage - 1, pageSize, Sort.by(Sort.Direction.DESC, "id"));
         SysQuartzJobQueryCriteria criteria = new SysQuartzJobQueryCriteria();
         criteria.setJobName(query.getJobName());
         criteria.setStatus(query.getStatus());
@@ -94,14 +91,12 @@ public class QuartzJobController {
     @PostMapping("/log/list")
     public AdminPageResult<QuartzLogResponse> logList(@RequestBody Map<String, Object> body) {
         Long jobId = ((Number) body.get("jobId")).longValue();
-        int currentPage =
-                body.get("currentPage") != null && ((Number) body.get("currentPage")).intValue() > 0
-                        ? ((Number) body.get("currentPage")).intValue()
-                        : 1;
-        int pageSize =
-                body.get("pageSize") != null && ((Number) body.get("pageSize")).intValue() > 0
-                        ? ((Number) body.get("pageSize")).intValue()
-                        : 20;
+        int currentPage = body.get("currentPage") != null && ((Number) body.get("currentPage")).intValue() > 0
+                ? ((Number) body.get("currentPage")).intValue()
+                : 1;
+        int pageSize = body.get("pageSize") != null && ((Number) body.get("pageSize")).intValue() > 0
+                ? ((Number) body.get("pageSize")).intValue()
+                : 20;
         Pageable pageable = PageRequest.of(currentPage - 1, pageSize);
         Page<SysQuartzLog> page = quartzJobService.logPage(jobId, pageable);
         return AdminPageResult.of(

@@ -136,8 +136,7 @@ public class FileController {
         String extension = getExtension(file.getOriginalFilename());
         List<String> allowedExtensions = fileStorage.getAllowedExtensions();
         if (allowedExtensions != null && !allowedExtensions.isEmpty()) {
-            boolean allowed =
-                    allowedExtensions.stream().anyMatch(ext -> ext.equalsIgnoreCase(extension));
+            boolean allowed = allowedExtensions.stream().anyMatch(ext -> ext.equalsIgnoreCase(extension));
             if (!allowed) {
                 throw new SystemException(SystemErrorCode.E_FILE_TYPE_NOT_ALLOWED);
             }
@@ -146,8 +145,7 @@ public class FileController {
         String contentType = file.getContentType();
         List<String> blockedMimeTypes = fileStorage.getBlockedMimeTypes();
         if (contentType != null && blockedMimeTypes != null) {
-            boolean blocked =
-                    blockedMimeTypes.stream().anyMatch(mime -> mime.equalsIgnoreCase(contentType));
+            boolean blocked = blockedMimeTypes.stream().anyMatch(mime -> mime.equalsIgnoreCase(contentType));
             if (blocked) {
                 throw new SystemException(SystemErrorCode.E_FILE_TYPE_NOT_ALLOWED);
             }

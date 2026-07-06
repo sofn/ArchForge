@@ -33,8 +33,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class RateLimitAspect {
 
-    private static final String LUA_SCRIPT =
-            """
+    private static final String LUA_SCRIPT = """
             local current = redis.call('INCR', KEYS[1])
             if tonumber(current) == 1 then
                 redis.call('EXPIRE', KEYS[1], ARGV[1])
@@ -42,8 +41,7 @@ public class RateLimitAspect {
             return current
             """;
 
-    private static final DefaultRedisScript<Long> LIMIT_SCRIPT =
-            new DefaultRedisScript<>(LUA_SCRIPT, Long.class);
+    private static final DefaultRedisScript<Long> LIMIT_SCRIPT = new DefaultRedisScript<>(LUA_SCRIPT, Long.class);
 
     private final StringRedisTemplate redisTemplate;
 
@@ -65,16 +63,14 @@ public class RateLimitAspect {
 
     private String buildKey(ProceedingJoinPoint point, RateLimit rateLimit) {
         MethodSignature signature = (MethodSignature) point.getSignature();
-        String baseKey =
-                rateLimit.key().isEmpty()
-                        ? signature.getDeclaringTypeName() + "." + signature.getName()
-                        : rateLimit.key();
-        String dimension =
-                switch (rateLimit.limitType()) {
-                    case GLOBAL -> "global";
-                    case IP -> "ip:" + getClientIp();
-                    case USER -> "user:" + getCurrentUserId();
-                };
+        String baseKey = rateLimit.key().isEmpty()
+                ? signature.getDeclaringTypeName() + "." + signature.getName()
+                : rateLimit.key();
+        String dimension = switch (rateLimit.limitType()) {
+            case GLOBAL -> "global";
+            case IP -> "ip:" + getClientIp();
+            case USER -> "user:" + getCurrentUserId();
+        };
         return "rate:limit:" + baseKey + ":" + dimension;
     }
 

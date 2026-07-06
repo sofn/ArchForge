@@ -24,14 +24,12 @@ public class MenuDTO {
             this.path = entity.getPath();
             this.status = entity.getStatus();
             this.isButton = entity.getIsButton();
-            this.statusStr =
-                    BasicEnumUtil.getDescriptionByValue(StatusEnum.class, entity.getStatus());
+            this.statusStr = BasicEnumUtil.getDescriptionByValue(StatusEnum.class, entity.getStatus());
 
             if (!entity.getIsButton()) {
                 this.menuType = entity.getMenuType();
-                this.menuTypeStr =
-                        BasicEnumUtil.getDescriptionByValue(
-                                MenuTypeEnum.class, entity.getMenuType());
+                this.menuTypeStr = BasicEnumUtil.getDescriptionByValue(
+                        MenuTypeEnum.class, entity.getMenuType());
             } else {
                 this.menuType = 0;
             }

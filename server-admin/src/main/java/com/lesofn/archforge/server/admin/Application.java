@@ -16,9 +16,9 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @ComponentScan(basePackages = "com.lesofn.archforge")
 @SpringBootApplication(
         exclude = {
-            DataSourceAutoConfiguration.class,
-            HibernateJpaAutoConfiguration.class,
-            DataSourceTransactionManagerAutoConfiguration.class
+                DataSourceAutoConfiguration.class,
+                HibernateJpaAutoConfiguration.class,
+                DataSourceTransactionManagerAutoConfiguration.class
         })
 @EnableTransactionManagement
 public class Application {

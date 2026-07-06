@@ -42,8 +42,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class LoginController {
 
-    private static final DateTimeFormatter EXPIRES_FORMATTER =
-            DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+    private static final DateTimeFormatter EXPIRES_FORMATTER = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
 
     private final LoginService loginService;
     private final UserService userService;
@@ -76,9 +75,7 @@ public class LoginController {
 
     /** 生成验证码 */
     @GetMapping("/captchaImage")
-    public CaptchaDTO getCaptchaImg() {
-        return loginService.generateCaptchaImg();
-    }
+    public CaptchaDTO getCaptchaImg() { return loginService.generateCaptchaImg(); }
 
     /**
      * 登录方法
@@ -90,8 +87,7 @@ public class LoginController {
     @PostMapping("/login")
     @RateLimit(key = "login", time = 60, maxCount = 10, limitType = RateLimit.LimitType.IP)
     public LoginResponseDTO login(
-            @Parameter(description = "登录信息", required = true) @RequestBody @Valid
-                    LoginCommand loginCommand) {
+            @Parameter(description = "登录信息", required = true) @RequestBody @Valid LoginCommand loginCommand) {
         // 生成令牌并获取用户信息
         LoginService.LoginResult loginResult = loginService.login(loginCommand);
         SystemLoginUser loginUser = loginResult.getLoginUser();
@@ -113,8 +109,7 @@ public class LoginController {
     @Operation(summary = "刷新令牌")
     @PostMapping("/refresh-token")
     public RefreshTokenResponseDTO refreshToken(@RequestBody @Valid RefreshTokenCommand command) {
-        SystemLoginUser loginUser =
-                tokenService.getLoginUserByRefreshToken(command.getRefreshToken());
+        SystemLoginUser loginUser = tokenService.getLoginUserByRefreshToken(command.getRefreshToken());
         if (loginUser == null) {
             throw new AdminAuthException(AdminAuthErrorCode.TOKEN_INVALID);
         }

@@ -29,8 +29,7 @@ class MetaInfoConverterTest {
 
     @Test
     void testConvertToEntityAttribute() {
-        String json =
-                "{\"title\":\"Test Title\",\"icon\":\"test-icon\",\"showLink\":true,\"rank\":1}";
+        String json = "{\"title\":\"Test Title\",\"icon\":\"test-icon\",\"showLink\":true,\"rank\":1}";
 
         MetaDTO metaDTO = converter.convertToEntityAttribute(json);
 

@@ -48,17 +48,14 @@ public class DefaultAuthService implements AuthService, ApplicationContextAware,
         AuthSpi spi = this.findAuthServiceSpi(request, type);
         long uid = spi.auth(request);
         Optional<UserProvider> provider = getUserProvider();
-        if (!Strings.CS.equals(spi.getName(), BasicAuthSpi.SPI_NAME)
-                && !Strings.CS.equals(spi.getName(), GuestAuthSpi.SPI_NAME)
-                && (provider.isPresent() && !provider.get().isValidUser(uid))) {
+        if (!Strings.CS.equals(spi.getName(), BasicAuthSpi.SPI_NAME) && !Strings.CS.equals(spi.getName(),
+                GuestAuthSpi.SPI_NAME) && (provider.isPresent() && !provider.get().isValidUser(uid))) {
             uid = 0;
             LOGGER.warn("auth passed,but uid not found: " + uid + " authType: " + spi.getName());
             throw new AdminAuthException(USER_AUTHFAIL);
         }
 
-        if (uid <= 0
-                && type.authFailThrowException()
-                && !Strings.CS.equals(spi.getName(), GuestAuthSpi.SPI_NAME)) {
+        if (uid <= 0 && type.authFailThrowException() && !Strings.CS.equals(spi.getName(), GuestAuthSpi.SPI_NAME)) {
             throw new AdminAuthException(USER_AUTHFAIL);
         }
 
@@ -70,17 +67,10 @@ public class DefaultAuthService implements AuthService, ApplicationContextAware,
 
         String authType = spi.getName();
         int appId = NumberUtils.toInt(request.getHeader(ENGINE_APPID_HEADER));
-        ClientVersion clientVersion =
-                ClientVersion.valueOf(request.getHeader(ClientVersion.VERSION_HEADER));
+        ClientVersion clientVersion = ClientVersion.valueOf(request.getHeader(ClientVersion.VERSION_HEADER));
 
-        AuthResponse response =
-                new AuthResponse(
-                        (String) request.getAttribute("platform"),
-                        uid,
-                        remoteIp,
-                        appId,
-                        authType,
-                        clientVersion);
+        AuthResponse response = new AuthResponse((String) request.getAttribute(
+                "platform"), uid, remoteIp, appId, authType, clientVersion);
 
         try {
             LOGGER.info(

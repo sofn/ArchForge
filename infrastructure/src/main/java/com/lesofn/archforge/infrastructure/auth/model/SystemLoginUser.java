@@ -41,7 +41,5 @@ public class SystemLoginUser extends BaseLoginUser {
         this.deptId = deptId;
     }
 
-    public Long getRoleId() {
-        return Optional.ofNullable(getRoleInfo()).map(RoleInfo::getRoleId).orElse(0L);
-    }
+    public Long getRoleId() { return Optional.ofNullable(getRoleInfo()).map(RoleInfo::getRoleId).orElse(0L); }
 }

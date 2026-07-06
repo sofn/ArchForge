@@ -29,7 +29,8 @@ import org.springframework.web.client.RestClient;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class QuartzJobIntegrationTest {
 
-    @LocalServerPort int port;
+    @LocalServerPort
+    int port;
 
     private RestClient rest;
     private String accessToken;
@@ -40,13 +41,12 @@ class QuartzJobIntegrationTest {
     @SuppressWarnings("unchecked")
     void setup() throws Exception {
         rest = RestClient.builder().baseUrl("http://localhost:" + port).build();
-        String resp =
-                rest.post()
-                        .uri("/login")
-                        .header("Content-Type", "application/json")
-                        .body(Map.of("username", "admin", "password", "admin123"))
-                        .retrieve()
-                        .body(String.class);
+        String resp = rest.post()
+                .uri("/login")
+                .header("Content-Type", "application/json")
+                .body(Map.of("username", "admin", "password", "admin123"))
+                .retrieve()
+                .body(String.class);
         Map<String, Object> body = M.readValue(resp, Map.class);
         Map<String, Object> data = (Map<String, Object>) body.get("data");
         accessToken = (String) data.get("accessToken");
@@ -55,14 +55,13 @@ class QuartzJobIntegrationTest {
 
     private Map<String, Object> post(String path, Object body) {
         try {
-            String resp =
-                    rest.post()
-                            .uri(path)
-                            .header("Content-Type", "application/json")
-                            .header("Authorization", "Bearer " + accessToken)
-                            .body(body == null ? "" : M.writeValueAsString(body))
-                            .retrieve()
-                            .body(String.class);
+            String resp = rest.post()
+                    .uri(path)
+                    .header("Content-Type", "application/json")
+                    .header("Authorization", "Bearer " + accessToken)
+                    .body(body == null ? "" : M.writeValueAsString(body))
+                    .retrieve()
+                    .body(String.class);
             return M.readValue(resp, Map.class);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -71,14 +70,13 @@ class QuartzJobIntegrationTest {
 
     private Map<String, Object> put(String path, Object body) {
         try {
-            String resp =
-                    rest.put()
-                            .uri(path)
-                            .header("Content-Type", "application/json")
-                            .header("Authorization", "Bearer " + accessToken)
-                            .body(body == null ? "" : M.writeValueAsString(body))
-                            .retrieve()
-                            .body(String.class);
+            String resp = rest.put()
+                    .uri(path)
+                    .header("Content-Type", "application/json")
+                    .header("Authorization", "Bearer " + accessToken)
+                    .body(body == null ? "" : M.writeValueAsString(body))
+                    .retrieve()
+                    .body(String.class);
             return M.readValue(resp, Map.class);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -87,12 +85,11 @@ class QuartzJobIntegrationTest {
 
     private Map<String, Object> delete(String path) {
         try {
-            String resp =
-                    rest.delete()
-                            .uri(path)
-                            .header("Authorization", "Bearer " + accessToken)
-                            .retrieve()
-                            .body(String.class);
+            String resp = rest.delete()
+                    .uri(path)
+                    .header("Authorization", "Bearer " + accessToken)
+                    .retrieve()
+                    .body(String.class);
             return M.readValue(resp, Map.class);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -115,19 +112,18 @@ class QuartzJobIntegrationTest {
     @Order(2)
     @SuppressWarnings("unchecked")
     void addJob() {
-        Map<String, Object> resp =
-                post(
-                        "/quartz/add",
-                        Map.of(
-                                "jobName", "it-demo-hello",
-                                "jobGroup", "DEFAULT",
-                                "description", "integration test demo job",
-                                "beanName", "demoQuartzJob",
-                                "methodName", "echo",
-                                "methodParams", "[\"hello-from-it\"]",
-                                "cron", "0 0 1 1 1 ? 2099",
-                                "misfirePolicy", 1,
-                                "concurrent", false));
+        Map<String, Object> resp = post(
+                "/quartz/add",
+                Map.of(
+                        "jobName", "it-demo-hello",
+                        "jobGroup", "DEFAULT",
+                        "description", "integration test demo job",
+                        "beanName", "demoQuartzJob",
+                        "methodName", "echo",
+                        "methodParams", "[\"hello-from-it\"]",
+                        "cron", "0 0 1 1 1 ? 2099",
+                        "misfirePolicy", 1,
+                        "concurrent", false));
         assertEquals(0, resp.get("code"), "add failed: " + resp);
         createdJobId = ((Number) resp.get("data")).longValue();
         assertNotNull(createdJobId);
@@ -137,10 +133,9 @@ class QuartzJobIntegrationTest {
     @Order(3)
     @SuppressWarnings("unchecked")
     void listJobs() {
-        Map<String, Object> resp =
-                post(
-                        "/quartz/list",
-                        Map.of("jobName", "it-demo", "currentPage", 1, "pageSize", 10));
+        Map<String, Object> resp = post(
+                "/quartz/list",
+                Map.of("jobName", "it-demo", "currentPage", 1, "pageSize", 10));
         assertEquals(0, resp.get("code"));
         Map<String, Object> data = (Map<String, Object>) resp.get("data");
         List<Map<String, Object>> list = (List<Map<String, Object>>) data.get("list");
@@ -160,10 +155,9 @@ class QuartzJobIntegrationTest {
         boolean found = false;
         while (System.currentTimeMillis() < deadline) {
             @SuppressWarnings("unchecked")
-            Map<String, Object> logResp =
-                    post(
-                            "/quartz/log/list",
-                            Map.of("jobId", createdJobId, "currentPage", 1, "pageSize", 10));
+            Map<String, Object> logResp = post(
+                    "/quartz/log/list",
+                    Map.of("jobId", createdJobId, "currentPage", 1, "pageSize", 10));
             assertEquals(0, logResp.get("code"));
             @SuppressWarnings("unchecked")
             Map<String, Object> data = (Map<String, Object>) logResp.get("data");
@@ -183,19 +177,18 @@ class QuartzJobIntegrationTest {
     @Test
     @Order(5)
     void updateJob() {
-        Map<String, Object> resp =
-                put(
-                        "/quartz/update/" + createdJobId,
-                        Map.of(
-                                "jobName", "it-demo-hello",
-                                "jobGroup", "DEFAULT",
-                                "description", "updated description",
-                                "beanName", "demoQuartzJob",
-                                "methodName", "echo",
-                                "methodParams", "[\"updated\"]",
-                                "cron", "0 0 2 1 1 ? 2099",
-                                "misfirePolicy", 1,
-                                "concurrent", false));
+        Map<String, Object> resp = put(
+                "/quartz/update/" + createdJobId,
+                Map.of(
+                        "jobName", "it-demo-hello",
+                        "jobGroup", "DEFAULT",
+                        "description", "updated description",
+                        "beanName", "demoQuartzJob",
+                        "methodName", "echo",
+                        "methodParams", "[\"updated\"]",
+                        "cron", "0 0 2 1 1 ? 2099",
+                        "misfirePolicy", 1,
+                        "concurrent", false));
         assertEquals(0, resp.get("code"));
     }
 

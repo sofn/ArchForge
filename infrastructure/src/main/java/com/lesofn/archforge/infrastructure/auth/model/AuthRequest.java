@@ -60,24 +60,23 @@ public class AuthRequest {
 
     public Iterable<String> getHeaderNames() {
         final Enumeration<String> e = request.getHeaderNames();
-        return () ->
-                new Iterator<String>() {
+        return () -> new Iterator<String>() {
 
-                    @Override
-                    public boolean hasNext() {
-                        return e.hasMoreElements();
-                    }
+            @Override
+            public boolean hasNext() {
+                return e.hasMoreElements();
+            }
 
-                    @Override
-                    public String next() {
-                        return e.nextElement();
-                    }
+            @Override
+            public String next() {
+                return e.nextElement();
+            }
 
-                    @Override
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+            @Override
+            public void remove() {
+                throw new UnsupportedOperationException();
+            }
+        };
     }
 
     public List<KeyValue<String, String>> getCookies() {
@@ -101,24 +100,19 @@ public class AuthRequest {
         }
         List<KeyValue<String, String>> cookies = getCookies();
         for (KeyValue<String, String> pair : cookies) {
-            if (name.equals(pair.getKey())) return pair.getValue();
+            if (name.equals(pair.getKey()))
+                return pair.getValue();
         }
         return null;
     }
 
-    public String getMethod() {
-        return request.getMethod();
-    }
+    public String getMethod() { return request.getMethod(); }
 
-    public String getCharacterEncoding() {
-        return request.getCharacterEncoding();
-    }
+    public String getCharacterEncoding() { return request.getCharacterEncoding(); }
 
     public boolean isMultiPart() {
         String contentType = request.getContentType();
-        return "POST".equals(request.getMethod())
-                && contentType != null
-                && contentType.toLowerCase().startsWith(MULTIPART);
+        return "POST".equals(request.getMethod()) && contentType != null && contentType.toLowerCase().startsWith(MULTIPART);
     }
 
     public Object getAttribute(String name) {
@@ -129,17 +123,11 @@ public class AuthRequest {
         request.setAttribute(name, value);
     }
 
-    public String getScheme() {
-        return request.getScheme();
-    }
+    public String getScheme() { return request.getScheme(); }
 
-    public String getRequestURI() {
-        return request.getRequestURI();
-    }
+    public String getRequestURI() { return request.getRequestURI(); }
 
-    public String getRemoteIp() {
-        return IpUtil.getRealIpAddr(this.request);
-    }
+    public String getRemoteIp() { return IpUtil.getRealIpAddr(this.request); }
 
     public String getApiPath() {
         String path = this.getRequestURI();
@@ -169,15 +157,12 @@ public class AuthRequest {
     }
 
     public boolean isHttps() {
-        return Strings.CI.equals("HTTPS", this.getScheme())
-                || Strings.CI.equals("SSL", this.getHeader("X-Proto"));
+        return Strings.CI.equals("HTTPS", this.getScheme()) || Strings.CI.equals("SSL", this.getHeader("X-Proto"));
     }
 
     public String getParameter(String name) {
         return this.request.getParameter(name);
     }
 
-    public RequestFrom getFrom() {
-        return RequestFrom.valueOf(this.request.getHeader(FROM_HEADER), RequestFrom.INNER);
-    }
+    public RequestFrom getFrom() { return RequestFrom.valueOf(this.request.getHeader(FROM_HEADER), RequestFrom.INNER); }
 }

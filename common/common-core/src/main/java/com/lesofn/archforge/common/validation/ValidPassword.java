@@ -10,11 +10,14 @@ import java.lang.annotation.Target;
 /**
  * 密码安全策略校验注解。
  *
- * <p>默认要求：长度 8-32，必须包含至少 1 个数字、1 个字母、1 个特殊字符。
+ * <p>
+ * 默认要求：长度 8-32，必须包含至少 1 个数字、1 个字母、1 个特殊字符。
  *
  * @author sofn
  */
-@Target({ElementType.FIELD, ElementType.PARAMETER})
+@Target({
+        ElementType.FIELD, ElementType.PARAMETER
+})
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = ValidPasswordValidator.class)
 public @interface ValidPassword {

@@ -40,7 +40,8 @@ public class AdminUserListRequest {
     private Integer pageSize = 10;
 
     public Long getDeptIdAsLong() {
-        if (deptId == null || deptId.isEmpty()) return null;
+        if (deptId == null || deptId.isEmpty())
+            return null;
         try {
             return Long.parseLong(deptId);
         } catch (NumberFormatException e) {
@@ -49,7 +50,8 @@ public class AdminUserListRequest {
     }
 
     public Integer getStatusAsInt() {
-        if (status == null || status.isEmpty()) return null;
+        if (status == null || status.isEmpty())
+            return null;
         try {
             return Integer.parseInt(status);
         } catch (NumberFormatException e) {

@@ -6,8 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface SysRoleMenuRepository
-        extends JpaRepository<SysRoleMenu, SysRoleMenu.SysRoleMenuId>, SysRoleMenuRepositoryCustom {
+public interface SysRoleMenuRepository extends JpaRepository<SysRoleMenu, SysRoleMenu.SysRoleMenuId>, SysRoleMenuRepositoryCustom {
 
     List<SysRoleMenu> findByRoleId(Long roleId);
 

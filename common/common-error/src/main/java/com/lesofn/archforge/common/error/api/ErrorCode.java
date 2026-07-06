@@ -15,9 +15,7 @@ public interface ErrorCode {
     String getMsg();
 
     /** 拼接project、module、node后的完整的错误码 */
-    default int getCode() {
-        return ErrorManager.genCode(this);
-    }
+    default int getCode() { return ErrorManager.genCode(this); }
 
     default ProjectModule projectModule() {
         return ErrorManager.projectModule(this);

@@ -39,10 +39,9 @@ public class IdempotentAspect {
     @Around("@annotation(idempotent)")
     public Object around(ProceedingJoinPoint point, Idempotent idempotent) throws Throwable {
         String redisKey = buildKey(point, idempotent);
-        Boolean acquired =
-                redisTemplate
-                        .opsForValue()
-                        .setIfAbsent(redisKey, "1", Duration.ofSeconds(idempotent.interval()));
+        Boolean acquired = redisTemplate
+                .opsForValue()
+                .setIfAbsent(redisKey, "1", Duration.ofSeconds(idempotent.interval()));
         if (Boolean.FALSE.equals(acquired)) {
             log.warn("Duplicate request detected: key={}", redisKey);
             throw new SystemException(SystemErrorCode.E_DUPLICATE_REQUEST);
@@ -52,10 +51,9 @@ public class IdempotentAspect {
 
     private String buildKey(ProceedingJoinPoint point, Idempotent idempotent) {
         MethodSignature signature = (MethodSignature) point.getSignature();
-        String baseKey =
-                idempotent.keyPrefix().isEmpty()
-                        ? signature.getDeclaringTypeName() + "." + signature.getName()
-                        : idempotent.keyPrefix();
+        String baseKey = idempotent.keyPrefix().isEmpty()
+                ? signature.getDeclaringTypeName() + "." + signature.getName()
+                : idempotent.keyPrefix();
         String userId = getCurrentUserId();
         String argsHash = hashArgs(point.getArgs());
         return "idempotent:" + baseKey + ":" + userId + ":" + argsHash;

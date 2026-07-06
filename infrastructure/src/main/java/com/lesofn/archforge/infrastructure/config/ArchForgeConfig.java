@@ -144,21 +144,19 @@ public class ArchForgeConfig {
         private long maxFileSize = 10L * 1024 * 1024;
 
         /** 允许的文件扩展名白名单（不带点号） */
-        private List<String> allowedExtensions =
-                List.of(
-                        "jpg", "jpeg", "png", "gif", "webp", "bmp", "svg", "pdf", "doc", "docx",
-                        "xls", "xlsx", "ppt", "pptx", "txt", "csv", "zip", "rar", "7z", "mp3",
-                        "mp4", "avi", "mov", "json", "xml");
+        private List<String> allowedExtensions = List.of(
+                "jpg", "jpeg", "png", "gif", "webp", "bmp", "svg", "pdf", "doc", "docx",
+                "xls", "xlsx", "ppt", "pptx", "txt", "csv", "zip", "rar", "7z", "mp3",
+                "mp4", "avi", "mov", "json", "xml");
 
         /** 禁用的 MIME 类型黑名单 */
-        private List<String> blockedMimeTypes =
-                List.of(
-                        "application/x-msdownload",
-                        "application/x-sh",
-                        "application/x-executable",
-                        "application/x-ms-installer",
-                        "application/x-bat",
-                        "application/javascript");
+        private List<String> blockedMimeTypes = List.of(
+                "application/x-msdownload",
+                "application/x-sh",
+                "application/x-executable",
+                "application/x-ms-installer",
+                "application/x-bat",
+                "application/javascript");
 
         /** S3 配置 */
         private S3Config s3 = new S3Config();

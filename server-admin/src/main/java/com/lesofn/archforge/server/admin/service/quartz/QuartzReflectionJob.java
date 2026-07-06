@@ -20,26 +20,31 @@ import org.springframework.context.ApplicationContext;
 /**
  * Single Quartz {@link Job} implementation that dispatches to a Spring bean method by reflection.
  *
- * <p>Configuration is read from the trigger {@link JobDataMap}:
+ * <p>
+ * Configuration is read from the trigger {@link JobDataMap}:
  *
  * <ul>
- *   <li>{@code jobId} – primary key of {@link SysQuartzJob}
- *   <li>{@code jobName}, {@code jobGroup} – Quartz identifiers (also persisted on the log row)
- *   <li>{@code beanName} – Spring bean name to look up
- *   <li>{@code methodName} – method on the bean to invoke
- *   <li>{@code methodParams} – JSON array of arguments (string/number/boolean primitives), or null
+ * <li>{@code jobId} – primary key of {@link SysQuartzJob}
+ * <li>{@code jobName}, {@code jobGroup} – Quartz identifiers (also persisted on the log row)
+ * <li>{@code beanName} – Spring bean name to look up
+ * <li>{@code methodName} – method on the bean to invoke
+ * <li>{@code methodParams} – JSON array of arguments (string/number/boolean primitives), or null
  * </ul>
  *
- * <p>Each invocation persists a {@link SysQuartzLog} row capturing duration and any error.
+ * <p>
+ * Each invocation persists a {@link SysQuartzLog} row capturing duration and any error.
  *
  * @author sofn
  */
 @Slf4j
 public class QuartzReflectionJob implements Job {
 
-    @Autowired private ApplicationContext applicationContext;
-    @Autowired private SysQuartzJobRepository jobRepository;
-    @Autowired private SysQuartzLogRepository logRepository;
+    @Autowired
+    private ApplicationContext applicationContext;
+    @Autowired
+    private SysQuartzJobRepository jobRepository;
+    @Autowired
+    private SysQuartzLogRepository logRepository;
 
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
@@ -108,17 +113,17 @@ public class QuartzReflectionJob implements Job {
             Long jobId, String jobName, String jobGroup, String beanName, String methodName) {
         if (jobId != null) {
             SysQuartzJob found = jobRepository.findById(jobId).orElse(null);
-            if (found != null) return found;
+            if (found != null)
+                return found;
         }
         return jobRepository
                 .findByJobNameAndJobGroup(jobName, jobGroup)
                 .orElseGet(
-                        () ->
-                                new SysQuartzJob()
-                                        .setJobName(jobName)
-                                        .setJobGroup(jobGroup)
-                                        .setBeanName(beanName)
-                                        .setMethodName(methodName));
+                        () -> new SysQuartzJob()
+                                .setJobName(jobName)
+                                .setJobGroup(jobGroup)
+                                .setBeanName(beanName)
+                                .setMethodName(methodName));
     }
 
     private static Method findMethod(Class<?> type, String name, int arity)

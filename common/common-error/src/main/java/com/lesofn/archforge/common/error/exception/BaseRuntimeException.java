@@ -45,7 +45,5 @@ public abstract class BaseRuntimeException extends RuntimeException implements I
     }
 
     @Override
-    public ErrorInfo getErrorInfo() {
-        return errorInfo;
-    }
+    public ErrorInfo getErrorInfo() { return errorInfo; }
 }

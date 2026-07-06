@@ -23,7 +23,8 @@ public class MapCache {
     private static final Map<String, List<DictionaryData>> DICTIONARY_CACHE = new HashMap<>(128);
     private static final String ENUM_PACKAGE = "com.lesofn.archforge.common.enums.common";
 
-    private MapCache() {}
+    private MapCache() {
+    }
 
     static {
         initDictionaryCache();
@@ -32,20 +33,16 @@ public class MapCache {
     @SuppressWarnings("rawtypes")
     private static void initDictionaryCache() {
         try {
-            PathMatchingResourcePatternResolver resolver =
-                    new PathMatchingResourcePatternResolver();
-            MetadataReaderFactory metadataReaderFactory =
-                    new CachingMetadataReaderFactory(resolver);
+            PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
+            MetadataReaderFactory metadataReaderFactory = new CachingMetadataReaderFactory(resolver);
 
             // 将包名转换为路径模式
-            String packageSearchPath =
-                    "classpath*:" + ENUM_PACKAGE.replace('.', '/') + "/**/*.class";
+            String packageSearchPath = "classpath*:" + ENUM_PACKAGE.replace('.', '/') + "/**/*.class";
             Resource[] resources = resolver.getResources(packageSearchPath);
 
             for (Resource resource : resources) {
                 if (resource.isReadable()) {
-                    MetadataReader metadataReader =
-                            metadataReaderFactory.getMetadataReader(resource);
+                    MetadataReader metadataReader = metadataReaderFactory.getMetadataReader(resource);
                     String className = metadataReader.getClassMetadata().getClassName();
 
                     // 检查是否是枚举类并且实现了DictionaryEnum接口
@@ -58,10 +55,8 @@ public class MapCache {
                     if (!clazz.isEnum()) {
                         continue;
                     }
-                    if (DictionaryEnum.class.isAssignableFrom(clazz)
-                            && clazz.isAnnotationPresent(Dictionary.class)) {
-                        DictionaryEnum[] enumConstants =
-                                (DictionaryEnum[]) clazz.getEnumConstants();
+                    if (DictionaryEnum.class.isAssignableFrom(clazz) && clazz.isAnnotationPresent(Dictionary.class)) {
+                        DictionaryEnum[] enumConstants = (DictionaryEnum[]) clazz.getEnumConstants();
                         if (enumConstants != null && enumConstants.length > 0) {
                             loadInCache(enumConstants);
                         }

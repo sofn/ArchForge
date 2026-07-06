@@ -9,24 +9,28 @@ import java.lang.annotation.Target;
  * Declares that a field on a query-criteria DTO contributes a JPA Predicate when processed by
  * {@code QueryHelp}.
  *
- * <p>Usage:
+ * <p>
+ * Usage:
  *
- * <pre>{@code
- * @Data
- * public class SysUserQueryCriteria {
- *     @Query(type = Query.Type.INNER_LIKE)
- *     private String username;
+ * <pre>
+ * {
+ *     &#64;code
+ *     &#64;Data
+ *     public class SysUserQueryCriteria {
+ *         &#64;Query(type = Query.Type.INNER_LIKE)
+ *         private String username;
  *
- *     @Query(blurry = "username,email,nickname")
- *     private String blurry;
+ *         &#64;Query(blurry = "username,email,nickname")
+ *         private String blurry;
  *
- *     @Query(type = Query.Type.BETWEEN)
- *     private List<LocalDateTime> createTime;
+ *         &#64;Query(type = Query.Type.BETWEEN)
+ *         private List<LocalDateTime> createTime;
  *
- *     @Query(propName = "id", type = Query.Type.IN, joinName = "dept")
- *     private Set<Long> deptIds;
+ *         &#64;Query(propName = "id", type = Query.Type.IN, joinName = "dept")
+ *         private Set<Long> deptIds;
+ *     }
  * }
- * }</pre>
+ * </pre>
  *
  * @author sofn
  */

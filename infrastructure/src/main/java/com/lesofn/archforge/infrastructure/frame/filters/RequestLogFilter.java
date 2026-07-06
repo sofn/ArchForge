@@ -34,9 +34,9 @@ public class RequestLogFilter implements Filter {
         HttpServletResponse response = (HttpServletResponse) servletResponse;
         String path = request.getRequestURI();
         if (Strings.CS.startsWithAny(
-                        path, "/webjars", "/static", "/js", "/css", "/libs", "/WEB-INF")
-                || Strings.CS.startsWithAny(request.getRequestURI(), "/swagger-", "/v3/api-docs")
-                || Strings.CS.startsWithAny(path, GlobalConstants.staticResourceArray)) {
+                path, "/webjars", "/static", "/js", "/css", "/libs", "/WEB-INF") || Strings.CS.startsWithAny(request
+                        .getRequestURI(), "/swagger-", "/v3/api-docs") || Strings.CS.startsWithAny(path,
+                                GlobalConstants.staticResourceArray)) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -76,7 +76,7 @@ public class RequestLogFilter implements Filter {
                 log.error(
                         "EngineException error",
                         e.getMessage() + " " + errorCodeEx.getErrorInfo().getMsg());
-            } else if (e.getCause() instanceof IErrorCodeException causeErrorCodeEx) {
+            } else if (e.getCause()instanceof IErrorCodeException causeErrorCodeEx) {
                 log.error(
                         "EngineException error",
                         e.getCause().getMessage() + " " + causeErrorCodeEx.getErrorInfo().getMsg());
@@ -86,10 +86,8 @@ public class RequestLogFilter implements Filter {
             throw e;
         } finally {
             // 如果是错误页面 或 没有错误的第一次执行
-            if (Strings.CS.equals("/error", path)
-                    || request.getAttribute(
-                                    "org.springframework.boot.autoconfigure.web.DefaultErrorAttributes.ERROR")
-                            == null) {
+            if (Strings.CS.equals("/error", path) || request.getAttribute(
+                    "org.springframework.boot.autoconfigure.web.DefaultErrorAttributes.ERROR") == null) {
                 long endTime = System.currentTimeMillis();
                 RequestLogRecord record = new RequestLogRecord();
                 record.setRequestId(context.getRequestId());
@@ -104,9 +102,7 @@ public class RequestLogFilter implements Filter {
                 record.setResponseStatus(response.getStatus());
                 record.setClientVersion(context.getClientVersion());
                 record.setResponse(
-                        new String(
-                                ((ResponseWrapper) response).toByteArray(),
-                                StandardCharsets.UTF_8));
+                        new String(((ResponseWrapper) response).toByteArray(), StandardCharsets.UTF_8));
                 // text/html不打印body
                 if (!Strings.CS.contains(response.getContentType(), "application/json")) {
                     record.setWriteBody(false);
@@ -133,8 +129,10 @@ public class RequestLogFilter implements Filter {
     }
 
     @Override
-    public void init(FilterConfig filterConfig) throws ServletException {}
+    public void init(FilterConfig filterConfig) throws ServletException {
+    }
 
     @Override
-    public void destroy() {}
+    public void destroy() {
+    }
 }

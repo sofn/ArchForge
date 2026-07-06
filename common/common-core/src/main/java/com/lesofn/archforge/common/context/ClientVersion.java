@@ -67,14 +67,21 @@ public class ClientVersion implements Serializable {
 
         @Override
         public boolean equals(Object obj) {
-            if (this == obj) return true;
-            if (obj == null) return false;
-            if (getClass() != obj.getClass()) return false;
+            if (this == obj)
+                return true;
+            if (obj == null)
+                return false;
+            if (getClass() != obj.getClass())
+                return false;
             Version other = (Version) obj;
-            if (major != other.major) return false;
-            if (minor != other.minor) return false;
-            if (revision != other.revision) return false;
-            if (build != other.build) return false;
+            if (major != other.major)
+                return false;
+            if (minor != other.minor)
+                return false;
+            if (revision != other.revision)
+                return false;
+            if (build != other.build)
+                return false;
             return true;
         }
 
@@ -90,15 +97,9 @@ public class ClientVersion implements Serializable {
             if (this.equals(o)) {
                 return 0;
             }
-            if (this.major > o.major
-                    || (this.major == o.major && this.minor > o.minor)
-                    || (this.major == o.major
-                            && this.minor == o.minor
-                            && this.revision > o.revision)
-                    || (this.major == o.major
-                            && this.minor == o.minor
-                            && this.revision == o.revision
-                            && this.build > o.build)) {
+            if (this.major > o.major || (this.major == o.major && this.minor > o.minor) || (this.major == o.major &&
+                    this.minor == o.minor && this.revision > o.revision) || (this.major == o.major && this.minor == o.minor &&
+                            this.revision == o.revision && this.build > o.build)) {
                 return 1;
             }
             return -1;
@@ -171,16 +172,23 @@ public class ClientVersion implements Serializable {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null) return false;
-        if (getClass() != obj.getClass()) return false;
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
         ClientVersion other = (ClientVersion) obj;
         if (clientVersion == null) {
-            if (other.clientVersion != null) return false;
-        } else if (!clientVersion.equals(other.clientVersion)) return false;
+            if (other.clientVersion != null)
+                return false;
+        } else if (!clientVersion.equals(other.clientVersion))
+            return false;
         if (sdkVersion == null) {
-            if (other.sdkVersion != null) return false;
-        } else if (!sdkVersion.equals(other.sdkVersion)) return false;
+            if (other.sdkVersion != null)
+                return false;
+        } else if (!sdkVersion.equals(other.sdkVersion))
+            return false;
         return true;
     }
 }

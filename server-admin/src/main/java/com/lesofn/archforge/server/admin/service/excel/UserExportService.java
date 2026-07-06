@@ -24,8 +24,7 @@ public class UserExportService {
     /** Writes a single-sheet workbook of users to the given output stream. */
     public void exportTo(OutputStream out) throws IOException {
         List<SysUser> users = userService.findAll();
-        List<String> headers =
-                List.of("ID", "Username", "Nickname", "Email", "Phone", "Sex", "Status");
+        List<String> headers = List.of("ID", "Username", "Nickname", "Email", "Phone", "Sex", "Status");
         List<List<Object>> rows = new ArrayList<>(users.size());
         for (SysUser u : users) {
             rows.add(

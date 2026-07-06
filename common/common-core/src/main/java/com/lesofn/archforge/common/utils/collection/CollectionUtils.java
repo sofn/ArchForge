@@ -17,8 +17,7 @@ public class CollectionUtils {
     public static final Joiner ARGS_JOINER = Joiner.on('_');
     public static final Joiner ARGS_JOINER_2 = Joiner.on(',');
     public static final Splitter LIST_SPLITTER = Splitter.on(',').trimResults().omitEmptyStrings();
-    public static final Splitter LINE_SPLITTER =
-            Splitter.onPattern("\r?\n").trimResults().omitEmptyStrings();
+    public static final Splitter LINE_SPLITTER = Splitter.onPattern("\r?\n").trimResults().omitEmptyStrings();
 
     public static List<String> strListSplitter(String str) {
         if (StringUtils.isEmpty(str)) {

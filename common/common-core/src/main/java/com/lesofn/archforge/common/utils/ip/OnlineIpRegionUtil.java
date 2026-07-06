@@ -14,7 +14,8 @@ import org.apache.commons.lang3.StringUtils;
 @Slf4j
 public class OnlineIpRegionUtil {
 
-    private OnlineIpRegionUtil() {}
+    private OnlineIpRegionUtil() {
+    }
 
     /** website for query geography address from ip */
     public static final String ADDRESS_QUERY_SITE = "http://whois.pconline.com.cn/ipJson.jsp";

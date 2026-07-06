@@ -19,7 +19,8 @@ import org.springframework.web.client.RestClient;
 /**
  * 基于 RestClient 的管理端 API 集成测试
  *
- * <p>覆盖用户、角色、部门管理的核心 CRUD 接口，使用测试用户 (testadmin) 执行操作。
+ * <p>
+ * 覆盖用户、角色、部门管理的核心 CRUD 接口，使用测试用户 (testadmin) 执行操作。
  *
  * @author sofn
  */
@@ -30,7 +31,8 @@ import org.springframework.web.client.RestClient;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class RestClientIntegrationTest {
 
-    @LocalServerPort int port;
+    @LocalServerPort
+    int port;
 
     private RestClient restClient;
     private String accessToken;
@@ -57,8 +59,7 @@ class RestClientIntegrationTest {
             throw new RuntimeException(e);
         }
 
-        RestClient.RequestBodySpec spec =
-                restClient.post().uri(path).header("Content-Type", "application/json");
+        RestClient.RequestBodySpec spec = restClient.post().uri(path).header("Content-Type", "application/json");
         if (accessToken != null) {
             spec = spec.header("Authorization", "Bearer " + accessToken);
         }
@@ -79,15 +80,14 @@ class RestClientIntegrationTest {
             throw new RuntimeException(e);
         }
 
-        String response =
-                restClient
-                        .put()
-                        .uri(path)
-                        .header("Content-Type", "application/json")
-                        .header("Authorization", "Bearer " + accessToken)
-                        .body(json)
-                        .retrieve()
-                        .body(String.class);
+        String response = restClient
+                .put()
+                .uri(path)
+                .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer " + accessToken)
+                .body(json)
+                .retrieve()
+                .body(String.class);
         try {
             return objectMapper.readValue(response, Map.class);
         } catch (Exception e) {
@@ -97,13 +97,12 @@ class RestClientIntegrationTest {
 
     @SuppressWarnings("unchecked")
     private Map<String, Object> get(String path) {
-        String response =
-                restClient
-                        .get()
-                        .uri(path)
-                        .header("Authorization", "Bearer " + accessToken)
-                        .retrieve()
-                        .body(String.class);
+        String response = restClient
+                .get()
+                .uri(path)
+                .header("Authorization", "Bearer " + accessToken)
+                .retrieve()
+                .body(String.class);
         try {
             return objectMapper.readValue(response, Map.class);
         } catch (Exception e) {
@@ -116,8 +115,7 @@ class RestClientIntegrationTest {
     @Test
     @Order(1)
     void login() {
-        Map<String, Object> response =
-                post("/login", Map.of("username", "admin", "password", "admin123"));
+        Map<String, Object> response = post("/login", Map.of("username", "admin", "password", "admin123"));
         assertEquals(0, response.get("code"));
         @SuppressWarnings("unchecked")
         Map<String, Object> data = (Map<String, Object>) response.get("data");
@@ -130,17 +128,16 @@ class RestClientIntegrationTest {
     @Test
     @Order(10)
     void createUser() {
-        Map<String, Object> response =
-                post(
-                        "/user/create",
-                        Map.of(
-                                "username", "testadmin",
-                                "nickname", "测试管理员",
-                                "phone", "13900000001",
-                                "email", "testadmin@archforge.com",
-                                "sex", 0,
-                                "status", 1,
-                                "password", "Test1234"));
+        Map<String, Object> response = post(
+                "/user/create",
+                Map.of(
+                        "username", "testadmin",
+                        "nickname", "测试管理员",
+                        "phone", "13900000001",
+                        "email", "testadmin@archforge.com",
+                        "sex", 0,
+                        "status", 1,
+                        "password", "Test1234"));
         assertEquals(0, response.get("code"), "Create user failed: " + response);
     }
 
@@ -148,48 +145,43 @@ class RestClientIntegrationTest {
     @Order(11)
     @SuppressWarnings("unchecked")
     void listUsers() {
-        Map<String, Object> response =
-                post("/user", Map.of("username", "", "currentPage", 1, "pageSize", 100));
+        Map<String, Object> response = post("/user", Map.of("username", "", "currentPage", 1, "pageSize", 100));
         assertEquals(0, response.get("code"));
         Map<String, Object> data = (Map<String, Object>) response.get("data");
         List<Map<String, Object>> list = (List<Map<String, Object>>) data.get("list");
         assertTrue(list.stream().anyMatch(u -> "testadmin".equals(u.get("username"))));
         // 记录创建的用户ID
-        createdUserId =
-                list.stream()
-                        .filter(u -> "testadmin".equals(u.get("username")))
-                        .findFirst()
-                        .map(u -> ((Number) u.get("id")).longValue())
-                        .orElse(null);
+        createdUserId = list.stream()
+                .filter(u -> "testadmin".equals(u.get("username")))
+                .findFirst()
+                .map(u -> ((Number) u.get("id")).longValue())
+                .orElse(null);
         assertNotNull(createdUserId);
     }
 
     @Test
     @Order(12)
     void updateUser() {
-        Map<String, Object> response =
-                put(
-                        "/user/update",
-                        Map.of(
-                                "id", createdUserId,
-                                "nickname", "测试管理员-已修改",
-                                "email", "testadmin-updated@archforge.com"));
+        Map<String, Object> response = put(
+                "/user/update",
+                Map.of(
+                        "id", createdUserId,
+                        "nickname", "测试管理员-已修改",
+                        "email", "testadmin-updated@archforge.com"));
         assertEquals(0, response.get("code"));
     }
 
     @Test
     @Order(13)
     void toggleUserStatus() {
-        Map<String, Object> response =
-                post("/user/status", Map.of("id", createdUserId, "status", 2));
+        Map<String, Object> response = post("/user/status", Map.of("id", createdUserId, "status", 2));
         assertEquals(0, response.get("code"));
     }
 
     @Test
     @Order(14)
     void resetUserPassword() {
-        Map<String, Object> response =
-                post("/user/reset-password", Map.of("id", createdUserId, "password", "NewPass123"));
+        Map<String, Object> response = post("/user/reset-password", Map.of("id", createdUserId, "password", "NewPass123"));
         assertEquals(0, response.get("code"));
     }
 
@@ -205,13 +197,12 @@ class RestClientIntegrationTest {
     @Test
     @Order(20)
     void createRole() {
-        Map<String, Object> response =
-                post(
-                        "/role/create",
-                        Map.of(
-                                "name", "RestClient测试角色",
-                                "code", "restclient_test_role",
-                                "status", 1));
+        Map<String, Object> response = post(
+                "/role/create",
+                Map.of(
+                        "name", "RestClient测试角色",
+                        "code", "restclient_test_role",
+                        "status", 1));
         assertEquals(0, response.get("code"), "Create role failed: " + response);
     }
 
@@ -226,30 +217,28 @@ class RestClientIntegrationTest {
         assertTrue(
                 list.stream().anyMatch(r -> "restclient_test_role".equals(r.get("code"))),
                 "Role list: " + list);
-        createdRoleId =
-                list.stream()
-                        .filter(r -> "restclient_test_role".equals(r.get("code")))
-                        .findFirst()
-                        .map(r -> ((Number) r.get("id")).longValue())
-                        .orElse(null);
+        createdRoleId = list.stream()
+                .filter(r -> "restclient_test_role".equals(r.get("code")))
+                .findFirst()
+                .map(r -> ((Number) r.get("id")).longValue())
+                .orElse(null);
         assertNotNull(createdRoleId);
     }
 
     @Test
     @Order(22)
     void updateRole() {
-        Map<String, Object> response =
-                put(
-                        "/role/update",
-                        Map.of(
-                                "id",
-                                createdRoleId,
-                                "name",
-                                "RestClient测试角色-已修改",
-                                "code",
-                                "restclient_test_role",
-                                "status",
-                                1));
+        Map<String, Object> response = put(
+                "/role/update",
+                Map.of(
+                        "id",
+                        createdRoleId,
+                        "name",
+                        "RestClient测试角色-已修改",
+                        "code",
+                        "restclient_test_role",
+                        "status",
+                        1));
         assertEquals(0, response.get("code"));
     }
 
@@ -265,17 +254,16 @@ class RestClientIntegrationTest {
     @Test
     @Order(30)
     void createDept() {
-        Map<String, Object> response =
-                post(
-                        "/dept/create",
-                        Map.of(
-                                "name", "测试部门",
-                                "parentId", 100,
-                                "principal", "测试负责人",
-                                "email", "testdept@archforge.com",
-                                "phone", "13900000099",
-                                "status", 1,
-                                "sort", 99));
+        Map<String, Object> response = post(
+                "/dept/create",
+                Map.of(
+                        "name", "测试部门",
+                        "parentId", 100,
+                        "principal", "测试负责人",
+                        "email", "testdept@archforge.com",
+                        "phone", "13900000099",
+                        "status", 1,
+                        "sort", 99));
         assertEquals(0, response.get("code"), "Create dept failed: " + response);
     }
 
@@ -287,26 +275,24 @@ class RestClientIntegrationTest {
         assertEquals(0, response.get("code"));
         List<Map<String, Object>> data = (List<Map<String, Object>>) response.get("data");
         assertTrue(data.stream().anyMatch(d -> "测试部门".equals(d.get("name"))));
-        createdDeptId =
-                data.stream()
-                        .filter(d -> "测试部门".equals(d.get("name")))
-                        .findFirst()
-                        .map(d -> ((Number) d.get("id")).longValue())
-                        .orElse(null);
+        createdDeptId = data.stream()
+                .filter(d -> "测试部门".equals(d.get("name")))
+                .findFirst()
+                .map(d -> ((Number) d.get("id")).longValue())
+                .orElse(null);
         assertNotNull(createdDeptId);
     }
 
     @Test
     @Order(32)
     void updateDept() {
-        Map<String, Object> response =
-                put(
-                        "/dept/update",
-                        Map.of(
-                                "id", createdDeptId,
-                                "name", "测试部门-已修改",
-                                "principal", "新负责人",
-                                "email", "updated-dept@archforge.com"));
+        Map<String, Object> response = put(
+                "/dept/update",
+                Map.of(
+                        "id", createdDeptId,
+                        "name", "测试部门-已修改",
+                        "principal", "新负责人",
+                        "email", "updated-dept@archforge.com"));
         assertEquals(0, response.get("code"));
     }
 

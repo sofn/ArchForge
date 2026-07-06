@@ -14,9 +14,7 @@ public class NullAuthSpi extends AbstractAuthSpi {
     public static final String SPI_NAME = "Null";
 
     @Override
-    public String getName() {
-        return SPI_NAME;
-    }
+    public String getName() { return SPI_NAME; }
 
     @Override
     protected boolean checkCanAuth(AuthRequest request) {

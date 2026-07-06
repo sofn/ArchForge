@@ -6,4 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 /**
  * @author sofn
  */
-public interface SysFileRepository extends JpaRepository<SysFile, Long> {}
+public interface SysFileRepository extends JpaRepository<SysFile, Long> {
+}

@@ -18,19 +18,16 @@ public class ErrorInfo {
     static final Map<String, ErrorInfo> ERROR_MSG_CODES_MAP = new ConcurrentHashMap<>();
 
     /** 错误码 */
-    @Getter private final int code;
+    @Getter
+    private final int code;
 
     /** 返回错误信息 */
     private final String msg;
 
-    public String getMsg() {
-        return msg;
-    }
+    public String getMsg() { return msg; }
 
     /** 兼容前端字段名: message */
-    public String getMessage() {
-        return msg;
-    }
+    public String getMessage() { return msg; }
 
     public static ErrorInfo parse(String message) {
         return ERROR_MSG_CODES_MAP.computeIfAbsent(

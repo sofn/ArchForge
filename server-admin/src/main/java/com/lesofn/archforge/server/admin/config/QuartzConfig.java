@@ -32,15 +32,12 @@ public class QuartzConfig {
     }
 
     /** Subclass of SpringBeanJobFactory that autowires Job instances after creation. */
-    static class AutowiringSpringBeanJobFactory extends SpringBeanJobFactory
-            implements ApplicationContextAware {
+    static class AutowiringSpringBeanJobFactory extends SpringBeanJobFactory implements ApplicationContextAware {
 
         private transient AutowireCapableBeanFactory beanFactory;
 
         @Override
-        public void setApplicationContext(ApplicationContext ctx) {
-            this.beanFactory = ctx.getAutowireCapableBeanFactory();
-        }
+        public void setApplicationContext(ApplicationContext ctx) { this.beanFactory = ctx.getAutowireCapableBeanFactory(); }
 
         @Override
         protected Object createJobInstance(TriggerFiredBundle bundle) throws Exception {

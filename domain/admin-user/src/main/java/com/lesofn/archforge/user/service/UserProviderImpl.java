@@ -10,7 +10,8 @@ import org.springframework.stereotype.Service;
 /** Authors: sofn Version: 1.0 Created at 2015-10-02 22:10. */
 @Service
 public class UserProviderImpl implements UserProvider {
-    @Resource private UserService userService;
+    @Resource
+    private UserService userService;
 
     @Override
     public boolean isValidUser(long uid) {

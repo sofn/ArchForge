@@ -71,7 +71,5 @@ public class CookieAuthSpi extends AbstractAuthSpi {
     }
 
     @Override
-    public String getName() {
-        return SPI_NAME;
-    }
+    public String getName() { return SPI_NAME; }
 }

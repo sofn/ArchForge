@@ -16,7 +16,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 /**
  * 解决网页认证问题，set cookie
  *
- * <p>Authors: sofn Version: 1.0 Created at 2015-10-06 22:50.
+ * <p>
+ * Authors: sofn Version: 1.0 Created at 2015-10-06 22:50.
  */
 @Controller
 @RequestMapping("/proxy")
@@ -27,10 +28,7 @@ public class ProxyResource {
     @BaseInfo(desc = "代理url，种cookie", needAuth = AuthType.REQUIRED)
     @RequestMapping(value = "", method = RequestMethod.GET)
     public String proxy(RequestContext rc, @RequestParam String url, HttpServletResponse response) {
-        Cookie cookie =
-                new Cookie(
-                        CookieAuthSpi.COOKIE_NAME,
-                        CookieAuthSpi.generateCookie(rc.getCurrentUid()));
+        Cookie cookie = new Cookie(CookieAuthSpi.COOKIE_NAME, CookieAuthSpi.generateCookie(rc.getCurrentUid()));
         cookie.setMaxAge((int) CookieAuthSpi.COOKIE_EXPIRES_TIME);
         response.addCookie(cookie);
         logger.info("proxy: " + url);

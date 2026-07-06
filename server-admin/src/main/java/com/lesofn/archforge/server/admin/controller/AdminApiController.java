@@ -92,14 +92,12 @@ public class AdminApiController {
     @PostMapping("/user")
     public AdminPageResult<AdminUserItemDTO> getUserList(
             @RequestBody AdminUserListRequest request) {
-        int currentPage =
-                request.getCurrentPage() != null && request.getCurrentPage() > 0
-                        ? request.getCurrentPage()
-                        : 1;
-        int pageSize =
-                request.getPageSize() != null && request.getPageSize() > 0
-                        ? request.getPageSize()
-                        : 10;
+        int currentPage = request.getCurrentPage() != null && request.getCurrentPage() > 0
+                ? request.getCurrentPage()
+                : 1;
+        int pageSize = request.getPageSize() != null && request.getPageSize() > 0
+                ? request.getPageSize()
+                : 10;
 
         SysUserQueryCriteria criteria = new SysUserQueryCriteria();
         criteria.setBlurry(request.getBlurry());
@@ -113,20 +111,18 @@ public class AdminApiController {
             criteria.setCreateTime(request.getCreateTime());
         }
 
-        Pageable pageable =
-                PageRequest.of(
-                        currentPage - 1,
-                        pageSize,
-                        org.springframework.data.domain.Sort.by(
-                                org.springframework.data.domain.Sort.Direction.DESC, "userId"));
+        Pageable pageable = PageRequest.of(
+                currentPage - 1,
+                pageSize,
+                org.springframework.data.domain.Sort.by(
+                        org.springframework.data.domain.Sort.Direction.DESC, "userId"));
         Specification<SysUser> spec = (root, q, cb) -> QueryHelp.getPredicate(root, criteria, cb);
         Page<SysUser> userPage = userService.findAll(spec, pageable);
 
         Map<Long, String> deptNameMap = buildDeptNameMap();
-        List<AdminUserItemDTO> userItems =
-                userPage.getContent().stream()
-                        .map(user -> userMapper.toDto(user, deptNameMap))
-                        .collect(Collectors.toList());
+        List<AdminUserItemDTO> userItems = userPage.getContent().stream()
+                .map(user -> userMapper.toDto(user, deptNameMap))
+                .collect(Collectors.toList());
         return AdminPageResult.of(userItems, userPage.getTotalElements(), pageSize, currentPage);
     }
 
@@ -162,23 +158,20 @@ public class AdminApiController {
     @PostMapping("/role")
     public AdminPageResult<AdminRoleItemDTO> getRoleList(
             @RequestBody AdminRoleListRequest request) {
-        int currentPage =
-                request.getCurrentPage() != null && request.getCurrentPage() > 0
-                        ? request.getCurrentPage()
-                        : 1;
-        int pageSize =
-                request.getPageSize() != null && request.getPageSize() > 0
-                        ? request.getPageSize()
-                        : 10;
+        int currentPage = request.getCurrentPage() != null && request.getCurrentPage() > 0
+                ? request.getCurrentPage()
+                : 1;
+        int pageSize = request.getPageSize() != null && request.getPageSize() > 0
+                ? request.getPageSize()
+                : 10;
 
         Pageable pageable = PageRequest.of(currentPage - 1, pageSize);
         Page<SysRole> rolePage = roleService.findAll(pageable);
 
-        List<AdminRoleItemDTO> roleItems =
-                rolePage.getContent().stream()
-                        .filter(role -> !Boolean.TRUE.equals(role.getDeleted()))
-                        .map(roleMapper::toDto)
-                        .collect(Collectors.toList());
+        List<AdminRoleItemDTO> roleItems = rolePage.getContent().stream()
+                .filter(role -> !Boolean.TRUE.equals(role.getDeleted()))
+                .map(roleMapper::toDto)
+                .collect(Collectors.toList());
 
         return AdminPageResult.of(roleItems, rolePage.getTotalElements(), pageSize, currentPage);
     }
@@ -244,16 +237,25 @@ public class AdminApiController {
     @PutMapping("/user/update")
     public Boolean updateUser(@RequestBody @Valid UserUpdateRequest request) {
         Optional<SysUser> opt = userService.findById(request.getId());
-        if (opt.isEmpty()) return false;
+        if (opt.isEmpty())
+            return false;
         SysUser user = opt.get();
-        if (request.getUsername() != null) user.setUsername(request.getUsername());
-        if (request.getNickname() != null) user.setNickname(request.getNickname());
-        if (request.getPhone() != null) user.setPhoneNumber(request.getPhone());
-        if (request.getEmail() != null) user.setEmail(request.getEmail());
-        if (request.getSex() != null) user.setSex(GenderEnum.fromValue(request.getSex()));
-        if (request.getStatus() != null) user.setStatus(request.getStatus());
-        if (request.getRemark() != null) user.setRemark(request.getRemark());
-        if (request.getParentId() != null) user.setDeptId(request.getParentId());
+        if (request.getUsername() != null)
+            user.setUsername(request.getUsername());
+        if (request.getNickname() != null)
+            user.setNickname(request.getNickname());
+        if (request.getPhone() != null)
+            user.setPhoneNumber(request.getPhone());
+        if (request.getEmail() != null)
+            user.setEmail(request.getEmail());
+        if (request.getSex() != null)
+            user.setSex(GenderEnum.fromValue(request.getSex()));
+        if (request.getStatus() != null)
+            user.setStatus(request.getStatus());
+        if (request.getRemark() != null)
+            user.setRemark(request.getRemark());
+        if (request.getParentId() != null)
+            user.setDeptId(request.getParentId());
         userService.update(user);
         return true;
     }
@@ -315,11 +317,15 @@ public class AdminApiController {
     @PutMapping("/role/update")
     public Boolean updateRole(@RequestBody @Valid RoleUpdateRequest request) {
         Optional<SysRole> opt = roleService.findById(request.getId());
-        if (opt.isEmpty()) return false;
+        if (opt.isEmpty())
+            return false;
         SysRole role = opt.get();
-        if (request.getName() != null) role.setRoleName(request.getName());
-        if (request.getCode() != null) role.setRoleKey(request.getCode());
-        if (request.getRemark() != null) role.setRemark(request.getRemark());
+        if (request.getName() != null)
+            role.setRoleName(request.getName());
+        if (request.getCode() != null)
+            role.setRoleKey(request.getCode());
+        if (request.getRemark() != null)
+            role.setRemark(request.getRemark());
         roleService.update(role);
         return true;
     }
@@ -346,8 +352,7 @@ public class AdminApiController {
     @Operation(summary = "保存角色菜单权限")
     @PostMapping("/role/save-menu")
     public Boolean saveRoleMenu(@RequestBody @Valid RoleMenuRequest request) {
-        List<Long> menuIdList =
-                request.getMenuIds() != null ? request.getMenuIds() : Collections.emptyList();
+        List<Long> menuIdList = request.getMenuIds() != null ? request.getMenuIds() : Collections.emptyList();
         roleMenuService.updateRoleMenus(request.getId(), menuIdList);
         return true;
     }
@@ -366,7 +371,8 @@ public class AdminApiController {
     @PutMapping("/menu/update")
     public Boolean updateMenu(@RequestBody @Valid MenuUpdateRequest request) {
         Optional<SysMenu> opt = menuService.findById(request.getId());
-        if (opt.isEmpty()) return false;
+        if (opt.isEmpty())
+            return false;
         SysMenu menu = opt.get();
         applyMenuFields(
                 menu,
@@ -419,16 +425,25 @@ public class AdminApiController {
     @PutMapping("/dept/update")
     public Boolean updateDept(@RequestBody @Valid DeptUpdateRequest request) {
         Optional<SysDept> opt = deptService.findById(request.getId());
-        if (opt.isEmpty()) return false;
+        if (opt.isEmpty())
+            return false;
         SysDept dept = opt.get();
-        if (request.getName() != null) dept.setName(request.getName());
-        if (request.getPrincipal() != null) dept.setPrincipal(request.getPrincipal());
-        if (request.getPhone() != null) dept.setPhone(request.getPhone());
-        if (request.getEmail() != null) dept.setEmail(request.getEmail());
-        if (request.getSort() != null) dept.setSort(request.getSort());
-        if (request.getStatus() != null) dept.setStatus(request.getStatus());
-        if (request.getRemark() != null) dept.setRemark(request.getRemark());
-        if (request.getParentId() != null) dept.setParentId(request.getParentId());
+        if (request.getName() != null)
+            dept.setName(request.getName());
+        if (request.getPrincipal() != null)
+            dept.setPrincipal(request.getPrincipal());
+        if (request.getPhone() != null)
+            dept.setPhone(request.getPhone());
+        if (request.getEmail() != null)
+            dept.setEmail(request.getEmail());
+        if (request.getSort() != null)
+            dept.setSort(request.getSort());
+        if (request.getStatus() != null)
+            dept.setStatus(request.getStatus());
+        if (request.getRemark() != null)
+            dept.setRemark(request.getRemark());
+        if (request.getParentId() != null)
+            dept.setParentId(request.getParentId());
         deptService.update(dept);
         return true;
     }
@@ -450,22 +465,21 @@ public class AdminApiController {
         int pageSize = getInt(request, "pageSize", 10);
         Pageable pageable = PageRequest.of(currentPage - 1, pageSize);
         Page<SysConfig> page = configService.findAll(pageable);
-        List<Map<String, Object>> list =
-                page.getContent().stream()
-                        .filter(c -> !Boolean.TRUE.equals(c.getDeleted()))
-                        .map(
-                                c -> {
-                                    Map<String, Object> m = new java.util.LinkedHashMap<>();
-                                    m.put("id", c.getConfigId());
-                                    m.put("configName", c.getConfigName());
-                                    m.put("configKey", c.getConfigKey());
-                                    m.put("configValue", c.getConfigValue());
-                                    m.put("configType", c.getConfigType());
-                                    m.put("remark", c.getRemark());
-                                    m.put("createTime", toEpochMilli(c.getCreateTime()));
-                                    return m;
-                                })
-                        .collect(Collectors.toList());
+        List<Map<String, Object>> list = page.getContent().stream()
+                .filter(c -> !Boolean.TRUE.equals(c.getDeleted()))
+                .map(
+                        c -> {
+                            Map<String, Object> m = new java.util.LinkedHashMap<>();
+                            m.put("id", c.getConfigId());
+                            m.put("configName", c.getConfigName());
+                            m.put("configKey", c.getConfigKey());
+                            m.put("configValue", c.getConfigValue());
+                            m.put("configType", c.getConfigType());
+                            m.put("remark", c.getRemark());
+                            m.put("createTime", toEpochMilli(c.getCreateTime()));
+                            return m;
+                        })
+                .collect(Collectors.toList());
         return AdminPageResult.of(list, page.getTotalElements(), pageSize, currentPage);
     }
 
@@ -486,13 +500,19 @@ public class AdminApiController {
     @PutMapping("/config/update")
     public Boolean updateConfig(@RequestBody @Valid ConfigUpdateRequest request) {
         Optional<SysConfig> opt = configService.findById(request.getId());
-        if (opt.isEmpty()) return false;
+        if (opt.isEmpty())
+            return false;
         SysConfig config = opt.get();
-        if (request.getConfigName() != null) config.setConfigName(request.getConfigName());
-        if (request.getConfigKey() != null) config.setConfigKey(request.getConfigKey());
-        if (request.getConfigValue() != null) config.setConfigValue(request.getConfigValue());
-        if (request.getConfigType() != null) config.setConfigType(request.getConfigType());
-        if (request.getRemark() != null) config.setRemark(request.getRemark());
+        if (request.getConfigName() != null)
+            config.setConfigName(request.getConfigName());
+        if (request.getConfigKey() != null)
+            config.setConfigKey(request.getConfigKey());
+        if (request.getConfigValue() != null)
+            config.setConfigValue(request.getConfigValue());
+        if (request.getConfigType() != null)
+            config.setConfigType(request.getConfigType());
+        if (request.getRemark() != null)
+            config.setRemark(request.getRemark());
         configService.update(config);
         return true;
     }
@@ -514,22 +534,21 @@ public class AdminApiController {
         int pageSize = getInt(request, "pageSize", 10);
         Pageable pageable = PageRequest.of(currentPage - 1, pageSize);
         Page<SysNotice> page = noticeService.findAll(pageable);
-        List<Map<String, Object>> list =
-                page.getContent().stream()
-                        .filter(n -> !Boolean.TRUE.equals(n.getDeleted()))
-                        .map(
-                                n -> {
-                                    Map<String, Object> m = new java.util.LinkedHashMap<>();
-                                    m.put("id", n.getNoticeId());
-                                    m.put("noticeTitle", n.getNoticeTitle());
-                                    m.put("noticeType", n.getNoticeType());
-                                    m.put("noticeContent", n.getNoticeContent());
-                                    m.put("status", n.getStatus());
-                                    m.put("remark", n.getRemark());
-                                    m.put("createTime", toEpochMilli(n.getCreateTime()));
-                                    return m;
-                                })
-                        .collect(Collectors.toList());
+        List<Map<String, Object>> list = page.getContent().stream()
+                .filter(n -> !Boolean.TRUE.equals(n.getDeleted()))
+                .map(
+                        n -> {
+                            Map<String, Object> m = new java.util.LinkedHashMap<>();
+                            m.put("id", n.getNoticeId());
+                            m.put("noticeTitle", n.getNoticeTitle());
+                            m.put("noticeType", n.getNoticeType());
+                            m.put("noticeContent", n.getNoticeContent());
+                            m.put("status", n.getStatus());
+                            m.put("remark", n.getRemark());
+                            m.put("createTime", toEpochMilli(n.getCreateTime()));
+                            return m;
+                        })
+                .collect(Collectors.toList());
         return AdminPageResult.of(list, page.getTotalElements(), pageSize, currentPage);
     }
 
@@ -551,13 +570,19 @@ public class AdminApiController {
     @PutMapping("/notice/update")
     public Boolean updateNotice(@RequestBody @Valid NoticeUpdateRequest request) {
         Optional<SysNotice> opt = noticeService.findById(request.getId());
-        if (opt.isEmpty()) return false;
+        if (opt.isEmpty())
+            return false;
         SysNotice notice = opt.get();
-        if (request.getNoticeTitle() != null) notice.setNoticeTitle(request.getNoticeTitle());
-        if (request.getNoticeType() != null) notice.setNoticeType(request.getNoticeType());
-        if (request.getNoticeContent() != null) notice.setNoticeContent(request.getNoticeContent());
-        if (request.getStatus() != null) notice.setStatus(request.getStatus());
-        if (request.getRemark() != null) notice.setRemark(request.getRemark());
+        if (request.getNoticeTitle() != null)
+            notice.setNoticeTitle(request.getNoticeTitle());
+        if (request.getNoticeType() != null)
+            notice.setNoticeType(request.getNoticeType());
+        if (request.getNoticeContent() != null)
+            notice.setNoticeContent(request.getNoticeContent());
+        if (request.getStatus() != null)
+            notice.setStatus(request.getStatus());
+        if (request.getRemark() != null)
+            notice.setRemark(request.getRemark());
         noticeService.update(notice);
         return true;
     }
@@ -579,25 +604,24 @@ public class AdminApiController {
         int pageSize = getInt(request, "pageSize", 10);
         Pageable pageable = PageRequest.of(currentPage - 1, pageSize);
         Page<SysOperLog> page = operLogService.findAll(pageable);
-        List<Map<String, Object>> list =
-                page.getContent().stream()
-                        .filter(o -> !Boolean.TRUE.equals(o.getDeleted()))
-                        .map(
-                                o -> {
-                                    Map<String, Object> m = new java.util.LinkedHashMap<>();
-                                    m.put("id", o.getOperId());
-                                    m.put("username", o.getUsername());
-                                    m.put("module", o.getModule());
-                                    m.put("summary", o.getSummary());
-                                    m.put("ip", o.getIp());
-                                    m.put("address", o.getAddress());
-                                    m.put("system", o.getSystemName());
-                                    m.put("browser", o.getBrowser());
-                                    m.put("status", o.getStatus());
-                                    m.put("operatingTime", toEpochMilli(o.getOperatingTime()));
-                                    return m;
-                                })
-                        .collect(Collectors.toList());
+        List<Map<String, Object>> list = page.getContent().stream()
+                .filter(o -> !Boolean.TRUE.equals(o.getDeleted()))
+                .map(
+                        o -> {
+                            Map<String, Object> m = new java.util.LinkedHashMap<>();
+                            m.put("id", o.getOperId());
+                            m.put("username", o.getUsername());
+                            m.put("module", o.getModule());
+                            m.put("summary", o.getSummary());
+                            m.put("ip", o.getIp());
+                            m.put("address", o.getAddress());
+                            m.put("system", o.getSystemName());
+                            m.put("browser", o.getBrowser());
+                            m.put("status", o.getStatus());
+                            m.put("operatingTime", toEpochMilli(o.getOperatingTime()));
+                            return m;
+                        })
+                .collect(Collectors.toList());
         return AdminPageResult.of(list, page.getTotalElements(), pageSize, currentPage);
     }
 
@@ -626,24 +650,23 @@ public class AdminApiController {
         int pageSize = getInt(request, "pageSize", 10);
         Pageable pageable = PageRequest.of(currentPage - 1, pageSize);
         Page<SysLoginLog> page = loginLogService.findAll(pageable);
-        List<Map<String, Object>> list =
-                page.getContent().stream()
-                        .filter(l -> !Boolean.TRUE.equals(l.getDeleted()))
-                        .map(
-                                l -> {
-                                    Map<String, Object> m = new java.util.LinkedHashMap<>();
-                                    m.put("id", l.getInfoId());
-                                    m.put("username", l.getUsername());
-                                    m.put("ip", l.getIp());
-                                    m.put("address", l.getAddress());
-                                    m.put("system", l.getSystemName());
-                                    m.put("browser", l.getBrowser());
-                                    m.put("status", l.getStatus());
-                                    m.put("behavior", l.getBehavior());
-                                    m.put("loginTime", toEpochMilli(l.getLoginTime()));
-                                    return m;
-                                })
-                        .collect(Collectors.toList());
+        List<Map<String, Object>> list = page.getContent().stream()
+                .filter(l -> !Boolean.TRUE.equals(l.getDeleted()))
+                .map(
+                        l -> {
+                            Map<String, Object> m = new java.util.LinkedHashMap<>();
+                            m.put("id", l.getInfoId());
+                            m.put("username", l.getUsername());
+                            m.put("ip", l.getIp());
+                            m.put("address", l.getAddress());
+                            m.put("system", l.getSystemName());
+                            m.put("browser", l.getBrowser());
+                            m.put("status", l.getStatus());
+                            m.put("behavior", l.getBehavior());
+                            m.put("loginTime", toEpochMilli(l.getLoginTime()));
+                            return m;
+                        })
+                .collect(Collectors.toList());
         return AdminPageResult.of(list, page.getTotalElements(), pageSize, currentPage);
     }
 
@@ -733,24 +756,40 @@ public class AdminApiController {
             String frameSrc,
             Boolean frameLoading,
             Boolean hiddenTag) {
-        if (parentId != null) menu.setParentId(parentId);
-        if (menuType != null) menu.setMenuType(menuType);
-        if (name != null) menu.setRouterName(name);
-        if (path != null) menu.setPath(path);
-        if (auths != null) menu.setPermission(auths);
-        if (status != null) menu.setStatus(status);
+        if (parentId != null)
+            menu.setParentId(parentId);
+        if (menuType != null)
+            menu.setMenuType(menuType);
+        if (name != null)
+            menu.setRouterName(name);
+        if (path != null)
+            menu.setPath(path);
+        if (auths != null)
+            menu.setPermission(auths);
+        if (status != null)
+            menu.setStatus(status);
         MetaDTO meta = menu.getMetaInfo() != null ? menu.getMetaInfo() : new MetaDTO();
-        if (title != null) meta.setTitle(title);
-        if (icon != null) meta.setIcon(icon);
-        if (rank != null) meta.setRank(rank);
-        if (showLink != null) meta.setShowLink(showLink);
-        if (showParent != null) meta.setShowParent(showParent);
-        if (keepAlive != null) meta.setKeepAlive(keepAlive);
-        if (frameSrc != null) meta.setFrameSrc(frameSrc);
-        if (frameLoading != null) meta.setFrameLoading(frameLoading);
-        if (hiddenTag != null) meta.setHiddenTag(hiddenTag);
+        if (title != null)
+            meta.setTitle(title);
+        if (icon != null)
+            meta.setIcon(icon);
+        if (rank != null)
+            meta.setRank(rank);
+        if (showLink != null)
+            meta.setShowLink(showLink);
+        if (showParent != null)
+            meta.setShowParent(showParent);
+        if (keepAlive != null)
+            meta.setKeepAlive(keepAlive);
+        if (frameSrc != null)
+            meta.setFrameSrc(frameSrc);
+        if (frameLoading != null)
+            meta.setFrameLoading(frameLoading);
+        if (hiddenTag != null)
+            meta.setHiddenTag(hiddenTag);
         menu.setMetaInfo(meta);
-        if (title != null) menu.setMenuName(title);
+        if (title != null)
+            menu.setMenuName(title);
     }
 
     private int getInt(Map<String, Object> map, String key, int defaultValue) {

@@ -8,6 +8,7 @@ public class GlobalConstants {
     public static final int USER_ID_AUTH = 2;
     public static final int TASK_ID_AUTH = 3;
 
-    public static final String[] staticResourceArray =
-            new String[] {"html", "css", "js", "ico", "png", "jpg", "gif"};
+    public static final String[] staticResourceArray = new String[] {
+            "html", "css", "js", "ico", "png", "jpg", "gif"
+    };
 }

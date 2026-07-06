@@ -115,8 +115,7 @@ public class SecurityConfig {
         config.setAllowCredentials(corsConfig.isAllowCredentials());
 
         // 白名单来源：如果配置了 "*" 且 allowCredentials=true，改用 AllowedOriginPattern
-        if (corsConfig.getAllowedOrigins().size() == 1
-                && "*".equals(corsConfig.getAllowedOrigins().getFirst())) {
+        if (corsConfig.getAllowedOrigins().size() == 1 && "*".equals(corsConfig.getAllowedOrigins().getFirst())) {
             config.addAllowedOriginPattern("*");
         } else {
             corsConfig.getAllowedOrigins().forEach(config::addAllowedOrigin);
@@ -148,87 +147,79 @@ public class SecurityConfig {
                         session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 // 配置logout
                 .logout(
-                        logout ->
-                                logout.logoutUrl("/logout")
-                                        .logoutSuccessHandler(logoutSuccessHandler()))
+                        logout -> logout.logoutUrl("/logout")
+                                .logoutSuccessHandler(logoutSuccessHandler()))
                 // 配置请求授权规则
                 .authorizeHttpRequests(
-                        auth ->
-                                auth
-                                        // 对于登录login 注册register 验证码captchaImage 以及公共Api的请求允许匿名访问
-                                        .requestMatchers(
-                                                "/login",
-                                                "/register",
-                                                "/getConfig",
-                                                "/captchaImage",
-                                                "/refresh-token")
-                                        .permitAll()
-                                        .requestMatchers("/api/**")
-                                        .permitAll()
-                                        // 静态资源允许匿名访问
-                                        .requestMatchers(
-                                                HttpMethod.GET,
-                                                "/",
-                                                "/*.html",
-                                                "/**",
-                                                "/profile/**")
-                                        .permitAll()
-                                        .requestMatchers(
-                                                HttpMethod.GET,
-                                                "/**/*.html",
-                                                "/**/*.css",
-                                                "/**/*.js")
-                                        .permitAll()
-                                        // Swagger相关路径允许匿名访问
-                                        .requestMatchers(
-                                                "/swagger-ui/**",
-                                                "/swagger-ui.html",
-                                                "/v3/api-docs/**",
-                                                "/swagger-resources/**",
-                                                "/webjars/**")
-                                        .permitAll()
-                                        // H2 Console允许匿名访问（仅开发环境）
-                                        .requestMatchers("/h2-console/**")
-                                        .permitAll()
-                                        // Actuator端点允许匿名访问
-                                        .requestMatchers("/actuator/**")
-                                        .permitAll()
-                                        // Jolokia端点允许匿名访问
-                                        .requestMatchers("/jolokia/**")
-                                        .permitAll()
-                                        // 其他所有请求都需要认证
-                                        .anyRequest()
-                                        .authenticated())
+                        auth -> auth
+                                // 对于登录login 注册register 验证码captchaImage 以及公共Api的请求允许匿名访问
+                                .requestMatchers(
+                                        "/login",
+                                        "/register",
+                                        "/getConfig",
+                                        "/captchaImage",
+                                        "/refresh-token")
+                                .permitAll()
+                                .requestMatchers("/api/**")
+                                .permitAll()
+                                // 静态资源允许匿名访问
+                                .requestMatchers(
+                                        HttpMethod.GET,
+                                        "/",
+                                        "/*.html",
+                                        "/**",
+                                        "/profile/**")
+                                .permitAll()
+                                .requestMatchers(
+                                        HttpMethod.GET,
+                                        "/**/*.html",
+                                        "/**/*.css",
+                                        "/**/*.js")
+                                .permitAll()
+                                // Swagger相关路径允许匿名访问
+                                .requestMatchers(
+                                        "/swagger-ui/**",
+                                        "/swagger-ui.html",
+                                        "/v3/api-docs/**",
+                                        "/swagger-resources/**",
+                                        "/webjars/**")
+                                .permitAll()
+                                // H2 Console允许匿名访问（仅开发环境）
+                                .requestMatchers("/h2-console/**")
+                                .permitAll()
+                                // Actuator端点允许匿名访问
+                                .requestMatchers("/actuator/**")
+                                .permitAll()
+                                // Jolokia端点允许匿名访问
+                                .requestMatchers("/jolokia/**")
+                                .permitAll()
+                                // 其他所有请求都需要认证
+                                .anyRequest()
+                                .authenticated())
                 // 安全响应头
                 .headers(
                         headers -> {
                             headers
                                     // X-Content-Type-Options: nosniff (防止 MIME 嗅探)
-                                    .contentTypeOptions(cto -> {})
+                                    .contentTypeOptions(cto -> {
+                                    })
                                     // X-Frame-Options: 禁用（H2 控制台等需要 iframe）
                                     .frameOptions(HeadersConfigurer.FrameOptionsConfig::disable)
                                     // Referrer-Policy: strict-origin-when-cross-origin
                                     .referrerPolicy(
-                                            rp ->
-                                                    rp.policy(
-                                                            ReferrerPolicyHeaderWriter
-                                                                    .ReferrerPolicy
-                                                                    .STRICT_ORIGIN_WHEN_CROSS_ORIGIN));
+                                            rp -> rp.policy(
+                                                    ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN));
                             // Content-Security-Policy: 基础策略
                             headers.contentSecurityPolicy(
-                                    csp ->
-                                            csp.policyDirectives(
-                                                    "default-src 'self'; "
-                                                            + "script-src 'self' 'unsafe-inline' 'unsafe-eval'; "
-                                                            + "style-src 'self' 'unsafe-inline'; "
-                                                            + "img-src 'self' data: blob:; "
-                                                            + "connect-src 'self'"));
+                                    csp -> csp.policyDirectives(
+                                            "default-src 'self'; " + "script-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
+                                                    "style-src 'self' 'unsafe-inline'; " + "img-src 'self' data: blob:; " +
+                                                    "connect-src 'self'"));
                             // HSTS 仅在 prod profile 启用
                             if (isProdProfile) {
                                 headers.httpStrictTransportSecurity(
-                                        hsts ->
-                                                hsts.includeSubDomains(true)
-                                                        .maxAgeInSeconds(31536000L));
+                                        hsts -> hsts.includeSubDomains(true)
+                                                .maxAgeInSeconds(31536000L));
                             }
                         });
 

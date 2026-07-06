@@ -19,8 +19,8 @@ import lombok.experimental.Accessors;
 @Table(
         name = "sys_quartz_log",
         indexes = {
-            @Index(name = "idx_sys_quartz_log_job_id", columnList = "job_id"),
-            @Index(name = "idx_sys_quartz_log_started_at", columnList = "started_at")
+                @Index(name = "idx_sys_quartz_log_job_id", columnList = "job_id"),
+                @Index(name = "idx_sys_quartz_log_started_at", columnList = "started_at")
         })
 public class SysQuartzLog {
 
@@ -100,7 +100,5 @@ public class SysQuartzLog {
                 .setFinishedAt(finishedAt);
     }
 
-    public boolean isSuccess() {
-        return status != null && status == STATUS_SUCCESS;
-    }
+    public boolean isSuccess() { return status != null && status == STATUS_SUCCESS; }
 }

@@ -5,27 +5,33 @@ import jakarta.persistence.metamodel.SingularAttribute;
 /**
  * Type-safe JPQL expression builder using JPA Static Metamodel.
  *
- * <p>Provides static helper methods for building JPQL expression fragments (aggregation, DISTINCT,
+ * <p>
+ * Provides static helper methods for building JPQL expression fragments (aggregation, DISTINCT,
  * NULL handling, CASE-WHEN, string functions) without hard-coding field names as raw strings.
  *
- * <p>Usage:
+ * <p>
+ * Usage:
  *
- * <pre>{@code
+ * <pre>
+ * {@code
  * // Instead of "COUNT(DISTINCT o.customer)"
  * SafeExpr.countDistinct(Order_.customer);
  *
  * // Instead of "COALESCE(o.discountRate, 0)"
  * SafeExpr.coalesce(Order_.discountRate, 0);
- * }</pre>
+ * }
+ * </pre>
  *
- * <p>For alias-aware expressions (e.g. {@code o.amount}), use {@link AliasExpr}.
+ * <p>
+ * For alias-aware expressions (e.g. {@code o.amount}), use {@link AliasExpr}.
  *
  * @author sofn
  * @see AliasExpr
  */
 public final class SafeExpr {
 
-    private SafeExpr() {}
+    private SafeExpr() {
+    }
 
     // ==================== Aggregate Functions ====================
 

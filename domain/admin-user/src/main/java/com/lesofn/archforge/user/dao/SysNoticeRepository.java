@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface SysNoticeRepository
-        extends JpaRepository<SysNotice, Long>, JpaSpecificationExecutor<SysNotice> {}
+public interface SysNoticeRepository extends JpaRepository<SysNotice, Long>, JpaSpecificationExecutor<SysNotice> {
+}

@@ -95,19 +95,16 @@ public class SysMenuService {
         }
 
         // 传给前端的路由排除掉按钮和停用的菜单
-        List<SysMenu> noButtonMenus =
-                allMenus.stream()
-                        .filter(menu -> !menu.getIsButton())
-                        .filter(menu -> StatusEnum.ENABLE.getValue() == menu.getStatus())
-                        .toList();
+        List<SysMenu> noButtonMenus = allMenus.stream()
+                .filter(menu -> !menu.getIsButton())
+                .filter(menu -> StatusEnum.ENABLE.getValue() == menu.getStatus())
+                .toList();
 
-        Map<Long, SysMenu> parentMap =
-                noButtonMenus.stream()
-                        .collect(Collectors.toMap(SysMenu::getMenuId, Function.identity()));
+        Map<Long, SysMenu> parentMap = noButtonMenus.stream()
+                .collect(Collectors.toMap(SysMenu::getMenuId, Function.identity()));
 
-        Map<SysMenu, RouterDTO> routerMap =
-                noButtonMenus.stream()
-                        .collect(Collectors.toMap(Function.identity(), RouterDTO::new));
+        Map<SysMenu, RouterDTO> routerMap = noButtonMenus.stream()
+                .collect(Collectors.toMap(Function.identity(), RouterDTO::new));
 
         List<RouterDTO> roots = new ArrayList<>();
         for (SysMenu sysMenu : noButtonMenus) {
@@ -129,15 +126,13 @@ public class SysMenuService {
             }
         }
 
-        roots =
-                roots.stream()
-                        .sorted(
-                                Comparator.comparing(
-                                        it ->
-                                                Optional.ofNullable(it.getMeta())
-                                                        .map(MetaDTO::getRank)
-                                                        .orElse(-1)))
-                        .toList();
+        roots = roots.stream()
+                .sorted(
+                        Comparator.comparing(
+                                it -> Optional.ofNullable(it.getMeta())
+                                        .map(MetaDTO::getRank)
+                                        .orElse(-1)))
+                .toList();
 
         sortRouterDTOChildren(roots);
         return roots;
@@ -154,15 +149,13 @@ public class SysMenuService {
             RouterDTO current = stack.pop();
 
             if (CollectionUtils.isNotEmpty(current.getChildren())) {
-                List<RouterDTO> sortedChildren =
-                        current.getChildren().stream()
-                                .sorted(
-                                        Comparator.comparing(
-                                                it ->
-                                                        Optional.ofNullable(it.getMeta())
-                                                                .map(MetaDTO::getRank)
-                                                                .orElse(-1)))
-                                .toList();
+                List<RouterDTO> sortedChildren = current.getChildren().stream()
+                        .sorted(
+                                Comparator.comparing(
+                                        it -> Optional.ofNullable(it.getMeta())
+                                                .map(MetaDTO::getRank)
+                                                .orElse(-1)))
+                        .toList();
                 current.setChildren(sortedChildren);
 
                 stack.addAll(sortedChildren);

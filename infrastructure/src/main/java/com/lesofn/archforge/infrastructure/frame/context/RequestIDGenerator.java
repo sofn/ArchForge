@@ -28,9 +28,7 @@ public class RequestIDGenerator {
         }
     }
 
-    public static RequestIDGenerator getInstance() {
-        return InstanceHolder.idGenerator;
-    }
+    public static RequestIDGenerator getInstance() { return InstanceHolder.idGenerator; }
 
     public String nextId() {
         return this.hostName + "-" + requestId.getAndIncrement();

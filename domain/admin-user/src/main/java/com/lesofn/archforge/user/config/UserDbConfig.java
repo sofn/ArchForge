@@ -18,15 +18,16 @@ import org.springframework.transaction.PlatformTransactionManager;
 @Configuration
 @EnableJpaRepositories(
         basePackages = {
-            "com.lesofn.archforge.user.dao",
-            "com.lesofn.archforge.user.menu.repository",
-            "com.lesofn.archforge.user.dept.repository"
+                "com.lesofn.archforge.user.dao",
+                "com.lesofn.archforge.user.menu.repository",
+                "com.lesofn.archforge.user.dept.repository"
         },
         entityManagerFactoryRef = "userEntityManagerFactory",
         transactionManagerRef = "userTransactionManager")
 public class UserDbConfig {
 
-    @Resource private DataSource dataSource;
+    @Resource
+    private DataSource dataSource;
 
     @Value("${spring.jpa.hibernate.ddl-auto:update}")
     private String ddlAuto;
@@ -44,8 +45,7 @@ public class UserDbConfig {
         jpaVendorAdapter.setShowSql(false);
         jpaVendorAdapter.setDatabasePlatform("org.hibernate.dialect.PostgreSQLDialect");
 
-        LocalContainerEntityManagerFactoryBean factoryBean =
-                new LocalContainerEntityManagerFactoryBean();
+        LocalContainerEntityManagerFactoryBean factoryBean = new LocalContainerEntityManagerFactoryBean();
 
         factoryBean.setDataSource(new GroupDataSourceProxy(dataSource, "user"));
         factoryBean.setJpaVendorAdapter(jpaVendorAdapter);

@@ -43,7 +43,5 @@ public abstract class BaseException extends Exception implements IErrorCodeExcep
     }
 
     @Override
-    public ErrorInfo getErrorInfo() {
-        return errorInfo;
-    }
+    public ErrorInfo getErrorInfo() { return errorInfo; }
 }

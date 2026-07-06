@@ -15,13 +15,9 @@ public class ThreadLocalContext extends InheritableThreadLocal<RequestContext> {
         return new RequestContext(requestIdGenerator.nextId());
     }
 
-    public static HttpServletRequest getServletRequest() {
-        return instance.get().getOriginRequest();
-    }
+    public static HttpServletRequest getServletRequest() { return instance.get().getOriginRequest(); }
 
-    public static RequestContext getRequestContext() {
-        return instance.get();
-    }
+    public static RequestContext getRequestContext() { return instance.get(); }
 
     public static void clear() {
         instance.remove();

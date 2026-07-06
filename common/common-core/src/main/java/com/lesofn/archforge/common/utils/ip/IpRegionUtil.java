@@ -9,7 +9,8 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class IpRegionUtil {
 
-    private IpRegionUtil() {}
+    private IpRegionUtil() {
+    }
 
     public static IpRegion getIpRegion(String ip) {
         if (StringUtils.isEmpty(ip)) {

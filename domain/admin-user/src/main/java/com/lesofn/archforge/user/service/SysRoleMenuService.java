@@ -53,16 +53,15 @@ public class SysRoleMenuService {
     public void updateRoleMenus(Long roleId, List<Long> menuIds) {
         roleMenuRepository.deleteByRoleId(roleId);
 
-        List<SysRoleMenu> roleMenus =
-                menuIds.stream()
-                        .map(
-                                menuId -> {
-                                    SysRoleMenu roleMenu = new SysRoleMenu();
-                                    roleMenu.setRoleId(roleId);
-                                    roleMenu.setMenuId(menuId);
-                                    return roleMenu;
-                                })
-                        .toList();
+        List<SysRoleMenu> roleMenus = menuIds.stream()
+                .map(
+                        menuId -> {
+                            SysRoleMenu roleMenu = new SysRoleMenu();
+                            roleMenu.setRoleId(roleId);
+                            roleMenu.setMenuId(menuId);
+                            return roleMenu;
+                        })
+                .toList();
 
         roleMenuRepository.saveAll(roleMenus);
     }

@@ -34,7 +34,5 @@ public class TaskService {
     }
 
     @Autowired
-    public void setTaskDao(TaskDao taskDao) {
-        this.taskDao = taskDao;
-    }
+    public void setTaskDao(TaskDao taskDao) { this.taskDao = taskDao; }
 }

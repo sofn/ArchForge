@@ -22,7 +22,5 @@ public class TreeNode {
         this.name = name;
     }
 
-    public void setNodes(List<TreeNode> nodes) {
-        this.nodes = nodes;
-    }
+    public void setNodes(List<TreeNode> nodes) { this.nodes = nodes; }
 }

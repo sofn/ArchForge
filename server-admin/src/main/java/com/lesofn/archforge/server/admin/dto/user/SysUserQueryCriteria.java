@@ -27,11 +27,14 @@ public class SysUserQueryCriteria {
     @Query(type = Query.Type.INNER_LIKE)
     private String phoneNumber;
 
-    @Query private Integer status;
+    @Query
+    private Integer status;
 
-    @Query private Long deptId;
+    @Query
+    private Long deptId;
 
-    @Query private Boolean deleted;
+    @Query
+    private Boolean deleted;
 
     /** Two-element list {@code [start, end]} — ignored if size != 2. */
     @Query(type = Query.Type.BETWEEN)

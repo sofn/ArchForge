@@ -43,25 +43,22 @@ public class ErrorExceptionHandle {
             }
             ErrorInfo errorInfo = errorCodeEx.getErrorInfo();
             if (errorInfo != null) {
-                ProblemDetail problem =
-                        ProblemDetail.forStatusAndDetail(HttpStatus.OK, errorInfo.getMsg());
+                ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.OK, errorInfo.getMsg());
                 problem.setTitle("Business Error");
                 problem.setProperty("code", errorInfo.getCode());
                 problem.setInstance(URI.create(request.getRequestURI()));
                 return problem;
             }
-            ProblemDetail problem =
-                    ProblemDetail.forStatusAndDetail(
-                            HttpStatus.INTERNAL_SERVER_ERROR, pair.getRight());
+            ProblemDetail problem = ProblemDetail.forStatusAndDetail(
+                    HttpStatus.INTERNAL_SERVER_ERROR, pair.getRight());
             problem.setTitle("System Error");
             problem.setProperty("code", SystemErrorCode.SYSTEM_ERROR.getCode());
             return problem;
         }
         log.error("error, request: {}", parseParam(request), e);
-        ProblemDetail problem =
-                ProblemDetail.forStatusAndDetail(
-                        HttpStatus.INTERNAL_SERVER_ERROR,
-                        pair.getLeft().getClass().getSimpleName() + ": " + pair.getRight());
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                pair.getLeft().getClass().getSimpleName() + ": " + pair.getRight());
         problem.setTitle("System Error");
         problem.setProperty("code", SystemErrorCode.SYSTEM_ERROR.getCode());
         problem.setInstance(URI.create(request.getRequestURI()));
@@ -72,18 +69,13 @@ public class ErrorExceptionHandle {
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
     public ProblemDetail badRequestException(
             HttpServletRequest request, MethodArgumentNotValidException e) {
-        List<String> errors =
-                e.getBindingResult().getFieldErrors().stream()
-                        .map(
-                                (FieldError fieldError) ->
-                                        fieldError.getField()
-                                                + ": "
-                                                + fieldError.getDefaultMessage())
-                        .toList();
+        List<String> errors = e.getBindingResult().getFieldErrors().stream()
+                .map(
+                        (FieldError fieldError) -> fieldError.getField() + ": " + fieldError.getDefaultMessage())
+                .toList();
 
         log.error("BadRequestException, request: {}", parseParam(request), e);
-        ProblemDetail problem =
-                ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Validation failed");
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Validation failed");
         problem.setTitle("Invalid Request");
         problem.setProperty("code", HttpCodes.BAD_REQUEST.getStatus());
         problem.setProperty("errors", errors);

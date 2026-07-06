@@ -16,8 +16,7 @@ import org.testcontainers.postgresql.PostgreSQLContainer;
  * @author sofn
  */
 @Slf4j
-public class InitPostgreSQLServer
-        implements ApplicationContextInitializer<ConfigurableApplicationContext> {
+public class InitPostgreSQLServer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
 
     private static final String POSTGRES_IMAGE = "postgres:17-alpine";
     private static final String DB_USER = "archforge";
@@ -52,18 +51,16 @@ public class InitPostgreSQLServer
         try {
             log.info("Starting PostgreSQL containers via Testcontainers...");
 
-            userContainer =
-                    new PostgreSQLContainer(POSTGRES_IMAGE)
-                            .withDatabaseName("archforge_user")
-                            .withUsername(DB_USER)
-                            .withPassword(DB_PASSWORD);
+            userContainer = new PostgreSQLContainer(POSTGRES_IMAGE)
+                    .withDatabaseName("archforge_user")
+                    .withUsername(DB_USER)
+                    .withPassword(DB_PASSWORD);
             userContainer.start();
 
-            taskContainer =
-                    new PostgreSQLContainer(POSTGRES_IMAGE)
-                            .withDatabaseName("archforge_task")
-                            .withUsername(DB_USER)
-                            .withPassword(DB_PASSWORD);
+            taskContainer = new PostgreSQLContainer(POSTGRES_IMAGE)
+                    .withDatabaseName("archforge_task")
+                    .withUsername(DB_USER)
+                    .withPassword(DB_PASSWORD);
             taskContainer.start();
 
             log.info(
@@ -76,11 +73,12 @@ public class InitPostgreSQLServer
             // 注册关闭钩子
             Runtime.getRuntime()
                     .addShutdownHook(
-                            new Thread(
-                                    () -> {
-                                        if (userContainer != null) userContainer.stop();
-                                        if (taskContainer != null) taskContainer.stop();
-                                    }));
+                            new Thread(() -> {
+                                if (userContainer != null)
+                                    userContainer.stop();
+                                if (taskContainer != null)
+                                    taskContainer.stop();
+                            }));
 
         } catch (Exception e) {
             log.error("Failed to start PostgreSQL containers", e);
