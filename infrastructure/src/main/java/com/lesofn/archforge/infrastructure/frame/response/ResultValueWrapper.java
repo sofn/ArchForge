@@ -1,6 +1,6 @@
 package com.lesofn.archforge.infrastructure.frame.response;
 
-import com.lesofn.archforge.common.errors.SystemErrorCode;
+import com.lesofn.archforge.common.error.SystemErrorCode;
 import com.lesofn.archforge.infrastructure.frame.response.model.ResponseResult;
 import com.lesofn.archforge.infrastructure.frame.response.model.Result;
 import org.jspecify.annotations.NonNull;

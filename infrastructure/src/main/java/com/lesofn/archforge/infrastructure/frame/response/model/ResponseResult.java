@@ -2,7 +2,7 @@ package com.lesofn.archforge.infrastructure.frame.response.model;
 
 import com.lesofn.archforge.common.error.api.ErrorCode;
 import com.lesofn.archforge.common.error.manager.ErrorInfo;
-import com.lesofn.archforge.common.errors.SystemErrorCode;
+import com.lesofn.archforge.common.error.SystemErrorCode;
 import lombok.Getter;
 
 /**

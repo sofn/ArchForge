@@ -4,7 +4,7 @@ import com.lesofn.archforge.common.error.api.ErrorCode;
 import com.lesofn.archforge.common.error.api.ProjectModule;
 import com.lesofn.archforge.common.error.exception.BaseRuntimeException;
 import com.lesofn.archforge.common.error.manager.ErrorInfo;
-import com.lesofn.archforge.common.errors.ArchForgeProjectModule;
+import com.lesofn.archforge.common.error.ArchForgeProjectModule;
 
 /**
  * @author sofn

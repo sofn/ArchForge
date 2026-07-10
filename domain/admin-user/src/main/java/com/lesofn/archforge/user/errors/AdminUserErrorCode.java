@@ -2,7 +2,7 @@ package com.lesofn.archforge.user.errors;
 
 import com.lesofn.archforge.common.error.api.ErrorCode;
 import com.lesofn.archforge.common.error.manager.ErrorManager;
-import com.lesofn.archforge.common.errors.ArchForgeProjectModule;
+import com.lesofn.archforge.common.error.ArchForgeProjectModule;
 import lombok.Getter;
 
 /**

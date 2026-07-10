@@ -1,8 +1,9 @@
 // Java 21
 
 dependencies {
-    // 依赖 common-core 模块
-    api(project(":common:common-core"))
+    // 依赖 common 基础模块
+    api(project(":common:common-base"))
+    api(project(":common:common-jpa"))
     
     // 核心框架依赖 (Spring Boot BOM 管理的版本)
     // Excluding spring-boot-starter-logging to avoid SLF4J multiple providers issue
@@ -32,6 +33,9 @@ dependencies {
         exclude(group = "ch.qos.logback", module = "logback-classic")
         exclude(group = "org.apache.logging.log4j", module = "log4j-to-slf4j")
     }
+
+    // OpenAPI / Swagger
+    api("org.springdoc:springdoc-openapi-starter-webmvc-ui")
 
     // Kaptcha 验证码
     api("com.github.penggle:kaptcha")

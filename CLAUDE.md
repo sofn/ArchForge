@@ -21,10 +21,8 @@ Multi-module Spring Boot 4 project with DDD + Clean Architecture:
 
 ```
 ArchForge/
-├── common/common-core        # Utilities, enums, encryption, Jackson, base entities
-├── common/common-error       # ErrorCode, exceptions, error manager
-├── infrastructure/           # Auth, config, filters, file storage, database proxy
-├── domain/admin-user/        # User/Role/Menu/Dept domain entities + services
+├── common/common-base        # Base utilities, enums, encryption, Jackson, validation\n├── common/common-error       # ErrorCode, exceptions, error manager
+├── common/common-jpa         # JPA base entities, converters, query helpers\n├── domain/admin-user/        # User/Role/Menu/Dept domain entities + services
 ├── server-admin/             # Controllers, Spring Boot entry point, security
 ├── example/example-task/     # Example bounded context
 └── dependencies/             # Centralized version management (java-platform)

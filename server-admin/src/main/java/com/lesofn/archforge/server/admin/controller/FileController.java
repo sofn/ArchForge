@@ -1,7 +1,7 @@
 package com.lesofn.archforge.server.admin.controller;
 
 import com.lesofn.archforge.common.error.system.SystemException;
-import com.lesofn.archforge.common.errors.SystemErrorCode;
+import com.lesofn.archforge.common.error.SystemErrorCode;
 import com.lesofn.archforge.infrastructure.config.ArchForgeConfig;
 import com.lesofn.archforge.infrastructure.file.FileStorageService;
 import com.lesofn.archforge.user.dao.SysFileRepository;

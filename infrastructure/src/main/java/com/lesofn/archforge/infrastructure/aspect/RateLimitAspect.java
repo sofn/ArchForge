@@ -1,7 +1,7 @@
 package com.lesofn.archforge.infrastructure.aspect;
 
 import com.lesofn.archforge.common.error.system.SystemException;
-import com.lesofn.archforge.common.errors.SystemErrorCode;
+import com.lesofn.archforge.common.error.SystemErrorCode;
 import com.lesofn.archforge.infrastructure.annotation.RateLimit;
 import com.lesofn.archforge.infrastructure.auth.AuthenticationUtils;
 import com.lesofn.archforge.infrastructure.auth.model.SystemLoginUser;

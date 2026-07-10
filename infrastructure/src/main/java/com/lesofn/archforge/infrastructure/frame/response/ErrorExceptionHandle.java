@@ -4,7 +4,7 @@ import com.google.common.base.Joiner;
 import com.lesofn.archforge.common.error.exception.IErrorCodeException;
 import com.lesofn.archforge.common.error.manager.ErrorInfo;
 import com.lesofn.archforge.common.error.system.HttpCodes;
-import com.lesofn.archforge.common.errors.SystemErrorCode;
+import com.lesofn.archforge.common.error.SystemErrorCode;
 import jakarta.servlet.http.HttpServletRequest;
 import java.net.URI;
 import java.util.HashMap;

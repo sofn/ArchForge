@@ -22,7 +22,8 @@ pluginManagement {
 
 rootProject.name = "ArchForge"
 
-include("common:common-core")
+include("common:common-base")
+include("common:common-jpa")
 include("common:common-error")
 include("infrastructure")
 include("dependencies")

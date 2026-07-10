@@ -33,7 +33,7 @@
 - **Logback** — Excluded globally; use Log4j2.
 - **`var` keyword** — Always use explicit types for readability and team consistency.
 - **`com.alibaba:easyexcel*`** — Forbidden by Gradle build guard (root `build.gradle.kts`). The project standard Excel I/O library is `org.dhatim:fastexcel` + `fastexcel-reader`. See §3.7 Excel I/O.
-- **`org.apache.poi:*` (direct use)** — Pulled in only as a FastExcel transitive when strictly needed. Application code should use `FastExcelUtil` (in `common-core`) rather than POI APIs.
+- **`org.apache.poi:*` (direct use)** — Pulled in only as a FastExcel transitive when strictly needed. Application code should use `FastExcelUtil` (in `common-base`) rather than POI APIs.
 
 ---
 
@@ -44,7 +44,7 @@ ArchForge/
 ├── dependencies/                  # Centralized java-platform BOM
 │   └── build.gradle.kts           # All third-party version constraints
 ├── common/
-│   ├── common-core/               # Shared utilities, base entities, constants
+│   ├── common-base/               # Shared utilities, base entities, constants
 │   │   └── build.gradle.kts
 │   └── common-error/              # Error codes, exception hierarchy, response formats
 │       └── build.gradle.kts
@@ -78,15 +78,15 @@ ArchForge/
 ### Module Dependency Rules
 
 ```
-server-<name> → domain/* → common/common-core
-server-<name> → infrastructure → common/common-core
+server-<name> → domain/* → common/common-base
+server-<name> → infrastructure → common/common-base
                                  common/common-error
 ```
 
-- **`common/common-core`**: No Spring dependencies. Pure Java utilities, base classes, constants.
+- **`common/common-base`**: No Spring dependencies. Pure Java utilities, base classes, constants.
 - **`common/common-error`**: Error code enums, exception base classes, standard API response wrappers.
 - **`infrastructure/`**: Spring-aware cross-cutting concerns — authentication, authorization, filters, interceptors, file storage, database configuration, observability setup.
-- **`domain/<context>/`**: Business logic with DDD patterns. Depends on `common-core` and JPA. Contains entities with behavior, repository interfaces, domain services.
+- **`domain/<context>/`**: Business logic with DDD patterns. Depends on `common-base` and JPA. Contains entities with behavior, repository interfaces, domain services.
 - **`server-<name>/`**: Thin web layer — controllers, request/response DTOs, Spring Boot `@SpringBootApplication` entry point. Depends on `domain/*` and `infrastructure`.
 - **`dependencies/`**: `java-platform` module. All third-party versions defined here. Every other module applies `platform(project(":dependencies"))`.
 
@@ -245,7 +245,7 @@ public class User extends BaseEntity {
 ### 3.7 Excel I/O
 
 - **Library**: `org.dhatim:fastexcel` (writer) + `org.dhatim:fastexcel-reader` (reader).
-- **Forbidden**: `com.alibaba:easyexcel*` is rejected at Gradle resolution time (see root `build.gradle.kts`). Direct use of `org.apache.poi:*` is also discouraged — go through `FastExcelUtil` in `common-core`.
+- **Forbidden**: `com.alibaba:easyexcel*` is rejected at Gradle resolution time (see root `build.gradle.kts`). Direct use of `org.apache.poi:*` is also discouraged — go through `FastExcelUtil` in `common-base`.
 - **Streaming**: FastExcel is streaming by default — large workbooks must not be materialized in memory. Pass an `OutputStream` to `FastExcelUtil.write(out, sheetName, headers, rows)` and stream rows from a `Stream`/`Iterable`.
 - **Headers**: Always include a header row; readers should skip it via `FastExcelUtil.readFirstSheet(in)` (skips row 0 by convention).
 

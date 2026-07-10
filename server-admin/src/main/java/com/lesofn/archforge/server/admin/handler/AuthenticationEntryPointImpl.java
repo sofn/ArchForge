@@ -1,7 +1,7 @@
 package com.lesofn.archforge.server.admin.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.lesofn.archforge.common.errors.SystemErrorCode;
+import com.lesofn.archforge.common.error.SystemErrorCode;
 import com.lesofn.archforge.infrastructure.frame.response.model.ResponseResult;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

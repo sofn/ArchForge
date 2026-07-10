@@ -2,7 +2,7 @@ package com.lesofn.archforge.server.admin.error;
 
 import com.lesofn.archforge.common.error.exception.IErrorCodeException;
 import com.lesofn.archforge.common.error.system.SystemException;
-import com.lesofn.archforge.common.errors.SystemErrorCode;
+import com.lesofn.archforge.common.error.SystemErrorCode;
 import com.lesofn.archforge.common.utils.GlobalConstants;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.Strings;

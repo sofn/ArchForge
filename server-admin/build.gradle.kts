@@ -71,7 +71,8 @@ dependencies {
     // 引入项目统一版本管理平台
     implementation(platform(project(":dependencies")))
     
-    api(project(":common:common-core"))
+    api(project(":common:common-base"))
+    api(project(":common:common-jpa"))
     api(project(":infrastructure"))
     api(project(":domain:admin-user"))
     api(project(":example:example-task"))

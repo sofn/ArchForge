@@ -2,7 +2,7 @@ package com.lesofn.archforge.infrastructure.aspect;
 
 import com.google.common.hash.Hashing;
 import com.lesofn.archforge.common.error.system.SystemException;
-import com.lesofn.archforge.common.errors.SystemErrorCode;
+import com.lesofn.archforge.common.error.SystemErrorCode;
 import com.lesofn.archforge.infrastructure.annotation.Idempotent;
 import com.lesofn.archforge.infrastructure.auth.AuthenticationUtils;
 import com.lesofn.archforge.infrastructure.auth.model.SystemLoginUser;
