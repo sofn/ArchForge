@@ -129,3 +129,15 @@ INSERT INTO  sys_role_menu (role_id, menu_id) VALUES (2, 60);
 INSERT INTO  sys_role_menu (role_id, menu_id) VALUES (2, 61);
 INSERT INTO  sys_role_menu (role_id, menu_id) VALUES (3, 1);
 INSERT INTO  sys_role_menu (role_id, menu_id) VALUES (111, 1);
+
+-- 文件管理菜单
+INSERT INTO  sys_menu (menu_id, menu_name, menu_type, router_name, parent_id, path, is_button, permission, meta_info, status, remark, creator_id, create_time, updater_id, update_time, deleted) VALUES (66, '文件管理', 1, 'ToolFile', 3, '/tool/file/index', 0, 'tool:file:list', '{"title":"文件管理","icon":"ep:folder","showParent":true,"rank":2}', 1, '文件管理菜单', 1, '2022-05-21 08:30:54', 1, '2022-05-21 08:30:54', 0);
+INSERT INTO  sys_menu (menu_id, menu_name, menu_type, router_name, parent_id, path, is_button, permission, meta_info, status, remark, creator_id, create_time, updater_id, update_time, deleted) VALUES (67, '文件上传', 0, ' ', 66, '', 1, 'tool:file:upload', '{"title":"文件上传"}', 1, '', 1, '2022-05-21 08:30:54', 1, '2022-05-21 08:30:54', 0);
+INSERT INTO  sys_menu (menu_id, menu_name, menu_type, router_name, parent_id, path, is_button, permission, meta_info, status, remark, creator_id, create_time, updater_id, update_time, deleted) VALUES (68, '文件删除', 0, ' ', 66, '', 1, 'tool:file:delete', '{"title":"文件删除"}', 1, '', 1, '2022-05-21 08:30:54', 1, '2022-05-21 08:30:54', 0);
+INSERT INTO  sys_menu (menu_id, menu_name, menu_type, router_name, parent_id, path, is_button, permission, meta_info, status, remark, creator_id, create_time, updater_id, update_time, deleted) VALUES (69, '文件下载', 0, ' ', 66, '', 1, 'tool:file:download', '{"title":"文件下载"}', 1, '', 1, '2022-05-21 08:30:54', 1, '2022-05-21 08:30:54', 0);
+
+-- 文件管理权限赋给普通角色
+INSERT INTO  sys_role_menu (role_id, menu_id) VALUES (2, 66);
+INSERT INTO  sys_role_menu (role_id, menu_id) VALUES (2, 67);
+INSERT INTO  sys_role_menu (role_id, menu_id) VALUES (2, 68);
+INSERT INTO  sys_role_menu (role_id, menu_id) VALUES (2, 69);

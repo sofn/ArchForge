@@ -1,0 +1,83 @@
+-- V7: 文件管理模块
+-- 创建 sys_file 表、文件存储默认参数、文件管理菜单与权限
+
+-- 文件信息表
+CREATE TABLE IF NOT EXISTS sys_file
+(
+    file_id       BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    original_name VARCHAR(255)  DEFAULT '',
+    storage_name  VARCHAR(255)  DEFAULT '',
+    storage_path  VARCHAR(512)  DEFAULT '',
+    file_size     BIGINT,
+    content_type  VARCHAR(128)  DEFAULT '',
+    extension     VARCHAR(32)   DEFAULT '',
+    storage_type  VARCHAR(16)   DEFAULT 'local',
+    remark        VARCHAR(512)  DEFAULT '',
+    creator_id    BIGINT,
+    create_time   TIMESTAMP,
+    updater_id    BIGINT,
+    update_time   TIMESTAMP,
+    deleted       BOOLEAN       DEFAULT FALSE NOT NULL
+);
+
+-- 为 sys_config 的 config_key 增加唯一约束，便于 ON CONFLICT 处理
+ALTER TABLE sys_config
+    ADD CONSTRAINT IF NOT EXISTS uq_sys_config_config_key UNIQUE (config_key);
+
+-- 文件存储默认配置
+INSERT INTO sys_config (config_name, config_key, config_value, config_type, remark, creator_id, create_time, deleted)
+VALUES ('文件存储-存储类型', 'file.storage.type', 'local', 1, 'local 或 s3', 1, NOW(), false)
+ON CONFLICT (config_key) DO NOTHING;
+
+INSERT INTO sys_config (config_name, config_key, config_value, config_type, remark, creator_id, create_time, deleted)
+VALUES ('文件存储-本地存储目录', 'file.storage.localDir', 'uploads', 1, '本地存储根目录', 1, NOW(), false)
+ON CONFLICT (config_key) DO NOTHING;
+
+INSERT INTO sys_config (config_name, config_key, config_value, config_type, remark, creator_id, create_time, deleted)
+VALUES ('文件存储-S3 Endpoint', 'file.storage.s3.endpoint', 'http://localhost:9000', 1, 'S3 兼容服务地址', 1, NOW(), false)
+ON CONFLICT (config_key) DO NOTHING;
+
+INSERT INTO sys_config (config_name, config_key, config_value, config_type, remark, creator_id, create_time, deleted)
+VALUES ('文件存储-S3 Access Key', 'file.storage.s3.accessKey', 'minioadmin', 1, 'S3 Access Key', 1, NOW(), false)
+ON CONFLICT (config_key) DO NOTHING;
+
+INSERT INTO sys_config (config_name, config_key, config_value, config_type, remark, creator_id, create_time, deleted)
+VALUES ('文件存储-S3 Secret Key', 'file.storage.s3.secretKey', 'minioadmin', 1, 'S3 Secret Key', 1, NOW(), false)
+ON CONFLICT (config_key) DO NOTHING;
+
+INSERT INTO sys_config (config_name, config_key, config_value, config_type, remark, creator_id, create_time, deleted)
+VALUES ('文件存储-S3 Bucket', 'file.storage.s3.bucket', 'archforge', 1, 'S3 Bucket 名称', 1, NOW(), false)
+ON CONFLICT (config_key) DO NOTHING;
+
+INSERT INTO sys_config (config_name, config_key, config_value, config_type, remark, creator_id, create_time, deleted)
+VALUES ('文件存储-S3 Region', 'file.storage.s3.region', 'us-east-1', 1, 'S3 Region', 1, NOW(), false)
+ON CONFLICT (config_key) DO NOTHING;
+
+-- 文件管理菜单
+INSERT INTO sys_menu (menu_id, menu_name, menu_type, router_name, parent_id, path, is_button, permission, meta_info, status, remark, creator_id, create_time, deleted)
+VALUES (66, '文件管理', 1, 'ToolFile', 3, '/tool/file/index', 0, 'tool:file:list', '{"title":"文件管理","icon":"ep:folder","showParent":true,"rank":2}', 1, '文件管理菜单', 1, NOW(), false)
+ON CONFLICT (menu_id) DO NOTHING;
+
+-- 文件管理按钮权限
+INSERT INTO sys_menu (menu_id, menu_name, menu_type, router_name, parent_id, path, is_button, permission, meta_info, status, remark, creator_id, create_time, deleted)
+VALUES (67, '文件上传', 0, ' ', 66, '', 1, 'tool:file:upload', '{"title":"文件上传"}', 1, '', 1, NOW(), false)
+ON CONFLICT (menu_id) DO NOTHING;
+
+INSERT INTO sys_menu (menu_id, menu_name, menu_type, router_name, parent_id, path, is_button, permission, meta_info, status, remark, creator_id, create_time, deleted)
+VALUES (68, '文件删除', 0, ' ', 66, '', 1, 'tool:file:delete', '{"title":"文件删除"}', 1, '', 1, NOW(), false)
+ON CONFLICT (menu_id) DO NOTHING;
+
+INSERT INTO sys_menu (menu_id, menu_name, menu_type, router_name, parent_id, path, is_button, permission, meta_info, status, remark, creator_id, create_time, deleted)
+VALUES (69, '文件下载', 0, ' ', 66, '', 1, 'tool:file:download', '{"title":"文件下载"}', 1, '', 1, NOW(), false)
+ON CONFLICT (menu_id) DO NOTHING;
+
+-- 把文件管理菜单权限赋给普通角色
+INSERT INTO sys_role_menu (role_id, menu_id) VALUES (2, 66) ON CONFLICT DO NOTHING;
+INSERT INTO sys_role_menu (role_id, menu_id) VALUES (2, 67) ON CONFLICT DO NOTHING;
+INSERT INTO sys_role_menu (role_id, menu_id) VALUES (2, 68) ON CONFLICT DO NOTHING;
+INSERT INTO sys_role_menu (role_id, menu_id) VALUES (2, 69) ON CONFLICT DO NOTHING;
+
+-- 重置序列
+SELECT setval('sys_file_file_id_seq', COALESCE((SELECT MAX(file_id) FROM sys_file), 1));
+SELECT setval('sys_menu_menu_id_seq', COALESCE((SELECT MAX(menu_id) FROM sys_menu), 1));
+SELECT setval('sys_config_config_id_seq', COALESCE((SELECT MAX(config_id) FROM sys_config), 1));

@@ -63,7 +63,8 @@ public class InitDbMockServer {
                 "sys_config_config_id_seq",
                 "sys_notice_notice_id_seq",
                 "sys_oper_log_oper_id_seq",
-                "sys_login_log_info_id_seq"
+                "sys_login_log_info_id_seq",
+                "sys_file_file_id_seq"
         };
         String[] tables = {
                 "sys_user",
@@ -73,7 +74,8 @@ public class InitDbMockServer {
                 "sys_config",
                 "sys_notice",
                 "sys_oper_log",
-                "sys_login_log"
+                "sys_login_log",
+                "sys_file"
         };
         String[] idCols = {
                 "user_id",
@@ -83,7 +85,8 @@ public class InitDbMockServer {
                 "config_id",
                 "notice_id",
                 "oper_id",
-                "info_id"
+                "info_id",
+                "file_id"
         };
         for (int i = 0; i < sequences.length; i++) {
             try {

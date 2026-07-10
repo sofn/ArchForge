@@ -1,16 +1,20 @@
 package com.lesofn.archforge.server.admin.controller;
 
-import com.lesofn.archforge.common.error.system.SystemException;
 import com.lesofn.archforge.common.error.SystemErrorCode;
+import com.lesofn.archforge.common.error.system.SystemException;
 import com.lesofn.archforge.infrastructure.config.ArchForgeConfig;
 import com.lesofn.archforge.infrastructure.file.FileStorageService;
+import com.lesofn.archforge.server.admin.controller.admin.AdminControllerHelper;
+import com.lesofn.archforge.server.admin.dto.AdminPageResult;
 import com.lesofn.archforge.user.dao.SysFileRepository;
 import com.lesofn.archforge.user.domain.SysFile;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.persistence.criteria.Predicate;
 import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +24,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -81,6 +90,48 @@ public class FileController {
     @PostMapping("/file/upload-image")
     public Map<String, Object> uploadImage(@RequestParam("file") MultipartFile file) {
         return uploadFile(file);
+    }
+
+    @Operation(summary = "获取文件列表")
+    @PostMapping("/file/list")
+    public AdminPageResult<Map<String, Object>> listFiles(@RequestBody Map<String, Object> params) {
+        int currentPage = AdminControllerHelper.getInt(params, "currentPage", 1);
+        int pageSize = AdminControllerHelper.getInt(params, "pageSize", 10);
+        String originalName = params.get("originalName") != null ? params.get("originalName").toString() : "";
+        String storageType = params.get("storageType") != null ? params.get("storageType").toString() : "";
+
+        Pageable pageable = PageRequest.of(
+                Math.max(0, currentPage - 1), pageSize, Sort.by(Sort.Direction.DESC, "createTime"));
+
+        Specification<SysFile> spec = (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            predicates.add(cb.equal(root.get("deleted"), false));
+            if (!originalName.isBlank()) {
+                predicates.add(cb.like(cb.lower(root.get("originalName")), "%" + originalName.toLowerCase() + "%"));
+            }
+            if (!storageType.isBlank()) {
+                predicates.add(cb.equal(root.get("storageType"), storageType));
+            }
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+
+        Page<SysFile> page = fileRepository.findAll(spec, pageable);
+        List<Map<String, Object>> list = new ArrayList<>();
+        for (SysFile file : page.getContent()) {
+            Map<String, Object> item = new HashMap<>();
+            item.put("id", file.getFileId());
+            item.put("originalName", file.getOriginalName());
+            item.put("storageName", file.getStorageName());
+            item.put("storagePath", file.getStoragePath());
+            item.put("fileSize", file.getFileSize());
+            item.put("contentType", file.getContentType());
+            item.put("extension", file.getExtension());
+            item.put("storageType", file.getStorageType());
+            item.put("createTime", AdminControllerHelper.toEpochMilli(file.getCreateTime()));
+            list.add(item);
+        }
+
+        return AdminPageResult.of(list, page.getTotalElements(), page.getSize(), currentPage);
     }
 
     @Operation(summary = "下载文件")
