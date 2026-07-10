@@ -26,18 +26,17 @@ public class SwaggerConfig {
     public OpenAPI initOpenAPI() {
         return new OpenAPI()
                 .openapi("3.1.0")
-                .components(new Components().addSecuritySchemes("apikey", securityScheme()))
-                .addSecurityItem(new SecurityRequirement().addList("apikey"))
+                .components(new Components().addSecuritySchemes("bearer", securityScheme()))
+                .addSecurityItem(new SecurityRequirement().addList("bearer"))
                 .info(getApiInfo());
     }
 
     @Bean
     public SecurityScheme securityScheme() {
         return new SecurityScheme()
-                .type(SecurityScheme.Type.APIKEY)
-                .name("Authorization")
-                .in(SecurityScheme.In.HEADER)
-                .scheme("Bearer");
+                .type(SecurityScheme.Type.HTTP)
+                .scheme("bearer")
+                .bearerFormat("JWT");
     }
 
     /** 添加摘要信息 */

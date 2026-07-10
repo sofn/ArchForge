@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /** Authors: sofn Version: 1.0 Created at 15-6-8 23:15. */
@@ -22,7 +23,7 @@ public class FilterConfigFactory implements WebMvcConfigurer {
         FilterRegistrationBean<Filter> registration = new FilterRegistrationBean<>();
         Filter headerFilter = new RequestLogFilter(observationRegistry);
         registration.setFilter(headerFilter);
-        registration.setOrder(Integer.MAX_VALUE);
+        registration.setOrder(Ordered.HIGHEST_PRECEDENCE);
         // 拦截错误转发
         registration.setDispatcherTypes(EnumSet.allOf(DispatcherType.class));
         return registration;
@@ -33,7 +34,7 @@ public class FilterConfigFactory implements WebMvcConfigurer {
         FilterRegistrationBean<Filter> registration = new FilterRegistrationBean<>();
         Filter headerFilter = new HeaderResponseFilter();
         registration.setFilter(headerFilter);
-        registration.setOrder(Integer.MAX_VALUE);
+        registration.setOrder(Ordered.LOWEST_PRECEDENCE);
         return registration;
     }
 }

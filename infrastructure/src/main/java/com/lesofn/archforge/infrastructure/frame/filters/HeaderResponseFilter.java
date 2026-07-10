@@ -1,5 +1,6 @@
 package com.lesofn.archforge.infrastructure.frame.filters;
 
+import com.lesofn.archforge.infrastructure.frame.context.RequestContext;
 import com.lesofn.archforge.infrastructure.frame.context.ScopedValueContext;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletResponse;
@@ -14,11 +15,10 @@ public class HeaderResponseFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain)
             throws IOException, ServletException {
-        ((HttpServletResponse) response).setHeader("X-Engine-IP", request.getLocalAddr());
-        ((HttpServletResponse) response)
-                .setHeader(
-                        "X-Engine-RequestID",
-                        ScopedValueContext.getRequestContext().getRequestId());
+        HttpServletResponse resp = (HttpServletResponse) response;
+        resp.setHeader("X-Engine-IP", request.getLocalAddr());
+        RequestContext ctx = ScopedValueContext.getRequestContext();
+        resp.setHeader("X-Engine-RequestID", ctx == null ? "-" : ctx.getRequestId());
         filterChain.doFilter(request, response);
     }
 

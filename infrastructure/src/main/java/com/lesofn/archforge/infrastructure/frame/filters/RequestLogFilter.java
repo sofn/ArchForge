@@ -33,14 +33,8 @@ public class RequestLogFilter implements Filter {
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         HttpServletResponse response = (HttpServletResponse) servletResponse;
         String path = request.getRequestURI();
-        if (Strings.CS.startsWithAny(
-                path, "/webjars", "/static", "/js", "/css", "/libs", "/WEB-INF") || Strings.CS.startsWithAny(request
-                        .getRequestURI(), "/swagger-", "/v3/api-docs") || Strings.CS.startsWithAny(path,
-                                GlobalConstants.staticResourceArray)) {
-            filterChain.doFilter(request, response);
-            return;
-        }
 
+        // Always bind RequestContext so downstream filters/loggers can access requestId.
         RequestContext context = new RequestContext(requestIdGenerator.nextId());
         MDC.put("requestId", context.getRequestId());
 
@@ -52,6 +46,8 @@ public class RequestLogFilter implements Filter {
             throw e;
         } catch (Exception e) {
             throw new ServletException(e);
+        } finally {
+            MDC.remove("requestId");
         }
     }
 
@@ -62,6 +58,11 @@ public class RequestLogFilter implements Filter {
             RequestContext context,
             String path)
             throws IOException, ServletException {
+        if (isStaticOrSwagger(path)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         response = new ResponseWrapper(response);
         Observation observation = Observation.start("http.server.requests", observationRegistry);
         long startTime = System.currentTimeMillis();
@@ -126,6 +127,12 @@ public class RequestLogFilter implements Filter {
                 observation.stop();
             }
         }
+    }
+
+    private static boolean isStaticOrSwagger(String path) {
+        return Strings.CS.startsWithAny(path, "/webjars", "/static", "/js", "/css", "/libs", "/WEB-INF") || Strings.CS
+                .startsWithAny(path, "/swagger-", "/v3/api-docs") || Strings.CS.startsWithAny(path,
+                        GlobalConstants.staticResourceArray);
     }
 
     @Override

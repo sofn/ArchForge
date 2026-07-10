@@ -1,7 +1,7 @@
 package com.lesofn.archforge.infrastructure.user.web;
 
-import com.google.common.collect.ImmutableSet;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -20,7 +20,7 @@ public class RoleInfo {
     public static final String ADMIN_ROLE_KEY = "admin";
     public static final String ALL_PERMISSIONS = "*:*:*";
 
-    public static final Set<String> ADMIN_PERMISSIONS = ImmutableSet.of(ALL_PERMISSIONS);
+    public static final Set<String> ADMIN_PERMISSIONS = new HashSet<>(Collections.singleton(ALL_PERMISSIONS));
 
     public RoleInfo(
             Long roleId,
@@ -32,10 +32,20 @@ public class RoleInfo {
         this.roleId = roleId;
         this.roleKey = roleKey;
         this.dataScope = dataScope;
-        this.deptIdSet = deptIdSet;
-        this.menuPermissions = menuPermissions != null ? menuPermissions : Collections.emptySet();
-        this.menuIds = menuIds != null ? menuIds : Collections.emptySet();
+        setDeptIdSet(deptIdSet);
+        setMenuPermissions(menuPermissions);
+        setMenuIds(menuIds);
     }
+
+    public void setDeptIdSet(Set<Long> deptIdSet) {
+        this.deptIdSet = deptIdSet == null ? new HashSet<>() : new HashSet<>(deptIdSet);
+    }
+
+    public void setMenuPermissions(Set<String> menuPermissions) {
+        this.menuPermissions = menuPermissions == null ? new HashSet<>() : new HashSet<>(menuPermissions);
+    }
+
+    public void setMenuIds(Set<Long> menuIds) { this.menuIds = menuIds == null ? new HashSet<>() : new HashSet<>(menuIds); }
 
     private Long roleId;
     private String roleName;

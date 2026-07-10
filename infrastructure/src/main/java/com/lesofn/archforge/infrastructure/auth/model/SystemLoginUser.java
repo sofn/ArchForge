@@ -1,5 +1,7 @@
 package com.lesofn.archforge.infrastructure.auth.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.lesofn.archforge.infrastructure.user.base.BaseLoginUser;
 import com.lesofn.archforge.infrastructure.user.web.RoleInfo;
 import java.util.Optional;
@@ -26,15 +28,16 @@ public class SystemLoginUser extends BaseLoginUser {
     /** 当超过这个时间 则触发刷新缓存时间 */
     private Long autoRefreshCacheTime;
 
+    @JsonCreator
     public SystemLoginUser(
-            Long userId,
-            Boolean isAdmin,
-            String username,
-            String password,
-            RoleInfo roleInfo,
-            Long deptId) {
+            @JsonProperty("userId") Long userId,
+            @JsonProperty("admin") Boolean isAdmin,
+            @JsonProperty("username") String username,
+            @JsonProperty("password") String password,
+            @JsonProperty("roleInfo") RoleInfo roleInfo,
+            @JsonProperty("deptId") Long deptId) {
         this.userId = userId;
-        this.isAdmin = isAdmin;
+        this.isAdmin = isAdmin != null ? isAdmin : false;
         this.username = username;
         this.password = password;
         this.roleInfo = roleInfo;

@@ -1,5 +1,7 @@
 package com.lesofn.archforge.server.admin.util;
 
+import com.lesofn.archforge.common.constant.Constants;
+import com.lesofn.archforge.infrastructure.auth.model.SystemLoginUser;
 import com.lesofn.archforge.infrastructure.config.ArchForgeConfig;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
@@ -65,6 +67,9 @@ public class JwtTokenUtil {
     /** 生成token */
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
+        if (userDetails instanceof SystemLoginUser user) {
+            claims.put(Constants.Token.LOGIN_USER_KEY, user.getCachedKey());
+        }
         return doGenerateToken(claims, userDetails.getUsername());
     }
 

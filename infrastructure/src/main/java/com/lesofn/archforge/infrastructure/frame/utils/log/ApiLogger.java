@@ -3,6 +3,7 @@ package com.lesofn.archforge.infrastructure.frame.utils.log;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.lesofn.archforge.common.profile.DefaultProfileLoader;
+import com.lesofn.archforge.infrastructure.frame.context.RequestContext;
 import com.lesofn.archforge.infrastructure.frame.context.ScopedValueContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +16,11 @@ public class ApiLogger {
     private static Logger errorLog = LoggerFactory.getLogger("error");
 
     private static Logger fireLog = LoggerFactory.getLogger("fire");
+
+    private static String getRequestId() {
+        RequestContext ctx = ScopedValueContext.getRequestContext();
+        return ctx == null ? "-" : ctx.getRequestId();
+    }
 
     public static boolean isTraceEnabled() { return log.isTraceEnabled() && !DefaultProfileLoader.isProd(); }
 
@@ -37,14 +43,14 @@ public class ApiLogger {
     private static String formatMsg(Object msg) {
         return String.format(
                 "%s\t%s",
-                ScopedValueContext.getRequestContext().getRequestId(),
+                getRequestId(),
                 msg == null ? "null" : msg.toString());
     }
 
     private static String formatMsg(String tag, Object msg) {
         return String.format(
                 "%s\t%s\t%s",
-                ScopedValueContext.getRequestContext().getRequestId(),
+                getRequestId(),
                 tag,
                 msg == null ? "null" : msg.toString());
     }
@@ -82,7 +88,7 @@ public class ApiLogger {
         fireLog.warn(
                 String.format(
                         "%s\t%s\t%s\t%s\t%s\t%s",
-                        ScopedValueContext.getRequestContext().getRequestId(),
+                        getRequestId(),
                         resourceType,
                         resourceId,
                         "slow",
@@ -100,7 +106,7 @@ public class ApiLogger {
         fireLog.error(
                 String.format(
                         "%s\t%s\t%s\t%s\t%s\t%s",
-                        ScopedValueContext.getRequestContext().getRequestId(),
+                        getRequestId(),
                         resourceType,
                         resourceId,
                         "error",
