@@ -13,6 +13,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.Profiles;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,8 +22,11 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class SysMenuService {
 
+    private static final String DRUID_MENU_PATH = "/monitor/druid/index";
+
     private final SysMenuRepository sysMenuRepository;
     private final SysRoleMenuRepository roleMenuRepository;
+    private final Environment environment;
 
     public Optional<SysMenu> findById(Long id) {
         return sysMenuRepository.findById(id);
@@ -94,10 +99,13 @@ public class SysMenuService {
             allMenus = sysMenuRepository.selectMenuListByUserId(loginUser.getUserId());
         }
 
-        // 传给前端的路由排除掉按钮和停用的菜单
+        boolean isProd = environment.acceptsProfiles(Profiles.of("prod"));
+
+        // 传给前端的路由排除掉按钮和停用的菜单，prod 环境再额外隐藏数据监控入口
         List<SysMenu> noButtonMenus = allMenus.stream()
                 .filter(menu -> !menu.getIsButton())
                 .filter(menu -> StatusEnum.ENABLE.getValue() == menu.getStatus())
+                .filter(menu -> !isProd || !DRUID_MENU_PATH.equals(menu.getPath()))
                 .toList();
 
         Map<Long, SysMenu> parentMap = noButtonMenus.stream()

@@ -104,7 +104,10 @@ dependencies {
     
     // Oshi (系统监控)
     api("com.github.oshi:oshi-core")
-    
+
+    // Druid monitoring
+    api("com.alibaba:druid")
+
     // Testcontainers PostgreSQL for Dev environment
     api("org.testcontainers:testcontainers")
     api("org.testcontainers:testcontainers-postgresql")

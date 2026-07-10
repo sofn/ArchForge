@@ -16,6 +16,7 @@ dependencies {
     constraints {
         // 数据库相关
         api("com.baomidou:dynamic-datasource-spring-boot4-starter:4.5.0")
+        api("com.alibaba:druid:1.2.24")
         api("org.postgresql:postgresql:42.7.11")
         
         // 常用工具类

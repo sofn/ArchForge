@@ -32,23 +32,29 @@ spring:
   # Database - PostgreSQL via Testcontainers (auto-configured by InitPostgreSQLServer)
   datasource:
     dynamic:
+      druid:
+        filters: stat
       datasource:
         user_master:
+          type: com.alibaba.druid.pool.DruidDataSource
           driver-class-name: org.postgresql.Driver
           url: jdbc:postgresql://localhost:5432/archforge_user
           username: archforge
           password: archforge
         user_slave:
+          type: com.alibaba.druid.pool.DruidDataSource
           driver-class-name: org.postgresql.Driver
           url: jdbc:postgresql://localhost:5432/archforge_user
           username: archforge
           password: archforge
         task_master:
+          type: com.alibaba.druid.pool.DruidDataSource
           driver-class-name: org.postgresql.Driver
           url: jdbc:postgresql://localhost:5432/archforge_task
           username: archforge
           password: archforge
         task_slave:
+          type: com.alibaba.druid.pool.DruidDataSource
           driver-class-name: org.postgresql.Driver
           url: jdbc:postgresql://localhost:5432/archforge_task
           username: archforge
@@ -62,6 +68,9 @@ management:
         url: http://localhost:4318/v1/metrics
 
 arch-forge:
+  druid:
+    login-username: admin
+    login-password: admin
   embedded:
     redis: true
     postgresql: true

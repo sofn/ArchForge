@@ -193,6 +193,9 @@ public class SecurityConfig {
                                 // Jolokia端点允许匿名访问
                                 .requestMatchers("/jolokia/**")
                                 .permitAll()
+                                // Druid 监控页面允许匿名访问（非 prod 环境才会注册 StatViewServlet）
+                                .requestMatchers("/druid/**")
+                                .permitAll()
                                 // 其他所有请求都需要认证
                                 .anyRequest()
                                 .authenticated())
