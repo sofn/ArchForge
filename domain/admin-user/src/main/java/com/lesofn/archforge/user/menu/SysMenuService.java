@@ -28,6 +28,16 @@ public class SysMenuService {
     private final SysRoleMenuRepository roleMenuRepository;
     private final Environment environment;
 
+    /** 路由按 meta.rank 排序，未设置 rank 的排在最后 */
+    private static final Comparator<RouterDTO> ROUTER_RANK_COMPARATOR = Comparator.comparing(
+            (RouterDTO it) -> Optional.ofNullable(it.getMeta()).map(MetaDTO::getRank).orElse(null),
+            Comparator.nullsLast(Comparator.naturalOrder()));
+
+    /** 菜单实体按 metaInfo.rank 排序，未设置 rank 的排在最后 */
+    private static final Comparator<SysMenu> SYS_MENU_RANK_COMPARATOR = Comparator.comparing(
+            (SysMenu it) -> Optional.ofNullable(it.getMetaInfo()).map(MetaDTO::getRank).orElse(null),
+            Comparator.nullsLast(Comparator.naturalOrder()));
+
     public Optional<SysMenu> findById(Long id) {
         return sysMenuRepository.findById(id);
     }
@@ -41,7 +51,9 @@ public class SysMenuService {
     }
 
     public List<SysMenu> findAllActiveMenus() {
-        return sysMenuRepository.findAllActiveMenus();
+        List<SysMenu> menus = sysMenuRepository.findAllActiveMenus();
+        menus.sort(SYS_MENU_RANK_COMPARATOR);
+        return menus;
     }
 
     public List<SysMenu> findByPermission(String permission) {
@@ -86,6 +98,7 @@ public class SysMenuService {
     private List<SysMenu> buildMenuTree(List<SysMenu> menus, Long parentId) {
         return menus.stream()
                 .filter(menu -> menu.getParentId().equals(parentId))
+                .sorted(SYS_MENU_RANK_COMPARATOR)
                 .peek(menu -> menu.setChildren(buildMenuTree(menus, menu.getMenuId())))
                 .toList();
     }
@@ -134,13 +147,7 @@ public class SysMenuService {
             }
         }
 
-        roots = roots.stream()
-                .sorted(
-                        Comparator.comparing(
-                                it -> Optional.ofNullable(it.getMeta())
-                                        .map(MetaDTO::getRank)
-                                        .orElse(-1)))
-                .toList();
+        roots = roots.stream().sorted(ROUTER_RANK_COMPARATOR).toList();
 
         sortRouterDTOChildren(roots);
         return roots;
@@ -157,13 +164,7 @@ public class SysMenuService {
             RouterDTO current = stack.pop();
 
             if (CollectionUtils.isNotEmpty(current.getChildren())) {
-                List<RouterDTO> sortedChildren = current.getChildren().stream()
-                        .sorted(
-                                Comparator.comparing(
-                                        it -> Optional.ofNullable(it.getMeta())
-                                                .map(MetaDTO::getRank)
-                                                .orElse(-1)))
-                        .toList();
+                List<RouterDTO> sortedChildren = current.getChildren().stream().sorted(ROUTER_RANK_COMPARATOR).toList();
                 current.setChildren(sortedChildren);
 
                 stack.addAll(sortedChildren);
