@@ -2,6 +2,7 @@ package com.lesofn.archforge.server.admin.controller;
 
 import com.lesofn.archforge.common.error.SystemErrorCode;
 import com.lesofn.archforge.common.error.system.SystemException;
+import com.lesofn.archforge.infrastructure.annotation.RepeatSubmit;
 import com.lesofn.archforge.infrastructure.config.ArchForgeConfig;
 import com.lesofn.archforge.infrastructure.file.FileStorageService;
 import com.lesofn.archforge.server.admin.controller.admin.AdminControllerHelper;
@@ -53,6 +54,7 @@ public class FileController {
 
     @Operation(summary = "上传文件")
     @PostMapping("/file/upload")
+    @RepeatSubmit
     public Map<String, Object> uploadFile(@RequestParam("file") MultipartFile file) {
         validateUploadFile(file);
         String originalName = file.getOriginalFilename();
@@ -88,6 +90,7 @@ public class FileController {
 
     @Operation(summary = "上传图片（头像等）")
     @PostMapping("/file/upload-image")
+    @RepeatSubmit
     public Map<String, Object> uploadImage(@RequestParam("file") MultipartFile file) {
         return uploadFile(file);
     }

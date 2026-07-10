@@ -53,7 +53,6 @@ subprojects {
             java {
                 target("src/*/java/**/*.java")
                 eclipse().configFile(rootProject.file("config/spotless/eclipse-format.xml"))
-                removeUnusedImports()
                 trimTrailingWhitespace()
                 endWithNewline()
             }

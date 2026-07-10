@@ -1,5 +1,6 @@
 package com.lesofn.archforge.infrastructure.frame.filters;
 
+import com.lesofn.archforge.infrastructure.frame.filter.RepeatableFilter;
 import io.micrometer.observation.ObservationRegistry;
 import jakarta.servlet.DispatcherType;
 import jakarta.servlet.Filter;
@@ -35,6 +36,16 @@ public class FilterConfigFactory implements WebMvcConfigurer {
         Filter headerFilter = new HeaderResponseFilter();
         registration.setFilter(headerFilter);
         registration.setOrder(Ordered.LOWEST_PRECEDENCE);
+        return registration;
+    }
+
+    @Bean
+    public FilterRegistrationBean<Filter> repeatableFilterChain() {
+        FilterRegistrationBean<Filter> registration = new FilterRegistrationBean<>();
+        registration.setFilter(new RepeatableFilter());
+        registration.addUrlPatterns("/*");
+        registration.setName("repeatableFilter");
+        registration.setOrder(Ordered.HIGHEST_PRECEDENCE + 1);
         return registration;
     }
 }

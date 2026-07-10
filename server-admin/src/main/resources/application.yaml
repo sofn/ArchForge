@@ -16,6 +16,9 @@ spring:
   application:
     name: ArchForge
     version: 1.0.0
+  messages:
+    basename: i18n/messages
+    encoding: UTF-8
   threads:
     virtual:
       enabled: true

@@ -25,4 +25,17 @@ public class MessageUtils {
         MessageSource messageSource = SpringContextHolder.getBean(MessageSource.class);
         return messageSource.getMessage(code, args, LocaleContextHolder.getLocale());
     }
+
+    /**
+     * 根据消息键和参数获取消息，找不到时返回 defaultMessage。
+     *
+     * @param code 消息键
+     * @param defaultMessage 兜底消息
+     * @param args 参数
+     * @return 国际化翻译值
+     */
+    public static String messageOrDefault(String code, String defaultMessage, Object... args) {
+        MessageSource messageSource = SpringContextHolder.getBean(MessageSource.class);
+        return messageSource.getMessage(code, args, defaultMessage, LocaleContextHolder.getLocale());
+    }
 }
