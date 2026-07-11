@@ -82,7 +82,7 @@ class QueryHelpSpec extends Specification {
 
         then:
         // Fix 1: LIKE now uses escape char (3-arg cb.like)
-        1 * cb.like(_, "%alice%", '\\' as char)
+        1 * cb.like(_, "%alice%", '!' as char)
         1 * cb.equal(_, 1)
     }
 
@@ -104,7 +104,7 @@ class QueryHelpSpec extends Specification {
         QueryHelp.getPredicate(root, crit, cb)
 
         then:
-        2 * cb.like(_, "%x%", '\\' as char)
+        2 * cb.like(_, "%x%", '!' as char)
         1 * cb.or(_ as Predicate[])
     }
 
@@ -165,7 +165,7 @@ class QueryHelpSpec extends Specification {
         QueryHelp.getPredicate(root, crit, cb)
 
         then:
-        1 * cb.like(_, "%\\%admin\\%%", '\\' as char)
+        1 * cb.like(_, "%!%admin!%%", '!' as char)
     }
 
     def "LIKE value containing _ is escaped"() {
@@ -185,7 +185,7 @@ class QueryHelpSpec extends Specification {
         QueryHelp.getPredicate(root, crit, cb)
 
         then:
-        1 * cb.like(_, "%a\\_b%", '\\' as char)
+        1 * cb.like(_, "%a!_b%", '!' as char)
     }
 
     def "blurry value containing % is escaped"() {
@@ -206,7 +206,7 @@ class QueryHelpSpec extends Specification {
         QueryHelp.getPredicate(root, crit, cb)
 
         then:
-        2 * cb.like(_, "%100\\%%", '\\' as char)
+        2 * cb.like(_, "%100!%%", '!' as char)
     }
 
     // ==================== Fix 3: BETWEEN validation ====================
@@ -268,7 +268,7 @@ class QueryHelpSpec extends Specification {
         then:
         // ignoreCase wraps the path in LOWER() and lowercases the pattern
         1 * cb.lower(_) >> lowerExpr
-        1 * cb.like(lowerExpr, "%alice%", _ as char) >> pred
+        1 * cb.like(lowerExpr, "%alice%", '!' as char) >> pred
     }
 
     def "blurry with ignoreCase uses LOWER()"() {
@@ -291,7 +291,7 @@ class QueryHelpSpec extends Specification {
         then:
         // ignoreCase wraps each blurry field path in LOWER()
         2 * cb.lower(_) >> lowerExpr
-        2 * cb.like(lowerExpr, "%admin%", _ as char) >> pred
+        2 * cb.like(lowerExpr, "%admin%", '!' as char) >> pred
     }
 
     // ==================== Fix 5: renamed comparison types ====================

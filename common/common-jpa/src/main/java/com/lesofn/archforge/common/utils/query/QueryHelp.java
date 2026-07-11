@@ -41,6 +41,8 @@ import org.jspecify.annotations.Nullable;
 @Slf4j
 public final class QueryHelp {
 
+    private static final char LIKE_ESCAPE_CHAR = '!';
+
     private QueryHelp() {
     }
 
@@ -183,9 +185,13 @@ public final class QueryHelp {
         return cb.or(ors.toArray(new Predicate[0]));
     }
 
-    // Fix 1: escape LIKE wildcards (%, _, \) in user input
+    // Fix 1: escape LIKE wildcards (%, _, !) in user input; '!' is the escape char
     private static String escapeLike(Object value) {
-        return value.toString().replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_");
+        String escape = String.valueOf(LIKE_ESCAPE_CHAR);
+        return value.toString()
+                .replace(escape, escape + escape)
+                .replace("%", escape + "%")
+                .replace("_", escape + "_");
     }
 
     // Fix 4: build a LIKE predicate, optionally case-insensitive via LOWER()
@@ -193,9 +199,9 @@ public final class QueryHelp {
             CriteriaBuilder cb, Path<?> path, String pattern, boolean ignoreCase) {
         Expression<String> expr = path.as(String.class);
         if (ignoreCase) {
-            return cb.like(cb.lower(expr), pattern.toLowerCase(), '\\');
+            return cb.like(cb.lower(expr), pattern.toLowerCase(), LIKE_ESCAPE_CHAR);
         }
-        return cb.like(expr, pattern, '\\');
+        return cb.like(expr, pattern, LIKE_ESCAPE_CHAR);
     }
 
     @SuppressWarnings("unchecked")
