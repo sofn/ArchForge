@@ -1,4 +1,6 @@
 @NullMarked
+@ApplicationModule(id = "admin-user", allowedDependencies = {"common", "infrastructure"})
 package com.lesofn.archforge.user;
 
 import org.jspecify.annotations.NullMarked;
+import org.springframework.modulith.ApplicationModule;
