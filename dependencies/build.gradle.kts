@@ -92,6 +92,12 @@ dependencies {
 
         // Quartz (调度 — Spring Boot 4.0.7 BOM 已托管 quartz 版本，但显式声明 starter 便于追踪)
         api("org.springframework.boot:spring-boot-starter-quartz:4.0.7")
+
+        // Spring Modulith
+        api("org.springframework.modulith:spring-modulith-api:2.0.0")
+        api("org.springframework.modulith:spring-modulith-core:2.0.0")
+        api("org.springframework.modulith:spring-modulith-test:2.0.0")
+        api("org.springframework.modulith:spring-modulith-docs:2.0.0")
     }
 }
 
