@@ -88,6 +88,8 @@ spring:
     time-zone: GMT+8
     locale: zh_CN
     default-property-inclusion: non_null
+  modulith:
+    detection-strategy: explicitly-annotated
 
 springdoc:
   api-docs:
