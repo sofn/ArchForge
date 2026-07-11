@@ -72,7 +72,7 @@ subprojects {
         // 配置测试任务使用JUnit Platform
         tasks.withType<Test> {
             useJUnitPlatform()
-            jvmArgs("--enable-preview")
+            jvmArgs("--enable-preview", "--enable-native-access=ALL-UNNAMED")
         }
 
         // 全局排除冲突的日志依赖

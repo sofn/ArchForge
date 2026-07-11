@@ -41,11 +41,11 @@ tasks.bootRun {
 // Spring AOT processing also needs --enable-preview
 // Use 'prod' profile during AOT to skip Testcontainers (no Docker in CI/native builds)
 tasks.named<JavaExec>("processAot") {
-    jvmArgs("--enable-preview")
+    jvmArgs("--enable-preview", "--enable-native-access=ALL-UNNAMED")
     systemProperty("spring.profiles.active", "prod")
 }
 tasks.named<JavaExec>("processTestAot") {
-    jvmArgs("--enable-preview")
+    jvmArgs("--enable-preview", "--enable-native-access=ALL-UNNAMED")
 }
 
 // GraalVM Native Image 配置
