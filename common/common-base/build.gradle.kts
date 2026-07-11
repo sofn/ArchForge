@@ -39,6 +39,9 @@ dependencies {
     api("eu.bitwalker:UserAgentUtils")
     api("org.jspecify:jspecify")
 
+    // Spring Modulith annotations (transitively available to all modules)
+    api("org.springframework.modulith:spring-modulith-api")
+
     // Excel I/O - FastExcel (高性能、无 POI 依赖；项目标准 Excel 库)
     api("org.dhatim:fastexcel")
     api("org.dhatim:fastexcel-reader")

@@ -129,6 +129,10 @@ dependencies {
     // MapStruct注解处理器
     annotationProcessor("org.mapstruct:mapstruct-processor:1.6.3")
     compileOnly("org.mapstruct:mapstruct:1.6.3")
+
+    // Spring Modulith verification and documentation
+    testImplementation("org.springframework.modulith:spring-modulith-test")
+    testImplementation("org.springframework.modulith:spring-modulith-docs")
 }
 
 // jlink: 生成最小化 JRE (Spring Boot Web + Actuator + JPA 所需模块)
