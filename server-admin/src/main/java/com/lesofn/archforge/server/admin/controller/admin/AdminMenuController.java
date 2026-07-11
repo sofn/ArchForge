@@ -1,5 +1,6 @@
 package com.lesofn.archforge.server.admin.controller.admin;
 
+import com.lesofn.archforge.infrastructure.annotation.Log;
 import com.lesofn.archforge.server.admin.dto.AdminMenuItemDTO;
 import com.lesofn.archforge.server.admin.dto.request.MenuCreateRequest;
 import com.lesofn.archforge.server.admin.dto.request.MenuDeleteRequest;
@@ -33,6 +34,7 @@ public class AdminMenuController {
         return allMenus.stream().map(menuMapper::toDto).collect(Collectors.toList());
     }
 
+    @Log
     @Operation(summary = "创建菜单")
     @PostMapping("/menu/create")
     public Long createMenu(@RequestBody @Valid MenuCreateRequest request) {
@@ -41,6 +43,7 @@ public class AdminMenuController {
         return saved.getMenuId();
     }
 
+    @Log
     @Operation(summary = "更新菜单")
     @PutMapping("/menu/update")
     public Boolean updateMenu(@RequestBody @Valid MenuUpdateRequest request) {
@@ -71,6 +74,7 @@ public class AdminMenuController {
         return true;
     }
 
+    @Log
     @Operation(summary = "删除菜单")
     @PostMapping("/menu/delete")
     public Boolean deleteMenu(@RequestBody @Valid MenuDeleteRequest request) {

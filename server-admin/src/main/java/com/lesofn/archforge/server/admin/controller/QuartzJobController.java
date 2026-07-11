@@ -1,5 +1,6 @@
 package com.lesofn.archforge.server.admin.controller;
 
+import com.lesofn.archforge.infrastructure.annotation.Log;
 import com.lesofn.archforge.server.admin.dto.AdminPageResult;
 import com.lesofn.archforge.server.admin.dto.quartz.QuartzJobQuery;
 import com.lesofn.archforge.server.admin.dto.quartz.QuartzJobResponse;
@@ -51,36 +52,42 @@ public class QuartzJobController {
                 currentPage);
     }
 
+    @Log
     @Operation(summary = "新增 Quartz 任务")
     @PostMapping("/add")
     public Long add(@RequestBody QuartzJobUpsertRequest req) {
         return quartzJobService.add(toEntity(new SysQuartzJob(), req));
     }
 
+    @Log
     @Operation(summary = "更新 Quartz 任务")
     @PutMapping("/update/{id}")
     public void update(@PathVariable Long id, @RequestBody QuartzJobUpsertRequest req) {
         quartzJobService.update(id, toEntity(new SysQuartzJob(), req));
     }
 
+    @Log
     @Operation(summary = "删除 Quartz 任务")
     @DeleteMapping("/delete/{id}")
     public void delete(@PathVariable Long id) {
         quartzJobService.delete(id);
     }
 
+    @Log
     @Operation(summary = "暂停 Quartz 任务")
     @PostMapping("/pause/{id}")
     public void pause(@PathVariable Long id) {
         quartzJobService.pause(id);
     }
 
+    @Log
     @Operation(summary = "恢复 Quartz 任务")
     @PostMapping("/resume/{id}")
     public void resume(@PathVariable Long id) {
         quartzJobService.resume(id);
     }
 
+    @Log
     @Operation(summary = "立即执行一次")
     @PostMapping("/run/{id}")
     public void run(@PathVariable Long id) {

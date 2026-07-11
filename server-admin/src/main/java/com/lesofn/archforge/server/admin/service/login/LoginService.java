@@ -4,18 +4,26 @@ import static com.lesofn.archforge.infrastructure.auth.errors.AdminAuthErrorCode
 
 import com.google.code.kaptcha.Producer;
 import com.lesofn.archforge.common.encrypt.RsaEncrypter;
+import com.lesofn.archforge.common.utils.ip.IpRegionUtil;
+import com.lesofn.archforge.common.utils.ip.IpUtil;
 import com.lesofn.archforge.infrastructure.auth.errors.AdminAuthException;
 import com.lesofn.archforge.infrastructure.auth.model.SystemLoginUser;
 import com.lesofn.archforge.infrastructure.config.ArchForgeConfig;
 import com.lesofn.archforge.infrastructure.config.CaptchaType;
+import com.lesofn.archforge.infrastructure.frame.context.ScopedValueContext;
 import com.lesofn.archforge.infrastructure.frame.utils.MapCache;
 import com.lesofn.archforge.server.admin.dto.CaptchaDTO;
 import com.lesofn.archforge.server.admin.dto.ConfigDTO;
 import com.lesofn.archforge.server.admin.dto.LoginCommand;
 import com.lesofn.archforge.server.admin.service.cache.RedisCacheService;
+import com.lesofn.archforge.user.domain.SysLoginLog;
+import com.lesofn.archforge.user.service.SysLoginLogService;
+import eu.bitwalker.useragentutils.UserAgent;
 import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
+import java.time.LocalDateTime;
 import java.util.UUID;
 import javax.imageio.ImageIO;
 import lombok.RequiredArgsConstructor;
@@ -42,6 +50,7 @@ public class LoginService {
     private final TokenService tokenService;
     private final RedisCacheService redisCacheService;
     private final LoginAttemptService loginAttemptService;
+    private final SysLoginLogService loginLogService;
     private final ArchForgeConfig appForgeConfig;
 
     @Resource(name = "captchaProducer")
@@ -57,35 +66,41 @@ public class LoginService {
      * @return LoginResult 包含token和用户信息
      */
     public LoginResult login(LoginCommand loginCommand) {
-        // 登录失败锁定检查
-        loginAttemptService.checkNotLocked(loginCommand.getUsername());
-
-        // 验证码校验
-        validateCaptcha(loginCommand.getCaptchaCodeKey(), loginCommand.getCaptchaCode());
-
-        // 用户验证
-        Authentication authentication;
         try {
+            // 登录失败锁定检查
+            loginAttemptService.checkNotLocked(loginCommand.getUsername());
+
+            // 验证码校验
+            validateCaptcha(loginCommand.getCaptchaCodeKey(), loginCommand.getCaptchaCode());
+
+            // 用户验证
             String decryptedPassword = decryptPassword(loginCommand.getPassword());
-            authentication = authenticationManager.authenticate(
+            Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(loginCommand.getUsername(), decryptedPassword));
+
+            SystemLoginUser loginUser = (SystemLoginUser) authentication.getPrincipal();
+            // 登录成功，清除失败计数
+            loginAttemptService.clearAttempts(loginCommand.getUsername());
+            // 生成token
+            String token = tokenService.createTokenAndPutUserInCache(loginUser);
+
+            recordLoginLog(loginUser, 1, "登录成功");
+            return new LoginResult(token, loginUser);
         } catch (BadCredentialsException e) {
             log.info("用户[{}]登录失败，用户名或密码错误", loginCommand.getUsername());
             loginAttemptService.recordFailure(loginCommand.getUsername());
+            recordLoginLog(loginCommand.getUsername(), 0, "登录失败");
             throw new AdminAuthException(USERNAME_PASSWORD_ERROR);
+        } catch (AdminAuthException e) {
+            log.info("用户[{}]登录失败：{}", loginCommand.getUsername(), e.getMessage());
+            recordLoginLog(loginCommand.getUsername(), 0, "登录失败");
+            throw e;
         } catch (Exception e) {
             log.error("用户[{}]登录失败", loginCommand.getUsername(), e);
             loginAttemptService.recordFailure(loginCommand.getUsername());
+            recordLoginLog(loginCommand.getUsername(), 0, "登录失败");
             throw new AdminAuthException(LOGIN_ERROR);
         }
-
-        SystemLoginUser loginUser = (SystemLoginUser) authentication.getPrincipal();
-        // 登录成功，清除失败计数
-        loginAttemptService.clearAttempts(loginCommand.getUsername());
-        // 生成token
-        String token = tokenService.createTokenAndPutUserInCache(loginUser);
-
-        return new LoginResult(token, loginUser);
     }
 
     /** 登录结果封装类 */
@@ -101,6 +116,51 @@ public class LoginService {
         public String getToken() { return token; }
 
         public SystemLoginUser getLoginUser() { return loginUser; }
+    }
+
+    private void recordLoginLog(SystemLoginUser loginUser, int status, String behavior) {
+        SysLoginLog loginLog = new SysLoginLog();
+        loginLog.setUsername(loginUser.getUsername());
+        loginLog.setStatus(status);
+        loginLog.setBehavior(behavior);
+        if (loginUser.getLoginInfo() != null) {
+            loginLog.setIp(loginUser.getLoginInfo().getIpAddress());
+            loginLog.setAddress(loginUser.getLoginInfo().getLocation());
+            loginLog.setSystemName(loginUser.getLoginInfo().getOperationSystem());
+            loginLog.setBrowser(loginUser.getLoginInfo().getBrowser());
+        } else {
+            fillLoginLogFromRequest(loginLog);
+        }
+        loginLog.setLoginTime(LocalDateTime.now());
+        saveLoginLog(loginLog);
+    }
+
+    private void recordLoginLog(String username, int status, String behavior) {
+        SysLoginLog loginLog = new SysLoginLog();
+        loginLog.setUsername(username);
+        loginLog.setStatus(status);
+        loginLog.setBehavior(behavior);
+        fillLoginLogFromRequest(loginLog);
+        loginLog.setLoginTime(LocalDateTime.now());
+        saveLoginLog(loginLog);
+    }
+
+    private void fillLoginLogFromRequest(SysLoginLog loginLog) {
+        HttpServletRequest request = ScopedValueContext.getServletRequest();
+        String ip = request == null ? "" : IpUtil.getRealIpAddr(request);
+        UserAgent userAgent = UserAgent.parseUserAgentString(request == null ? "" : request.getHeader("User-Agent"));
+        loginLog.setIp(ip);
+        loginLog.setAddress(IpRegionUtil.getBriefLocationByIp(ip));
+        loginLog.setSystemName(userAgent.getOperatingSystem().getName());
+        loginLog.setBrowser(userAgent.getBrowser().getName());
+    }
+
+    private void saveLoginLog(SysLoginLog loginLog) {
+        try {
+            loginLogService.create(loginLog);
+        } catch (Exception ex) {
+            log.warn("Failed to save login log", ex);
+        }
     }
 
     private void validateCaptcha(String uuid, String code) {

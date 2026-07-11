@@ -1,5 +1,6 @@
 package com.lesofn.archforge.server.admin.controller.admin;
 
+import com.lesofn.archforge.infrastructure.annotation.Log;
 import com.lesofn.archforge.server.admin.dto.AdminPageResult;
 import com.lesofn.archforge.server.admin.dto.request.NoticeCreateRequest;
 import com.lesofn.archforge.server.admin.dto.request.NoticeDeleteRequest;
@@ -52,6 +53,7 @@ public class AdminNoticeController {
         return AdminPageResult.of(list, page.getTotalElements(), pageSize, currentPage);
     }
 
+    @Log
     @Operation(summary = "创建通知公告")
     @PostMapping("/notice/create")
     public Long createNotice(@RequestBody @Valid NoticeCreateRequest request) {
@@ -65,6 +67,7 @@ public class AdminNoticeController {
         return saved.getNoticeId();
     }
 
+    @Log
     @Operation(summary = "更新通知公告")
     @PutMapping("/notice/update")
     public Boolean updateNotice(@RequestBody @Valid NoticeUpdateRequest request) {
@@ -87,6 +90,7 @@ public class AdminNoticeController {
         return true;
     }
 
+    @Log
     @Operation(summary = "删除通知公告")
     @PostMapping("/notice/delete")
     public Boolean deleteNotice(@RequestBody @Valid NoticeDeleteRequest request) {

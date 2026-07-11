@@ -1,5 +1,6 @@
 package com.lesofn.archforge.server.admin.controller.system;
 
+import com.lesofn.archforge.infrastructure.annotation.Log;
 import com.lesofn.archforge.user.domain.SysUser;
 import com.lesofn.archforge.user.domain.query.SysUserQuery;
 import com.lesofn.archforge.user.service.SysUserService;
@@ -39,12 +40,14 @@ public class SysUserController {
         return ResponseEntity.ok(users);
     }
 
+    @Log(module = "用户管理", summary = "创建用户")
     @PostMapping
     public ResponseEntity<SysUser> createUser(@RequestBody SysUser user) {
         SysUser createdUser = userService.create(user);
         return ResponseEntity.ok(createdUser);
     }
 
+    @Log(module = "用户管理", summary = "更新用户")
     @PutMapping("/{id}")
     public ResponseEntity<SysUser> updateUser(@PathVariable Long id, @RequestBody SysUser user) {
         user.setUserId(id);
@@ -52,12 +55,14 @@ public class SysUserController {
         return ResponseEntity.ok(updatedUser);
     }
 
+    @Log(module = "用户管理", summary = "删除用户")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         userService.deleteById(id);
         return ResponseEntity.ok().build();
     }
 
+    @Log(module = "用户管理", summary = "更新用户状态")
     @PatchMapping("/{id}/status")
     public ResponseEntity<Void> updateUserStatus(
             @PathVariable Long id, @RequestParam Integer status) {
@@ -65,6 +70,7 @@ public class SysUserController {
         return ResponseEntity.ok().build();
     }
 
+    @Log(module = "用户管理", summary = "重置用户密码")
     @PostMapping("/{id}/reset-password")
     public ResponseEntity<Void> resetPassword(
             @PathVariable Long id, @RequestParam String newPassword) {

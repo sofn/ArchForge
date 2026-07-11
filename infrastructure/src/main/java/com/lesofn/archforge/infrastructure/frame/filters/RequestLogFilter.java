@@ -2,6 +2,7 @@ package com.lesofn.archforge.infrastructure.frame.filters;
 
 import com.lesofn.archforge.common.error.exception.IErrorCodeException;
 import com.lesofn.archforge.common.utils.GlobalConstants;
+import com.lesofn.archforge.common.utils.ip.IpUtil;
 import com.lesofn.archforge.infrastructure.frame.context.RequestContext;
 import com.lesofn.archforge.infrastructure.frame.context.RequestIDGenerator;
 import com.lesofn.archforge.infrastructure.frame.context.ScopedValueContext;
@@ -36,6 +37,8 @@ public class RequestLogFilter implements Filter {
 
         // Always bind RequestContext so downstream filters/loggers can access requestId.
         RequestContext context = new RequestContext(requestIdGenerator.nextId());
+        context.setOriginRequest(request);
+        context.setIp(IpUtil.getRealIpAddr(request));
         MDC.put("requestId", context.getRequestId());
 
         // ScopedValue: entire filter chain runs within context scope, auto-cleanup on exit

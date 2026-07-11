@@ -5,6 +5,7 @@ import com.lesofn.archforge.server.admin.dto.AdminRoleIdRequest;
 import com.lesofn.archforge.server.admin.dto.AdminRoleItemDTO;
 import com.lesofn.archforge.server.admin.dto.AdminRoleMenuItemDTO;
 import com.lesofn.archforge.server.admin.dto.AdminRoleSimpleDTO;
+import com.lesofn.archforge.infrastructure.annotation.Log;
 import com.lesofn.archforge.server.admin.dto.AdminRoleListRequest;
 import com.lesofn.archforge.server.admin.dto.request.RoleCreateRequest;
 import com.lesofn.archforge.server.admin.dto.request.RoleDeleteRequest;
@@ -88,6 +89,7 @@ public class AdminRoleController {
         return roleMenus.stream().map(SysRoleMenu::getMenuId).collect(Collectors.toList());
     }
 
+    @Log
     @Operation(summary = "创建角色")
     @PostMapping("/role/create")
     public Long createRole(@RequestBody @Valid RoleCreateRequest request) {
@@ -101,6 +103,7 @@ public class AdminRoleController {
         return saved.getRoleId();
     }
 
+    @Log
     @Operation(summary = "更新角色")
     @PutMapping("/role/update")
     public Boolean updateRole(@RequestBody @Valid RoleUpdateRequest request) {
@@ -119,6 +122,7 @@ public class AdminRoleController {
         return true;
     }
 
+    @Log
     @Operation(summary = "删除角色")
     @PostMapping("/role/delete")
     public Boolean deleteRole(@RequestBody @Valid RoleDeleteRequest request) {
@@ -126,6 +130,7 @@ public class AdminRoleController {
         return true;
     }
 
+    @Log
     @Operation(summary = "更新角色状态")
     @PostMapping("/role/status")
     public Boolean updateRoleStatus(@RequestBody @Valid RoleStatusRequest request) {
@@ -138,6 +143,7 @@ public class AdminRoleController {
         return true;
     }
 
+    @Log
     @Operation(summary = "保存角色菜单权限")
     @PostMapping("/role/save-menu")
     public Boolean saveRoleMenu(@RequestBody @Valid RoleMenuRequest request) {

@@ -1,5 +1,6 @@
 package com.lesofn.archforge.server.admin.controller.admin;
 
+import com.lesofn.archforge.infrastructure.annotation.Log;
 import com.lesofn.archforge.server.admin.dto.AdminPageResult;
 import com.lesofn.archforge.server.admin.dto.request.ConfigCreateRequest;
 import com.lesofn.archforge.server.admin.dto.request.ConfigDeleteRequest;
@@ -52,6 +53,7 @@ public class AdminConfigController {
         return AdminPageResult.of(list, page.getTotalElements(), pageSize, currentPage);
     }
 
+    @Log
     @Operation(summary = "创建参数")
     @PostMapping("/config/create")
     public Long createConfig(@RequestBody @Valid ConfigCreateRequest request) {
@@ -65,6 +67,7 @@ public class AdminConfigController {
         return saved.getConfigId();
     }
 
+    @Log
     @Operation(summary = "更新参数")
     @PutMapping("/config/update")
     public Boolean updateConfig(@RequestBody @Valid ConfigUpdateRequest request) {
@@ -87,6 +90,7 @@ public class AdminConfigController {
         return true;
     }
 
+    @Log
     @Operation(summary = "删除参数")
     @PostMapping("/config/delete")
     public Boolean deleteConfig(@RequestBody @Valid ConfigDeleteRequest request) {

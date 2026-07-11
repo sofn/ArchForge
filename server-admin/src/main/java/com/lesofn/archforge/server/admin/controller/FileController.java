@@ -2,6 +2,7 @@ package com.lesofn.archforge.server.admin.controller;
 
 import com.lesofn.archforge.common.error.SystemErrorCode;
 import com.lesofn.archforge.common.error.system.SystemException;
+import com.lesofn.archforge.infrastructure.annotation.Log;
 import com.lesofn.archforge.infrastructure.annotation.RepeatSubmit;
 import com.lesofn.archforge.infrastructure.config.ArchForgeConfig;
 import com.lesofn.archforge.infrastructure.file.FileStorageService;
@@ -52,6 +53,7 @@ public class FileController {
     private final SysFileRepository fileRepository;
     private final ArchForgeConfig appForgeConfig;
 
+    @Log
     @Operation(summary = "上传文件")
     @PostMapping("/file/upload")
     @RepeatSubmit
@@ -88,6 +90,7 @@ public class FileController {
         return result;
     }
 
+    @Log
     @Operation(summary = "上传图片（头像等）")
     @PostMapping("/file/upload-image")
     @RepeatSubmit
@@ -155,6 +158,7 @@ public class FileController {
                 .body(new InputStreamResource(inputStream));
     }
 
+    @Log
     @Operation(summary = "删除文件")
     @PostMapping("/file/delete")
     public Boolean deleteFile(@RequestBody Map<String, Object> data) {

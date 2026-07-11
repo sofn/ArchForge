@@ -1,5 +1,6 @@
 package com.lesofn.archforge.server.admin.controller.system;
 
+import com.lesofn.archforge.infrastructure.annotation.Log;
 import com.lesofn.archforge.user.domain.SysMenu;
 import com.lesofn.archforge.user.menu.SysMenuService;
 import java.util.List;
@@ -61,12 +62,14 @@ public class SysMenuController {
         return ResponseEntity.ok(menus);
     }
 
+    @Log(module = "菜单管理", summary = "创建菜单")
     @PostMapping
     public ResponseEntity<SysMenu> createMenu(@RequestBody SysMenu menu) {
         SysMenu createdMenu = menuService.create(menu);
         return ResponseEntity.ok(createdMenu);
     }
 
+    @Log(module = "菜单管理", summary = "更新菜单")
     @PutMapping("/{id}")
     public ResponseEntity<SysMenu> updateMenu(@PathVariable Long id, @RequestBody SysMenu menu) {
         menu.setMenuId(id);
@@ -74,12 +77,14 @@ public class SysMenuController {
         return ResponseEntity.ok(updatedMenu);
     }
 
+    @Log(module = "菜单管理", summary = "删除菜单")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteMenu(@PathVariable Long id) {
         menuService.deleteById(id);
         return ResponseEntity.ok().build();
     }
 
+    @Log(module = "菜单管理", summary = "更新菜单状态")
     @PatchMapping("/{id}/status")
     public ResponseEntity<Void> updateMenuStatus(
             @PathVariable Long id, @RequestParam Integer status) {

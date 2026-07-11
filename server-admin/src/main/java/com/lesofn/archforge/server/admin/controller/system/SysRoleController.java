@@ -1,5 +1,6 @@
 package com.lesofn.archforge.server.admin.controller.system;
 
+import com.lesofn.archforge.infrastructure.annotation.Log;
 import com.lesofn.archforge.user.domain.SysRole;
 import com.lesofn.archforge.user.service.SysRoleService;
 import java.util.List;
@@ -58,12 +59,14 @@ public class SysRoleController {
         return ResponseEntity.ok(roles);
     }
 
+    @Log(module = "角色管理", summary = "创建角色")
     @PostMapping
     public ResponseEntity<SysRole> createRole(@RequestBody SysRole role) {
         SysRole createdRole = roleService.create(role);
         return ResponseEntity.ok(createdRole);
     }
 
+    @Log(module = "角色管理", summary = "更新角色")
     @PutMapping("/{id}")
     public ResponseEntity<SysRole> updateRole(@PathVariable Long id, @RequestBody SysRole role) {
         role.setRoleId(id);
@@ -71,12 +74,14 @@ public class SysRoleController {
         return ResponseEntity.ok(updatedRole);
     }
 
+    @Log(module = "角色管理", summary = "删除角色")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteRole(@PathVariable Long id) {
         roleService.deleteById(id);
         return ResponseEntity.ok().build();
     }
 
+    @Log(module = "角色管理", summary = "软删除角色")
     @PatchMapping("/{id}/soft-delete")
     public ResponseEntity<Void> softDeleteRole(@PathVariable Long id) {
         roleService.softDeleteById(id);

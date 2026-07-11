@@ -1,5 +1,6 @@
 package com.lesofn.archforge.server.admin.controller.admin;
 
+import com.lesofn.archforge.infrastructure.annotation.Log;
 import com.lesofn.archforge.server.admin.dto.AdminDeptItemDTO;
 import com.lesofn.archforge.server.admin.dto.request.DeptCreateRequest;
 import com.lesofn.archforge.server.admin.dto.request.DeptDeleteRequest;
@@ -39,6 +40,7 @@ public class AdminDeptController {
         return allDepts.stream().map(deptMapper::toDto).collect(Collectors.toList());
     }
 
+    @Log
     @Operation(summary = "创建部门")
     @PostMapping("/dept/create")
     public Long createDept(@RequestBody @Valid DeptCreateRequest request) {
@@ -55,6 +57,7 @@ public class AdminDeptController {
         return saved.getDeptId();
     }
 
+    @Log
     @Operation(summary = "更新部门")
     @PutMapping("/dept/update")
     public Boolean updateDept(@RequestBody @Valid DeptUpdateRequest request) {
@@ -83,6 +86,7 @@ public class AdminDeptController {
         return true;
     }
 
+    @Log
     @Operation(summary = "删除部门")
     @PostMapping("/dept/delete")
     public Boolean deleteDept(@RequestBody @Valid DeptDeleteRequest request) {

@@ -2,6 +2,7 @@ package com.lesofn.archforge.server.admin.controller.admin;
 
 import com.lesofn.archforge.common.enums.common.GenderEnum;
 import com.lesofn.archforge.common.utils.query.QueryHelp;
+import com.lesofn.archforge.infrastructure.annotation.Log;
 import com.lesofn.archforge.server.admin.dto.AdminPageResult;
 import com.lesofn.archforge.server.admin.dto.AdminUserItemDTO;
 import com.lesofn.archforge.server.admin.dto.AdminUserListRequest;
@@ -96,6 +97,7 @@ public class AdminUserController {
                 .orElse(Collections.emptyList());
     }
 
+    @Log
     @Operation(summary = "创建用户")
     @PostMapping("/user/create")
     public Long createUser(@RequestBody @Valid UserCreateRequest request) {
@@ -117,6 +119,7 @@ public class AdminUserController {
         return saved.getUserId();
     }
 
+    @Log
     @Operation(summary = "更新用户")
     @PutMapping("/user/update")
     public Boolean updateUser(@RequestBody @Valid UserUpdateRequest request) {
@@ -145,6 +148,7 @@ public class AdminUserController {
         return true;
     }
 
+    @Log
     @Operation(summary = "删除用户")
     @PostMapping("/user/delete")
     public Boolean deleteUser(@RequestBody @Valid UserDeleteRequest request) {
@@ -152,6 +156,7 @@ public class AdminUserController {
         return true;
     }
 
+    @Log
     @Operation(summary = "更新用户状态")
     @PostMapping("/user/status")
     public Boolean updateUserStatus(@RequestBody @Valid UserStatusRequest request) {
@@ -159,6 +164,7 @@ public class AdminUserController {
         return true;
     }
 
+    @Log
     @Operation(summary = "重置用户密码")
     @PostMapping("/user/reset-password")
     public Boolean resetUserPassword(@RequestBody @Valid UserPasswordRequest request) {
@@ -167,6 +173,7 @@ public class AdminUserController {
         return true;
     }
 
+    @Log
     @Operation(summary = "分配用户角色")
     @PostMapping("/user/assign-role")
     public Boolean assignUserRole(@RequestBody @Valid UserRoleRequest request) {
