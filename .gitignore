@@ -42,3 +42,7 @@ server-admin/src/main/resources/application-prod.yaml
 
 # Ignore QueryDSL
 **/generated/
+
+# Runtime upload directory
+uploads/
+server-admin/uploads/
