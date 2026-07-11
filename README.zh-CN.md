@@ -19,7 +19,7 @@
 
 ## 项目简介
 
-ArchForge 是一个**开箱即用的全栈管理系统**，后端基于 Spring Boot 4，前端基于 Vue 3，提供完整的用户/角色/菜单/部门管理、文件上传下载、服务器监控、JWT 认证等功能。采用整洁架构，使用现代化技术栈。
+ArchForge 是一个**开箱即用的全栈管理系统**，后端基于 Spring Boot 4，前端基于 Vue 3，提供完整的用户/角色/菜单/部门管理、文件管理、定时任务、国际化、日志审计、服务器监控、JWT 认证等功能。采用整洁架构，使用现代化技术栈。
 
 ### 为什么选择 ArchForge？
 
@@ -37,12 +37,29 @@ ArchForge 是一个**开箱即用的全栈管理系统**，后端基于 Spring B
 | 角色管理 | 角色增删改查、菜单权限分配、按钮级权限控制 |
 | 菜单管理 | 动态菜单树、多级菜单、iframe/外链支持 |
 | 部门管理 | 组织架构树形管理 |
-| 文件管理 | 文件/图片上传下载，支持本地存储和 S3 (RustFS) |
+| 文件管理 | 文件上传、列表、下载、删除；支持本地存储与 S3 (RustFS)；扩展名/大小/MIME 白名单 |
 | 参数设置 | 系统参数配置管理 |
 | 通知公告 | 通知/公告发布管理 |
 | 日志管理 | 操作日志、登录日志查看与清理 |
-| 服务监控 | CPU/内存/JVM/磁盘实时监控仪表盘 |
+| 定时任务 | 基于 Quartz 的反射式 Cron 任务；支持暂停/恢复/立即执行/执行日志 |
+| 国际化 | 前后端 locale 同步，默认支持简体中文与英文消息 |
+| 服务监控 | CPU/内存/JVM/磁盘实时监控仪表盘，Druid SQL 监控 |
 | 接口文档 | 内嵌 Swagger UI (SpringDoc OpenAPI) |
+| 架构 | Spring Modulith 2.0 模块边界、显式 DTO 接口、JSpecify 空安全、Spotless 代码格式化 |
+| 安全 | 管理端接口强制鉴权、旧接口下线、敏感信息脱敏、@RepeatSubmit 防重放 |
+
+## 新增能力
+
+本次合并的 feature/dev 分支带来了一批可直接落地的能力：
+
+- **文件管理** — 完整支持上传、列表、下载、删除，可配置本地或 S3 (RustFS) 存储，支持扩展名白名单、文件大小与 MIME 类型限制。
+- **定时任务** — 基于 Quartz 的反射式 Cron 任务，管理后台可直接暂停/恢复/立即执行，并查看执行日志。
+- **国际化** — 后端 Spring MessageSource 与前端 vue-i18n 联动，默认提供简体中文与英文两套消息。
+- **Druid 监控** — 非生产环境开启 Druid SQL 监控，生产环境自动隐藏。
+- **Spring Modulith 2.0** — 显式模块边界、依赖关系校验与模块文档生成测试，支撑 `admin-user`、`example-task` 与 infrastructure 层。
+- **安全加固** — 管理端接口要求 admin 或已认证身份，下线历史接口，敏感日志脱敏，并支持 `@RepeatSubmit` 防重放。
+- **显式 DTO 接口** — 控制器逐步替换 `Map` 参数与返回值，改为显式 Request/Response DTO，配合 MapStruct 映射。
+- **体验优化** — QueryHelp 适配 Druid `mergeSql` 的 `LIKE` 转义，JDK 25 原生访问为测试与 AOT 任务开启。
 
 ## 快速开始
 
@@ -90,7 +107,7 @@ cd ArchForge/docker
 
 | 层级 | 技术 |
 |------|------|
-| 后端 | Java 25, Spring Boot 4.0.5, Spring Security, Spring Data JPA, QueryDSL |
+| 后端 | Java 25, Spring Boot 4.0.5, Spring Security, Spring Data JPA, QueryDSL, Spring Modulith 2.0 |
 | 前端 | Vue 3.5, Vite 8, TypeScript 6, Element Plus, TailwindCSS 4 |
 | 数据库 | PostgreSQL 17 (开发环境 Testcontainers), Redis, Flyway |
 | 文件存储 | 本地文件系统, AWS S3 / RustFS (开发环境 Testcontainers) |
