@@ -39,12 +39,18 @@ import org.springframework.context.ApplicationContext;
 @Slf4j
 public class QuartzReflectionJob implements Job {
 
-    @Autowired
     private ApplicationContext applicationContext;
-    @Autowired
     private SysQuartzJobRepository jobRepository;
-    @Autowired
     private SysQuartzLogRepository logRepository;
+
+    @Autowired
+    public void setApplicationContext(ApplicationContext applicationContext) { this.applicationContext = applicationContext; }
+
+    @Autowired
+    public void setJobRepository(SysQuartzJobRepository jobRepository) { this.jobRepository = jobRepository; }
+
+    @Autowired
+    public void setLogRepository(SysQuartzLogRepository logRepository) { this.logRepository = logRepository; }
 
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {

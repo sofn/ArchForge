@@ -1,5 +1,7 @@
 @NullMarked
-@ApplicationModule(id = "admin-user", allowedDependencies = {"common", "infrastructure"})
+@ApplicationModule(id = "admin-user", type = ApplicationModule.Type.OPEN, allowedDependencies = {
+        "common", "infrastructure"
+})
 package com.lesofn.archforge.user;
 
 import org.jspecify.annotations.NullMarked;

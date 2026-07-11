@@ -29,7 +29,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -48,9 +47,7 @@ public class AdminUserController {
     private final SysUserService userService;
     private final AdminUserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
-
-    @Autowired(required = false)
-    private SysDeptService deptService;
+    private final SysDeptService deptService;
 
     @Operation(summary = "获取用户列表")
     @PostMapping("/user")
@@ -193,9 +190,6 @@ public class AdminUserController {
     }
 
     private Map<Long, String> buildDeptNameMap() {
-        if (deptService == null) {
-            return Collections.emptyMap();
-        }
         List<SysDept> allDepts = deptService.findAll();
         return allDepts.stream()
                 .collect(Collectors.toMap(SysDept::getDeptId, SysDept::getName, (a, b) -> a));

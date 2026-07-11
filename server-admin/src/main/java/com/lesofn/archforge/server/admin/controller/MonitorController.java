@@ -7,7 +7,6 @@ import com.lesofn.archforge.server.admin.dto.AdminPageResult;
 import com.lesofn.archforge.server.admin.service.cache.CacheKeyEnum;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -16,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -26,14 +26,12 @@ import org.springframework.web.bind.annotation.*;
  */
 @Tag(name = "系统监控")
 @PreAuthorize("hasRole('ADMIN')")
+@RequiredArgsConstructor
 @RestController
 public class MonitorController {
 
-    @Resource
-    private RedisUtil redisUtil;
-
-    @Resource
-    private StringRedisTemplate stringRedisTemplate;
+    private final RedisUtil redisUtil;
+    private final StringRedisTemplate stringRedisTemplate;
 
     @Operation(summary = "在线用户列表")
     @PostMapping("/online-logs")

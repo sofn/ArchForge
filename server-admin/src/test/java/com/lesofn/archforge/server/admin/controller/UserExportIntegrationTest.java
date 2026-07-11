@@ -3,7 +3,7 @@ package com.lesofn.archforge.server.admin.controller;
 import static org.junit.jupiter.api.Assertions.*;
 
 import tools.jackson.databind.ObjectMapper;
-import com.lesofn.archforge.server.admin.Application;
+import com.lesofn.archforge.Application;
 import java.io.ByteArrayInputStream;
 import java.util.List;
 import java.util.Map;

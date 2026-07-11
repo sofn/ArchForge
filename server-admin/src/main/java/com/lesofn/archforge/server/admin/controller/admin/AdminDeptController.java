@@ -11,12 +11,10 @@ import com.lesofn.archforge.user.service.SysDeptService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,16 +26,11 @@ import org.springframework.web.bind.annotation.*;
 public class AdminDeptController {
 
     private final AdminDeptMapper deptMapper;
-
-    @Autowired(required = false)
-    private SysDeptService deptService;
+    private final SysDeptService deptService;
 
     @Operation(summary = "获取全量部门列表")
     @PostMapping("/dept")
     public List<AdminDeptItemDTO> getDeptList() {
-        if (deptService == null) {
-            return Collections.emptyList();
-        }
         List<SysDept> allDepts = deptService.findAll();
         return allDepts.stream().map(deptMapper::toDto).collect(Collectors.toList());
     }
