@@ -160,21 +160,15 @@ public class SecurityConfig {
                                         "/captchaImage",
                                         "/refresh-token")
                                 .permitAll()
-                                .requestMatchers("/api/**")
-                                .permitAll()
                                 // 静态资源允许匿名访问
                                 .requestMatchers(
                                         HttpMethod.GET,
                                         "/",
                                         "/*.html",
-                                        "/**",
-                                        "/profile/**")
-                                .permitAll()
-                                .requestMatchers(
-                                        HttpMethod.GET,
                                         "/**/*.html",
                                         "/**/*.css",
-                                        "/**/*.js")
+                                        "/**/*.js",
+                                        "/profile/**")
                                 .permitAll()
                                 // Swagger相关路径允许匿名访问
                                 .requestMatchers(
