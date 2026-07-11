@@ -8,6 +8,10 @@ import com.lesofn.archforge.infrastructure.config.ArchForgeConfig;
 import com.lesofn.archforge.infrastructure.file.FileStorageService;
 import com.lesofn.archforge.server.admin.controller.admin.AdminControllerHelper;
 import com.lesofn.archforge.server.admin.dto.AdminPageResult;
+import com.lesofn.archforge.server.admin.dto.request.DeleteRequest;
+import com.lesofn.archforge.server.admin.dto.request.FileListRequest;
+import com.lesofn.archforge.server.admin.dto.response.FileResponse;
+import com.lesofn.archforge.server.admin.dto.response.UploadFileResponse;
 import com.lesofn.archforge.user.dao.SysFileRepository;
 import com.lesofn.archforge.user.domain.SysFile;
 import io.swagger.v3.oas.annotations.Operation;
@@ -17,9 +21,7 @@ import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -59,7 +61,7 @@ public class FileController {
     @Operation(summary = "上传文件")
     @PostMapping("/file/upload")
     @RepeatSubmit
-    public Map<String, Object> uploadFile(@RequestParam("file") MultipartFile file) {
+    public UploadFileResponse uploadFile(@RequestParam("file") MultipartFile file) {
         validateUploadFile(file);
         String originalName = file.getOriginalFilename();
         String extension = getExtension(originalName);
@@ -84,29 +86,24 @@ public class FileController {
         sysFile.setStorageType(appForgeConfig.getFileStorage().getType());
         SysFile saved = fileRepository.save(sysFile);
 
-        Map<String, Object> result = new HashMap<>();
-        result.put("fileId", saved.getFileId());
-        result.put("originalName", originalName);
-        result.put("url", "/file/download/" + saved.getFileId());
-        result.put("fileSize", file.getSize());
-        return result;
+        return new UploadFileResponse(saved.getFileId(), originalName, "/file/download/" + saved.getFileId(), file.getSize());
     }
 
     @Log
     @Operation(summary = "上传图片（头像等）")
     @PostMapping("/file/upload-image")
     @RepeatSubmit
-    public Map<String, Object> uploadImage(@RequestParam("file") MultipartFile file) {
+    public UploadFileResponse uploadImage(@RequestParam("file") MultipartFile file) {
         return uploadFile(file);
     }
 
     @Operation(summary = "获取文件列表")
     @PostMapping("/file/list")
-    public AdminPageResult<Map<String, Object>> listFiles(@RequestBody Map<String, Object> params) {
-        int currentPage = AdminControllerHelper.getInt(params, "currentPage", 1);
-        int pageSize = AdminControllerHelper.getInt(params, "pageSize", 10);
-        String originalName = params.get("originalName") != null ? params.get("originalName").toString() : "";
-        String storageType = params.get("storageType") != null ? params.get("storageType").toString() : "";
+    public AdminPageResult<FileResponse> listFiles(@RequestBody FileListRequest params) {
+        int currentPage = params.getCurrentPage() != null ? params.getCurrentPage() : 1;
+        int pageSize = params.getPageSize() != null ? params.getPageSize() : 10;
+        String originalName = params.getOriginalName() != null ? params.getOriginalName() : "";
+        String storageType = params.getStorageType() != null ? params.getStorageType() : "";
 
         Pageable pageable = PageRequest.of(
                 Math.max(0, currentPage - 1), pageSize, Sort.by(Sort.Direction.DESC, "createTime"));
@@ -124,19 +121,11 @@ public class FileController {
         };
 
         Page<SysFile> page = fileRepository.findAll(spec, pageable);
-        List<Map<String, Object>> list = new ArrayList<>();
+        List<FileResponse> list = new ArrayList<>();
         for (SysFile file : page.getContent()) {
-            Map<String, Object> item = new HashMap<>();
-            item.put("id", file.getFileId());
-            item.put("originalName", file.getOriginalName());
-            item.put("storageName", file.getStorageName());
-            item.put("storagePath", file.getStoragePath());
-            item.put("fileSize", file.getFileSize());
-            item.put("contentType", file.getContentType());
-            item.put("extension", file.getExtension());
-            item.put("storageType", file.getStorageType());
-            item.put("createTime", AdminControllerHelper.toEpochMilli(file.getCreateTime()));
-            list.add(item);
+            list.add(new FileResponse(file.getFileId(), file.getOriginalName(), file.getStorageName(), file
+                    .getStoragePath(), file.getFileSize(), file.getContentType(), file.getExtension(), file
+                            .getStorageType(), AdminControllerHelper.toEpochMilli(file.getCreateTime())));
         }
 
         return AdminPageResult.of(list, page.getTotalElements(), page.getSize(), currentPage);
@@ -163,8 +152,8 @@ public class FileController {
     @Log
     @Operation(summary = "删除文件")
     @PostMapping("/file/delete")
-    public Boolean deleteFile(@RequestBody Map<String, Object> data) {
-        Long fileId = Long.valueOf(data.get("id").toString());
+    public Boolean deleteFile(@RequestBody DeleteRequest data) {
+        Long fileId = data.getId();
         Optional<SysFile> optFile = fileRepository.findById(fileId);
         if (optFile.isEmpty()) {
             return false;

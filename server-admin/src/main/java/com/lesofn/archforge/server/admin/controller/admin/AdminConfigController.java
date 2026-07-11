@@ -2,17 +2,17 @@ package com.lesofn.archforge.server.admin.controller.admin;
 
 import com.lesofn.archforge.infrastructure.annotation.Log;
 import com.lesofn.archforge.server.admin.dto.AdminPageResult;
+import com.lesofn.archforge.server.admin.dto.PageQuery;
 import com.lesofn.archforge.server.admin.dto.request.ConfigCreateRequest;
 import com.lesofn.archforge.server.admin.dto.request.ConfigDeleteRequest;
 import com.lesofn.archforge.server.admin.dto.request.ConfigUpdateRequest;
+import com.lesofn.archforge.server.admin.dto.response.ConfigResponse;
 import com.lesofn.archforge.user.domain.SysConfig;
 import com.lesofn.archforge.user.service.SysConfigService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -33,24 +33,15 @@ public class AdminConfigController {
 
     @Operation(summary = "获取参数列表")
     @PostMapping("/config")
-    public AdminPageResult<Map<String, Object>> getConfigList(@RequestBody Map<String, Object> request) {
-        int currentPage = AdminControllerHelper.getInt(request, "currentPage", 1);
-        int pageSize = AdminControllerHelper.getInt(request, "pageSize", 10);
+    public AdminPageResult<ConfigResponse> getConfigList(@RequestBody PageQuery request) {
+        int currentPage = request.getCurrentPage() != null ? request.getCurrentPage() : 1;
+        int pageSize = request.getPageSize() != null ? request.getPageSize() : 10;
         Pageable pageable = PageRequest.of(currentPage - 1, pageSize);
         Page<SysConfig> page = configService.findAll(pageable);
-        List<Map<String, Object>> list = page.getContent().stream()
+        List<ConfigResponse> list = page.getContent().stream()
                 .filter(c -> !Boolean.TRUE.equals(c.getDeleted()))
-                .map(c -> {
-                    Map<String, Object> m = new LinkedHashMap<>();
-                    m.put("id", c.getConfigId());
-                    m.put("configName", c.getConfigName());
-                    m.put("configKey", c.getConfigKey());
-                    m.put("configValue", c.getConfigValue());
-                    m.put("configType", c.getConfigType());
-                    m.put("remark", c.getRemark());
-                    m.put("createTime", AdminControllerHelper.toEpochMilli(c.getCreateTime()));
-                    return m;
-                })
+                .map(c -> new ConfigResponse(c.getConfigId(), c.getConfigName(), c.getConfigKey(), c.getConfigValue(), c
+                        .getConfigType(), c.getRemark(), AdminControllerHelper.toEpochMilli(c.getCreateTime())))
                 .collect(Collectors.toList());
         return AdminPageResult.of(list, page.getTotalElements(), pageSize, currentPage);
     }

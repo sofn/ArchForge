@@ -2,9 +2,11 @@ package com.lesofn.archforge.server.admin.controller;
 
 import com.lesofn.archforge.infrastructure.annotation.Log;
 import com.lesofn.archforge.server.admin.dto.AdminPageResult;
+import com.lesofn.archforge.server.admin.dto.quartz.CronValidateRequest;
 import com.lesofn.archforge.server.admin.dto.quartz.QuartzJobQuery;
 import com.lesofn.archforge.server.admin.dto.quartz.QuartzJobResponse;
 import com.lesofn.archforge.server.admin.dto.quartz.QuartzJobUpsertRequest;
+import com.lesofn.archforge.server.admin.dto.quartz.QuartzLogListRequest;
 import com.lesofn.archforge.server.admin.dto.quartz.QuartzLogResponse;
 import com.lesofn.archforge.server.admin.dto.quartz.SysQuartzJobQueryCriteria;
 import com.lesofn.archforge.server.admin.service.quartz.QuartzJobService;
@@ -12,7 +14,6 @@ import com.lesofn.archforge.user.domain.SysQuartzJob;
 import com.lesofn.archforge.user.domain.SysQuartzLog;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -98,13 +99,13 @@ public class QuartzJobController {
 
     @Operation(summary = "查询任务执行日志")
     @PostMapping("/log/list")
-    public AdminPageResult<QuartzLogResponse> logList(@RequestBody Map<String, Object> body) {
-        Long jobId = ((Number) body.get("jobId")).longValue();
-        int currentPage = body.get("currentPage") != null && ((Number) body.get("currentPage")).intValue() > 0
-                ? ((Number) body.get("currentPage")).intValue()
+    public AdminPageResult<QuartzLogResponse> logList(@RequestBody QuartzLogListRequest body) {
+        Long jobId = body.getJobId();
+        int currentPage = body.getCurrentPage() != null && body.getCurrentPage() > 0
+                ? body.getCurrentPage()
                 : 1;
-        int pageSize = body.get("pageSize") != null && ((Number) body.get("pageSize")).intValue() > 0
-                ? ((Number) body.get("pageSize")).intValue()
+        int pageSize = body.getPageSize() != null && body.getPageSize() > 0
+                ? body.getPageSize()
                 : 20;
         Pageable pageable = PageRequest.of(currentPage - 1, pageSize);
         Page<SysQuartzLog> page = quartzJobService.logPage(jobId, pageable);
@@ -117,8 +118,8 @@ public class QuartzJobController {
 
     @Operation(summary = "校验 cron 表达式")
     @PostMapping("/validate-cron")
-    public boolean validateCron(@RequestBody Map<String, String> body) {
-        return quartzJobService.validateCron(body.get("cron"));
+    public boolean validateCron(@RequestBody CronValidateRequest body) {
+        return quartzJobService.validateCron(body.getCron());
     }
 
     private static SysQuartzJob toEntity(SysQuartzJob target, QuartzJobUpsertRequest req) {

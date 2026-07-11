@@ -2,17 +2,17 @@ package com.lesofn.archforge.server.admin.controller.admin;
 
 import com.lesofn.archforge.infrastructure.annotation.Log;
 import com.lesofn.archforge.server.admin.dto.AdminPageResult;
+import com.lesofn.archforge.server.admin.dto.PageQuery;
 import com.lesofn.archforge.server.admin.dto.request.NoticeCreateRequest;
 import com.lesofn.archforge.server.admin.dto.request.NoticeDeleteRequest;
 import com.lesofn.archforge.server.admin.dto.request.NoticeUpdateRequest;
+import com.lesofn.archforge.server.admin.dto.response.NoticeResponse;
 import com.lesofn.archforge.user.domain.SysNotice;
 import com.lesofn.archforge.user.service.SysNoticeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -33,24 +33,15 @@ public class AdminNoticeController {
 
     @Operation(summary = "获取通知公告列表")
     @PostMapping("/notice")
-    public AdminPageResult<Map<String, Object>> getNoticeList(@RequestBody Map<String, Object> request) {
-        int currentPage = AdminControllerHelper.getInt(request, "currentPage", 1);
-        int pageSize = AdminControllerHelper.getInt(request, "pageSize", 10);
+    public AdminPageResult<NoticeResponse> getNoticeList(@RequestBody PageQuery request) {
+        int currentPage = request.getCurrentPage() != null ? request.getCurrentPage() : 1;
+        int pageSize = request.getPageSize() != null ? request.getPageSize() : 10;
         Pageable pageable = PageRequest.of(currentPage - 1, pageSize);
         Page<SysNotice> page = noticeService.findAll(pageable);
-        List<Map<String, Object>> list = page.getContent().stream()
+        List<NoticeResponse> list = page.getContent().stream()
                 .filter(n -> !Boolean.TRUE.equals(n.getDeleted()))
-                .map(n -> {
-                    Map<String, Object> m = new LinkedHashMap<>();
-                    m.put("id", n.getNoticeId());
-                    m.put("noticeTitle", n.getNoticeTitle());
-                    m.put("noticeType", n.getNoticeType());
-                    m.put("noticeContent", n.getNoticeContent());
-                    m.put("status", n.getStatus());
-                    m.put("remark", n.getRemark());
-                    m.put("createTime", AdminControllerHelper.toEpochMilli(n.getCreateTime()));
-                    return m;
-                })
+                .map(n -> new NoticeResponse(n.getNoticeId(), n.getNoticeTitle(), n.getNoticeType(), n.getNoticeContent(), n
+                        .getStatus(), n.getRemark(), AdminControllerHelper.toEpochMilli(n.getCreateTime())))
                 .collect(Collectors.toList());
         return AdminPageResult.of(list, page.getTotalElements(), pageSize, currentPage);
     }
