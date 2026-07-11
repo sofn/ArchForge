@@ -1,8 +1,8 @@
 package com.lesofn.archforge.infrastructure.frame.utils.log;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.lesofn.archforge.common.profile.DefaultProfileLoader;
+import com.lesofn.archforge.common.utils.jackson.JsonUtil;
+import tools.jackson.databind.node.ObjectNode;
 import com.lesofn.archforge.infrastructure.frame.context.RequestContext;
 import com.lesofn.archforge.infrastructure.frame.context.ScopedValueContext;
 import org.slf4j.Logger;
@@ -79,8 +79,7 @@ public class ApiLogger {
         String extStr = "";
         if (ext != null) {
             try {
-                ObjectMapper mapper = new ObjectMapper();
-                extStr = mapper.writeValueAsString(ext);
+                extStr = JsonUtil.getObjectMapper().writeValueAsString(ext);
             } catch (Exception e) {
                 // Ignore serialization errors
             }

@@ -1,11 +1,11 @@
 package com.lesofn.archforge.infrastructure.frame.help.resources;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.lesofn.archforge.infrastructure.auth.annotation.ApiStatus;
 import com.lesofn.archforge.infrastructure.auth.annotation.AuthType;
 import com.lesofn.archforge.infrastructure.auth.annotation.BaseInfo;
 import com.lesofn.archforge.infrastructure.frame.context.RequestContext;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -19,12 +19,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/help")
 public class HelpResource {
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
-
     @BaseInfo(desc = "help-ping", status = ApiStatus.PUBLIC, needAuth = AuthType.OPTION)
     @RequestMapping(value = "/ping")
-    public ObjectNode ping(RequestContext rc) {
-        ObjectNode result = objectMapper.createObjectNode();
+    public Map<String, Object> ping(RequestContext rc) {
+        Map<String, Object> result = new LinkedHashMap<>();
         result.put("uid", rc.getCurrentUid());
         result.put("app_id", rc.getAppId());
         result.put("remote_ip", rc.getIp());
@@ -32,8 +30,8 @@ public class HelpResource {
     }
 
     @PostMapping(value = "/echo")
-    public ObjectNode echo(@RequestParam String msg) {
-        ObjectNode msgJson = objectMapper.createObjectNode();
+    public Map<String, Object> echo(@RequestParam String msg) {
+        Map<String, Object> msgJson = new LinkedHashMap<>();
         msgJson.put("msg", msg);
         return msgJson;
     }

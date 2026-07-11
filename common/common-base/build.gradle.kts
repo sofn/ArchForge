@@ -20,9 +20,8 @@ dependencies {
     api("com.konghq:unirest-java-core")
 
     // Jackson for JSON processing (Spring Boot BOM 管理的版本)
-    api("com.fasterxml.jackson.core:jackson-databind")
+    api("tools.jackson.core:jackson-databind")
     api("com.fasterxml.jackson.core:jackson-annotations")
-    api("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
 
     // web (Spring Boot BOM 管理的版本)
     api("org.springframework.boot:spring-boot-starter-web") {

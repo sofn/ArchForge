@@ -1,4 +1,4 @@
-package com.lesofn.archforge.infrastructure.config.jackson;
+package com.lesofn.archforge.common.sensitive.jackson;
 
 import com.lesofn.archforge.common.sensitive.Sensitive;
 import java.util.List;

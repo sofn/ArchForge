@@ -1,11 +1,7 @@
 package com.lesofn.archforge.common.repository.converter;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.lesofn.archforge.common.spring.SpringContextHolder;
 import com.lesofn.archforge.common.utils.jackson.JsonUtil;
 import jakarta.persistence.AttributeConverter;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
 
 /**
@@ -16,7 +12,6 @@ import org.springframework.util.StringUtils;
  * 然后在entity字段上使用： @Convert(converter = MetaInfoConverter.class) @Column(columnDefinition =
  * "TEXT") private MetaDTO metaInfo;
  */
-@Slf4j
 public abstract class AbstractJsonConverter<T> implements AttributeConverter<T, String> {
 
     @Override
@@ -24,12 +19,7 @@ public abstract class AbstractJsonConverter<T> implements AttributeConverter<T, 
         if (attribute == null) {
             return null;
         }
-        try {
-            return getObjectMapper().writeValueAsString(attribute);
-        } catch (JsonProcessingException e) {
-            log.error("Error converting object to JSON string: {}", attribute, e);
-            throw new RuntimeException("Failed to convert object to JSON", e);
-        }
+        return JsonUtil.to(attribute);
     }
 
     @Override
@@ -37,23 +27,9 @@ public abstract class AbstractJsonConverter<T> implements AttributeConverter<T, 
         if (!StringUtils.hasText(dbData)) {
             return null;
         }
-        try {
-            return getObjectMapper().readValue(dbData, getTargetType());
-        } catch (JsonProcessingException e) {
-            log.error("Error converting JSON string to object: {}", dbData, e);
-            throw new RuntimeException("Failed to convert JSON to object", e);
-        }
+        return JsonUtil.from(dbData, getTargetType());
     }
 
     /** 子类必须实现此方法，返回目标类型 */
     protected abstract Class<T> getTargetType();
-
-    /** 获取Spring配置的ObjectMapper实例 */
-    protected ObjectMapper getObjectMapper() {
-        if (SpringContextHolder.isInjectedApplicationContext()) {
-            return SpringContextHolder.getBean(ObjectMapper.class);
-        } else {
-            return JsonUtil.getObjectMapper();
-        }
-    }
 }

@@ -1,6 +1,6 @@
 package com.lesofn.archforge.server.admin.controller
 
-import com.fasterxml.jackson.databind.ObjectMapper
+import tools.jackson.databind.ObjectMapper
 import com.lesofn.archforge.server.admin.Application
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.server.LocalServerPort

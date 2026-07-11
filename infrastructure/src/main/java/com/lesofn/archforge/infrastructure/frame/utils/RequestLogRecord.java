@@ -1,9 +1,8 @@
 package com.lesofn.archforge.infrastructure.frame.utils;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.lesofn.archforge.common.context.ClientVersion;
+import com.lesofn.archforge.common.utils.jackson.JsonUtil;
+import tools.jackson.databind.node.ObjectNode;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
@@ -133,8 +132,7 @@ public class RequestLogRecord {
     public void setWriteBody(boolean writeBody) { this.writeBody = writeBody; }
 
     public ObjectNode toJSONObject() {
-        ObjectMapper mapper = new ObjectMapper();
-        return mapper.createObjectNode();
+        return JsonUtil.getObjectMapper().createObjectNode();
     }
 
     public String toString() {
@@ -175,12 +173,7 @@ public class RequestLogRecord {
     }
 
     public String toJsonString() {
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-            return mapper.writeValueAsString(this);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("Failed to serialize RequestLogRecord to JSON", e);
-        }
+        return JsonUtil.to(this);
     }
 
     private String getParameterString() {

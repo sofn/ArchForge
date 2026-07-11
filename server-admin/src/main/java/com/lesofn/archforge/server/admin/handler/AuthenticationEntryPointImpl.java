@@ -1,7 +1,7 @@
 package com.lesofn.archforge.server.admin.handler;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lesofn.archforge.common.error.SystemErrorCode;
+import com.lesofn.archforge.common.utils.jackson.JsonUtil;
 import com.lesofn.archforge.infrastructure.frame.response.model.ResponseResult;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -43,8 +43,7 @@ public class AuthenticationEntryPointImpl implements AuthenticationEntryPoint {
                 SystemErrorCode.COMMON_REQUEST_FORBIDDEN.getCode(),
                 SystemErrorCode.COMMON_REQUEST_FORBIDDEN.getMsg());
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        String jsonResult = objectMapper.writeValueAsString(result);
+        String jsonResult = JsonUtil.getObjectMapper().writeValueAsString(result);
 
         response.getWriter().write(jsonResult);
     }

@@ -1,5 +1,6 @@
 package com.lesofn.archforge.infrastructure.config.jackson;
 
+import com.lesofn.archforge.common.sensitive.jackson.SensitiveJacksonModule;
 import com.lesofn.archforge.infrastructure.config.ArchForgeConfig;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;

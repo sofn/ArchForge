@@ -2,7 +2,7 @@ package com.lesofn.archforge.server.admin.controller;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import com.lesofn.archforge.server.admin.Application;
 import java.util.List;
 import java.util.Map;

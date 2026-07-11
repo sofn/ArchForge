@@ -1,9 +1,9 @@
 package com.lesofn.archforge.infrastructure.frame.help.resources;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.lesofn.archforge.infrastructure.auth.annotation.AuthType;
 import com.lesofn.archforge.infrastructure.auth.annotation.BaseInfo;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -15,12 +15,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/welcome")
 public class WelcomeResource {
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
-
     @RequestMapping(value = "")
     @BaseInfo(desc = "welcome", needAuth = AuthType.OPTION)
-    public ObjectNode welcome() {
-        ObjectNode result = objectMapper.createObjectNode();
+    public Map<String, Object> welcome() {
+        Map<String, Object> result = new LinkedHashMap<>();
         result.put("message", "Welcome to ArchForge API");
         result.put("status", "success");
         return result;

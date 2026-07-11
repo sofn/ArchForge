@@ -2,9 +2,8 @@ package com.lesofn.archforge.infrastructure.frame.context;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lesofn.archforge.common.context.ClientVersion;
+import com.lesofn.archforge.common.utils.jackson.JsonUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import java.io.Serializable;
 import java.util.HashMap;
@@ -132,12 +131,7 @@ public class RequestContext implements Serializable {
     }
 
     public String toJSONString() {
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-            return mapper.writeValueAsString(this);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("Failed to serialize RequestContext to JSON", e);
-        }
+        return JsonUtil.to(this);
     }
 
     public String getPlatform() { return platform; }
