@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -134,6 +135,7 @@ public class LoginController {
      * @return 用户信息
      */
     @Operation(summary = "获取当前登录用户信息")
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/getLoginUserInfo")
     public CurrentLoginUserDTO getLoginUserInfo() {
         SystemLoginUser loginUser = AuthenticationUtils.getSystemLoginUser();
@@ -146,6 +148,7 @@ public class LoginController {
      * @return 路由信息
      */
     @Operation(summary = "获取用户对应的菜单路由", description = "用于动态生成路由")
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/getRouters")
     public List<RouterDTO> getRouters() {
         SystemLoginUser loginUser = AuthenticationUtils.getSystemLoginUser();
@@ -158,6 +161,7 @@ public class LoginController {
      * @return 路由信息
      */
     @Operation(summary = "获取异步路由", description = "兼容vue-pure-admin前端的路由获取接口")
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/get-async-routes")
     public List<RouterDTO> getAsyncRoutes() {
         SystemLoginUser loginUser = AuthenticationUtils.getSystemLoginUser();

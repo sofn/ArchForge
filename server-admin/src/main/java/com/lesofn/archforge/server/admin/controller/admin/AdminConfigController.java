@@ -19,9 +19,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "参数管理")
+@PreAuthorize("hasRole('ADMIN')")
 @RestController
 @CrossOrigin
 @RequiredArgsConstructor

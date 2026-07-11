@@ -17,9 +17,11 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "部门管理")
+@PreAuthorize("hasRole('ADMIN')")
 @RestController
 @CrossOrigin
 @RequiredArgsConstructor

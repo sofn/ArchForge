@@ -34,6 +34,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -44,6 +45,7 @@ import org.springframework.web.multipart.MultipartFile;
  */
 @Slf4j
 @Tag(name = "文件管理", description = "文件上传、下载、删除接口")
+@PreAuthorize("isAuthenticated()")
 @RestController
 @CrossOrigin
 @RequiredArgsConstructor

@@ -7,9 +7,11 @@ import java.util.Collections;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "服务器监控")
+@PreAuthorize("hasRole('ADMIN')")
 @RestController
 @CrossOrigin
 @RequiredArgsConstructor

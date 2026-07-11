@@ -35,9 +35,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "用户管理")
+@PreAuthorize("hasRole('ADMIN')")
 @RestController
 @CrossOrigin
 @RequiredArgsConstructor

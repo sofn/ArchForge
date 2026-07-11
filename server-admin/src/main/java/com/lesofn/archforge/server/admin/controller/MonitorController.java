@@ -18,12 +18,14 @@ import java.util.Properties;
 import java.util.stream.Collectors;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 /**
  * 系统监控接口：在线用户、缓存信息。
  */
 @Tag(name = "系统监控")
+@PreAuthorize("hasRole('ADMIN')")
 @RestController
 public class MonitorController {
 
