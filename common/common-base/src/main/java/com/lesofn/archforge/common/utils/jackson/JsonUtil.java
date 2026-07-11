@@ -290,7 +290,7 @@ public class JsonUtil {
     }
 
     private static String getAsString(JsonNode jsonNode) {
-        return jsonNode.asText();
+        return jsonNode.asString();
     }
 
     /**
@@ -417,7 +417,7 @@ public class JsonUtil {
                 return jsonNode.booleanValue();
             } else {
                 if (jsonNode.getNodeType() == JsonNodeType.STRING) {
-                    return BooleanUtils.toBoolean(jsonNode.asText());
+                    return BooleanUtils.toBoolean(jsonNode.asString());
                 } else { // number
                     return BooleanUtils.toBoolean(jsonNode.intValue());
                 }
