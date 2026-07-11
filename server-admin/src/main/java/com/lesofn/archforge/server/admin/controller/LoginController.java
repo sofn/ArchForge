@@ -1,6 +1,5 @@
 package com.lesofn.archforge.server.admin.controller;
 
-import com.lesofn.archforge.common.utils.jackson.JsonUtil;
 import com.lesofn.archforge.infrastructure.annotation.RateLimit;
 import com.lesofn.archforge.infrastructure.auth.AuthenticationUtils;
 import com.lesofn.archforge.infrastructure.auth.errors.AdminAuthErrorCode;
@@ -14,7 +13,6 @@ import com.lesofn.archforge.server.admin.service.login.TokenService;
 import com.lesofn.archforge.server.admin.service.user.UserService;
 import com.lesofn.archforge.user.menu.SysMenuService;
 import com.lesofn.archforge.user.menu.dto.RouterDTO;
-import com.lesofn.archforge.user.service.SysUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -47,7 +45,6 @@ public class LoginController {
 
     private final LoginService loginService;
     private final UserService userService;
-    private final SysUserService sysUserService;
     private final SysMenuService menuService;
     private final ArchForgeConfig appForgeConfig;
     private final TokenService tokenService;
@@ -68,11 +65,7 @@ public class LoginController {
      */
     @Operation(summary = "获取系统配置")
     @GetMapping("/getConfig")
-    public ConfigDTO getConfig() {
-        log.info("user: {}", JsonUtil.to(sysUserService.getUserByUserName("admin")));
-        log.info("user: {}", JsonUtil.to(sysUserService.getUserByUserName("ag1")));
-        return loginService.getConfig();
-    }
+    public ConfigDTO getConfig() { return loginService.getConfig(); }
 
     /** 生成验证码 */
     @GetMapping("/captchaImage")
