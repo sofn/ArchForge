@@ -43,6 +43,9 @@ server-admin/src/main/resources/application-prod.yaml
 # Ignore QueryDSL
 **/generated/
 
+# Git worktrees
+.worktrees/
+
 # Runtime upload directory
 uploads/
 server-admin/uploads/
