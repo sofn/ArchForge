@@ -66,13 +66,14 @@ public class RequestLogFilter implements Filter {
             return;
         }
 
-        response = new ResponseWrapper(response);
+        boolean binaryResponse = isBinaryResponsePath(path);
+        HttpServletResponse responseToUse = binaryResponse ? response : new ResponseWrapper(response);
         Observation observation = Observation.start("http.server.requests", observationRegistry);
         long startTime = System.currentTimeMillis();
         try {
             observation.lowCardinalityKeyValue("http.method", request.getMethod());
             observation.lowCardinalityKeyValue("http.path", path);
-            filterChain.doFilter(request, response);
+            filterChain.doFilter(request, responseToUse);
         } catch (Exception e) {
             observation.error(e);
             // 此处拦截也必须抛出，否则不执行ErrorHandlerResource
@@ -95,7 +96,7 @@ public class RequestLogFilter implements Filter {
                 long endTime = System.currentTimeMillis();
                 RequestLogRecord record = new RequestLogRecord();
                 record.setRequestId(context.getRequestId());
-                record.setIp(request.getRemoteHost());
+                record.setIp(context.getIp());
                 record.setUid(context.getCurrentUid());
                 record.setSource(context.getAppId() + "");
                 record.setUseTime(endTime - startTime);
@@ -103,12 +104,17 @@ public class RequestLogFilter implements Filter {
                 record.setApi(requestUri != null ? (String) requestUri : path);
                 record.setMethod(request.getMethod());
                 record.setParameters(request.getParameterMap());
-                record.setResponseStatus(response.getStatus());
+                record.setResponseStatus(responseToUse.getStatus());
                 record.setClientVersion(context.getClientVersion());
-                record.setResponse(
-                        new String(((ResponseWrapper) response).toByteArray(), StandardCharsets.UTF_8));
+                if (responseToUse instanceof ResponseWrapper wrapper) {
+                    record.setResponse(
+                            new String(wrapper.toByteArray(), StandardCharsets.UTF_8));
+                } else {
+                    record.setResponse("");
+                    record.setWriteBody(false);
+                }
                 // text/html不打印body
-                if (!Strings.CS.contains(response.getContentType(), "application/json")) {
+                if (!Strings.CS.contains(responseToUse.getContentType(), "application/json")) {
                     record.setWriteBody(false);
                 }
                 MDC.put("CUSTOM_LOG", "request");
@@ -126,7 +132,7 @@ public class RequestLogFilter implements Filter {
                 }
                 MDC.remove("CUSTOM_LOG");
                 observation.lowCardinalityKeyValue(
-                        "http.status", String.valueOf(response.getStatus()));
+                        "http.status", String.valueOf(responseToUse.getStatus()));
                 observation.stop();
             }
         }
@@ -136,6 +142,10 @@ public class RequestLogFilter implements Filter {
         return Strings.CS.startsWithAny(path, "/webjars", "/static", "/js", "/css", "/libs", "/WEB-INF") || Strings.CS
                 .startsWithAny(path, "/swagger-", "/v3/api-docs") || Strings.CS.startsWithAny(path,
                         GlobalConstants.staticResourceArray);
+    }
+
+    private static boolean isBinaryResponsePath(String path) {
+        return Strings.CS.startsWithAny(path, "/file/download/", "/user/export");
     }
 
     @Override

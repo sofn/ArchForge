@@ -170,26 +170,26 @@ public class SecurityConfig {
                                         "/**/*.js",
                                         "/profile/**")
                                 .permitAll()
-                                // Swagger相关路径允许匿名访问
+                                // Swagger 相关路径需要认证
                                 .requestMatchers(
                                         "/swagger-ui/**",
                                         "/swagger-ui.html",
                                         "/v3/api-docs/**",
                                         "/swagger-resources/**",
                                         "/webjars/**")
-                                .permitAll()
+                                .authenticated()
                                 // H2 Console允许匿名访问（仅开发环境）
                                 .requestMatchers("/h2-console/**")
                                 .permitAll()
-                                // Actuator端点允许匿名访问
+                                // Actuator 端点需要认证
                                 .requestMatchers("/actuator/**")
-                                .permitAll()
-                                // Jolokia端点允许匿名访问
+                                .authenticated()
+                                // Jolokia 端点需要认证
                                 .requestMatchers("/jolokia/**")
-                                .permitAll()
-                                // Druid 监控页面允许匿名访问（非 prod 环境才会注册 StatViewServlet）
+                                .authenticated()
+                                // Druid 监控页面需要认证（非 prod 环境才会注册 StatViewServlet）
                                 .requestMatchers("/druid/**")
-                                .permitAll()
+                                .authenticated()
                                 // 其他所有请求都需要认证
                                 .anyRequest()
                                 .authenticated())

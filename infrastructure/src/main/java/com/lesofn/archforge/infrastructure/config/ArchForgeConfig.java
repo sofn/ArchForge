@@ -68,6 +68,9 @@ public class ArchForgeConfig {
     /** CORS 跨域配置 */
     private Cors cors = new Cors();
 
+    /** 安全配置 */
+    private Security security = new Security();
+
     @Setter
     @Getter
     public static class Token {
@@ -225,5 +228,12 @@ public class ArchForgeConfig {
 
         /** 预检请求缓存时长（秒） */
         private long maxAge = 3600L;
+    }
+
+    @Setter
+    @Getter
+    public static class Security {
+        /** 可信反向代理 IP 列表，用于安全地解析 X-Forwarded-For 获取客户端真实 IP */
+        private List<String> trustedProxies = List.of();
     }
 }

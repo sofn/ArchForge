@@ -207,6 +207,64 @@ public class IpUtil {
     }
 
     /**
+     * 获取客户端真实 IP，仅信任配置的反向代理列表中的 X-Forwarded-For。
+     *
+     * <p>
+     * 从 X-Forwarded-For 右侧向左侧遍历，跳过受信任的代理，返回第一个非受信任 IP，
+     * 防止客户端伪造 X-Forwarded-For 前缀绕过 IP 限流。
+     *
+     * @param request 请求
+     * @param trustedProxies 可信反向代理 IP 列表
+     * @return 客户端 IP
+     */
+    public static String getClientIp(HttpServletRequest request, List<String> trustedProxies) {
+        if (request == null) {
+            return "127.0.0.1";
+        }
+        String remoteAddr = request.getRemoteAddr();
+        if (trustedProxies == null || trustedProxies.isEmpty()) {
+            return remoteAddr;
+        }
+        if (!isTrustedProxy(remoteAddr, trustedProxies)) {
+            return remoteAddr;
+        }
+
+        String forwarded = request.getHeader("X-Forwarded-For");
+        if (StringUtils.isNotBlank(forwarded)) {
+            String[] ips = forwarded.split(",");
+            for (int i = ips.length - 1; i >= 0; i--) {
+                String candidate = ips[i].trim();
+                if (StringUtils.isNotBlank(candidate) && !isTrustedProxy(candidate, trustedProxies)) {
+                    return candidate;
+                }
+            }
+            return ips[0].trim();
+        }
+
+        String proxyClientIp = request.getHeader("Proxy-Client-IP");
+        if (StringUtils.isNotBlank(proxyClientIp)) {
+            return proxyClientIp.trim();
+        }
+        String wlProxyClientIp = request.getHeader("WL-Proxy-Client-IP");
+        if (StringUtils.isNotBlank(wlProxyClientIp)) {
+            return wlProxyClientIp.trim();
+        }
+        return remoteAddr;
+    }
+
+    private static boolean isTrustedProxy(String ip, List<String> trustedProxies) {
+        if (StringUtils.isBlank(ip)) {
+            return false;
+        }
+        for (String trusted : trustedProxies) {
+            if (ip.equals(trusted) || ip.equals(StringUtils.trimToEmpty(trusted))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * 是否为内网ip A类 10.0.0.0-10.255.255.255 B类 172.16.0.0-172.31.255.255 C类
      * 192.168.0.0-192.168.255.255 不包括回环ip
      *

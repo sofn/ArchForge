@@ -2,9 +2,11 @@ package com.lesofn.archforge.infrastructure.aspect;
 
 import com.lesofn.archforge.common.error.system.SystemException;
 import com.lesofn.archforge.common.error.SystemErrorCode;
+import com.lesofn.archforge.common.utils.ip.IpUtil;
 import com.lesofn.archforge.infrastructure.annotation.RateLimit;
 import com.lesofn.archforge.infrastructure.auth.AuthenticationUtils;
 import com.lesofn.archforge.infrastructure.auth.model.SystemLoginUser;
+import com.lesofn.archforge.infrastructure.config.ArchForgeConfig;
 import com.lesofn.archforge.infrastructure.frame.context.RequestContext;
 import com.lesofn.archforge.infrastructure.frame.context.ScopedValueContext;
 import jakarta.servlet.http.HttpServletRequest;
@@ -44,6 +46,7 @@ public class RateLimitAspect {
     private static final DefaultRedisScript<Long> LIMIT_SCRIPT = new DefaultRedisScript<>(LUA_SCRIPT, Long.class);
 
     private final StringRedisTemplate redisTemplate;
+    private final ArchForgeConfig archForgeConfig;
 
     @Around("@annotation(rateLimit)")
     public Object around(ProceedingJoinPoint point, RateLimit rateLimit) throws Throwable {
@@ -78,11 +81,8 @@ public class RateLimitAspect {
         RequestContext ctx = ScopedValueContext.getRequestContext();
         if (ctx != null && ctx.getOriginRequest() != null) {
             HttpServletRequest request = ctx.getOriginRequest();
-            String forwarded = request.getHeader("X-Forwarded-For");
-            if (forwarded != null && !forwarded.isEmpty()) {
-                return forwarded.split(",")[0].trim();
-            }
-            return request.getRemoteAddr();
+            List<String> trustedProxies = archForgeConfig.getSecurity().getTrustedProxies();
+            return IpUtil.getClientIp(request, trustedProxies);
         }
         return "unknown";
     }

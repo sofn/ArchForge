@@ -176,7 +176,7 @@ public class LoginService {
         }
 
         Object cacheCode = redisCacheService.captchaCache.get(uuid);
-        redisCacheService.loginUserCache.delete(uuid);
+        redisCacheService.captchaCache.delete(uuid);
 
         if (cacheCode == null) {
             throw new AdminAuthException(CAPTCHA_EXPIRED);
