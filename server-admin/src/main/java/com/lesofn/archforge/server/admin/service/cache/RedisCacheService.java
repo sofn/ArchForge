@@ -2,10 +2,10 @@ package com.lesofn.archforge.server.admin.service.cache;
 
 import com.lesofn.archforge.infrastructure.auth.model.SystemLoginUser;
 import com.lesofn.archforge.infrastructure.db.redis.RedisUtil;
-import com.lesofn.archforge.user.domain.SysRole;
-import com.lesofn.archforge.user.domain.SysUser;
-import com.lesofn.archforge.user.service.SysRoleService;
-import com.lesofn.archforge.user.service.SysUserService;
+import com.lesofn.archforge.user.api.domain.SysRole;
+import com.lesofn.archforge.user.api.domain.SysUser;
+import com.lesofn.archforge.user.api.service.SysRoleService;
+import com.lesofn.archforge.user.api.service.SysUserService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

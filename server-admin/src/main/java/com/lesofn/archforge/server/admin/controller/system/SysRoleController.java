@@ -1,8 +1,8 @@
 package com.lesofn.archforge.server.admin.controller.system;
 
 import com.lesofn.archforge.infrastructure.annotation.Log;
-import com.lesofn.archforge.user.domain.SysRole;
-import com.lesofn.archforge.user.service.SysRoleService;
+import com.lesofn.archforge.user.api.domain.SysRole;
+import com.lesofn.archforge.user.api.service.SysRoleService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

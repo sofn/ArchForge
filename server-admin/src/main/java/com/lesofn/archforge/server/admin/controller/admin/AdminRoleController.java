@@ -14,12 +14,12 @@ import com.lesofn.archforge.server.admin.dto.request.RoleStatusRequest;
 import com.lesofn.archforge.server.admin.dto.request.RoleUpdateRequest;
 import com.lesofn.archforge.server.admin.mapper.AdminRoleMapper;
 import com.lesofn.archforge.server.admin.mapper.AdminRoleMenuMapper;
-import com.lesofn.archforge.user.dao.SysRoleMenuRepository;
-import com.lesofn.archforge.user.domain.SysRole;
-import com.lesofn.archforge.user.domain.SysRoleMenu;
-import com.lesofn.archforge.user.menu.SysMenuService;
-import com.lesofn.archforge.user.service.SysRoleMenuService;
-import com.lesofn.archforge.user.service.SysRoleService;
+import com.lesofn.archforge.user.api.dao.SysRoleMenuRepository;
+import com.lesofn.archforge.user.api.domain.SysRole;
+import com.lesofn.archforge.user.api.domain.SysRoleMenu;
+import com.lesofn.archforge.user.api.menu.SysMenuService;
+import com.lesofn.archforge.user.api.service.SysRoleMenuService;
+import com.lesofn.archforge.user.api.service.SysRoleService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -77,7 +77,7 @@ public class AdminRoleController {
     @Operation(summary = "获取角色权限菜单树")
     @PostMapping("/role-menu")
     public List<AdminRoleMenuItemDTO> getRoleMenuTree() {
-        List<com.lesofn.archforge.user.domain.SysMenu> allMenus = menuService.findAllActiveMenus();
+        List<com.lesofn.archforge.user.api.domain.SysMenu> allMenus = menuService.findAllActiveMenus();
         return allMenus.stream().map(roleMenuMapper::toDto).collect(Collectors.toList());
     }
 

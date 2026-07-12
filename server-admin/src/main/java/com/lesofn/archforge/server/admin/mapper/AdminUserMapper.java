@@ -2,7 +2,7 @@ package com.lesofn.archforge.server.admin.mapper;
 
 import com.lesofn.archforge.common.enums.common.GenderEnum;
 import com.lesofn.archforge.server.admin.dto.AdminUserItemDTO;
-import com.lesofn.archforge.user.domain.SysUser;
+import com.lesofn.archforge.user.api.domain.SysUser;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Map;

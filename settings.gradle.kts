@@ -30,6 +30,7 @@ include("dependencies")
 include("server-admin")
 
 include("domain:admin-user")
+include("domain:admin-user-api")
 
 include("example:example-task")
 

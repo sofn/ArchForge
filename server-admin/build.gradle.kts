@@ -74,7 +74,8 @@ dependencies {
     api(project(":common:common-base"))
     api(project(":common:common-jpa"))
     api(project(":infrastructure"))
-    api(project(":domain:admin-user"))
+    api(project(":domain:admin-user-api"))
+    implementation(project(":domain:admin-user"))
     api(project(":example:example-task"))
 
     // 排除logback，使用log4j2

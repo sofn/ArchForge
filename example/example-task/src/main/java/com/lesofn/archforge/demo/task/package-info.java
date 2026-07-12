@@ -1,6 +1,6 @@
 @NullMarked
 @ApplicationModule(id = "example-task", allowedDependencies = {
-        "common", "infrastructure", "admin-user"
+        "common", "infrastructure"
 })
 package com.lesofn.archforge.demo.task;
 

@@ -1,7 +1,7 @@
 package com.lesofn.archforge.server.admin.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.lesofn.archforge.user.domain.SysUser;
+import com.lesofn.archforge.user.api.domain.SysUser;
 import java.time.LocalDateTime;
 import lombok.Data;
 import lombok.NoArgsConstructor;

@@ -1,6 +1,6 @@
 package com.lesofn.archforge.server.admin.dto.quartz;
 
-import com.lesofn.archforge.user.domain.SysQuartzJob;
+import com.lesofn.archforge.user.api.domain.SysQuartzJob;
 import java.time.LocalDateTime;
 import lombok.Data;
 

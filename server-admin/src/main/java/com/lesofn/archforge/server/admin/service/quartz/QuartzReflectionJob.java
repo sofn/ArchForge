@@ -1,10 +1,10 @@
 package com.lesofn.archforge.server.admin.service.quartz;
 
 import com.lesofn.archforge.common.utils.jackson.JsonUtil;
-import com.lesofn.archforge.user.dao.SysQuartzJobRepository;
-import com.lesofn.archforge.user.dao.SysQuartzLogRepository;
-import com.lesofn.archforge.user.domain.SysQuartzJob;
-import com.lesofn.archforge.user.domain.SysQuartzLog;
+import com.lesofn.archforge.user.api.dao.SysQuartzJobRepository;
+import com.lesofn.archforge.user.api.dao.SysQuartzLogRepository;
+import com.lesofn.archforge.user.api.domain.SysQuartzJob;
+import com.lesofn.archforge.user.api.domain.SysQuartzLog;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.time.LocalDateTime;

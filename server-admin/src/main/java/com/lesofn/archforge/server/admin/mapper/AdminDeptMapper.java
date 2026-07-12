@@ -1,7 +1,7 @@
 package com.lesofn.archforge.server.admin.mapper;
 
 import com.lesofn.archforge.server.admin.dto.AdminDeptItemDTO;
-import com.lesofn.archforge.user.domain.SysDept;
+import com.lesofn.archforge.user.api.domain.SysDept;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import org.mapstruct.Mapper;

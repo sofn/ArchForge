@@ -2,10 +2,10 @@ package com.lesofn.archforge.server.admin.service.quartz;
 
 import com.lesofn.archforge.common.utils.query.QueryHelp;
 import com.lesofn.archforge.server.admin.dto.quartz.SysQuartzJobQueryCriteria;
-import com.lesofn.archforge.user.dao.SysQuartzJobRepository;
-import com.lesofn.archforge.user.dao.SysQuartzLogRepository;
-import com.lesofn.archforge.user.domain.SysQuartzJob;
-import com.lesofn.archforge.user.domain.SysQuartzLog;
+import com.lesofn.archforge.user.api.dao.SysQuartzJobRepository;
+import com.lesofn.archforge.user.api.dao.SysQuartzLogRepository;
+import com.lesofn.archforge.user.api.domain.SysQuartzJob;
+import com.lesofn.archforge.user.api.domain.SysQuartzLog;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.CronExpression;

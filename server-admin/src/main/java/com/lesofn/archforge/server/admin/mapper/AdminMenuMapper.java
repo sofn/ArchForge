@@ -1,10 +1,10 @@
 package com.lesofn.archforge.server.admin.mapper;
 
 import com.lesofn.archforge.server.admin.dto.AdminMenuItemDTO;
-import com.lesofn.archforge.user.domain.SysMenu;
-import com.lesofn.archforge.user.menu.dto.ExtraIconDTO;
-import com.lesofn.archforge.user.menu.dto.MetaDTO;
-import com.lesofn.archforge.user.menu.dto.TransitionDTO;
+import com.lesofn.archforge.user.api.domain.SysMenu;
+import com.lesofn.archforge.user.api.menu.dto.ExtraIconDTO;
+import com.lesofn.archforge.user.api.menu.dto.MetaDTO;
+import com.lesofn.archforge.user.api.menu.dto.TransitionDTO;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

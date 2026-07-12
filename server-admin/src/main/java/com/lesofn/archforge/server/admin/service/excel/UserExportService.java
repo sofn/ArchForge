@@ -1,8 +1,8 @@
 package com.lesofn.archforge.server.admin.service.excel;
 
 import com.lesofn.archforge.common.utils.excel.FastExcelUtil;
-import com.lesofn.archforge.user.domain.SysUser;
-import com.lesofn.archforge.user.service.SysUserService;
+import com.lesofn.archforge.user.api.domain.SysUser;
+import com.lesofn.archforge.user.api.service.SysUserService;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;

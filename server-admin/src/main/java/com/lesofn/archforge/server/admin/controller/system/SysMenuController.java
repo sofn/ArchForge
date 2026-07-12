@@ -1,8 +1,8 @@
 package com.lesofn.archforge.server.admin.controller.system;
 
 import com.lesofn.archforge.infrastructure.annotation.Log;
-import com.lesofn.archforge.user.domain.SysMenu;
-import com.lesofn.archforge.user.menu.SysMenuService;
+import com.lesofn.archforge.user.api.domain.SysMenu;
+import com.lesofn.archforge.user.api.menu.SysMenuService;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;

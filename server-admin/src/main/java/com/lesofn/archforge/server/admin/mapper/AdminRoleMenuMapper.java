@@ -1,7 +1,7 @@
 package com.lesofn.archforge.server.admin.mapper;
 
 import com.lesofn.archforge.server.admin.dto.AdminRoleMenuItemDTO;
-import com.lesofn.archforge.user.domain.SysMenu;
+import com.lesofn.archforge.user.api.domain.SysMenu;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

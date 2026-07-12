@@ -1,0 +1,41 @@
+package com.lesofn.archforge.user.internal.service;
+
+import com.lesofn.archforge.user.api.service.SysOperLogService;
+import com.lesofn.archforge.user.api.dao.SysOperLogRepository;
+import com.lesofn.archforge.user.api.domain.SysOperLog;
+import java.util.Optional;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+@RequiredArgsConstructor
+public class SysOperLogServiceImpl implements SysOperLogService {
+
+    private final SysOperLogRepository operLogRepository;
+
+    public Optional<SysOperLog> findById(Long operId) {
+        return operLogRepository.findById(operId);
+    }
+
+    public Page<SysOperLog> findAll(Pageable pageable) {
+        return operLogRepository.findAll(pageable);
+    }
+
+    @Transactional
+    public SysOperLog create(SysOperLog operLog) {
+        return operLogRepository.save(operLog);
+    }
+
+    @Transactional
+    public void deleteById(Long operId) {
+        operLogRepository.deleteById(operId);
+    }
+
+    @Transactional
+    public void clearAll() {
+        operLogRepository.clearAll();
+    }
+}
