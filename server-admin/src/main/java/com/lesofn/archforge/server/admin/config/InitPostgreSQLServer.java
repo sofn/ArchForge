@@ -29,11 +29,11 @@ public class InitPostgreSQLServer implements ApplicationContextInitializer<Confi
     public void initialize(ConfigurableApplicationContext applicationContext) {
         ConfigurableEnvironment env = applicationContext.getEnvironment();
 
-        // 只在 dev profile 且 embedded.postgresql=true 时启动
-        if (!env.matchesProfiles("dev")) {
+        // 只在 test profile 且 embedded.postgresql=true 时启动
+        if (!env.matchesProfiles("test")) {
             return;
         }
-        String pgEnabled = env.getProperty("arch-forge.embedded.postgresql", "false");
+        String pgEnabled = env.getProperty("arch-forge.embedded.postgresql", "true");
         if (!"true".equals(pgEnabled)) {
             return;
         }

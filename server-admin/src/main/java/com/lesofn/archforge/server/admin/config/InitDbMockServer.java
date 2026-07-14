@@ -2,9 +2,9 @@ package com.lesofn.archforge.server.admin.config;
 
 import com.lesofn.archforge.infrastructure.frame.database.GroupDataSourceProxy;
 import jakarta.annotation.PostConstruct;
-import jakarta.annotation.Resource;
 import java.nio.charset.StandardCharsets;
 import javax.sql.DataSource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Profile;
@@ -19,12 +19,12 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
-@Profile("dev")
-@ConditionalOnProperty(name = "arch-forge.embedded.db-init", havingValue = "true")
+@Profile("test")
+@ConditionalOnProperty(name = "arch-forge.embedded.db-init", havingValue = "true", matchIfMissing = true)
+@RequiredArgsConstructor
 public class InitDbMockServer {
 
-    @Resource
-    private DataSource dataSource;
+    private final DataSource dataSource;
 
     @PostConstruct
     public void init() {

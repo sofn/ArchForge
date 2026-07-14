@@ -21,8 +21,8 @@ import org.testcontainers.utility.DockerImageName;
  */
 @Slf4j
 @Configuration
-@Profile("dev")
-@ConditionalOnProperty(name = "arch-forge.embedded.redis", havingValue = "true")
+@Profile("test")
+@ConditionalOnProperty(name = "arch-forge.embedded.redis", havingValue = "true", matchIfMissing = true)
 public class InitRedisMockServer {
 
     private static final int REDIS_PORT = 6379;

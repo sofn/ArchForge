@@ -14,8 +14,8 @@ import org.testcontainers.containers.wait.strategy.HttpWaitStrategy;
  */
 @Slf4j
 @Configuration
-@Profile("dev")
-@ConditionalOnProperty(name = "arch-forge.embedded.s3", havingValue = "true")
+@Profile("test")
+@ConditionalOnProperty(name = "arch-forge.embedded.s3", havingValue = "true", matchIfMissing = true)
 public class InitS3Server {
 
     private static final String RUSTFS_IMAGE = "rustfs/rustfs:latest";
