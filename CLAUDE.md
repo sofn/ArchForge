@@ -58,12 +58,14 @@ ArchForge/
 ## Configuration
 
 - Config prefix: `arch-forge` — mapped to `ArchForgeConfig` bean
-- Profiles: `dev` (default), `test`, `prod`
+- Profiles: `dev` (default), `test`, `staging`, `prod`
   - `application.yaml`: base config
-  - `application-dev.yaml`: Testcontainers + DevTools
-  - `application-{test,prod}.yaml.example`: templates (real files gitignored)
+  - `application-dev.yaml`: local Docker PostgreSQL/Redis/RustFS, script-initialized SQL
+  - `application-test.yaml`: Testcontainers + Flyway + seed data
+  - `application-staging.yaml`: external services, Flyway
+  - `application-prod.yaml`: production hardened, Flyway
 - Logging: Log4j2 via `log4j2-spring.xml` with `<SpringProfile>` sections
-- Database: PostgreSQL via Flyway migrations (`server-admin/src/main/resources/db/migration/`)
+- Database: PostgreSQL via Flyway migrations (`server-admin/src/main/resources/db/migration/`) and `domain/admin-user/src/main/resources/sql/` seed data
 
 ## JDK 25 Features
 
@@ -79,8 +81,8 @@ ArchForge/
 - **Spock 2.4** (Groovy 5.x) for BDD tests — `src/test/groovy/`
 - **JUnit 6** (Jupiter) for unit tests — `src/test/java/`
 - **RestClient integration tests** — `RestClientIntegrationTest.java` (15 API tests)
-- **Testcontainers** in dev: PostgreSQL 17, Redis 7, RustFS (auto-started)
-- Test data: Flyway V2/V3 + `InitDbMockServer` SQL seed data
+- **Testcontainers** in test: PostgreSQL 17, Redis 7, RustFS (auto-started)
+- Test data: Flyway migrations + `InitDbMockServer` SQL seed data
 
 ## Dependencies
 

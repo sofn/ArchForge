@@ -27,7 +27,7 @@ ArchForge is a **production-ready, full-stack admin platform** that combines a S
 - **Team project standard**: Codified conventions (Spotless, JSpecify, Lombok), centralized dependency BOM, skill-based onboarding
 - **JDK 25 features in production**: ScopedValue, Structured Concurrency, Pattern Matching, Stream Gatherers, Virtual Threads
 - **Production-ready deployment**: Docker with jlink minimal JRE + Project Leyden CDS, Flyway migrations, multi-datasource, Micrometer observability
-- **Zero-config dev**: `./gradlew server-admin:bootRun` auto-starts PostgreSQL, Redis, RustFS via Testcontainers
+- **Zero-config dev**: `scripts/dev/init.sh` starts PostgreSQL, Redis, RustFS Docker containers; `./gradlew server-admin:bootRun` connects to them
 
 ## Features
 
@@ -72,14 +72,16 @@ git clone https://github.com/sofn/ArchForge.git
 git clone https://github.com/sofn/ArchForgeAdmin.git
 ```
 
-### 2. Start Backend
+### 2. Start Dev Environment
 
 ```bash
-cd ArchForge
+cd ArchForge/scripts/dev
+./init.sh           # starts PostgreSQL, Redis, RustFS Docker containers
+cd ../..
 JAVA_HOME=/path/to/jdk25 ./gradlew server-admin:bootRun
 ```
 
-> Dev profile auto-starts PostgreSQL, Redis, and RustFS via Testcontainers. No manual DB setup needed.
+> Dev profile uses the Docker containers started by `scripts/dev/init.sh`. Use `scripts/dev/down.sh` to stop them.
 
 ### 3. Start Frontend
 
@@ -91,6 +93,16 @@ pnpm install && pnpm dev
 ### 4. Open Browser
 
 Visit `http://localhost:8848` and login with `admin / admin123`.
+
+### Staging / Production Deployment
+
+```bash
+cd ArchForge/scripts/staging  # or scripts/prod
+cp .env.example .env          # edit configuration
+./deploy.sh
+```
+
+This builds both backend and frontend Docker images, starts PostgreSQL + Redis + backend + frontend via Docker Compose, and imports seed SQL.
 
 ### Docker (Alternative)
 
