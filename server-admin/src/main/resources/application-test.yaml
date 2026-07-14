@@ -1,0 +1,52 @@
+# Test environment: Testcontainers + Flyway + seed data
+server:
+  port: 0
+
+spring:
+  devtools:
+    restart:
+      enabled: false
+    livereload:
+      enabled: false
+  quartz:
+    jdbc:
+      initialize-schema: never
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations: classpath:db/migration
+    default-schema: public
+  jpa:
+    hibernate:
+      ddl-auto: validate
+  sql:
+    init:
+      mode: never
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+      database: 0
+      timeout: 10s
+
+management:
+  otlp:
+    metrics:
+      export:
+        url: http://localhost:4318/v1/metrics
+
+arch-forge:
+  embedded:
+    redis: true
+    postgresql: true
+    db-init: true
+    s3: true
+  flyway:
+    enabled: true
+  monitor:
+    enabled: false
+  jwt:
+    secret: 5/jDAWs7a63GRgjS+uF2mP7dcLwI6GAgxf+Z0+fOAbgMR/jksG5r0v10nDOkrM0btxtb2FAuol8fSzSJis8gIA==
+    expire-seconds: 604800
+  captcha:
+    enabled: false
