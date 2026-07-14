@@ -1,0 +1,107 @@
+# Production environment
+server:
+  port: 8080
+
+spring:
+  devtools:
+    restart:
+      enabled: false
+    livereload:
+      enabled: false
+  quartz:
+    jdbc:
+      initialize-schema: never
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations: classpath:db/migration
+    default-schema: public
+  jpa:
+    hibernate:
+      ddl-auto: validate
+  sql:
+    init:
+      mode: never
+  data:
+    redis:
+      host: ${REDIS_HOST:redis}
+      port: ${REDIS_PORT:6379}
+      database: 0
+      timeout: 10s
+      lettuce:
+        pool:
+          min-idle: 2
+          max-idle: 8
+          max-active: 16
+          max-wait: 1s
+  datasource:
+    dynamic:
+      druid:
+        filters: stat
+        initial-size: 2
+        max-active: 20
+        min-idle: 2
+        max-wait: 60000
+      datasource:
+        user_master:
+          type: com.alibaba.druid.pool.DruidDataSource
+          driver-class-name: org.postgresql.Driver
+          url: ${SPRING_DATASOURCE_DYNAMIC_DATASOURCE_USER_MASTER_URL:jdbc:postgresql://postgres:5432/archforge_user}
+          username: ${DB_USERNAME:archforge}
+          password: ${DB_PASSWORD:archforge}
+        user_slave:
+          type: com.alibaba.druid.pool.DruidDataSource
+          driver-class-name: org.postgresql.Driver
+          url: ${SPRING_DATASOURCE_DYNAMIC_DATASOURCE_USER_SLAVE_URL:jdbc:postgresql://postgres:5432/archforge_user}
+          username: ${DB_USERNAME:archforge}
+          password: ${DB_PASSWORD:archforge}
+        task_master:
+          type: com.alibaba.druid.pool.DruidDataSource
+          driver-class-name: org.postgresql.Driver
+          url: ${SPRING_DATASOURCE_DYNAMIC_DATASOURCE_TASK_MASTER_URL:jdbc:postgresql://postgres:5432/archforge_task}
+          username: ${DB_USERNAME:archforge}
+          password: ${DB_PASSWORD:archforge}
+        task_slave:
+          type: com.alibaba.druid.pool.DruidDataSource
+          driver-class-name: org.postgresql.Driver
+          url: ${SPRING_DATASOURCE_DYNAMIC_DATASOURCE_TASK_SLAVE_URL:jdbc:postgresql://postgres:5432/archforge_task}
+          username: ${DB_USERNAME:archforge}
+          password: ${DB_PASSWORD:archforge}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
+
+arch-forge:
+  embedded:
+    redis: false
+    postgresql: false
+    db-init: false
+    s3: false
+  flyway:
+    enabled: true
+  monitor:
+    enabled: true
+  jwt:
+    secret: ${JWT_SECRET}
+    expire-seconds: 604800
+  captcha:
+    enabled: true
+  file-storage:
+    type: ${FILE_STORAGE_TYPE:s3}
+    local-dir: uploads
+    s3:
+      endpoint: ${S3_ENDPOINT}
+      access-key: ${S3_ACCESS_KEY}
+      secret-key: ${S3_SECRET_KEY}
+      bucket: ${S3_BUCKET}
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS}
