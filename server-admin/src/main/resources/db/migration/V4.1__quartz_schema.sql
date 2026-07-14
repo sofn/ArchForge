@@ -224,13 +224,13 @@ CREATE TABLE IF NOT EXISTS sys_quartz_job (
     method_params   TEXT,
     cron            VARCHAR(100) NOT NULL,
     misfire_policy  SMALLINT     NOT NULL DEFAULT 1,
-    concurrent      BOOLEAN      NOT NULL DEFAULT FALSE,
+    concurrent      INT NOT NULL DEFAULT 0,
     status          SMALLINT     NOT NULL DEFAULT 1, -- 1=PAUSED, 2=RUNNING
     creator_id      BIGINT,
     create_time     TIMESTAMP,
     updater_id      BIGINT,
     update_time     TIMESTAMP,
-    deleted         BOOLEAN      NOT NULL DEFAULT FALSE,
+    deleted         INT NOT NULL DEFAULT 0,
     UNIQUE (job_name, job_group)
 );
 
