@@ -126,8 +126,9 @@ start_postgres
 start_redis
 start_s3
 init_databases
-import_seed
 
 echo ""
 echo "Dev environment is ready."
 echo "Run: cd ${REPO_ROOT} && JAVA_HOME=/path/to/jdk25 ./gradlew server-admin:bootRun"
+echo "After the app has started (tables created by Hibernate), seed data with:"
+echo "  ${DIR}/seed.sh"
