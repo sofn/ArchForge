@@ -1,0 +1,63 @@
+# docker-compose.prod.yml — Production environment (full JRE, single node)
+# Usage: cd scripts/prod && cp .env.example .env && ./deploy.sh
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: ${DB_USERNAME:-archforge}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-archforge}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-archforge}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: always
+
+  redis:
+    image: redis:7-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: always
+
+  backend:
+    image: archforge:fulljre
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATASOURCE_DYNAMIC_DATASOURCE_USER_MASTER_URL: jdbc:postgresql://postgres:5432/archforge_user
+      SPRING_DATASOURCE_DYNAMIC_DATASOURCE_USER_SLAVE_URL: jdbc:postgresql://postgres:5432/archforge_user
+      SPRING_DATASOURCE_DYNAMIC_DATASOURCE_TASK_MASTER_URL: jdbc:postgresql://postgres:5432/archforge_task
+      SPRING_DATASOURCE_DYNAMIC_DATASOURCE_TASK_SLAVE_URL: jdbc:postgresql://postgres:5432/archforge_task
+      DB_USERNAME: ${DB_USERNAME:-archforge}
+      DB_PASSWORD: ${DB_PASSWORD:-archforge}
+      JWT_SECRET: ${JWT_SECRET}
+      S3_ENDPOINT: ${S3_ENDPOINT}
+      S3_ACCESS_KEY: ${S3_ACCESS_KEY}
+      S3_SECRET_KEY: ${S3_SECRET_KEY}
+      S3_BUCKET: ${S3_BUCKET}
+    volumes:
+      - ./logs:/app/logs
+    restart: always
+
+  frontend:
+    image: archforge-frontend:latest
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+    restart: always
+
+volumes:
+  postgres-data:
