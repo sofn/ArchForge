@@ -11,12 +11,18 @@ spring:
     livereload:
       enabled: true
       port: 35729
-  # Dev: Testcontainers spins up a fresh PostgreSQL each restart, so let the
-  # Quartz starter run org/quartz/impl/jdbcjobstore/tables_postgres.sql to
-  # create QRTZ_* tables. sys_quartz_* are created by Hibernate auto-DDL.
+  # Dev: local Docker containers started by scripts/dev/init.sh
   quartz:
     jdbc:
       initialize-schema: always
+  flyway:
+    enabled: false
+  jpa:
+    hibernate:
+      ddl-auto: update
+  sql:
+    init:
+      mode: never
   data:
     redis:
       host: 127.0.0.1
@@ -29,7 +35,7 @@ spring:
           max-idle: 8
           max-active: 8
           max-wait: -1ms
-  # Database - PostgreSQL via Testcontainers (auto-configured by InitPostgreSQLServer)
+  # Database - PostgreSQL via local Docker containers (script-initialized)
   datasource:
     dynamic:
       druid:
@@ -39,26 +45,26 @@ spring:
           type: com.alibaba.druid.pool.DruidDataSource
           driver-class-name: org.postgresql.Driver
           url: jdbc:postgresql://localhost:5432/archforge_user
-          username: archforge
-          password: archforge
+          username: ${DB_USERNAME:archforge}
+          password: ${DB_PASSWORD:archforge}
         user_slave:
           type: com.alibaba.druid.pool.DruidDataSource
           driver-class-name: org.postgresql.Driver
           url: jdbc:postgresql://localhost:5432/archforge_user
-          username: archforge
-          password: archforge
+          username: ${DB_USERNAME:archforge}
+          password: ${DB_PASSWORD:archforge}
         task_master:
           type: com.alibaba.druid.pool.DruidDataSource
           driver-class-name: org.postgresql.Driver
           url: jdbc:postgresql://localhost:5432/archforge_task
-          username: archforge
-          password: archforge
+          username: ${DB_USERNAME:archforge}
+          password: ${DB_PASSWORD:archforge}
         task_slave:
           type: com.alibaba.druid.pool.DruidDataSource
           driver-class-name: org.postgresql.Driver
           url: jdbc:postgresql://localhost:5432/archforge_task
-          username: archforge
-          password: archforge
+          username: ${DB_USERNAME:archforge}
+          password: ${DB_PASSWORD:archforge}
 
 # OpenTelemetry (tracing configured via OTel SDK env vars: OTEL_EXPORTER_OTLP_ENDPOINT, OTEL_TRACES_SAMPLER_ARG)
 management:
@@ -72,16 +78,24 @@ arch-forge:
     login-username: admin
     login-password: admin
   embedded:
-    redis: true
-    postgresql: true
-    db-init: true
-    s3: true
+    redis: false
+    postgresql: false
+    db-init: false
+    s3: false
   flyway:
     enabled: false
   monitor:
     enabled: true
   jwt:
-    secret: 5/jDAWs7a63GRgjS+uF2mP7dcLwI6GAgxf+Z0+fOAbgMR/jksG5r0v10nDOkrM0btxtb2FAuol8fSzSJis8gIA==
+    secret: ${JWT_SECRET:5/jDAWs7a63GRgjS+uF2mP7dcLwI6GAgxf+Z0+fOAbgMR/jksG5r0v10nDOkrM0btxtb2FAuol8fSzSJis8gIA==}
     expire-seconds: 604800
   captcha:
     enabled: false
+  file-storage:
+    type: s3
+    local-dir: uploads
+    s3:
+      endpoint: http://localhost:9000
+      access-key: minioadmin
+      secret-key: minioadmin
+      bucket: archforge
