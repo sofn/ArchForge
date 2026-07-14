@@ -46,6 +46,14 @@ tasks.named<JavaExec>("processAot") {
 }
 tasks.named<JavaExec>("processTestAot") {
     jvmArgs("--enable-preview", "--enable-native-access=ALL-UNNAMED")
+    systemProperty("spring.profiles.active", "test")
+}
+
+// Unit / integration tests default to the test profile (Testcontainers + Flyway)
+tasks.withType<Test> {
+    useJUnitPlatform()
+    systemProperty("spring.profiles.active", "test")
+    environment("SPRING_PROFILES_ACTIVE", "test")
 }
 
 // GraalVM Native Image 配置
