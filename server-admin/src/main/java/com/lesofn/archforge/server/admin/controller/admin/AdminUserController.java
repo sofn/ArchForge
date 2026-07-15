@@ -167,7 +167,7 @@ public class AdminUserController {
     @Operation(summary = "重置用户密码")
     @PostMapping("/user/reset-password")
     public Boolean resetUserPassword(@RequestBody @Valid UserPasswordRequest request) {
-        String newPwd = request.getNewPwd() != null ? request.getNewPwd() : "admin123";
+        String newPwd = request.getNewPwd();
         userService.resetPassword(request.getId(), passwordEncoder.encode(newPwd));
         return true;
     }

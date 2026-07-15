@@ -1,14 +1,19 @@
 package com.lesofn.archforge.infrastructure.db.redis;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.BoundSetOperations;
+import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.HashOperations;
+import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Component;
 
@@ -195,12 +200,25 @@ public class RedisUtil {
     }
 
     /**
-     * 获得缓存的基本对象列表
+     * 使用 SCAN 命令迭代匹配 pattern 的键，避免 Redis KEYS 命令阻塞。
      *
      * @param pattern 字符串前缀
      * @return 对象列表
      */
     public Collection<String> keys(final String pattern) {
-        return redisTemplate.keys(pattern);
+        return (Collection<String>) redisTemplate.execute(
+                (RedisCallback<Collection<String>>) connection -> {
+                    Set<String> keys = new HashSet<>();
+                    ScanOptions options = ScanOptions.scanOptions()
+                            .match(pattern)
+                            .count(100)
+                            .build();
+                    try (Cursor<byte[]> cursor = connection.keyCommands().scan(options)) {
+                        while (cursor.hasNext()) {
+                            keys.add(new String(cursor.next(), StandardCharsets.UTF_8));
+                        }
+                    }
+                    return keys;
+                });
     }
 }

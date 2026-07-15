@@ -211,8 +211,8 @@ public class ArchForgeConfig {
     @Setter
     @Getter
     public static class Cors {
-        /** 允许的来源列表（生产环境应设置具体域名，dev 可用 "*"） */
-        private List<String> allowedOrigins = List.of("*");
+        /** 允许的来源列表（生产环境必须配置具体域名，未配置时 dev 允许所有来源） */
+        private List<String> allowedOrigins = List.of();
 
         /** 允许的 HTTP 方法 */
         private List<String> allowedMethods = List.of("GET", "POST", "PUT", "DELETE", "OPTIONS");
@@ -223,7 +223,7 @@ public class ArchForgeConfig {
         /** 暴露给浏览器的响应头 */
         private List<String> exposedHeaders = List.of("Authorization");
 
-        /** 是否允许携带凭证 */
+        /** 是否允许携带凭证（生产环境必须配合 allowedOrigins 具体域名） */
         private boolean allowCredentials = true;
 
         /** 预检请求缓存时长（秒） */

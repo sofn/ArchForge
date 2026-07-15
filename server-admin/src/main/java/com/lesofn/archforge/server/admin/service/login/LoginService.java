@@ -251,17 +251,17 @@ public class LoginService {
     }
 
     /**
-     * 解密密码，如果RSA解密失败则尝试作为明文密码处理（兼容前端未加密的场景）
+     * 解密密码，RSA 解密失败直接拒绝，不再回退为明文密码。
      *
-     * @param encryptedPassword 加密后的密码或明文密码
+     * @param encryptedPassword RSA 加密后的密码
      * @return 解密后的密码
      */
     public String decryptPassword(String encryptedPassword) {
         try {
             return RsaEncrypter.decrypt(encryptedPassword, appForgeConfig.getRsaPrivateKey());
         } catch (Exception e) {
-            log.warn("RSA密码解密失败，尝试作为明文密码处理: {}", e.getMessage());
-            return encryptedPassword;
+            log.warn("RSA密码解密失败，拒绝明文回退: {}", e.getMessage());
+            throw new BadCredentialsException("密码解密失败");
         }
     }
 }

@@ -11,6 +11,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -112,13 +114,21 @@ public class SecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
         ArchForgeConfig.Cors corsConfig = archForgeConfig.getCors();
 
+        List<String> allowedOrigins = Objects.requireNonNullElse(corsConfig.getAllowedOrigins(), List.of());
+
+        if (environment.matchesProfiles("prod") && (allowedOrigins.isEmpty() || allowedOrigins.contains("*"))) {
+            throw new IllegalStateException("生产环境 CORS 必须配置具体的 allowedOrigins（arch-forge.cors.allowed-origins），不允许使用通配符 *");
+        }
+
         config.setAllowCredentials(corsConfig.isAllowCredentials());
 
-        // 白名单来源：如果配置了 "*" 且 allowCredentials=true，改用 AllowedOriginPattern
-        if (corsConfig.getAllowedOrigins().size() == 1 && "*".equals(corsConfig.getAllowedOrigins().getFirst())) {
+        if (allowedOrigins.isEmpty()) {
+            // dev 未配置来源时允许所有来源（使用 pattern 避免 * 与 allowCredentials=true 的非法组合）
+            config.addAllowedOriginPattern("*");
+        } else if (allowedOrigins.size() == 1 && "*".equals(allowedOrigins.get(0))) {
             config.addAllowedOriginPattern("*");
         } else {
-            corsConfig.getAllowedOrigins().forEach(config::addAllowedOrigin);
+            allowedOrigins.forEach(config::addAllowedOrigin);
         }
         corsConfig.getAllowedMethods().forEach(config::addAllowedMethod);
         corsConfig.getAllowedHeaders().forEach(config::addAllowedHeader);
