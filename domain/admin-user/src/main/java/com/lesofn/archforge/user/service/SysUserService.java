@@ -6,6 +6,7 @@ import com.lesofn.archforge.user.domain.query.SysUserQuery;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -66,16 +67,20 @@ public class SysUserService {
         userRepository.deleteById(id);
     }
 
-    @Transactional
-    public void softDeleteById(Long id) {
+    private void updateIfPresent(Long id, Consumer<SysUser> updater) {
         userRepository
                 .findById(id)
                 .ifPresent(
                         user -> {
-                            user.setDeleted(true);
+                            updater.accept(user);
                             user.setUpdateTime(LocalDateTime.now());
                             userRepository.save(user);
                         });
+    }
+
+    @Transactional
+    public void softDeleteById(Long id) {
+        updateIfPresent(id, user -> user.setDeleted(true));
     }
 
     public boolean existsByUsername(String username) {
@@ -92,26 +97,17 @@ public class SysUserService {
 
     @Transactional
     public void updateLoginInfo(Long userId, String loginIp) {
-        userRepository
-                .findById(userId)
-                .ifPresent(
-                        user -> {
-                            user.setLoginIp(loginIp);
-                            user.setLoginDate(LocalDateTime.now());
-                            userRepository.save(user);
-                        });
+        updateIfPresent(
+                userId,
+                user -> {
+                    user.setLoginIp(loginIp);
+                    user.setLoginDate(LocalDateTime.now());
+                });
     }
 
     @Transactional
     public void resetPassword(Long userId, String newPassword) {
-        userRepository
-                .findById(userId)
-                .ifPresent(
-                        user -> {
-                            user.setPassword(newPassword);
-                            user.setUpdateTime(LocalDateTime.now());
-                            userRepository.save(user);
-                        });
+        updateIfPresent(userId, user -> user.setPassword(newPassword));
     }
 
     public Page<SysUser> searchUsers(SysUserQuery query, Pageable pageable) {
@@ -121,26 +117,12 @@ public class SysUserService {
 
     @Transactional
     public void updateStatus(Long userId, Integer status) {
-        userRepository
-                .findById(userId)
-                .ifPresent(
-                        user -> {
-                            user.setStatus(status);
-                            user.setUpdateTime(LocalDateTime.now());
-                            userRepository.save(user);
-                        });
+        updateIfPresent(userId, user -> user.setStatus(status));
     }
 
     @Transactional
     public void updatePassword(Long userId, String newPassword) {
-        userRepository
-                .findById(userId)
-                .ifPresent(
-                        user -> {
-                            user.setPassword(newPassword);
-                            user.setUpdateTime(LocalDateTime.now());
-                            userRepository.save(user);
-                        });
+        updateIfPresent(userId, user -> user.setPassword(newPassword));
     }
 
     public List<SysUser> findActiveUsers() {

@@ -12,11 +12,10 @@ import com.lesofn.archforge.server.admin.dto.request.DeleteRequest;
 import com.lesofn.archforge.server.admin.dto.request.FileListRequest;
 import com.lesofn.archforge.server.admin.dto.response.FileResponse;
 import com.lesofn.archforge.server.admin.dto.response.UploadFileResponse;
-import com.lesofn.archforge.user.dao.SysFileRepository;
 import com.lesofn.archforge.user.domain.SysFile;
+import com.lesofn.archforge.user.service.SysFileService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.persistence.criteria.Predicate;
 import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -32,7 +31,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -54,7 +52,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class FileController {
 
     private final FileStorageService fileStorageService;
-    private final SysFileRepository fileRepository;
+    private final SysFileService fileService;
     private final ArchForgeConfig appForgeConfig;
 
     @Log
@@ -84,7 +82,7 @@ public class FileController {
         sysFile.setContentType(file.getContentType());
         sysFile.setExtension(extension);
         sysFile.setStorageType(appForgeConfig.getFileStorage().getType());
-        SysFile saved = fileRepository.save(sysFile);
+        SysFile saved = fileService.create(sysFile);
 
         return new UploadFileResponse(saved.getFileId(), originalName, "/file/download/" + saved.getFileId(), file.getSize());
     }
@@ -108,19 +106,7 @@ public class FileController {
         Pageable pageable = PageRequest.of(
                 Math.max(0, currentPage - 1), pageSize, Sort.by(Sort.Direction.DESC, "createTime"));
 
-        Specification<SysFile> spec = (root, query, cb) -> {
-            List<Predicate> predicates = new ArrayList<>();
-            predicates.add(cb.equal(root.get("deleted"), false));
-            if (!originalName.isBlank()) {
-                predicates.add(cb.like(cb.lower(root.get("originalName")), "%" + originalName.toLowerCase() + "%"));
-            }
-            if (!storageType.isBlank()) {
-                predicates.add(cb.equal(root.get("storageType"), storageType));
-            }
-            return cb.and(predicates.toArray(new Predicate[0]));
-        };
-
-        Page<SysFile> page = fileRepository.findAll(spec, pageable);
+        Page<SysFile> page = fileService.findFiles(originalName, storageType, pageable);
         List<FileResponse> list = new ArrayList<>();
         for (SysFile file : page.getContent()) {
             list.add(new FileResponse(file.getFileId(), file.getOriginalName(), file.getStorageName(), file
@@ -134,7 +120,7 @@ public class FileController {
     @Operation(summary = "下载文件")
     @GetMapping("/file/download/{fileId}")
     public ResponseEntity<Resource> downloadFile(@PathVariable Long fileId) {
-        Optional<SysFile> optFile = fileRepository.findById(fileId);
+        Optional<SysFile> optFile = fileService.findById(fileId);
         if (optFile.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
@@ -154,13 +140,13 @@ public class FileController {
     @PostMapping("/file/delete")
     public Boolean deleteFile(@RequestBody DeleteRequest data) {
         Long fileId = data.getId();
-        Optional<SysFile> optFile = fileRepository.findById(fileId);
+        Optional<SysFile> optFile = fileService.findById(fileId);
         if (optFile.isEmpty()) {
             return false;
         }
         SysFile sysFile = optFile.get();
         fileStorageService.delete(sysFile.getStoragePath());
-        fileRepository.deleteById(fileId);
+        fileService.deleteById(fileId);
         return true;
     }
 
