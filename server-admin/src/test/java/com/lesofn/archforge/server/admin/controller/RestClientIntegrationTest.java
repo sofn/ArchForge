@@ -181,7 +181,7 @@ class RestClientIntegrationTest {
     @Test
     @Order(14)
     void resetUserPassword() {
-        Map<String, Object> response = post("/user/reset-password", Map.of("id", createdUserId, "password", "NewPass123"));
+        Map<String, Object> response = post("/user/reset-password", Map.of("id", createdUserId, "newPwd", "NewPass123"));
         assertEquals(0, response.get("code"));
     }
 

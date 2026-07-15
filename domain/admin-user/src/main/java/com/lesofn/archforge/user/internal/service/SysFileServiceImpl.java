@@ -2,6 +2,7 @@ package com.lesofn.archforge.user.internal.service;
 
 import com.lesofn.archforge.user.api.dao.SysFileRepository;
 import com.lesofn.archforge.user.api.domain.SysFile;
+import com.lesofn.archforge.user.api.service.SysFileService;
 import jakarta.persistence.criteria.Predicate;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,11 +15,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * 文件元数据服务
+ * 文件元数据服务实现
  */
 @Service
 @RequiredArgsConstructor
-public class SysFileService {
+public class SysFileServiceImpl implements SysFileService {
 
     private final SysFileRepository fileRepository;
 

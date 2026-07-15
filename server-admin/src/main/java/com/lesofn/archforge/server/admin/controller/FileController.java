@@ -13,7 +13,7 @@ import com.lesofn.archforge.server.admin.dto.request.FileListRequest;
 import com.lesofn.archforge.server.admin.dto.response.FileResponse;
 import com.lesofn.archforge.server.admin.dto.response.UploadFileResponse;
 import com.lesofn.archforge.user.api.domain.SysFile;
-import com.lesofn.archforge.user.internal.service.SysFileService;
+import com.lesofn.archforge.user.api.service.SysFileService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.io.InputStream;

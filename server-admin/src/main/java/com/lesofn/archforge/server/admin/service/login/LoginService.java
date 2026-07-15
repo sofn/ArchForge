@@ -29,6 +29,7 @@ import javax.imageio.ImageIO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
+import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -52,6 +53,7 @@ public class LoginService {
     private final LoginAttemptService loginAttemptService;
     private final SysLoginLogService loginLogService;
     private final ArchForgeConfig appForgeConfig;
+    private final Environment environment;
 
     @Resource(name = "captchaProducer")
     private Producer captchaProducer;
@@ -251,17 +253,21 @@ public class LoginService {
     }
 
     /**
-     * 解密密码，RSA 解密失败直接拒绝，不再回退为明文密码。
+     * 解密密码。生产环境 RSA 解密失败直接拒绝；非生产环境保留明文回退用于开发/测试。
      *
-     * @param encryptedPassword RSA 加密后的密码
+     * @param encryptedPassword RSA 加密后的密码或明文密码
      * @return 解密后的密码
      */
     public String decryptPassword(String encryptedPassword) {
         try {
             return RsaEncrypter.decrypt(encryptedPassword, appForgeConfig.getRsaPrivateKey());
         } catch (Exception e) {
-            log.warn("RSA密码解密失败，拒绝明文回退: {}", e.getMessage());
-            throw new BadCredentialsException("密码解密失败");
+            if (environment.matchesProfiles("prod")) {
+                log.warn("RSA密码解密失败，拒绝明文回退: {}", e.getMessage());
+                throw new BadCredentialsException("密码解密失败");
+            }
+            log.warn("RSA密码解密失败，尝试作为明文密码处理: {}", e.getMessage());
+            return encryptedPassword;
         }
     }
 }
