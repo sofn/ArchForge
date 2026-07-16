@@ -1,10 +1,14 @@
 package com.lesofn.archforge.user.internal.service;
 
-import com.lesofn.archforge.user.api.service.SysUserService;
 import com.lesofn.archforge.user.api.dao.SysUserRepository;
 import com.lesofn.archforge.user.api.domain.SysUser;
 import com.lesofn.archforge.user.api.domain.query.SysUserQuery;
+import com.lesofn.archforge.user.api.service.SysUserService;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -18,6 +22,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class SysUserServiceImpl implements SysUserService {
+
+    private static final char LIKE_ESCAPE_CHAR = '!';
 
     private final SysUserRepository userRepository;
 
@@ -51,7 +57,6 @@ public class SysUserServiceImpl implements SysUserService {
 
     @Transactional
     public SysUser create(SysUser user) {
-        user.setPassword(user.getPassword());
         user.setCreateTime(LocalDateTime.now());
         user.setDeleted(false);
         return userRepository.save(user);
@@ -112,8 +117,46 @@ public class SysUserServiceImpl implements SysUserService {
     }
 
     public Page<SysUser> searchUsers(SysUserQuery query, Pageable pageable) {
-        // 简化实现，实际应该根据查询条件进行筛选
-        return userRepository.findAll(pageable);
+        Specification<SysUser> spec = (root, criteriaQuery, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            if (query != null) {
+                if (isNotBlank(query.getUsername())) {
+                    predicates.add(like(cb, root, "username", query.getUsername()));
+                }
+                if (isNotBlank(query.getEmail())) {
+                    predicates.add(like(cb, root, "email", query.getEmail()));
+                }
+                if (isNotBlank(query.getPhoneNumber())) {
+                    predicates.add(like(cb, root, "phoneNumber", query.getPhoneNumber()));
+                }
+                if (query.getEnabled() != null) {
+                    if (Boolean.TRUE.equals(query.getEnabled())) {
+                        predicates.add(cb.equal(root.get("status"), 1));
+                    } else {
+                        predicates.add(cb.notEqual(root.get("status"), 1));
+                    }
+                }
+            }
+            predicates.add(cb.equal(root.get("deleted"), false));
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+        return userRepository.findAll(spec, pageable);
+    }
+
+    private static Predicate like(CriteriaBuilder cb, Root<SysUser> root, String attribute, String value) {
+        String pattern = "%" + escapeLike(value) + "%";
+        return cb.like(root.get(attribute).as(String.class), pattern, LIKE_ESCAPE_CHAR);
+    }
+
+    private static String escapeLike(String value) {
+        String escape = String.valueOf(LIKE_ESCAPE_CHAR);
+        return value.replace(escape, escape + escape)
+                .replace("%", escape + "%")
+                .replace("_", escape + "_");
+    }
+
+    private static boolean isNotBlank(String value) {
+        return value != null && !value.isBlank();
     }
 
     @Transactional
@@ -127,14 +170,18 @@ public class SysUserServiceImpl implements SysUserService {
     }
 
     public List<SysUser> findActiveUsers() {
-        // 假设状态为1表示活跃用户
-        // 实际实现应该根据具体业务逻辑调整
-        return userRepository.findAll();
+        return userRepository.findAll((root, criteriaQuery, cb) -> cb.and(
+                cb.equal(root.get("status"), 1),
+                cb.equal(root.get("deleted"), false)));
     }
 
     public List<SysUser> findByDeptId(Long deptId) {
-        // 简化实现，实际应该根据部门ID查询用户
-        return userRepository.findAll();
+        if (deptId == null) {
+            return List.of();
+        }
+        return userRepository.findAll((root, criteriaQuery, cb) -> cb.and(
+                cb.equal(root.get("deptId"), deptId),
+                cb.equal(root.get("deleted"), false)));
     }
 
     public SysUser getUserByUserName(String username) {
