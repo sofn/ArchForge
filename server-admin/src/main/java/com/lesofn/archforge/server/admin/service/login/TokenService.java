@@ -9,12 +9,10 @@ import com.lesofn.archforge.infrastructure.config.ArchForgeConfig;
 import com.lesofn.archforge.server.admin.service.cache.RedisCacheService;
 import com.lesofn.archforge.server.admin.util.JwtTokenUtil;
 import io.jsonwebtoken.*;
-import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.Duration;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-import javax.crypto.SecretKey;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -50,7 +48,7 @@ public class TokenService {
         String token = getTokenFromRequest(request);
         if (StringUtils.isNotEmpty(token)) {
             try {
-                Claims claims = parseToken(token);
+                Claims claims = jwtTokenUtil.parseToken(token);
                 // 校验 JTI 黑名单（登出后的 token 不可再用）
                 String jti = claims.getId();
                 if (jti != null && isTokenBlacklisted(jti)) {
@@ -60,7 +58,7 @@ public class TokenService {
                 // 解析对应的权限以及用户信息
                 String uuid = (String) claims.get(Constants.Token.LOGIN_USER_KEY);
 
-                return redisCacheService.loginUserCache.get(uuid);
+                return redisCacheService.getLoginUserCache().get(uuid);
             } catch (AdminAuthException e) {
                 throw e;
             } catch (MalformedJwtException
@@ -84,7 +82,7 @@ public class TokenService {
      */
     public String createTokenAndPutUserInCache(SystemLoginUser loginUser) {
         loginUser.setCachedKey(UUID.randomUUID().toString().replace("-", ""));
-        redisCacheService.loginUserCache.set(loginUser.getCachedKey(), loginUser);
+        redisCacheService.getLoginUserCache().set(loginUser.getCachedKey(), loginUser);
         return jwtTokenUtil.generateToken(loginUser);
     }
 
@@ -100,7 +98,7 @@ public class TokenService {
                     currentTime + TimeUnit.MINUTES.toMillis(
                             appForgeConfig.getToken().getAutoRefreshTime()));
             // 根据uuid将loginUser存入缓存
-            redisCacheService.loginUserCache.set(loginUser.getCachedKey(), loginUser);
+            redisCacheService.getLoginUserCache().set(loginUser.getCachedKey(), loginUser);
         }
     }
 
@@ -113,7 +111,7 @@ public class TokenService {
     public String createRefreshToken(SystemLoginUser loginUser) {
         String refreshToken = UUID.randomUUID().toString().replace("-", "");
         // 存储 refreshToken -> cachedKey 的映射
-        redisCacheService.refreshTokenCache.set(refreshToken, loginUser.getCachedKey());
+        redisCacheService.getRefreshTokenCache().set(refreshToken, loginUser.getCachedKey());
         return refreshToken;
     }
 
@@ -124,11 +122,11 @@ public class TokenService {
      * @return 登录用户
      */
     public SystemLoginUser getLoginUserByRefreshToken(String refreshToken) {
-        String cachedKey = redisCacheService.refreshTokenCache.get(refreshToken);
+        String cachedKey = redisCacheService.getRefreshTokenCache().get(refreshToken);
         if (cachedKey == null) {
             return null;
         }
-        return redisCacheService.loginUserCache.get(cachedKey);
+        return redisCacheService.getLoginUserCache().get(cachedKey);
     }
 
     /**
@@ -137,7 +135,7 @@ public class TokenService {
      * @param refreshToken 刷新令牌
      */
     public void removeRefreshToken(String refreshToken) {
-        redisCacheService.refreshTokenCache.delete(refreshToken);
+        redisCacheService.getRefreshTokenCache().delete(refreshToken);
     }
 
     /**
@@ -155,11 +153,11 @@ public class TokenService {
     public void removeToken(String token) {
         if (StringUtils.isNotEmpty(token)) {
             try {
-                Claims claims = parseToken(token);
+                Claims claims = jwtTokenUtil.parseToken(token);
                 // 解析对应的权限以及用户信息
                 String uuid = (String) claims.get(Constants.Token.LOGIN_USER_KEY);
                 // 删除用户缓存记录
-                redisCacheService.loginUserCache.delete(uuid);
+                redisCacheService.getLoginUserCache().delete(uuid);
                 // 将 JTI 加入黑名单，TTL 为 token 剩余过期时间
                 String jti = claims.getId();
                 if (jti != null) {
@@ -186,29 +184,6 @@ public class TokenService {
         }
         Boolean exists = redisTemplate.hasKey(BLACKLIST_KEY_PREFIX + jti);
         return Boolean.TRUE.equals(exists);
-    }
-
-    /**
-     * 从令牌中获取数据声明 (JJWT 0.12.x API)
-     *
-     * @param token 令牌
-     * @return 数据声明
-     */
-    private Claims parseToken(String token) {
-        SecretKey key = Keys.hmacShaKeyFor(appForgeConfig.getJwt().getSecret().getBytes());
-
-        return Jwts.parser().verifyWith(key).build().parseSignedClaims(token).getPayload();
-    }
-
-    /**
-     * 从令牌中获取用户名
-     *
-     * @param token 令牌
-     * @return 用户名
-     */
-    private String getUsernameFromToken(String token) {
-        Claims claims = parseToken(token);
-        return claims.getSubject();
     }
 
     /**

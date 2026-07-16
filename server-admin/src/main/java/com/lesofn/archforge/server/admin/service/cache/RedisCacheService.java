@@ -7,6 +7,7 @@ import com.lesofn.archforge.user.api.domain.SysUser;
 import com.lesofn.archforge.user.api.service.SysRoleService;
 import com.lesofn.archforge.user.api.service.SysUserService;
 import jakarta.annotation.PostConstruct;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -21,11 +22,16 @@ public class RedisCacheService {
     private final SysUserService sysUserService;
     private final SysRoleService sysRoleService;
 
-    public RedisCacheTemplate<String> captchaCache;
-    public RedisCacheTemplate<SystemLoginUser> loginUserCache;
-    public RedisCacheTemplate<String> refreshTokenCache;
-    public RedisCacheTemplate<SysUser> userCache;
-    public RedisCacheTemplate<SysRole> roleCache;
+    @Getter
+    private RedisCacheTemplate<String> captchaCache;
+    @Getter
+    private RedisCacheTemplate<SystemLoginUser> loginUserCache;
+    @Getter
+    private RedisCacheTemplate<String> refreshTokenCache;
+    @Getter
+    private RedisCacheTemplate<SysUser> userCache;
+    @Getter
+    private RedisCacheTemplate<SysRole> roleCache;
 
     @PostConstruct
     public void init() {

@@ -45,12 +45,12 @@ public class JwtTokenUtil {
 
     /** 从token中获取自定义声明 */
     public <T> T getClaimFromToken(String token, Function<Claims, T> claimsResolver) {
-        final Claims claims = getAllClaimsFromToken(token);
+        final Claims claims = parseToken(token);
         return claimsResolver.apply(claims);
     }
 
     /** 解析token获取所有声明 (JJWT 0.12.x API) */
-    private Claims getAllClaimsFromToken(String token) {
+    public Claims parseToken(String token) {
         return Jwts.parser()
                 .verifyWith(getSigningKey())
                 .build()

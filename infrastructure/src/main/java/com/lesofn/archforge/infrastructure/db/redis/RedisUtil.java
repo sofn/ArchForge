@@ -10,11 +10,9 @@ import java.util.concurrent.TimeUnit;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.BoundSetOperations;
 import org.springframework.data.redis.core.Cursor;
-import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ScanOptions;
-import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Component;
 
 /**
@@ -22,15 +20,12 @@ import org.springframework.stereotype.Component;
  *
  * @author sofn
  */
-@SuppressWarnings(value = {
-        "unchecked", "rawtypes"
-})
 @Component
 public class RedisUtil {
 
-    public final RedisTemplate redisTemplate;
+    private final RedisTemplate<Object, Object> redisTemplate;
 
-    public RedisUtil(@Qualifier("redisTemplate") RedisTemplate redisTemplate) {
+    public RedisUtil(@Qualifier("redisTemplate") RedisTemplate<Object, Object> redisTemplate) {
         this.redisTemplate = redisTemplate;
     }
 
@@ -86,9 +81,9 @@ public class RedisUtil {
      * @param key 缓存键值
      * @return 缓存键值对应的数据
      */
+    @SuppressWarnings("unchecked")
     public <T> T getCacheObject(final String key) {
-        ValueOperations<String, T> operation = redisTemplate.opsForValue();
-        return operation.get(key);
+        return (T) redisTemplate.opsForValue().get(key);
     }
 
     /** 删除单个对象 */
@@ -101,8 +96,9 @@ public class RedisUtil {
      *
      * @param collection 多个对象
      */
-    public Long deleteObject(final Collection collection) {
-        return redisTemplate.delete(collection);
+    public Long deleteObject(final Collection<String> collection) {
+        Collection<Object> keys = new java.util.ArrayList<>(collection);
+        return redisTemplate.delete(keys);
     }
 
     /**
@@ -123,8 +119,9 @@ public class RedisUtil {
      * @param key 缓存的键值
      * @return 缓存键值对应的数据
      */
+    @SuppressWarnings("unchecked")
     public <T> List<T> getCacheList(final String key) {
-        return redisTemplate.opsForList().range(key, 0, -1);
+        return (List<T>) redisTemplate.opsForList().range(key, 0, -1);
     }
 
     /**
@@ -134,8 +131,8 @@ public class RedisUtil {
      * @param dataSet 缓存的数据
      * @return 缓存数据的对象
      */
-    public <T> BoundSetOperations<String, T> setCacheSet(final String key, final Set<T> dataSet) {
-        BoundSetOperations<String, T> setOperation = redisTemplate.boundSetOps(key);
+    public <T> BoundSetOperations<Object, Object> setCacheSet(final String key, final Set<T> dataSet) {
+        BoundSetOperations<Object, Object> setOperation = redisTemplate.boundSetOps(key);
         for (T t : dataSet) {
             setOperation.add(t);
         }
@@ -143,8 +140,9 @@ public class RedisUtil {
     }
 
     /** 获得缓存的set */
+    @SuppressWarnings("unchecked")
     public <T> Set<T> getCacheSet(final String key) {
-        return redisTemplate.opsForSet().members(key);
+        return (Set<T>) redisTemplate.opsForSet().members(key);
     }
 
     /** 缓存Map */
@@ -155,8 +153,9 @@ public class RedisUtil {
     }
 
     /** 获得缓存的Map */
+    @SuppressWarnings("unchecked")
     public <T> Map<String, T> getCacheMap(final String key) {
-        return redisTemplate.opsForHash().entries(key);
+        return (Map<String, T>) (Map<?, ?>) redisTemplate.opsForHash().entries(key);
     }
 
     /**
@@ -177,15 +176,14 @@ public class RedisUtil {
      * @param hKey Hash键
      * @return Hash中的对象
      */
+    @SuppressWarnings("unchecked")
     public <T> T getCacheMapValue(final String key, final String hKey) {
-        HashOperations<String, String, T> opsForHash = redisTemplate.opsForHash();
-        return opsForHash.get(key, hKey);
+        return (T) redisTemplate.opsForHash().get(key, hKey);
     }
 
     /** 删除Hash中的数据 */
     public void delCacheMapValue(final String key, final String hKey) {
-        HashOperations hashOperations = redisTemplate.opsForHash();
-        hashOperations.delete(key, hKey);
+        redisTemplate.opsForHash().delete(key, hKey);
     }
 
     /**
@@ -195,8 +193,9 @@ public class RedisUtil {
      * @param hKeys Hash键集合
      * @return Hash对象集合
      */
+    @SuppressWarnings("unchecked")
     public <T> List<T> getMultiCacheMapValue(final String key, final Collection<Object> hKeys) {
-        return redisTemplate.opsForHash().multiGet(key, hKeys);
+        return (List<T>) redisTemplate.opsForHash().multiGet(key, hKeys);
     }
 
     /**
@@ -206,7 +205,7 @@ public class RedisUtil {
      * @return 对象列表
      */
     public Collection<String> keys(final String pattern) {
-        return (Collection<String>) redisTemplate.execute(
+        return redisTemplate.execute(
                 (RedisCallback<Collection<String>>) connection -> {
                     Set<String> keys = new HashSet<>();
                     ScanOptions options = ScanOptions.scanOptions()

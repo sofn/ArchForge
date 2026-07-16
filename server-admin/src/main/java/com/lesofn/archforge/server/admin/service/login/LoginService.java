@@ -177,8 +177,8 @@ public class LoginService {
             throw new AdminAuthException(CAPTCHA_EXPIRED);
         }
 
-        Object cacheCode = redisCacheService.captchaCache.get(uuid);
-        redisCacheService.captchaCache.delete(uuid);
+        Object cacheCode = redisCacheService.getCaptchaCache().get(uuid);
+        redisCacheService.getCaptchaCache().delete(uuid);
 
         if (cacheCode == null) {
             throw new AdminAuthException(CAPTCHA_EXPIRED);
@@ -225,7 +225,7 @@ public class LoginService {
         }
 
         // 保存验证码信息（保存答案）
-        redisCacheService.captchaCache.set(uuid, answer);
+        redisCacheService.getCaptchaCache().set(uuid, answer);
 
         // 转换流信息写出
         try {
