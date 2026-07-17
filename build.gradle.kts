@@ -98,7 +98,7 @@ subprojects {
         
         dependencies {
             // 引入 Spring Boot dependencies
-            add("implementation", platform("org.springframework.boot:spring-boot-dependencies:4.0.7"))
+            add("implementation", platform("org.springframework.boot:spring-boot-dependencies:4.1.0"))
             // 引入自定义 dependencies
             add("implementation", platform(project(":dependencies")))
 

@@ -10,8 +10,8 @@ dependencies {
     api("org.postgresql:postgresql")
 
     // Hibernate Static Metamodel Generator (类型安全字段引用，替代 QueryDSL Q-classes)
-    // 版本与 Spring Boot 4.0.7 BOM 对齐 (Hibernate 7.2.x)
-    annotationProcessor("org.hibernate.orm:hibernate-processor:7.2.19.Final")
+    // 版本与 Spring Boot 4.1.0 BOM 对齐 (Hibernate 7.4.x)
+    annotationProcessor("org.hibernate.orm:hibernate-processor:7.4.1.Final")
 
     // Lombok
     compileOnly("org.projectlombok:lombok")

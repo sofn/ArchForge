@@ -1,6 +1,7 @@
 package com.lesofn.archforge.infrastructure.db.redis;
 
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -49,7 +50,7 @@ public class RedisUtil {
      */
     public <T> void setCacheObject(
             final String key, final T value, final Integer timeout, final TimeUnit timeUnit) {
-        redisTemplate.opsForValue().set(key, value, timeout, timeUnit);
+        redisTemplate.opsForValue().set(key, value, Duration.of(timeout, timeUnit.toChronoUnit()));
     }
 
     /**
@@ -72,7 +73,7 @@ public class RedisUtil {
      * @return true=设置成功；false=设置失败
      */
     public Boolean expire(final String key, final long timeout, final TimeUnit unit) {
-        return redisTemplate.expire(key, timeout, unit);
+        return redisTemplate.expire(key, Duration.of(timeout, unit.toChronoUnit()));
     }
 
     /**

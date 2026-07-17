@@ -72,13 +72,13 @@ dependencies {
         api("org.mapstruct:mapstruct:1.6.3")
         api("org.mapstruct:mapstruct-processor:1.6.3")
 
-        // Micrometer + OpenTelemetry (versions aligned with Spring Boot 4.0.7 BOM)
-        api("io.micrometer:micrometer-tracing-bridge-otel:1.6.6")
-        api("io.opentelemetry:opentelemetry-exporter-otlp:1.55.0")
+        // Micrometer + OpenTelemetry (versions aligned with Spring Boot 4.1.0 BOM)
+        api("io.micrometer:micrometer-tracing-bridge-otel:1.7.0")
+        api("io.opentelemetry:opentelemetry-exporter-otlp:1.62.0")
 
-        // Flyway (versions aligned with Spring Boot 4.0.7 BOM)
-        api("org.flywaydb:flyway-core:11.14.1")
-        api("org.flywaydb:flyway-database-postgresql:11.14.1")
+        // Flyway (versions aligned with Spring Boot 4.1.0 BOM)
+        api("org.flywaydb:flyway-core:12.4.0")
+        api("org.flywaydb:flyway-database-postgresql:12.4.0")
 
         // Oshi (系统监控)
         api("com.github.oshi:oshi-core:6.8.1")
@@ -90,14 +90,14 @@ dependencies {
         api("org.dhatim:fastexcel:0.20.2")
         api("org.dhatim:fastexcel-reader:0.20.2")
 
-        // Quartz (调度 — Spring Boot 4.0.7 BOM 已托管 quartz 版本，但显式声明 starter 便于追踪)
-        api("org.springframework.boot:spring-boot-starter-quartz:4.0.7")
+        // Quartz (调度 — Spring Boot 4.1.0 BOM 已托管 quartz 版本，但显式声明 starter 便于追踪)
+        api("org.springframework.boot:spring-boot-starter-quartz:4.1.0")
 
         // Spring Modulith
-        api("org.springframework.modulith:spring-modulith-api:2.0.0")
-        api("org.springframework.modulith:spring-modulith-core:2.0.0")
-        api("org.springframework.modulith:spring-modulith-test:2.0.0")
-        api("org.springframework.modulith:spring-modulith-docs:2.0.0")
+        api("org.springframework.modulith:spring-modulith-api:2.1.0")
+        api("org.springframework.modulith:spring-modulith-core:2.1.0")
+        api("org.springframework.modulith:spring-modulith-test:2.1.0")
+        api("org.springframework.modulith:spring-modulith-docs:2.1.0")
     }
 }
 

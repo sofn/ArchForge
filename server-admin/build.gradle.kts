@@ -1,5 +1,5 @@
 plugins {
-    id("org.springframework.boot") version "4.0.7"
+    id("org.springframework.boot") version "4.1.0"
     id("org.graalvm.buildtools.native")
 }
 
@@ -75,7 +75,7 @@ graalvmNative {
 
 dependencies {
     // 引入 Spring Boot dependencies BOM
-    implementation(platform("org.springframework.boot:spring-boot-dependencies:4.0.7"))
+    implementation(platform("org.springframework.boot:spring-boot-dependencies:4.1.0"))
     // 引入项目统一版本管理平台
     implementation(platform(project(":dependencies")))
     
@@ -129,7 +129,7 @@ dependencies {
     api("org.springframework.boot:spring-boot-starter-quartz")
     
     // Spring Boot DevTools - 开发环境自动重启和热部署
-    developmentOnly("org.springframework.boot:spring-boot-devtools:4.0.7")
+    developmentOnly("org.springframework.boot:spring-boot-devtools:4.1.0")
     
     // Lombok注解处理器
     annotationProcessor("org.projectlombok:lombok:1.18.46")
