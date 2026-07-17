@@ -112,7 +112,9 @@ public class AdminUserDetailsService implements UserDetailsService {
         Set<Long> menuIds = menuList.stream().map(SysMenu::getMenuId).collect(Collectors.toSet());
         Set<String> permissions = menuList.stream().map(SysMenu::getPermission).collect(Collectors.toSet());
 
-        DataScopeEnum dataScopeEnum = BasicEnumUtil.fromValue(DataScopeEnum.class, role.getDataScope());
+        DataScopeEnum dataScopeEnum = BasicEnumUtil.fromValue(
+                DataScopeEnum.class,
+                role.getDataScope() == null ? null : role.getDataScope().intValue());
 
         Set<Long> deptIdSet = Collections.emptySet();
         if (StringUtils.isNotEmpty(role.getDeptIdSet())) {

@@ -70,15 +70,13 @@ spring:
           merge-sql: true
           slow-sql-millis: 500
           log-slow-sql: true
-  main:
-    allow-bean-definition-overriding: true
   mvc:
     problemdetails:
       enabled: true
   sql:
     init:
       encoding: UTF-8
-      mode: always
+      mode: never
   jackson:
     deserialization:
       fail-on-unknown-properties: false
