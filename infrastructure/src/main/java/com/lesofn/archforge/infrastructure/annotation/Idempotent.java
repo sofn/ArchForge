@@ -6,10 +6,16 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 防重复提交注解。
+ * 幂等注解。
  *
  * <p>
- * AOP 切面基于 Redis SETNX + TTL 实现，key 由用户标识 + 方法签名 + 参数哈希组成。
+ * 支持三种模式：
+ * <ul>
+ * <li>{@code PARAM}：基于方法参数生成 Redis key，SETNX + TTL 防止重复提交</li>
+ * <li>{@code TOKEN}：客户端先申请一次性幂等 Token，请求时通过 {@code X-Idempotent-Token}
+ * 头部传入，服务端消费后失效</li>
+ * <li>{@code HEADER}：基于指定请求头值做幂等控制</li>
+ * </ul>
  *
  * @author sofn
  */
@@ -17,9 +23,24 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Idempotent {
 
-    /** 重复提交检查时长（秒，默认 5 秒） */
-    int interval() default 5;
+    /** 幂等模式 */
+    IdempotentType type() default IdempotentType.PARAM;
 
-    /** Key 前缀（默认使用方法签名） */
-    String keyPrefix() default "";
+    /**
+     * 幂等 key。
+     *
+     * <p>
+     * {@code PARAM} 模式下支持 SpEL 表达式（如 {@code #orderNo}），为空时使用方法签名 + 参数哈希。
+     * {@code HEADER} 模式下为请求头名称前缀，可为空。
+     */
+    String key() default "";
+
+    /** 幂等 Token / key 过期时间（秒，默认 10 秒；TOKEN 模式下指 Token 申请后的有效期） */
+    long expireSeconds() default 10;
+
+    /** 提示信息 */
+    String message() default "";
+
+    /** TOKEN 模式下读取的 HTTP Header 名称 */
+    String header() default "X-Idempotent-Token";
 }

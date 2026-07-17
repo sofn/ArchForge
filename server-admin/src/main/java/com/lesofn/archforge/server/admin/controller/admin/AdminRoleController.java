@@ -8,6 +8,7 @@ import com.lesofn.archforge.server.admin.dto.AdminRoleSimpleDTO;
 import com.lesofn.archforge.infrastructure.annotation.Log;
 import com.lesofn.archforge.server.admin.dto.AdminRoleListRequest;
 import com.lesofn.archforge.server.admin.dto.request.RoleCreateRequest;
+import com.lesofn.archforge.server.admin.dto.request.RoleDataScopeRequest;
 import com.lesofn.archforge.server.admin.dto.request.RoleDeleteRequest;
 import com.lesofn.archforge.server.admin.dto.request.RoleMenuRequest;
 import com.lesofn.archforge.server.admin.dto.request.RoleStatusRequest;
@@ -151,6 +152,21 @@ public class AdminRoleController {
     public Boolean saveRoleMenu(@RequestBody @Valid RoleMenuRequest request) {
         List<Long> menuIdList = request.getMenuIds() != null ? request.getMenuIds() : Collections.emptyList();
         roleMenuService.updateRoleMenus(request.getId(), menuIdList);
+        return true;
+    }
+
+    @Log
+    @Operation(summary = "更新角色数据权限")
+    @PostMapping("/role/data-scope")
+    public Boolean updateRoleDataScope(@RequestBody @Valid RoleDataScopeRequest request) {
+        Optional<SysRole> opt = roleService.findById(request.getId());
+        if (opt.isEmpty()) {
+            return false;
+        }
+        SysRole role = opt.get();
+        role.setDataScope(request.getDataScope().shortValue());
+        role.setDeptIdSet(roleMapper.toDeptIdSet(request.getDeptIds()));
+        roleService.update(role);
         return true;
     }
 }

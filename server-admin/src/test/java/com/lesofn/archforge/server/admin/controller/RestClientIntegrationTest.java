@@ -243,6 +243,27 @@ class RestClientIntegrationTest {
     }
 
     @Test
+    @Order(23)
+    @SuppressWarnings("unchecked")
+    void updateRoleDataScope() {
+        Map<String, Object> response = post("/role/data-scope", Map.of("id", createdRoleId, "dataScope", 2, "deptIds", List
+                .of()));
+        assertEquals(0, response.get("code"), "Update role data scope failed: " + response);
+
+        response = post("/role", Map.of("currentPage", 1, "pageSize", 100));
+        assertEquals(0, response.get("code"));
+        Map<String, Object> data = (Map<String, Object>) response.get("data");
+        List<Map<String, Object>> list = (List<Map<String, Object>>) data.get("list");
+        Map<String, Object> role = list.stream()
+                .filter(r -> createdRoleId.equals(((Number) r.get("id")).longValue()))
+                .findFirst()
+                .orElse(null);
+        assertNotNull(role);
+        assertEquals(2, ((Number) role.get("dataScope")).intValue());
+        assertNotNull(role.get("customDeptIds"));
+    }
+
+    @Test
     @Order(29)
     void deleteRole() {
         Map<String, Object> response = post("/role/delete", Map.of("id", createdRoleId));

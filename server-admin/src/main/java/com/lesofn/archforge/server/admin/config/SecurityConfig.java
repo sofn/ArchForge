@@ -168,7 +168,8 @@ public class SecurityConfig {
                                         "/register",
                                         "/getConfig",
                                         "/captchaImage",
-                                        "/refresh-token")
+                                        "/refresh-token",
+                                        "/idempotent/token")
                                 .permitAll()
                                 // 静态资源允许匿名访问
                                 .requestMatchers(

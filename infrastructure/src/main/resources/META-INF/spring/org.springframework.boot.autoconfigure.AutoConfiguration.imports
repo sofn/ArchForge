@@ -1,3 +1,5 @@
 com.lesofn.archforge.infrastructure.redisson.RedissonAutoConfiguration
 com.lesofn.archforge.infrastructure.cache.CacheAutoConfiguration
 com.lesofn.archforge.infrastructure.lock.DistributedLockAutoConfiguration
+com.lesofn.archforge.infrastructure.security.idempotent.IdempotentAutoConfiguration
+com.lesofn.archforge.infrastructure.security.sign.ApiSignAutoConfiguration

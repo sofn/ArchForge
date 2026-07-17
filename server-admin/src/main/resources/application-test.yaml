@@ -50,3 +50,7 @@ arch-forge:
     expire-seconds: 604800
   captcha:
     enabled: false
+  security:
+    sign:
+      apps:
+        test-app: test-secret

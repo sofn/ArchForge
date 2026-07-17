@@ -4,6 +4,9 @@ import com.lesofn.archforge.common.enums.common.GenderEnum;
 import com.lesofn.archforge.common.utils.query.QueryHelp;
 import com.lesofn.archforge.infrastructure.auth.model.SystemLoginUser;
 import com.lesofn.archforge.infrastructure.db.redis.RedisUtil;
+import com.lesofn.archforge.infrastructure.security.datascope.DataPermission;
+import com.lesofn.archforge.infrastructure.security.datascope.DataScopeContextHolder;
+import com.lesofn.archforge.server.admin.datascope.DataScopeSpecification;
 import com.lesofn.archforge.server.admin.dto.AdminPageResult;
 import com.lesofn.archforge.server.admin.dto.AdminUserItemDTO;
 import com.lesofn.archforge.server.admin.dto.AdminUserListRequest;
@@ -56,6 +59,7 @@ public class UserServiceImpl implements UserService {
     private final AdminUserMapper adminUserMapper;
     private final PasswordEncoder passwordEncoder;
     private final RedisUtil redisUtil;
+    private final DataScopeSpecification dataScopeSpecification;
 
     @Override
     public CurrentLoginUserDTO getLoginUserInfo(SystemLoginUser loginUser) {
@@ -86,6 +90,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @DataPermission(deptAlias = "deptId", userAlias = "userId")
     public AdminPageResult<AdminUserItemDTO> getUserList(AdminUserListRequest request) {
         int currentPage = request.getCurrentPage() != null && request.getCurrentPage() > 0 ? request.getCurrentPage() : 1;
         int pageSize = request.getPageSize() != null && request.getPageSize() > 0 ? request.getPageSize() : 10;
@@ -104,6 +109,7 @@ public class UserServiceImpl implements UserService {
 
         Pageable pageable = PageRequest.of(currentPage - 1, pageSize, Sort.by(Sort.Direction.DESC, "userId"));
         Specification<SysUser> spec = (root, q, cb) -> QueryHelp.getPredicate(root, criteria, cb);
+        spec = dataScopeSpecification.apply(spec, DataScopeContextHolder.get());
         Page<SysUser> userPage = sysUserService.findAll(spec, pageable);
 
         Map<Long, String> deptNameMap = getDeptNameMap();
