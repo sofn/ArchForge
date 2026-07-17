@@ -34,6 +34,13 @@ dependencies {
         exclude(group = "org.apache.logging.log4j", module = "log4j-to-slf4j")
     }
 
+    // Caffeine L1 cache + Spring context support for CaffeineCacheManager
+    api("com.github.ben-manes.caffeine:caffeine")
+    api("org.springframework:spring-context-support")
+
+    // Redisson (distributed lock + cache sync)
+    api("org.redisson:redisson")
+
     // OpenAPI / Swagger
     api("org.springdoc:springdoc-openapi-starter-webmvc-ui")
 

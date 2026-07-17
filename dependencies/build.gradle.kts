@@ -98,6 +98,9 @@ dependencies {
         api("org.springframework.modulith:spring-modulith-core:2.1.0")
         api("org.springframework.modulith:spring-modulith-test:2.1.0")
         api("org.springframework.modulith:spring-modulith-docs:2.1.0")
+
+        // Redisson (distributed lock + cache sync)
+        api("org.redisson:redisson:3.52.0")
     }
 }
 

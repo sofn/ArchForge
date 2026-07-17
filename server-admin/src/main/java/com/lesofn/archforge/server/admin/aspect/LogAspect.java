@@ -4,8 +4,8 @@ import com.lesofn.archforge.common.utils.ip.IpRegionUtil;
 import com.lesofn.archforge.common.utils.ip.IpUtil;
 import com.lesofn.archforge.infrastructure.annotation.Log;
 import com.lesofn.archforge.infrastructure.frame.context.ScopedValueContext;
+import com.lesofn.archforge.server.admin.event.LogEvent;
 import com.lesofn.archforge.user.api.domain.SysOperLog;
-import com.lesofn.archforge.user.api.service.SysOperLogService;
 import eu.bitwalker.useragentutils.UserAgent;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -17,6 +17,7 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -34,7 +35,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class LogAspect {
 
-    private final SysOperLogService operLogService;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Around("@annotation(logAnnotation)")
     public Object around(ProceedingJoinPoint point, Log logAnnotation) throws Throwable {
@@ -64,9 +65,9 @@ public class LogAspect {
         } finally {
             operLog.setStatus(status);
             try {
-                operLogService.create(operLog);
+                eventPublisher.publishEvent(new LogEvent(operLog));
             } catch (Exception ex) {
-                log.warn("Failed to save operation log", ex);
+                log.warn("Failed to publish operation log event", ex);
             }
         }
     }

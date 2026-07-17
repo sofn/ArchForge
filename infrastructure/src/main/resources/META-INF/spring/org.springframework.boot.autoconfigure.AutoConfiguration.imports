@@ -1,0 +1,3 @@
+com.lesofn.archforge.infrastructure.redisson.RedissonAutoConfiguration
+com.lesofn.archforge.infrastructure.cache.CacheAutoConfiguration
+com.lesofn.archforge.infrastructure.lock.DistributedLockAutoConfiguration
