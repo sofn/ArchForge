@@ -23,7 +23,7 @@ ArchForge is a **production-ready, full-stack admin platform** that combines a S
 
 ### Why ArchForge?
 
-- **Modern architecture**: JDK 25 + Spring Boot 4 + DDD + Clean Architecture — not a legacy codebase ported forward
+- **Modern architecture**: JDK 25 + Spring Boot 4 + DDD + Clean Architecture
 - **Team project standard**: Codified conventions (Spotless, JSpecify, Lombok), centralized dependency BOM, skill-based onboarding
 - **JDK 25 features in production**: ScopedValue, Structured Concurrency, Pattern Matching, Stream Gatherers, Virtual Threads
 - **Production-ready deployment**: Docker with jlink minimal JRE + Project Leyden CDS, Flyway migrations, multi-datasource, Micrometer observability
@@ -33,8 +33,8 @@ ArchForge is a **production-ready, full-stack admin platform** that combines a S
 
 | Category | Details |
 |----------|---------|
-| **Auth** | JWT + refresh token, Spring Security, BCrypt password, configurable captcha |
-| **RBAC** | Users, roles, menus, departments, button-level permissions |
+| **Auth** | JWT + refresh token, Spring Security, BCrypt password, configurable captcha, API request signing, idempotent token |
+| **RBAC** | Users, roles, menus, departments, button-level permissions, role-based data scopes |
 | **System** | Config management, notice/announcements, operation & login logs |
 | **File Management** | Upload, list, download, delete; local filesystem and S3 (RustFS) backends; extension/size/MIME allow-lists |
 | **Scheduler** | Quartz-based reflective cron jobs; pause/resume/run once; execution logs |
@@ -49,6 +49,9 @@ ArchForge is a **production-ready, full-stack admin platform** that combines a S
 
 The latest merged feature branch added a number of production-ready capabilities:
 
+- **Idempotent Token** — `@Idempotent` supports PARAM, TOKEN, and HEADER modes; includes a `/idempotent/token` endpoint to issue one-time tokens that prevent duplicate form submissions.
+- **API Request Signing** — `@ApiSign` enforces HMAC-SHA256 request signatures with timestamp and nonce checks, preventing tampering and replay attacks.
+- **Data Permission** — Role-level data scopes (all, custom departments, single department, department tree, self-only) applied via `@DataPermission` and JPA Specifications.
 - **File Management** — A complete file lifecycle (upload, list, download, delete) with configurable local or S3/RustFS storage, extension allow-lists and size limits.
 - **Quartz Scheduling** — Reflective cron jobs managed from the admin UI, including pause/resume/run-once and execution logs.
 - **i18n** — Locale-aware message bundles on both backend and frontend, with English and Simplified Chinese out of the box.
