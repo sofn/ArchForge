@@ -33,11 +33,11 @@ services:
         condition: service_healthy
     environment:
       SPRING_PROFILES_ACTIVE: staging
-      SPRING_DATA_REDIS_HOST: redis
-      SPRING_DATASOURCE_DYNAMIC_DATASOURCE_USER_MASTER_URL: jdbc:postgresql://postgres:5432/archforge_user
-      SPRING_DATASOURCE_DYNAMIC_DATASOURCE_USER_SLAVE_URL: jdbc:postgresql://postgres:5432/archforge_user
-      SPRING_DATASOURCE_DYNAMIC_DATASOURCE_TASK_MASTER_URL: jdbc:postgresql://postgres:5432/archforge_task
-      SPRING_DATASOURCE_DYNAMIC_DATASOURCE_TASK_SLAVE_URL: jdbc:postgresql://postgres:5432/archforge_task
+      REDIS_HOST: redis
+      DB_USER_MASTER_URL: jdbc:postgresql://postgres:5432/archforge_user
+      DB_USER_SLAVE_URL: jdbc:postgresql://postgres:5432/archforge_user
+      DB_TASK_MASTER_URL: jdbc:postgresql://postgres:5432/archforge_task
+      DB_TASK_SLAVE_URL: jdbc:postgresql://postgres:5432/archforge_task
       DB_USERNAME: ${DB_USERNAME:-archforge}
       DB_PASSWORD: ${DB_PASSWORD:-archforge}
       JWT_SECRET: ${JWT_SECRET}

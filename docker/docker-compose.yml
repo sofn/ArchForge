@@ -43,12 +43,12 @@ services:
       - "8080:8080"
     environment:
       SPRING_PROFILES_ACTIVE: prod
-      SPRING_DATA_REDIS_HOST: redis
+      REDIS_HOST: redis
       JWT_SECRET: ${JWT_SECRET:-5/jDAWs7a63GRgjS+uF2mP7dcLwI6GAgxf+Z0+fOAbgMR/jksG5r0v10nDOkrM0btxtb2FAuol8fSzSJis8gIA==}
-      SPRING_DATASOURCE_DYNAMIC_DATASOURCE_USER_MASTER_URL: jdbc:postgresql://postgres:5432/archforge_user
-      SPRING_DATASOURCE_DYNAMIC_DATASOURCE_USER_SLAVE_URL: jdbc:postgresql://postgres:5432/archforge_user
-      SPRING_DATASOURCE_DYNAMIC_DATASOURCE_TASK_MASTER_URL: jdbc:postgresql://postgres:5432/archforge_task
-      SPRING_DATASOURCE_DYNAMIC_DATASOURCE_TASK_SLAVE_URL: jdbc:postgresql://postgres:5432/archforge_task
+      DB_USER_MASTER_URL: jdbc:postgresql://postgres:5432/archforge_user
+      DB_USER_SLAVE_URL: jdbc:postgresql://postgres:5432/archforge_user
+      DB_TASK_MASTER_URL: jdbc:postgresql://postgres:5432/archforge_task
+      DB_TASK_SLAVE_URL: jdbc:postgresql://postgres:5432/archforge_task
       SPRING_DATASOURCE_DYNAMIC_DATASOURCE_USER_MASTER_USERNAME: ${DB_USERNAME:-archforge}
       SPRING_DATASOURCE_DYNAMIC_DATASOURCE_USER_MASTER_PASSWORD: ${DB_PASSWORD:-archforge}
       SPRING_DATASOURCE_DYNAMIC_DATASOURCE_USER_SLAVE_USERNAME: ${DB_USERNAME:-archforge}

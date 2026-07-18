@@ -42,25 +42,25 @@ spring:
         user_master:
           type: com.alibaba.druid.pool.DruidDataSource
           driver-class-name: org.postgresql.Driver
-          url: ${SPRING_DATASOURCE_DYNAMIC_DATASOURCE_USER_MASTER_URL:jdbc:postgresql://postgres:5432/archforge_user}
+          url: ${DB_USER_MASTER_URL:jdbc:postgresql://postgres:5432/archforge_user}
           username: ${DB_USERNAME:archforge}
           password: ${DB_PASSWORD:archforge}
         user_slave:
           type: com.alibaba.druid.pool.DruidDataSource
           driver-class-name: org.postgresql.Driver
-          url: ${SPRING_DATASOURCE_DYNAMIC_DATASOURCE_USER_SLAVE_URL:jdbc:postgresql://postgres:5432/archforge_user}
+          url: ${DB_USER_SLAVE_URL:jdbc:postgresql://postgres:5432/archforge_user}
           username: ${DB_USERNAME:archforge}
           password: ${DB_PASSWORD:archforge}
         task_master:
           type: com.alibaba.druid.pool.DruidDataSource
           driver-class-name: org.postgresql.Driver
-          url: ${SPRING_DATASOURCE_DYNAMIC_DATASOURCE_TASK_MASTER_URL:jdbc:postgresql://postgres:5432/archforge_task}
+          url: ${DB_TASK_MASTER_URL:jdbc:postgresql://postgres:5432/archforge_task}
           username: ${DB_USERNAME:archforge}
           password: ${DB_PASSWORD:archforge}
         task_slave:
           type: com.alibaba.druid.pool.DruidDataSource
           driver-class-name: org.postgresql.Driver
-          url: ${SPRING_DATASOURCE_DYNAMIC_DATASOURCE_TASK_SLAVE_URL:jdbc:postgresql://postgres:5432/archforge_task}
+          url: ${DB_TASK_SLAVE_URL:jdbc:postgresql://postgres:5432/archforge_task}
           username: ${DB_USERNAME:archforge}
           password: ${DB_PASSWORD:archforge}
 
