@@ -62,8 +62,18 @@ services:
       SPRING_DATASOURCE_DYNAMIC_DATASOURCE_USER_SLAVE_DRIVER_CLASS_NAME: org.postgresql.Driver
       SPRING_DATASOURCE_DYNAMIC_DATASOURCE_TASK_MASTER_DRIVER_CLASS_NAME: org.postgresql.Driver
       SPRING_DATASOURCE_DYNAMIC_DATASOURCE_TASK_SLAVE_DRIVER_CLASS_NAME: org.postgresql.Driver
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://jaeger:4318/v1/traces
+      SAMPLING_PROBABILITY: "0.1"
     volumes:
       - ./logs:/app/logs
+    networks:
+      - default
+      - observability
 
 volumes:
   postgres-data:
+
+networks:
+  observability:
+    name: archforge-observability
+    external: true

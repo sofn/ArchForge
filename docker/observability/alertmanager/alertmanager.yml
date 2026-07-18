@@ -1,0 +1,22 @@
+global:
+  resolve_timeout: 5m
+
+route:
+  receiver: 'default'
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 4h
+
+receivers:
+  - name: 'default'
+    # 示例 webhook 接收器，请替换为真实通知地址
+    webhook_configs:
+      - url: 'http://127.0.0.1:5001/webhook'
+        send_resolved: true
+
+inhibit_rules:
+  - source_match:
+      severity: 'critical'
+    target_match:
+      severity: 'warning'
+    equal: [ 'alertname', 'cluster', 'service' ]

@@ -73,7 +73,9 @@ dependencies {
         api("org.mapstruct:mapstruct-processor:1.6.3")
 
         // Micrometer + OpenTelemetry (versions aligned with Spring Boot 4.1.0 BOM)
+        api("io.micrometer:micrometer-tracing:1.6.6")
         api("io.micrometer:micrometer-tracing-bridge-otel:1.7.0")
+        api("io.micrometer:micrometer-registry-prometheus:1.14.4")
         api("io.opentelemetry:opentelemetry-exporter-otlp:1.62.0")
 
         // Flyway (versions aligned with Spring Boot 4.1.0 BOM)

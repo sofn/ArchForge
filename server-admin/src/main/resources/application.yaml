@@ -9,6 +9,12 @@ management:
     distribution:
       percentiles-histogram:
         http.server.requests: true
+  tracing:
+    enabled: true
+    sampling:
+      probability: ${SAMPLING_PROBABILITY:1.0}
+    otlp:
+      endpoint: ${OTEL_EXPORTER_OTLP_ENDPOINT:http://localhost:4318/v1/traces}
 
 spring:
   profiles:

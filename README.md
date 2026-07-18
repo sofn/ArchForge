@@ -39,7 +39,7 @@ ArchForge is a **production-ready, full-stack admin platform** that combines a S
 | **File Management** | Upload, list, download, delete; local filesystem and S3 (RustFS) backends; extension/size/MIME allow-lists |
 | **Scheduler** | Quartz-based reflective cron jobs; pause/resume/run once; execution logs |
 | **i18n** | Backend and frontend locale sync; English / Simplified Chinese message bundles |
-| **Monitor** | Real-time CPU/memory/JVM/disk monitoring (Oshi), Druid SQL monitoring, embedded Swagger UI |
+| **Monitor** | Real-time CPU/memory/JVM/disk monitoring (Oshi), Prometheus + Grafana + Jaeger + Alertmanager observability stack |
 | **Database** | PostgreSQL, multi-datasource with read/write split, Flyway migration |
 | **Deploy** | Docker Compose (Leyden JVM + Native Image), Nginx reverse proxy |
 | **Frontend** | vue-pure-admin, Element Plus, TailwindCSS, Pinia, dynamic routing, i18n |
@@ -52,6 +52,7 @@ The latest merged feature branch added a number of production-ready capabilities
 - **Idempotent Token** — `@Idempotent` supports PARAM, TOKEN, and HEADER modes; includes a `/idempotent/token` endpoint to issue one-time tokens that prevent duplicate form submissions.
 - **API Request Signing** — `@ApiSign` enforces HMAC-SHA256 request signatures with timestamp and nonce checks, preventing tampering and replay attacks.
 - **Data Permission** — Role-level data scopes (all, custom departments, single department, department tree, self-only) applied via `@DataPermission` and JPA Specifications.
+- **OpenTelemetry Observability** — Pre-configured Prometheus + Grafana + Jaeger + Alertmanager stack with dashboards, alerting rules, and distributed trace visualization.
 - **File Management** — A complete file lifecycle (upload, list, download, delete) with configurable local or S3/RustFS storage, extension allow-lists and size limits.
 - **Quartz Scheduling** — Reflective cron jobs managed from the admin UI, including pause/resume/run-once and execution logs.
 - **i18n** — Locale-aware message bundles on both backend and frontend, with English and Simplified Chinese out of the box.
@@ -153,7 +154,7 @@ ArchForgeAdmin (Frontend)
 | Frontend | Vue 3.5, Vite 8, TypeScript 6, Element Plus, TailwindCSS 4 |
 | Database | PostgreSQL 17 (Testcontainers in dev), Redis, Flyway |
 | File Storage | Local filesystem, AWS S3 / RustFS (Testcontainers in dev) |
-| Monitoring | Oshi, SpringDoc OpenAPI, Micrometer + OpenTelemetry |
+| Monitoring | Oshi, SpringDoc OpenAPI, Micrometer + OpenTelemetry, Prometheus + Grafana + Jaeger + Alertmanager |
 | Build | Gradle 9.4.1, pnpm, Docker, Project Leyden, Liberica NIK 25 |
 | Testing | JUnit 6, Spock 2.4, RestClient, Testcontainers |
 

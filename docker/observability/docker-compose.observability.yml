@@ -1,0 +1,87 @@
+# Observability stack: Prometheus + Grafana + Jaeger + Alertmanager
+# Usage:
+#   cd docker/observability
+#   docker compose up -d
+#
+# Default ports:
+#   Grafana      http://localhost:3000  (admin/admin)
+#   Prometheus   http://localhost:9090
+#   Jaeger UI    http://localhost:16686
+#   Alertmanager http://localhost:9093
+
+services:
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: archforge-jaeger
+    environment:
+      COLLECTOR_OTLP_ENABLED: "true"
+    ports:
+      - "16686:16686"
+      - "4317:4317"
+      - "4318:4318"
+    networks:
+      - archforge-observability
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:v3.2.0
+    container_name: archforge-prometheus
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./prometheus/rules:/etc/prometheus/rules:ro
+      - prometheus-data:/prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.enable-lifecycle"
+      - "--storage.tsdb.retention.time=15d"
+    ports:
+      - "9090:9090"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - archforge-observability
+    restart: unless-stopped
+
+  alertmanager:
+    image: prom/alertmanager:v0.28.0
+    container_name: archforge-alertmanager
+    volumes:
+      - ./alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+      - alertmanager-data:/alertmanager
+    ports:
+      - "9093:9093"
+    networks:
+      - archforge-observability
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:11.5.0
+    container_name: archforge-grafana
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_SERVER_ROOT_URL: "http://localhost:3000"
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - grafana-data:/var/lib/grafana
+    ports:
+      - "3000:3000"
+    networks:
+      - archforge-observability
+    depends_on:
+      - prometheus
+      - jaeger
+    restart: unless-stopped
+
+networks:
+  archforge-observability:
+    name: archforge-observability
+    driver: bridge
+
+volumes:
+  prometheus-data:
+  alertmanager-data:
+  grafana-data:

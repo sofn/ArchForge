@@ -58,7 +58,9 @@ dependencies {
     compileOnly("org.projectlombok:lombok")
 
     // Micrometer + OpenTelemetry
+    api("io.micrometer:micrometer-tracing")
     api("io.micrometer:micrometer-tracing-bridge-otel")
+    api("io.micrometer:micrometer-registry-prometheus")
     api("io.opentelemetry:opentelemetry-exporter-otlp")
 
     // AWS S3 SDK (文件存储)

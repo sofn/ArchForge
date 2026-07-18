@@ -50,7 +50,7 @@ spring:
           username: <your-db-username>
           password: <your-db-password>
 
-# OpenTelemetry (tracing configured via OTel SDK env vars: OTEL_EXPORTER_OTLP_ENDPOINT, OTEL_TRACES_SAMPLER_ARG)
+# OpenTelemetry (tracing endpoint configured via OTEL_EXPORTER_OTLP_ENDPOINT env var; sampling via SAMPLING_PROBABILITY)
 management:
   otlp:
     metrics:

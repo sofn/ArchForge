@@ -192,7 +192,13 @@ public class SecurityConfig {
                                 // H2 Console允许匿名访问（仅开发环境）
                                 .requestMatchers("/h2-console/**")
                                 .permitAll()
-                                // Actuator 端点需要认证
+                                // Actuator 健康/指标端点允许匿名访问（供 Prometheus 抓取）
+                                .requestMatchers(
+                                        "/actuator/health",
+                                        "/actuator/prometheus",
+                                        "/actuator/info")
+                                .permitAll()
+                                // Actuator 其他端点需要认证
                                 .requestMatchers("/actuator/**")
                                 .authenticated()
                                 // Jolokia 端点需要认证

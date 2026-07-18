@@ -1,0 +1,32 @@
+apiVersion: 1
+
+datasources:
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    uid: prometheus
+    isDefault: true
+    jsonData:
+      manageAlerts: true
+      alertmanagerUid: alertmanager
+      httpMethod: POST
+
+  - name: Alertmanager
+    type: alertmanager
+    access: proxy
+    url: http://alertmanager:9093
+    uid: alertmanager
+    jsonData:
+      implementation: prometheus
+
+  - name: Jaeger
+    type: jaeger
+    access: proxy
+    url: http://jaeger:16686
+    uid: jaeger
+    jsonData:
+      tracesToLogsV2:
+        enabled: true
+        datasourceUid: 'prometheus'
+        tags: [ 'requestId' ]

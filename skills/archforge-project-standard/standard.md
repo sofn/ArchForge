@@ -579,10 +579,12 @@ management:
 
 ### 6.6 Observability
 
-- **Tracing**: Micrometer Tracing bridge to OpenTelemetry, OTLP exporter.
-- **Metrics**: Micrometer with Prometheus endpoint + OTLP metrics export.
-- **Sampling**: 100% in dev, 10% in prod (configurable via `OTEL_TRACES_SAMPLER_ARG`).
-- **Endpoint**: Configurable via `OTEL_EXPORTER_OTLP_ENDPOINT` environment variable.
+- **Tracing**: Micrometer Tracing bridge to OpenTelemetry, OTLP exporter to Jaeger.
+- **Metrics**: Micrometer with Prometheus scrape endpoint (`/actuator/prometheus`).
+- **Dashboards**: Pre-configured Grafana dashboards for JVM, HTTP, and system metrics.
+- **Alerts**: Prometheus alert rules for error rate, latency, JVM heap, CPU, disk, and availability.
+- **Sampling**: Configurable via `SAMPLING_PROBABILITY` environment variable (default 1.0 in dev, 0.1 in production Docker Compose).
+- **Endpoint**: Configurable via `OTEL_EXPORTER_OTLP_ENDPOINT` environment variable (default `http://localhost:4318/v1/traces`).
 
 ---
 

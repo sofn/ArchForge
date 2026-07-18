@@ -1,0 +1,66 @@
+groups:
+  - name: archforge
+    rules:
+      - alert: HighErrorRate
+        expr: |
+          sum(rate(http_server_requests_seconds_count{status=~"5.."}[5m]))
+          /
+          sum(rate(http_server_requests_seconds_count[5m])) > 0.01
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High HTTP 5xx error rate"
+          description: "HTTP 5xx rate is above 1% for more than 2 minutes."
+
+      - alert: HighLatency
+        expr: |
+          histogram_quantile(0.99,
+            sum(rate(http_server_requests_seconds_bucket[5m])) by (le)
+          ) > 2
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High HTTP request latency"
+          description: "P99 latency is above 2 seconds for more than 5 minutes."
+
+      - alert: JvmHeapHigh
+        expr: |
+          jvm_memory_used_bytes{area="heap"}
+          /
+          jvm_memory_max_bytes{area="heap"} * 100 > 85
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "JVM heap memory usage high"
+          description: "JVM heap usage is above 85%."
+
+      - alert: CpuHigh
+        expr: process_cpu_usage * 100 > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "CPU usage high"
+          description: "Process CPU usage is above 80%."
+
+      - alert: DiskSpaceLow
+        expr: |
+          disk_free_bytes / disk_total_bytes * 100 < 15
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Disk space low"
+          description: "Free disk space is below 15%."
+
+      - alert: ApplicationDown
+        expr: up{job=~"archforge.*"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "ArchForge application is down"
+          description: "Prometheus can not scrape the ArchForge actuator endpoint."
