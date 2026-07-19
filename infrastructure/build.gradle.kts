@@ -1,10 +1,12 @@
-// Java 21
-
 dependencies {
     // 依赖 common 基础模块
     api(project(":common:common-base"))
     api(project(":common:common-jpa"))
-    
+
+    // 复用能力 starter
+    api(project(":starters:arch-forge-redisson-starter"))
+    api(project(":starters:arch-forge-trace-starter"))
+
     // 核心框架依赖 (Spring Boot BOM 管理的版本)
     // Excluding spring-boot-starter-logging to avoid SLF4J multiple providers issue
     api("org.springframework.boot:spring-boot-starter-web") {
@@ -18,28 +20,11 @@ dependencies {
         exclude(group = "ch.qos.logback", module = "logback-classic")
         exclude(group = "org.apache.logging.log4j", module = "log4j-to-slf4j")
     }
-    api("org.springframework.boot:spring-boot-starter-actuator") {
-        exclude(group = "org.springframework.boot", module = "spring-boot-starter-logging")
-        exclude(group = "ch.qos.logback", module = "logback-classic")
-        exclude(group = "org.apache.logging.log4j", module = "log4j-to-slf4j")
-    }
     api("org.springframework.boot:spring-boot-starter-security") {
         exclude(group = "org.springframework.boot", module = "spring-boot-starter-logging")
         exclude(group = "ch.qos.logback", module = "logback-classic")
         exclude(group = "org.apache.logging.log4j", module = "log4j-to-slf4j")
     }
-    api("org.springframework.boot:spring-boot-starter-data-redis") {
-        exclude(group = "org.springframework.boot", module = "spring-boot-starter-logging")
-        exclude(group = "ch.qos.logback", module = "logback-classic")
-        exclude(group = "org.apache.logging.log4j", module = "log4j-to-slf4j")
-    }
-
-    // Caffeine L1 cache + Spring context support for CaffeineCacheManager
-    api("com.github.ben-manes.caffeine:caffeine")
-    api("org.springframework:spring-context-support")
-
-    // Redisson (distributed lock + cache sync)
-    api("org.redisson:redisson")
 
     // OpenAPI / Swagger
     api("org.springdoc:springdoc-openapi-starter-webmvc-ui")
@@ -53,15 +38,9 @@ dependencies {
     api("org.springframework.boot:spring-boot-starter-log4j2") {
         exclude(group = "org.apache.logging.log4j", module = "log4j-to-slf4j")
     }
-    
+
     // Lombok
     compileOnly("org.projectlombok:lombok")
-
-    // Micrometer + OpenTelemetry
-    api("io.micrometer:micrometer-tracing")
-    api("io.micrometer:micrometer-tracing-bridge-otel")
-    api("io.micrometer:micrometer-registry-prometheus")
-    api("io.opentelemetry:opentelemetry-exporter-otlp")
 
     // AWS S3 SDK (文件存储)
     api("software.amazon.awssdk:s3")

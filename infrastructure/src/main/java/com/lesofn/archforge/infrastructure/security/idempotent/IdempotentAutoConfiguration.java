@@ -1,6 +1,6 @@
 package com.lesofn.archforge.infrastructure.security.idempotent;
 
-import com.lesofn.archforge.infrastructure.redisson.RedissonAutoConfiguration;
+import com.lesofn.archforge.starter.redisson.RedissonAutoConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;

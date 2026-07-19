@@ -1,6 +1,6 @@
 package com.lesofn.archforge.infrastructure.security.sign;
 
-import com.lesofn.archforge.infrastructure.redisson.RedissonAutoConfiguration;
+import com.lesofn.archforge.starter.redisson.RedissonAutoConfiguration;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
