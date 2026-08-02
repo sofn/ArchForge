@@ -1,7 +1,6 @@
 package com.lesofn.archforge.starter.cache;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
-import com.lesofn.archforge.starter.redisson.RedissonAutoConfiguration;
 import org.redisson.api.RedissonClient;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -23,7 +22,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 /**
  * Auto-configuration for the L1 (Caffeine) + L2 (Redis) composite cache.
  */
-@AutoConfiguration(after = RedissonAutoConfiguration.class)
+@AutoConfiguration(after = com.lesofn.archforge.starter.redisson.RedissonAutoConfiguration.class)
 @ConditionalOnProperty(prefix = "arch-forge.cache.composite", name = "enabled", havingValue = "true", matchIfMissing = true)
 @EnableConfigurationProperties(CacheProperties.class)
 @EnableCaching

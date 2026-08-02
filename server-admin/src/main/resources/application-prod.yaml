@@ -69,6 +69,12 @@ spring:
           password: ${DB_PASSWORD:archforge}
 
 management:
+  tracing:
+    enabled: true
+    sampling:
+      probability: ${SAMPLING_PROBABILITY:1.0}
+    otlp:
+      endpoint: ${OTEL_EXPORTER_OTLP_ENDPOINT:http://localhost:4318/v1/traces}
   endpoints:
     web:
       exposure:

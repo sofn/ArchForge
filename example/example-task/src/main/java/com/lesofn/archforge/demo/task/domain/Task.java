@@ -1,6 +1,8 @@
 package com.lesofn.archforge.demo.task.domain;
 
-import com.google.common.base.Preconditions;
+import com.lesofn.archforge.common.repository.BaseEntity;
+import com.lesofn.archforge.demo.task.errors.TaskErrorCode;
+import com.lesofn.archforge.demo.task.errors.TaskException;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -8,17 +10,18 @@ import lombok.*;
 @Setter
 @Getter
 @ToString
-@EqualsAndHashCode(of = "id")
+@EqualsAndHashCode(of = "id", callSuper = false)
 @NoArgsConstructor
 @Entity
 @Table(name = "task")
-public class Task {
+public class Task extends BaseEntity<Task> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Long id;
 
     public String title;
+
     public String description;
 
     @Column(name = "uid", nullable = false)
@@ -31,6 +34,20 @@ public class Task {
         this.title = title;
         this.description = description;
         this.uid = uid;
+    }
+
+    public static Task create(String title, String description, long uid) {
+        Task task = new Task(title, description, uid);
+        task.setDeleted(false);
+        return task;
+    }
+
+    public void updateInfo(String title, String description) {
+        if (this.status == TaskStatus.COMPLETED || this.status == TaskStatus.CANCELLED) {
+            throw new TaskException(TaskErrorCode.TASK_ALREADY_DONE);
+        }
+        this.title = title;
+        this.description = description;
     }
 
     public void start() {
@@ -46,19 +63,25 @@ public class Task {
     }
 
     public void reassign(long newUid) {
-        Preconditions.checkState(
-                this.status == TaskStatus.CREATED || this.status == TaskStatus.IN_PROGRESS,
-                "Cannot reassign task in status: %s",
-                this.status);
+        if (this.status == TaskStatus.COMPLETED || this.status == TaskStatus.CANCELLED) {
+            throw new TaskException(TaskErrorCode.TASK_ALREADY_DONE);
+        }
         this.uid = newUid;
     }
 
+    public void softDelete() {
+        if (this.status == TaskStatus.COMPLETED || this.status == TaskStatus.CANCELLED) {
+            throw new TaskException(TaskErrorCode.TASK_ALREADY_DONE);
+        }
+        setDeleted(true);
+    }
+
+    public boolean isDone() { return this.status == TaskStatus.COMPLETED || this.status == TaskStatus.CANCELLED; }
+
     private void transition(TaskStatus target) {
-        Preconditions.checkState(
-                this.status.canTransitionTo(target),
-                "Cannot transition from %s to %s",
-                this.status,
-                target);
+        if (!this.status.canTransitionTo(target)) {
+            throw new TaskException(TaskErrorCode.TASK_STATUS_TRANSITION_INVALID, this.status, target);
+        }
         this.status = target;
     }
 }

@@ -7,7 +7,6 @@ import com.lesofn.archforge.user.api.service.SysUserService;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -57,14 +56,11 @@ public class SysUserServiceImpl implements SysUserService {
 
     @Transactional
     public SysUser create(SysUser user) {
-        user.setCreateTime(LocalDateTime.now());
-        user.setDeleted(false);
         return userRepository.save(user);
     }
 
     @Transactional
     public SysUser update(SysUser user) {
-        user.setUpdateTime(LocalDateTime.now());
         return userRepository.save(user);
     }
 
@@ -79,14 +75,13 @@ public class SysUserServiceImpl implements SysUserService {
                 .ifPresent(
                         user -> {
                             updater.accept(user);
-                            user.setUpdateTime(LocalDateTime.now());
                             userRepository.save(user);
                         });
     }
 
     @Transactional
     public void softDeleteById(Long id) {
-        updateIfPresent(id, user -> user.setDeleted(true));
+        updateIfPresent(id, SysUser::markDeleted);
     }
 
     public boolean existsByUsername(String username) {
@@ -103,17 +98,12 @@ public class SysUserServiceImpl implements SysUserService {
 
     @Transactional
     public void updateLoginInfo(Long userId, String loginIp) {
-        updateIfPresent(
-                userId,
-                user -> {
-                    user.setLoginIp(loginIp);
-                    user.setLoginDate(LocalDateTime.now());
-                });
+        updateIfPresent(userId, user -> user.recordLogin(loginIp));
     }
 
     @Transactional
     public void resetPassword(Long userId, String newPassword) {
-        updateIfPresent(userId, user -> user.setPassword(newPassword));
+        updateIfPresent(userId, user -> user.changePassword(newPassword));
     }
 
     public Page<SysUser> searchUsers(SysUserQuery query, Pageable pageable) {
@@ -161,12 +151,12 @@ public class SysUserServiceImpl implements SysUserService {
 
     @Transactional
     public void updateStatus(Long userId, Integer status) {
-        updateIfPresent(userId, user -> user.setStatus(status));
+        updateIfPresent(userId, user -> user.updateStatus(status));
     }
 
     @Transactional
     public void updatePassword(Long userId, String newPassword) {
-        updateIfPresent(userId, user -> user.setPassword(newPassword));
+        updateIfPresent(userId, user -> user.changePassword(newPassword));
     }
 
     public List<SysUser> findActiveUsers() {

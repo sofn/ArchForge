@@ -1,7 +1,6 @@
 package com.lesofn.archforge.server.admin.service.login;
 
 import com.lesofn.archforge.common.enums.BasicEnumUtil;
-import com.lesofn.archforge.common.enums.common.UserStatusEnum;
 import com.lesofn.archforge.infrastructure.auth.model.SystemLoginUser;
 import com.lesofn.archforge.infrastructure.config.ArchForgeConfig;
 import com.lesofn.archforge.infrastructure.user.web.DataScopeEnum;
@@ -54,8 +53,8 @@ public class AdminUserDetailsService implements UserDetailsService {
             log.info("登录用户：{} 不存在.", username);
             throw new AdminUserException(AdminUserErrorCode.USER_NON_EXIST, username);
         }
-        if (!Objects.equals(UserStatusEnum.NORMAL.getValue(), user.getStatus())) {
-            log.info("登录用户：{} 已被停用.", username);
+        if (!user.canLogin()) {
+            log.info("登录用户：{} 已被停用或已删除.", username);
             throw new AdminUserException(AdminUserErrorCode.USER_IS_DISABLE, username);
         }
 

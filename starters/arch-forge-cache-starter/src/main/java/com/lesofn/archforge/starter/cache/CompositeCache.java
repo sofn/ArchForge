@@ -7,8 +7,8 @@ import org.springframework.cache.Cache;
  * Composite Cache: L1 (Caffeine) + L2 (Redis).
  *
  * <p>
- * Reads go L1 → L2; a miss in L1 but hit in L2 promotes the value back to L1.
- * Writes go L2 → L1, then broadcast an L1 invalidation so other instances reload
+ * Reads go L1 -> L2; a miss in L1 but hit in L2 promotes the value back to L1.
+ * Writes go L2 -> L1, then broadcast an L1 invalidation so other instances reload
  * from L2 lazily.
  */
 public class CompositeCache implements Cache {

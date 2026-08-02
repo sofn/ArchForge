@@ -1,29 +1,36 @@
 package com.lesofn.archforge.starter.redisson;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 import org.redisson.api.RBucket;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 
-@SpringBootTest
-@Import(RedisTestConfiguration.class)
-class RedissonAutoConfigurationTest {
+/**
+ * Integration test for {@link RedissonAutoConfiguration}.
+ */
+@SpringBootTest(classes = TestApplication.class)
+public class RedissonAutoConfigurationTest {
+
+    private final RedissonClient redissonClient;
 
     @Autowired
-    private RedissonClient redissonClient;
+    public RedissonAutoConfigurationTest(RedissonClient redissonClient) {
+        this.redissonClient = redissonClient;
+    }
 
     @Test
-    void shouldCreateRedissonClientAndReadWrite() {
-        assertThat(redissonClient).isNotNull();
+    public void testRedissonClientConnection() {
+        assertNotNull(redissonClient);
 
-        RBucket<String> bucket = redissonClient.getBucket("archforge:test:redisson");
-        bucket.set("ok");
+        RBucket<String> bucket = redissonClient.getBucket("test:key");
+        String expected = "test-value";
+        bucket.set(expected);
 
-        assertThat(bucket.get()).isEqualTo("ok");
+        String actual = bucket.get();
+        assertEquals(expected, actual);
 
         bucket.delete();
     }

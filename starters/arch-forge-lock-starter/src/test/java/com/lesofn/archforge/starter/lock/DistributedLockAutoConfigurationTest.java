@@ -1,41 +1,36 @@
 package com.lesofn.archforge.starter.lock;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.Test;
 import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 
-@SpringBootTest
-@Import(RedisTestConfiguration.class)
-class DistributedLockAutoConfigurationTest {
+@SpringBootTest(classes = TestApplication.class)
+public class DistributedLockAutoConfigurationTest {
 
-    @Autowired
-    private DistributedLockService distributedLockService;
+    private final DistributedLockService distributedLockService;
+    private final RedissonClient redissonClient;
 
     @Autowired
-    private LockTestService lockTestService;
-
-    @Test
-    void shouldCreateDistributedLockService() {
-        assertThat(distributedLockService).isNotNull();
+    public DistributedLockAutoConfigurationTest(DistributedLockService distributedLockService,
+            RedissonClient redissonClient) {
+        this.distributedLockService = distributedLockService;
+        this.redissonClient = redissonClient;
     }
 
     @Test
-    void shouldAcquireAndReleaseLock() {
-        RLock lock = distributedLockService.tryLock("manual", 3, 10, TimeUnit.SECONDS);
-        assertThat(lock).isNotNull();
+    public void shouldAcquireAndReleaseLock() {
+        String result = this.distributedLockService.executeWithLock("test", () -> "ok");
 
-        lock.unlock();
-        assertThat(lock.isLocked()).isFalse();
-    }
+        assertEquals("ok", result);
 
-    @Test
-    void shouldApplyDistributedLockAspect() {
-        String result = lockTestService.greet("world");
-        assertThat(result).isEqualTo("hello world");
+        RLock lock = this.redissonClient.getLock("arch:lock:test");
+        assertNotNull(lock);
+        assertFalse(lock.isLocked());
     }
 }

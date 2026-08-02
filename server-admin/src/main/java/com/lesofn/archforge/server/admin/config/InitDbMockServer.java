@@ -32,6 +32,7 @@ public class InitDbMockServer {
             log.info("开始初始化数据库数据...");
 
             DataSource userDs = new GroupDataSourceProxy(dataSource, "user");
+            DataSource taskDs = new GroupDataSourceProxy(dataSource, "task");
 
             ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
             populator.addScript(new ClassPathResource("sql/data-admin-user.sql"));
@@ -45,6 +46,7 @@ public class InitDbMockServer {
 
             // 重置 PostgreSQL 序列到最大 ID 之后
             resetSequences(userDs);
+            resetTaskSequences(taskDs);
 
             log.info("数据库数据初始化完成！");
         } catch (Exception e) {
@@ -97,6 +99,16 @@ public class InitDbMockServer {
             } catch (Exception e) {
                 log.warn("重置序列 {} 失败: {}", sequences[i], e.getMessage());
             }
+        }
+    }
+
+    private void resetTaskSequences(DataSource ds) {
+        JdbcTemplate jdbc = new JdbcTemplate(ds);
+        try {
+            jdbc.execute(
+                    "SELECT setval('task_id_seq', COALESCE((SELECT MAX(id) FROM task), 1))");
+        } catch (Exception e) {
+            log.warn("重置 task 序列失败: {}", e.getMessage());
         }
     }
 }

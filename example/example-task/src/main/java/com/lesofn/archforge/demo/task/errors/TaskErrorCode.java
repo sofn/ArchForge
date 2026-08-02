@@ -13,7 +13,9 @@ import lombok.Getter;
  */
 @Getter
 public enum TaskErrorCode implements ErrorCode {
-    TASK_NOT_EXISTS(1, "任务不存在");
+    TASK_NOT_EXISTS(1, "任务不存在"),
+    TASK_STATUS_TRANSITION_INVALID(2, "任务状态从{0}转换到{1}非法"),
+    TASK_ALREADY_DONE(3, "任务已完成或已取消，无法执行该操作");
 
     private final int nodeNum;
     private final String msg;

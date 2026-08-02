@@ -17,11 +17,4 @@ INSERT INTO sys_oper_log (oper_id, username, module, summary, ip, address, os_na
 INSERT INTO sys_login_log (info_id, username, ip, address, os_name, browser, status, behavior, login_time, creator_id, create_time, deleted) VALUES (1, 'admin', '127.0.0.1', '内网IP', 'Linux', 'Chrome', 1, '账号登录', '2025-01-01 08:00:00', 1, '2025-01-01 08:00:00', 0);
 INSERT INTO sys_login_log (info_id, username, ip, address, os_name, browser, status, behavior, login_time, creator_id, create_time, deleted) VALUES (2, 'ag1', '192.168.1.100', '内网IP', 'Windows', 'Firefox', 0, '账号登录', '2025-01-02 09:00:00', 2, '2025-01-02 09:00:00', 0);
 
--- 文件存储默认配置
-INSERT INTO sys_config (config_id, config_name, config_key, config_value, config_type, remark, creator_id, create_time, deleted) VALUES (5, '文件存储-存储类型', 'file.storage.type', 'local', 1, 'local 或 s3', 1, '2022-05-21 08:30:54', 0);
-INSERT INTO sys_config (config_id, config_name, config_key, config_value, config_type, remark, creator_id, create_time, deleted) VALUES (6, '文件存储-本地存储目录', 'file.storage.localDir', 'uploads', 1, '本地存储根目录', 1, '2022-05-21 08:30:54', 0);
-INSERT INTO sys_config (config_id, config_name, config_key, config_value, config_type, remark, creator_id, create_time, deleted) VALUES (7, '文件存储-S3 Endpoint', 'file.storage.s3.endpoint', 'http://localhost:9000', 1, 'S3 兼容服务地址', 1, '2022-05-21 08:30:54', 0);
-INSERT INTO sys_config (config_id, config_name, config_key, config_value, config_type, remark, creator_id, create_time, deleted) VALUES (8, '文件存储-S3 Access Key', 'file.storage.s3.accessKey', 'minioadmin', 1, 'S3 Access Key', 1, '2022-05-21 08:30:54', 0);
-INSERT INTO sys_config (config_id, config_name, config_key, config_value, config_type, remark, creator_id, create_time, deleted) VALUES (9, '文件存储-S3 Secret Key', 'file.storage.s3.secretKey', 'minioadmin', 1, 'S3 Secret Key', 1, '2022-05-21 08:30:54', 0);
-INSERT INTO sys_config (config_id, config_name, config_key, config_value, config_type, remark, creator_id, create_time, deleted) VALUES (10, '文件存储-S3 Bucket', 'file.storage.s3.bucket', 'archforge', 1, 'S3 Bucket 名称', 1, '2022-05-21 08:30:54', 0);
-INSERT INTO sys_config (config_id, config_name, config_key, config_value, config_type, remark, creator_id, create_time, deleted) VALUES (11, '文件存储-S3 Region', 'file.storage.s3.region', 'us-east-1', 1, 'S3 Region', 1, '2022-05-21 08:30:54', 0);
+

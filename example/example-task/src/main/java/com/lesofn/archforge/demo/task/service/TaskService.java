@@ -1,38 +1,159 @@
 package com.lesofn.archforge.demo.task.service;
 
+import static com.lesofn.archforge.demo.task.errors.TaskErrorCode.TASK_NOT_EXISTS;
+
 import com.lesofn.archforge.demo.task.dao.TaskDao;
 import com.lesofn.archforge.demo.task.domain.Task;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.lesofn.archforge.demo.task.domain.TaskStatus;
+import com.lesofn.archforge.demo.task.dto.*;
+import com.lesofn.archforge.demo.task.errors.TaskException;
+import jakarta.persistence.criteria.Predicate;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
-/** Authors: sofn Version: 1.0 Created at 2015-10-12 00:17. */
+/** Task application service */
 @Service
+@RequiredArgsConstructor
 public class TaskService {
-    private TaskDao taskDao;
 
-    public Task getTask(Long id) {
-        return taskDao.findById(id).orElse(null);
+    private final TaskDao taskDao;
+
+    public Optional<Task> getTask(Long id) {
+        return taskDao.findById(id);
     }
 
-    public void saveTask(Task entity) {
-        taskDao.save(entity);
+    public Task findById(Long id) {
+        return taskDao.findById(id).orElseThrow(() -> new TaskException(TASK_NOT_EXISTS));
     }
 
-    public boolean deleteTask(Long id) {
-        Task task = getTask(id);
-        if (task == null) {
-            return false;
+    @Transactional
+    public Long createTask(TaskCreateRequest request, Long uid) {
+        long ownerUid = uid != null ? uid : 0L;
+        Task task = Task.create(request.getTitle(), request.getDescription(), ownerUid);
+        Task saved = taskDao.save(task);
+        return saved.getId();
+    }
+
+    @Transactional
+    public Boolean updateTask(TaskUpdateRequest request) {
+        Task task = findById(request.getId());
+        task.updateInfo(request.getTitle(), request.getDescription());
+        if (request.getUid() != null) {
+            task.reassign(request.getUid());
         }
-        taskDao.deleteById(id);
+        taskDao.save(task);
         return true;
     }
 
-    public Page<Task> getTasksByPage(long uid, PageRequest request) {
+    @Transactional
+    public Boolean deleteTask(Long id) {
+        Task task = findById(id);
+        task.softDelete();
+        taskDao.save(task);
+        return true;
+    }
+
+    @Transactional
+    public Boolean startTask(Long id) {
+        Task task = findById(id);
+        task.start();
+        taskDao.save(task);
+        return true;
+    }
+
+    @Transactional
+    public Boolean completeTask(Long id) {
+        Task task = findById(id);
+        task.complete();
+        taskDao.save(task);
+        return true;
+    }
+
+    @Transactional
+    public Boolean cancelTask(Long id) {
+        Task task = findById(id);
+        task.cancel();
+        taskDao.save(task);
+        return true;
+    }
+
+    public TaskPageResult<TaskResponse> searchTasks(TaskListRequest request) {
+        int currentPage = request.getCurrentPage() != null && request.getCurrentPage() > 0
+                ? request.getCurrentPage()
+                : 1;
+        int pageSize = request.getPageSize() != null && request.getPageSize() > 0
+                ? request.getPageSize()
+                : 10;
+        Pageable pageable = PageRequest.of(currentPage - 1, pageSize);
+
+        TaskStatus statusFilter = parseStatus(request.getStatus());
+
+        Specification<Task> spec = (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            predicates.add(cb.equal(root.get("deleted"), false));
+            if (StringUtils.hasText(request.getTitle())) {
+                predicates.add(cb.like(
+                        root.get("title"),
+                        "%" + request.getTitle() + "%",
+                        '!'));
+            }
+            if (statusFilter != null) {
+                predicates.add(cb.equal(root.get("status"), statusFilter));
+            }
+            if (request.getUid() != null) {
+                predicates.add(cb.equal(root.get("uid"), request.getUid()));
+            }
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+
+        Page<Task> page = taskDao.findAll(spec, pageable);
+        List<TaskResponse> list = page.getContent().stream()
+                .map(this::toResponse)
+                .toList();
+        return TaskPageResult.of(list, page.getTotalElements(), pageSize, currentPage);
+    }
+
+    public Page<Task> getTasksByPage(long uid, Pageable request) {
         return taskDao.findByUid(uid, request);
     }
 
-    @Autowired
-    public void setTaskDao(TaskDao taskDao) { this.taskDao = taskDao; }
+    private TaskResponse toResponse(Task task) {
+        TaskResponse response = new TaskResponse();
+        response.setId(task.getId());
+        response.setTitle(task.getTitle());
+        response.setDescription(task.getDescription());
+        response.setStatus(task.getStatus().name());
+        response.setStatusLabel(task.getStatus().getLabel());
+        response.setUid(task.getUid());
+        response.setCreateTime(toEpochMilli(task.getCreateTime()));
+        return response;
+    }
+
+    private Long toEpochMilli(java.time.LocalDateTime dateTime) {
+        if (dateTime == null) {
+            return null;
+        }
+        return dateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+    }
+
+    private TaskStatus parseStatus(String status) {
+        if (!StringUtils.hasText(status)) {
+            return null;
+        }
+        try {
+            return TaskStatus.valueOf(status);
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
+    }
 }

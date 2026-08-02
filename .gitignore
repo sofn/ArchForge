@@ -43,6 +43,9 @@ IFLOW.md
 # Git worktrees
 .worktrees/
 
+# Claude local settings
+.claude/settings.local.json
+
 # Runtime upload directory
 uploads/
 server-admin/uploads/

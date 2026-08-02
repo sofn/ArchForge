@@ -129,3 +129,43 @@ arch-forge:
   file-storage:
     type: local
     local-dir: uploads
+    max-file-size: 10485760
+    allowed-extensions:
+      - jpg
+      - jpeg
+      - png
+      - gif
+      - webp
+      - bmp
+      - svg
+      - pdf
+      - doc
+      - docx
+      - xls
+      - xlsx
+      - ppt
+      - pptx
+      - txt
+      - csv
+      - zip
+      - rar
+      - 7z
+      - mp3
+      - mp4
+      - avi
+      - mov
+      - json
+      - xml
+    blocked-mime-types:
+      - application/x-msdownload
+      - application/x-sh
+      - application/x-executable
+      - application/x-ms-installer
+      - application/x-bat
+      - application/javascript
+    s3:
+      endpoint: http://localhost:9000
+      access-key: minioadmin
+      secret-key: minioadmin
+      bucket: archforge
+      region: us-east-1

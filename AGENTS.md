@@ -15,6 +15,11 @@ For every new requirement:
 5. **Verify before push** — run `./gradlew server-admin:bootRun` to confirm startup
 6. **Push codeplans repo** after completion
 
+## Agent Loop Files
+
+- Do NOT create or keep `.agent-loop/` inside this repository.
+- Place all agent-loop related files in `/home/sofn/code/sofn/codeplans/ArchForge/.agent-loop/`.
+
 ## Verification Checklist
 
 Before claiming work is complete:

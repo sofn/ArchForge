@@ -103,6 +103,9 @@ dependencies {
 
         // Redisson (distributed lock + cache sync)
         api("org.redisson:redisson:3.52.0")
+
+        // ArchUnit (architecture testing)
+        api("com.tngtech.archunit:archunit:1.3.0")
     }
 }
 

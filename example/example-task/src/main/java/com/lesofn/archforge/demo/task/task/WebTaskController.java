@@ -2,7 +2,7 @@ package com.lesofn.archforge.demo.task.task;
 
 import com.lesofn.archforge.demo.task.domain.Task;
 import com.lesofn.archforge.demo.task.service.TaskService;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,11 +16,11 @@ import org.springframework.web.bind.annotation.RequestParam;
  * Authors: sofn Version: 1.0 Created at 2015-10-22 00:11.
  */
 @Controller
+@RequiredArgsConstructor
 @RequestMapping("/web/task")
 public class WebTaskController {
 
-    @Resource
-    private TaskService taskService;
+    private final TaskService taskService;
 
     @RequestMapping(method = RequestMethod.GET)
     public String list() {
@@ -31,7 +31,7 @@ public class WebTaskController {
     public String save(@RequestParam(required = false, defaultValue = "0") long id, Model model) {
         Task task = null;
         if (id > 0) {
-            task = taskService.getTask(id);
+            task = taskService.getTask(id).orElse(null);
         }
         model.addAttribute("task", task);
         return "task/save";

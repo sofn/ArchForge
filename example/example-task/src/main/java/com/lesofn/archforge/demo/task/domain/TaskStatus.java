@@ -2,10 +2,18 @@ package com.lesofn.archforge.demo.task.domain;
 
 /** Task lifecycle state machine */
 public enum TaskStatus {
-    CREATED,
-    IN_PROGRESS,
-    COMPLETED,
-    CANCELLED;
+    CREATED("待处理"),
+    IN_PROGRESS("进行中"),
+    COMPLETED("已完成"),
+    CANCELLED("已取消");
+
+    private final String label;
+
+    TaskStatus(String label) {
+        this.label = label;
+    }
+
+    public String getLabel() { return label; }
 
     public boolean canTransitionTo(TaskStatus target) {
         return switch (this) {

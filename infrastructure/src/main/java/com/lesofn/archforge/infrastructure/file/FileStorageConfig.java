@@ -6,10 +6,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * 文件存储配置，根据 arch-forge.file-storage.type 选择 local 或 s3 实现
+ * 文件存储配置，根据 arch-forge.file-storage.type 选择 local 或 s3 实现。
  *
  * <p>
- * 使用 {@link AdaptiveFileStorageService} 包装，支持启动时从 sys_config 重新加载配置。
+ * 所有文件存储参数均通过 {@code arch-forge.file-storage.*} 配置项注入，不再从 sys_config 读取。
  *
  * @author sofn
  */

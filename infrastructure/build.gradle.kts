@@ -1,9 +1,9 @@
+// Java 21
+
 dependencies {
-    // 依赖 common 基础模块
+    // 依赖 common 基础模块与可复用 starter
     api(project(":common:common-base"))
     api(project(":common:common-jpa"))
-
-    // 复用能力 starter
     api(project(":starters:arch-forge-redisson-starter"))
     api(project(":starters:arch-forge-trace-starter"))
 

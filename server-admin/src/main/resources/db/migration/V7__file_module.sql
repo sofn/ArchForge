@@ -20,37 +20,8 @@ CREATE TABLE IF NOT EXISTS sys_file
     deleted       INT DEFAULT 0 NOT NULL
 );
 
--- 为 sys_config 的 config_key 增加唯一约束，便于 ON CONFLICT 处理
+-- 为 sys_config 的 config_key 增加唯一约束
 CREATE UNIQUE INDEX IF NOT EXISTS uq_sys_config_config_key ON sys_config (config_key);
-
--- 文件存储默认配置
-INSERT INTO sys_config (config_name, config_key, config_value, config_type, remark, creator_id, create_time, deleted)
-VALUES ('文件存储-存储类型', 'file.storage.type', 'local', 1, 'local 或 s3', 1, NOW(), 0)
-ON CONFLICT (config_key) DO NOTHING;
-
-INSERT INTO sys_config (config_name, config_key, config_value, config_type, remark, creator_id, create_time, deleted)
-VALUES ('文件存储-本地存储目录', 'file.storage.localDir', 'uploads', 1, '本地存储根目录', 1, NOW(), 0)
-ON CONFLICT (config_key) DO NOTHING;
-
-INSERT INTO sys_config (config_name, config_key, config_value, config_type, remark, creator_id, create_time, deleted)
-VALUES ('文件存储-S3 Endpoint', 'file.storage.s3.endpoint', 'http://localhost:9000', 1, 'S3 兼容服务地址', 1, NOW(), 0)
-ON CONFLICT (config_key) DO NOTHING;
-
-INSERT INTO sys_config (config_name, config_key, config_value, config_type, remark, creator_id, create_time, deleted)
-VALUES ('文件存储-S3 Access Key', 'file.storage.s3.accessKey', 'minioadmin', 1, 'S3 Access Key', 1, NOW(), 0)
-ON CONFLICT (config_key) DO NOTHING;
-
-INSERT INTO sys_config (config_name, config_key, config_value, config_type, remark, creator_id, create_time, deleted)
-VALUES ('文件存储-S3 Secret Key', 'file.storage.s3.secretKey', 'minioadmin', 1, 'S3 Secret Key', 1, NOW(), 0)
-ON CONFLICT (config_key) DO NOTHING;
-
-INSERT INTO sys_config (config_name, config_key, config_value, config_type, remark, creator_id, create_time, deleted)
-VALUES ('文件存储-S3 Bucket', 'file.storage.s3.bucket', 'archforge', 1, 'S3 Bucket 名称', 1, NOW(), 0)
-ON CONFLICT (config_key) DO NOTHING;
-
-INSERT INTO sys_config (config_name, config_key, config_value, config_type, remark, creator_id, create_time, deleted)
-VALUES ('文件存储-S3 Region', 'file.storage.s3.region', 'us-east-1', 1, 'S3 Region', 1, NOW(), 0)
-ON CONFLICT (config_key) DO NOTHING;
 
 -- 文件管理菜单
 INSERT INTO sys_menu (menu_id, menu_name, menu_type, router_name, parent_id, path, is_button, permission, meta_info, status, remark, creator_id, create_time, deleted)

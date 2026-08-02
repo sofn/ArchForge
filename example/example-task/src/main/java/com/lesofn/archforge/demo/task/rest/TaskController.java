@@ -1,67 +1,68 @@
 package com.lesofn.archforge.demo.task.rest;
 
-import static com.lesofn.archforge.demo.task.errors.TaskErrorCode.TASK_NOT_EXISTS;
-
-import com.lesofn.archforge.demo.task.domain.Task;
-import com.lesofn.archforge.demo.task.errors.TaskException;
+import com.lesofn.archforge.demo.task.dto.*;
 import com.lesofn.archforge.demo.task.service.TaskService;
 import com.lesofn.archforge.infrastructure.frame.context.RequestContext;
-import jakarta.annotation.Resource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 
-/** Authors: sofn Version: 1.0 Created at 2015-10-12 00:18. */
+/** Task management REST API */
+@Slf4j
+@Tag(name = "任务管理")
+@PreAuthorize("hasRole('ADMIN')")
 @RestController
+@CrossOrigin
+@RequiredArgsConstructor
 @RequestMapping("/task")
 public class TaskController {
-    private static Logger logger = LoggerFactory.getLogger(TaskController.class);
 
-    @Resource
-    private TaskService taskService;
+    private final TaskService taskService;
 
-    @RequestMapping(value = "/list", method = RequestMethod.GET)
-    public Page<Task> list(
-            RequestContext rc,
-            @RequestParam(required = false, defaultValue = "1") int page,
-            @RequestParam(value = "pagesize", required = false, defaultValue = "10") int pageSize) {
-        PageRequest request = PageRequest.of(page - 1, pageSize);
-        return taskService.getTasksByPage(rc.getCurrentUid(), request);
+    @Operation(summary = "获取任务列表")
+    @PostMapping
+    public TaskPageResult<TaskResponse> list(
+            RequestContext rc, @RequestBody @Valid TaskListRequest request) {
+        return taskService.searchTasks(request);
     }
 
-    @RequestMapping(value = "/get", method = RequestMethod.GET)
-    public Task get(@RequestParam("id") Long id) {
-        Task task = taskService.getTask(id);
-        if (task == null) {
-            String message = "任务不存在(id:" + id + ")";
-            logger.warn(message);
-            throw new TaskException(TASK_NOT_EXISTS);
-        }
-        return task;
+    @Operation(summary = "创建任务")
+    @PostMapping("/create")
+    public Long create(RequestContext rc, @RequestBody @Valid TaskCreateRequest request) {
+        return taskService.createTask(request, request.getUid() != null ? request.getUid() : rc.getCurrentUid());
     }
 
-    @RequestMapping(value = "/save", method = RequestMethod.POST)
-    public long save(
-            RequestContext rc,
-            @RequestParam(required = false, defaultValue = "0") long id,
-            @RequestParam String title,
-            @RequestParam String desc) {
-        Task task = new Task(title, desc, rc.getCurrentUid());
-        if (id > 0) {
-            task.setId(id);
-        }
-        // 保存任务,没有则创建,有则更新
-        taskService.saveTask(task);
-        return task.getId();
+    @Operation(summary = "更新任务")
+    @PutMapping("/update")
+    public Boolean update(@RequestBody @Valid TaskUpdateRequest request) {
+        return taskService.updateTask(request);
     }
 
-    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    public boolean delete(@RequestParam("id") Long id) {
-        return taskService.deleteTask(id);
+    @Operation(summary = "删除任务")
+    @PostMapping("/delete")
+    public Boolean delete(@RequestBody @Valid TaskDeleteRequest request) {
+        return taskService.deleteTask(request.getId());
+    }
+
+    @Operation(summary = "开始任务")
+    @PostMapping("/start")
+    public Boolean start(@RequestBody @Valid TaskActionRequest request) {
+        return taskService.startTask(request.getId());
+    }
+
+    @Operation(summary = "完成任务")
+    @PostMapping("/complete")
+    public Boolean complete(@RequestBody @Valid TaskActionRequest request) {
+        return taskService.completeTask(request.getId());
+    }
+
+    @Operation(summary = "取消任务")
+    @PostMapping("/cancel")
+    public Boolean cancel(@RequestBody @Valid TaskActionRequest request) {
+        return taskService.cancelTask(request.getId());
     }
 }

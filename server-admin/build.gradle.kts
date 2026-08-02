@@ -82,8 +82,7 @@ dependencies {
     api(project(":common:common-base"))
     api(project(":common:common-jpa"))
     api(project(":infrastructure"))
-    api(project(":domain:admin-user-api"))
-    implementation(project(":domain:admin-user"))
+    api(project(":domain:admin-user"))
     api(project(":example:example-task"))
 
     // 排除logback，使用log4j2
@@ -142,6 +141,9 @@ dependencies {
     // Spring Modulith verification and documentation
     testImplementation("org.springframework.modulith:spring-modulith-test")
     testImplementation("org.springframework.modulith:spring-modulith-docs")
+
+    // ArchUnit architecture tests
+    testImplementation("com.tngtech.archunit:archunit")
 }
 
 // jlink: 生成最小化 JRE (Spring Boot Web + Actuator + JPA 所需模块)

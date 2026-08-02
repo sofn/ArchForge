@@ -131,7 +131,7 @@ public class UserServiceImpl implements UserService {
         if (user.getRemark() == null) {
             user.setRemark("");
         }
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.prepareForCreate(passwordEncoder.encode(request.getPassword()));
         SysUser saved = sysUserService.create(user);
         return saved.getUserId();
     }
@@ -143,29 +143,18 @@ public class UserServiceImpl implements UserService {
             return false;
         }
         SysUser user = opt.get();
+        user.updateProfile(
+                request.getNickname(),
+                request.getPhone(),
+                request.getEmail(),
+                request.getSex() != null ? GenderEnum.fromValue(request.getSex()) : null,
+                request.getRemark(),
+                request.getParentId());
+        if (request.getStatus() != null) {
+            user.updateStatus(request.getStatus());
+        }
         if (request.getUsername() != null) {
             user.setUsername(request.getUsername());
-        }
-        if (request.getNickname() != null) {
-            user.setNickname(request.getNickname());
-        }
-        if (request.getPhone() != null) {
-            user.setPhoneNumber(request.getPhone());
-        }
-        if (request.getEmail() != null) {
-            user.setEmail(request.getEmail());
-        }
-        if (request.getSex() != null) {
-            user.setSex(GenderEnum.fromValue(request.getSex()));
-        }
-        if (request.getStatus() != null) {
-            user.setStatus(request.getStatus());
-        }
-        if (request.getRemark() != null) {
-            user.setRemark(request.getRemark());
-        }
-        if (request.getParentId() != null) {
-            user.setDeptId(request.getParentId());
         }
         sysUserService.update(user);
         return true;
@@ -198,7 +187,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Boolean resetPassword(UserPasswordRequest request) {
-        sysUserService.resetPassword(request.getId(), passwordEncoder.encode(request.getNewPwd()));
+        Optional<SysUser> opt = sysUserService.findById(request.getId());
+        if (opt.isPresent()) {
+            SysUser user = opt.get();
+            user.changePassword(passwordEncoder.encode(request.getNewPwd()));
+            sysUserService.update(user);
+        }
         return true;
     }
 
@@ -210,7 +204,7 @@ public class UserServiceImpl implements UserService {
             Optional<SysUser> opt = sysUserService.findById(request.getId());
             if (opt.isPresent()) {
                 SysUser user = opt.get();
-                user.setRoleId(roleId);
+                user.assignRole(roleId);
                 sysUserService.update(user);
             }
         }
