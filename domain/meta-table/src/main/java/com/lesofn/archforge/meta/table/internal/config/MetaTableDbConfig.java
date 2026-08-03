@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.sql.DataSource;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
@@ -33,6 +34,9 @@ import org.springframework.transaction.PlatformTransactionManager;
         transactionManagerRef = "metaTableTransactionManager")
 public class MetaTableDbConfig {
 
+    @Value("${spring.jpa.hibernate.ddl-auto:none}")
+    private String ddlAuto;
+
     private final DataSource dataSource;
 
     private DataSource metaDataSource() {
@@ -49,7 +53,7 @@ public class MetaTableDbConfig {
     @Bean
     LocalContainerEntityManagerFactoryBean metaTableEntityManagerFactory() {
         HibernateJpaVendorAdapter jpaVendorAdapter = new HibernateJpaVendorAdapter();
-        jpaVendorAdapter.setGenerateDdl(false);
+        jpaVendorAdapter.setGenerateDdl(true);
         jpaVendorAdapter.setShowSql(false);
         jpaVendorAdapter.setDatabasePlatform("org.hibernate.dialect.PostgreSQLDialect");
 
@@ -62,7 +66,7 @@ public class MetaTableDbConfig {
                 "com.lesofn.archforge.common.repository.converter");
 
         Map<String, Object> properties = new HashMap<>();
-        properties.put("hibernate.hbm2ddl.auto", "none");
+        properties.put("hibernate.hbm2ddl.auto", ddlAuto);
         properties.put("hibernate.dialect", "org.hibernate.dialect.PostgreSQLDialect");
         properties.put(
                 "hibernate.physical_naming_strategy",

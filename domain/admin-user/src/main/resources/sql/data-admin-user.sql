@@ -160,3 +160,23 @@ INSERT INTO  sys_role_menu (role_id, menu_id) VALUES (2, 74);
 INSERT INTO  sys_role_menu (role_id, menu_id) VALUES (2, 75);
 INSERT INTO  sys_role_menu (role_id, menu_id) VALUES (2, 76);
 INSERT INTO  sys_role_menu (role_id, menu_id) VALUES (2, 77);
+
+-- 元表格菜单
+INSERT INTO  sys_menu (menu_id, menu_name, menu_type, router_name, parent_id, path, is_button, permission, meta_info, status, remark, creator_id, create_time, updater_id, update_time, deleted) VALUES (80, '元表格', 1, 'MetaTable', 0, '/meta-table/index', 0, 'meta:table:list', '{"title":"元表格","icon":"ri:table-3","showParent":true,"rank":5}', 1, '元表格菜单', 1, '2022-05-21 08:30:54', 1, '2022-05-21 08:30:54', 0);
+INSERT INTO  sys_menu (menu_id, menu_name, menu_type, router_name, parent_id, path, is_button, permission, meta_info, status, remark, creator_id, create_time, updater_id, update_time, deleted) VALUES (81, '元表格查询', 0, ' ', 80, '', 1, 'meta:table:query', '{"title":"元表格查询"}', 1, '', 1, '2022-05-21 08:30:54', 1, '2022-05-21 08:30:54', 0);
+INSERT INTO  sys_menu (menu_id, menu_name, menu_type, router_name, parent_id, path, is_button, permission, meta_info, status, remark, creator_id, create_time, updater_id, update_time, deleted) VALUES (82, '元表格新增', 0, ' ', 80, '', 1, 'meta:table:add', '{"title":"元表格新增"}', 1, '', 1, '2022-05-21 08:30:54', 1, '2022-05-21 08:30:54', 0);
+INSERT INTO  sys_menu (menu_id, menu_name, menu_type, router_name, parent_id, path, is_button, permission, meta_info, status, remark, creator_id, create_time, updater_id, update_time, deleted) VALUES (83, '元表格修改', 0, ' ', 80, '', 1, 'meta:table:edit', '{"title":"元表格修改"}', 1, '', 1, '2022-05-21 08:30:54', 1, '2022-05-21 08:30:54', 0);
+INSERT INTO  sys_menu (menu_id, menu_name, menu_type, router_name, parent_id, path, is_button, permission, meta_info, status, remark, creator_id, create_time, updater_id, update_time, deleted) VALUES (84, '元表格删除', 0, ' ', 80, '', 1, 'meta:table:remove', '{"title":"元表格删除"}', 1, '', 1, '2022-05-21 08:30:54', 1, '2022-05-21 08:30:54', 0);
+INSERT INTO  sys_menu (menu_id, menu_name, menu_type, router_name, parent_id, path, is_button, permission, meta_info, status, remark, creator_id, create_time, updater_id, update_time, deleted) VALUES (85, '元表格导出', 0, ' ', 80, '', 1, 'meta:table:export', '{"title":"元表格导出"}', 1, '', 1, '2022-05-21 08:30:54', 1, '2022-05-21 08:30:54', 0);
+INSERT INTO  sys_menu (menu_id, menu_name, menu_type, router_name, parent_id, path, is_button, permission, meta_info, status, remark, creator_id, create_time, updater_id, update_time, deleted) VALUES (86, '元表格设计', 0, ' ', 80, '', 1, 'meta:table:design', '{"title":"元表格设计"}', 1, '', 1, '2022-05-21 08:30:54', 1, '2022-05-21 08:30:54', 0);
+INSERT INTO  sys_menu (menu_id, menu_name, menu_type, router_name, parent_id, path, is_button, permission, meta_info, status, remark, creator_id, create_time, updater_id, update_time, deleted) VALUES (87, '元表格数据', 0, ' ', 80, '', 1, 'meta:table:data', '{"title":"元表格数据"}', 1, '', 1, '2022-05-21 08:30:54', 1, '2022-05-21 08:30:54', 0);
+
+-- 把元表格菜单权限赋给管理员角色
+INSERT INTO sys_role_menu (role_id, menu_id) VALUES (1, 80);
+INSERT INTO sys_role_menu (role_id, menu_id) VALUES (1, 81);
+INSERT INTO sys_role_menu (role_id, menu_id) VALUES (1, 82);
+INSERT INTO sys_role_menu (role_id, menu_id) VALUES (1, 83);
+INSERT INTO sys_role_menu (role_id, menu_id) VALUES (1, 84);
+INSERT INTO sys_role_menu (role_id, menu_id) VALUES (1, 85);
+INSERT INTO sys_role_menu (role_id, menu_id) VALUES (1, 86);
+INSERT INTO sys_role_menu (role_id, menu_id) VALUES (1, 87);
