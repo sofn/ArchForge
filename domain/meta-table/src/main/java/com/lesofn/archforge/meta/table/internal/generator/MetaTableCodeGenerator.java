@@ -7,6 +7,7 @@ import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateExceptionHandler;
 import java.io.IOException;
+import org.springframework.stereotype.Component;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
@@ -21,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+@Component
 public class MetaTableCodeGenerator {
 
     private static final String TEMPLATE_DIR = "/templates/codegen";
@@ -28,7 +30,7 @@ public class MetaTableCodeGenerator {
 
     private final Configuration configuration;
 
-    public MetaTableCodeGenerator() throws IOException {
+    public MetaTableCodeGenerator() {
         this.configuration = new Configuration(Configuration.VERSION_2_3_33);
         this.configuration.setDefaultEncoding(ENCODING);
         this.configuration.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);

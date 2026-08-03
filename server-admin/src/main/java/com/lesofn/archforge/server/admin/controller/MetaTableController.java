@@ -7,9 +7,16 @@ import com.lesofn.archforge.meta.table.api.domain.MetaTable;
 import com.lesofn.archforge.meta.table.api.dto.MetaPageResult;
 import com.lesofn.archforge.meta.table.api.service.MetaTableAdminService;
 import com.lesofn.archforge.meta.table.api.service.MetaTableCrudService;
+import com.lesofn.archforge.meta.table.internal.generator.CodeGenOptions;
+import com.lesofn.archforge.meta.table.internal.generator.GeneratedResult;
+import com.lesofn.archforge.meta.table.internal.generator.MetaTableCodeGenerator;
 import com.lesofn.archforge.server.admin.dto.AdminPageResult;
 import com.lesofn.archforge.server.admin.dto.MetaTableResponse;
 import com.lesofn.archforge.server.admin.dto.request.MetaDataListRequest;
+import com.lesofn.archforge.server.admin.dto.request.MetaTableGenerateRequest;
+import com.lesofn.archforge.server.admin.dto.response.MetaTableGenerateResponse;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import com.lesofn.archforge.server.admin.dto.request.MetaTableCreateRequest;
 import com.lesofn.archforge.server.admin.dto.request.MetaTableListRequest;
 import com.lesofn.archforge.server.admin.dto.request.MetaTableUpdateRequest;
@@ -49,6 +56,7 @@ public class MetaTableController {
 
     private final MetaTableAdminService metaTableAdminService;
     private final MetaTableCrudService metaTableCrudService;
+    private final MetaTableCodeGenerator metaTableCodeGenerator;
 
     @Operation(summary = "获取元表格列表")
     @PostMapping
@@ -103,6 +111,45 @@ public class MetaTableController {
     @PostMapping("/{id}/copy")
     public Long copy(@PathVariable Long id) {
         return metaTableAdminService.copy(id);
+    }
+
+    @Log
+    @Operation(summary = "生成元表格代码")
+    @PostMapping("/{id}/generate")
+    public MetaTableGenerateResponse generate(@PathVariable Long id, @RequestBody @Valid MetaTableGenerateRequest request) {
+        MetaTable table = metaTableAdminService.findById(id);
+        List<MetaColumn> columns = metaTableAdminService.findColumns(id);
+
+        String tableCode = table.getTableCode();
+        String backendDir = request.getBackendDir();
+        if (backendDir == null || backendDir.isBlank()) {
+            backendDir = "example/" + tableCode;
+        }
+        String frontendDir = request.getFrontendDir();
+        if (frontendDir == null || frontendDir.isBlank()) {
+            frontendDir = "src/views/" + tableCode;
+        }
+        String basePath = request.getBasePath();
+        if (basePath == null || basePath.isBlank()) {
+            basePath = "/generated/" + tableCode;
+        }
+        boolean overwrite = Boolean.TRUE.equals(request.getOverwrite());
+
+        Path projectRoot = Paths.get(System.getProperty("user.dir"));
+        CodeGenOptions options = new CodeGenOptions();
+        options.setProjectRoot(projectRoot);
+        options.setBackendOutputDir(Paths.get(backendDir));
+        options.setFrontendOutputDir(Paths.get(frontendDir));
+        options.setBasePath(basePath);
+        options.setOverwrite(overwrite);
+
+        GeneratedResult result = metaTableCodeGenerator.generate(table, columns, options);
+
+        MetaTableGenerateResponse response = new MetaTableGenerateResponse();
+        response.setBackendDir(result.getBackendDir().toString());
+        response.setFrontendDir(result.getFrontendDir().toString());
+        response.setFiles(result.getFiles().size());
+        return response;
     }
 
     @Operation(summary = "检查删除元表格")
