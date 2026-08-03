@@ -4,11 +4,9 @@ import com.lesofn.archforge.meta.table.api.domain.MetaColumn;
 import com.lesofn.archforge.meta.table.api.domain.MetaTable;
 import com.lesofn.archforge.meta.table.api.service.MetaTableAdminService;
 import com.lesofn.archforge.meta.table.internal.generator.CodeGenOptions;
-import com.lesofn.archforge.meta.table.internal.generator.CodeGenModelFactory;
 import com.lesofn.archforge.meta.table.internal.generator.GeneratedResult;
 import com.lesofn.archforge.meta.table.internal.generator.MetaTableCodeGenerator;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +30,7 @@ public class MetaTableGenerateCliRunner implements CommandLineRunner {
     private final Environment environment;
     private final MetaTableAdminService metaTableAdminService;
     private final MetaTableCodeGenerator metaTableCodeGenerator;
+    private final CodeGenWorkspaceResolver codeGenWorkspaceResolver;
 
     @Override
     public void run(String... args) {
@@ -40,16 +39,19 @@ public class MetaTableGenerateCliRunner implements CommandLineRunner {
         List<MetaColumn> columns = metaTableAdminService.findColumns(tableId);
 
         String tableCode = table.getTableCode();
-        String backendDir = environment.getProperty("generate.backendDir", "example/" + tableCode);
-        String frontendDir = environment.getProperty("generate.frontendDir", "src/views/" + tableCode);
+        String backendDirProp = environment.getProperty("generate.backendDir");
+        String frontendDirProp = environment.getProperty("generate.frontendDir");
         String basePath = environment.getProperty("generate.basePath", "/generated/" + tableCode);
         boolean overwrite = Boolean.parseBoolean(environment.getProperty("generate.overwrite", "false"));
 
-        Path projectRoot = Paths.get(System.getProperty("user.dir"));
+        Path projectRoot = codeGenWorkspaceResolver.resolve();
+        Path backendDir = codeGenWorkspaceResolver.resolveBackendDir(backendDirProp, tableCode);
+        Path frontendDir = codeGenWorkspaceResolver.resolveFrontendDir(frontendDirProp, tableCode);
+
         CodeGenOptions options = new CodeGenOptions();
         options.setProjectRoot(projectRoot);
-        options.setBackendOutputDir(Paths.get(backendDir));
-        options.setFrontendOutputDir(Paths.get(frontendDir));
+        options.setBackendOutputDir(backendDir);
+        options.setFrontendOutputDir(frontendDir);
         options.setBasePath(basePath);
         options.setOverwrite(overwrite);
 
