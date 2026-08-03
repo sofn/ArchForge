@@ -32,7 +32,11 @@ include("server-admin")
 include("domain:admin-user")
 include("domain:meta-table")
 
-include("example:example-task")
+file("example").listFiles()?.filter {
+    it.isDirectory && File(it, "build.gradle.kts").exists()
+}?.forEach { dir ->
+    include("example:${dir.name}")
+}
 
 include("starters:arch-forge-redisson-starter")
 include("starters:arch-forge-cache-starter")

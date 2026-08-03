@@ -3,6 +3,8 @@ dependencies {
     api(project(":common:common-jpa"))
     api(project(":infrastructure"))
 
+    implementation("org.freemarker:freemarker")
+
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
     annotationProcessor("org.hibernate.orm:hibernate-processor:7.4.1.Final")

@@ -106,6 +106,9 @@ dependencies {
 
         // ArchUnit (architecture testing)
         api("com.tngtech.archunit:archunit:1.3.0")
+
+        // FreeMarker (template engine for code generation)
+        api("org.freemarker:freemarker:2.3.33")
     }
 }
 
