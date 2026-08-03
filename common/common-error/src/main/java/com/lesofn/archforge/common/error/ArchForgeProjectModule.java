@@ -13,7 +13,8 @@ import lombok.Getter;
 public enum ArchForgeProjectModule implements ProjectModule {
     ADMIN_AUTH("ArchForge-Admin", 1, "后台认证", 1),
     ADMIN_USER("ArchForge-Admin", 1, "后台用户", 2),
-    TASK("ArchForge-Admin", 1, "后台Task示例", 3);
+    TASK("ArchForge-Admin", 1, "后台Task示例", 3),
+    META_TABLE("ArchForge-Admin", 1, "元表格", 4);
 
     final String projectName;
     final int projectCode;
