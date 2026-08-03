@@ -184,6 +184,7 @@ public class MetaTableCodeGenerator {
         templateToPath.put("test-application.java.ftl", "src/test/java/" + packagePath + "/GeneratedTestApplication.java");
         templateToPath.put("integration-test.java.ftl", "src/test/java/" + packagePath + "/" + entityName +
                 "IntegrationTest.java");
+        templateToPath.put("db-config.java.ftl", "src/main/java/" + packagePath + "/config/" + entityName + "DbConfig.java");
 
         return renderAll(backendDir, templateToPath, model);
     }

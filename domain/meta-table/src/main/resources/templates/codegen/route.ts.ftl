@@ -6,7 +6,7 @@ export default {
   meta: {
     icon: "ri/table-line",
     title: "${tableName}",
-    rank: ${moduleCode}
+    rank: ${moduleCode?c}
   },
   children: [
     {

@@ -46,7 +46,7 @@ defineExpose({ getRef });
 <#elseif col.isInteger || col.isDecimal>
       <el-input-number
         v-model="form.${col.fieldName}"
-        :precision="<#if col.isDecimal>${col.scale}<#else>0</#if>"
+        :precision="<#if col.isDecimal>${col.scale?c}<#else>0</#if>"
         placeholder="请输入${col.columnName}"
         class="w-full"
       />

@@ -58,7 +58,7 @@ dependencies {
         api("org.junit.jupiter:junit-jupiter-engine:6.0.3")
         // Testcontainers
         api("org.testcontainers:testcontainers:2.0.5")
-        api("org.testcontainers:junit-jupiter:2.0.5")
+        api("org.testcontainers:testcontainers-junit-jupiter:2.0.5")
         api("org.testcontainers:testcontainers-postgresql:2.0.5")
         // Spock 2.4 with Groovy 5.0
         api("org.spockframework:spock-core:2.4-groovy-5.0")

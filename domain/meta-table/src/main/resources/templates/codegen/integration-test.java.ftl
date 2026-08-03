@@ -9,22 +9,30 @@ import ${packageBase}.service.${entityName}Service;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.transaction.annotation.Transactional;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.postgresql.PostgreSQLContainer;
 import static org.assertj.core.api.Assertions.assertThat;
 
-<#macro defaultValue col>
-<#if col.isString || col.isText || col.isJson || col.isFile>"测试"</#if>
-<#if col.isInteger>1L</#if>
-<#if col.isDecimal>new BigDecimal("1.00")</#if>
-<#if col.isBoolean>true</#if>
-<#if col.isDate>LocalDate.now()</#if>
-<#if col.isDateTime>LocalDateTime.now()</#if>
-<#if col.isEnum><#if col.hasOptions && col.options?size gt 0>${col.options[0].value}<#else>"A"</#if></#if>
-</#macro>
-
 @SpringBootTest(classes = GeneratedTestApplication.class)
+@Testcontainers
 @Transactional
 class ${entityName}IntegrationTest {
+
+    @Container
+    static PostgreSQLContainer postgres = new PostgreSQLContainer("postgres:17");
+
+    @DynamicPropertySource
+    static void configureProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.dynamic.primary", () -> "user_master");
+        registry.add("spring.datasource.dynamic.datasource.user_master.driver-class-name", () -> "org.postgresql.Driver");
+        registry.add("spring.datasource.dynamic.datasource.user_master.url", postgres::getJdbcUrl);
+        registry.add("spring.datasource.dynamic.datasource.user_master.username", postgres::getUsername);
+        registry.add("spring.datasource.dynamic.datasource.user_master.password", postgres::getPassword);
+    }
 
     @Autowired
     private ${entityName}Service service;
@@ -33,7 +41,7 @@ class ${entityName}IntegrationTest {
     void shouldCreateAndFind() {
         ${entityName}CreateRequest request = new ${entityName}CreateRequest();
 <#list columns as col>
-        request.set${col.fieldName?cap_first}(<@defaultValue col/>);
+        request.set${col.fieldName?cap_first}(${col.defaultJavaValue});
 </#list>
         Long id = service.create(request);
         assertThat(id).isNotNull();
@@ -44,14 +52,14 @@ class ${entityName}IntegrationTest {
     void shouldUpdate() {
         ${entityName}CreateRequest create = new ${entityName}CreateRequest();
 <#list columns as col>
-        create.set${col.fieldName?cap_first}(<@defaultValue col/>);
+        create.set${col.fieldName?cap_first}(${col.defaultJavaValue});
 </#list>
         Long id = service.create(create);
 
         ${entityName}UpdateRequest update = new ${entityName}UpdateRequest();
         update.setId(id);
 <#list columns as col>
-        update.set${col.fieldName?cap_first}(<@defaultValue col/>);
+        update.set${col.fieldName?cap_first}(${col.defaultJavaValue});
 </#list>
         assertThat(service.update(update)).isTrue();
         assertThat(service.detail(id)).isNotNull();
@@ -61,7 +69,7 @@ class ${entityName}IntegrationTest {
     void shouldDelete() {
         ${entityName}CreateRequest request = new ${entityName}CreateRequest();
 <#list columns as col>
-        request.set${col.fieldName?cap_first}(<@defaultValue col/>);
+        request.set${col.fieldName?cap_first}(${col.defaultJavaValue});
 </#list>
         Long id = service.create(request);
         assertThat(service.delete(id)).isTrue();

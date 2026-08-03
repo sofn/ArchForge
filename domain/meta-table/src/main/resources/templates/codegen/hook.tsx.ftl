@@ -8,6 +8,7 @@ import { useRenderIcon } from "@/components/ReIcon/src/hooks";
 import ${className}Form from "../form/index.vue";
 import type {
   ${className}CreateRequest,
+  ${className}UpdateRequest,
   ${className}ListRequest,
   ${className}Response
 } from "./types";
@@ -101,7 +102,7 @@ export function use${className}() {
   }
 
   async function openDialog(title = "新增", row?: ${className}Response) {
-    let formInline: ${className}CreateRequest = init${className}Form();
+    let formInline: ${className}UpdateRequest = init${className}Form() as ${className}UpdateRequest;
     if (title === "修改" && row?.id) {
       formInline = { ...row };
     }
@@ -118,14 +119,15 @@ export function use${className}() {
       contentRenderer: () => h(${className}Form, { ref: formRef, formInline }),
       beforeSure: (done, { options }) => {
         const FormRef = formRef.value.getRef();
-        const curData = options.props.formInline as ${className}CreateRequest;
+        const curData = options.props.formInline as ${className}UpdateRequest;
         FormRef.validate(async valid => {
           if (valid) {
             if (title === "新增") {
               await create${className}(curData);
               message(`新增${tableName}成功`, { type: "success" });
             } else {
-              await update${className}(row.id, curData);
+              const updateData: ${className}UpdateRequest = { ...curData, id: row.id };
+              await update${className}(row.id, updateData);
               message(`修改${tableName}成功`, { type: "success" });
             }
             done();

@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 public enum ${entityName}ProjectModule implements ProjectModule {
-    INSTANCE("ArchForge-Admin", 1, "${tableName}", ${moduleCode});
+    INSTANCE("ArchForge-Admin", 1, "${tableName}", ${moduleCode?c});
 
     private final String projectName;
     private final int projectCode;

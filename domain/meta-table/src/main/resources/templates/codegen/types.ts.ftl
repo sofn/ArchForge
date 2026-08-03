@@ -5,7 +5,7 @@ export interface ${className}CreateRequest {
 }
 
 export interface ${className}UpdateRequest extends ${className}CreateRequest {
-  id: number;
+  id?: number;
 }
 
 export interface ${className}ListRequest {

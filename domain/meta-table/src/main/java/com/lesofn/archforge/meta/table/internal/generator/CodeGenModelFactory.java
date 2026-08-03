@@ -139,6 +139,7 @@ public final class CodeGenModelFactory {
         col.put("scale", column.getScale() != null ? column.getScale() : 2);
         col.put("options", buildOptions(column.getOptions()));
         col.put("hasOptions", type == MetaColumnType.ENUM && column.getOptions() != null && !column.getOptions().isEmpty());
+        col.put("defaultJavaValue", javaDefaultValue(type, column.getOptions()));
 
         return col;
     }
@@ -255,5 +256,22 @@ public final class CodeGenModelFactory {
     private static int generateModuleCode(String tableCode) {
         int hash = tableCode.hashCode();
         return Math.floorMod(hash, 9000) + 100;
+    }
+
+    private static String javaDefaultValue(MetaColumnType type, List<OptionItem> options) {
+        return switch (type) {
+            case STRING, TEXT, JSON, FILE -> "\"测试\"";
+            case INTEGER -> "1L";
+            case DECIMAL -> "new BigDecimal(\"1.00\")";
+            case BOOLEAN -> "true";
+            case DATE -> "LocalDate.now()";
+            case DATETIME -> "LocalDateTime.now()";
+            case ENUM -> {
+                if (options != null && !options.isEmpty() && options.get(0).getValue() != null) {
+                    yield "\"" + options.get(0).getValue() + "\"";
+                }
+                yield "\"A\"";
+            }
+        };
     }
 }

@@ -13,19 +13,8 @@ type Result<T = any> = {
   data?: T;
 };
 
-type ResultTable<T = any> = {
-  code: number;
-  message: string;
-  data?: {
-    list: T[];
-    total?: number;
-    pageSize?: number;
-    currentPage?: number;
-  };
-};
-
 export const get${className}List = (data?: ${className}ListRequest) => {
-  return http.request<ResultTable<${className}PageResult<${className}Response>>>(
+  return http.request<Result<${className}PageResult<${className}Response>>>(
     "post",
     "${basePath}",
     { data }
