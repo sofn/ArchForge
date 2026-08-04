@@ -1,24 +1,20 @@
 package com.lesofn.archforge.meta.table.internal.ddl;
 
 import com.lesofn.archforge.meta.table.api.domain.MetaColumn;
-import com.lesofn.archforge.meta.table.api.domain.MetaColumnType;
 import com.lesofn.archforge.meta.table.api.domain.MetaTable;
-import com.lesofn.archforge.meta.table.internal.exception.MetaTableErrorCode;
-import com.lesofn.archforge.meta.table.internal.exception.MetaTableException;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 /**
  * 元表格 DDL 生成器。
  */
 @Component
+@RequiredArgsConstructor
 public class MetaTableDdlGenerator {
 
-    private static final int DEFAULT_VARCHAR_LENGTH = 255;
-    private static final int DEFAULT_FILE_LENGTH = 512;
-    private static final int DEFAULT_DECIMAL_PRECISION = 18;
-    private static final int DEFAULT_DECIMAL_SCALE = 2;
+    private final ColumnTypeResolver columnTypeResolver;
 
     /** 生成物理表名。 */
     public String physicalTableName(MetaTable table) {
@@ -64,56 +60,16 @@ public class MetaTableDdlGenerator {
 
     private String buildColumnDefinition(MetaColumn column) {
         String name = SqlIdentifier.quote(column.getColumnCode());
-        String type = resolveColumnType(column);
+        String type = columnTypeResolver.resolve(column);
         StringBuilder sb = new StringBuilder();
         sb.append(name).append(' ').append(type);
         if (Boolean.TRUE.equals(column.getRequired())) {
             sb.append(" NOT NULL");
         }
         if (column.getDefaultValue() != null && !column.getDefaultValue().isEmpty()) {
-            sb.append(" DEFAULT ").append(formatDefaultValue(column));
+            sb.append(" DEFAULT ").append(columnTypeResolver.formatDefaultValue(column));
         }
         return sb.toString();
-    }
-
-    private String resolveColumnType(MetaColumn column) {
-        MetaColumnType type = column.getDataType();
-        if (type == null) {
-            throw new MetaTableException(MetaTableErrorCode.META_COLUMN_TYPE_INVALID);
-        }
-        return switch (type) {
-            case STRING, ENUM -> {
-                int length = (column.getLength() == null || column.getLength() <= 0)
-                        ? DEFAULT_VARCHAR_LENGTH
-                        : column.getLength();
-                yield "VARCHAR(" + length + ")";
-            }
-            case TEXT -> "TEXT";
-            case INTEGER -> "BIGINT";
-            case DECIMAL -> {
-                int precision = (column.getPrecision() == null || column.getPrecision() <= 0)
-                        ? DEFAULT_DECIMAL_PRECISION
-                        : column.getPrecision();
-                int scale = column.getScale() == null ? DEFAULT_DECIMAL_SCALE : column.getScale();
-                yield "NUMERIC(" + precision + "," + scale + ")";
-            }
-            case BOOLEAN -> "BOOLEAN";
-            case DATE -> "DATE";
-            case DATETIME -> "TIMESTAMP";
-            case JSON -> "JSONB";
-            case FILE -> "VARCHAR(" + DEFAULT_FILE_LENGTH + ")";
-        };
-    }
-
-    private String formatDefaultValue(MetaColumn column) {
-        String value = column.getDefaultValue();
-        return switch (column.getDataType()) {
-            case STRING, TEXT, FILE, ENUM -> "'" + value.replace("'", "''") + "'";
-            case INTEGER, DECIMAL -> value;
-            case BOOLEAN -> Boolean.parseBoolean(value) ? "TRUE" : "FALSE";
-            case DATE, DATETIME -> "'" + value + "'";
-            case JSON -> "'" + value.replace("'", "''") + "'::jsonb";
-        };
     }
 
     private String buildCreateIndex(MetaTable table, MetaColumn column, boolean unique) {
