@@ -4,6 +4,7 @@ dependencies {
     api(project(":infrastructure"))
 
     implementation("org.freemarker:freemarker")
+    implementation("org.apache.commons:commons-csv:1.10.0")
 
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")

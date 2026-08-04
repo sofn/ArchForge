@@ -2,31 +2,28 @@ package com.lesofn.archforge.meta.table.internal.service;
 
 import static com.lesofn.archforge.meta.table.internal.exception.MetaTableErrorCode.META_TABLE_DATA_NOT_EXISTS;
 
-import com.lesofn.archforge.common.utils.excel.FastExcelUtil;
 import com.lesofn.archforge.meta.table.api.domain.MetaColumn;
 import com.lesofn.archforge.meta.table.api.domain.MetaTable;
+import com.lesofn.archforge.meta.table.api.dto.ImportResult;
 import com.lesofn.archforge.meta.table.api.dto.MetaPageResult;
+import com.lesofn.archforge.meta.table.api.enums.MetaDataFormat;
 import com.lesofn.archforge.meta.table.api.service.MetaTableAdminService;
 import com.lesofn.archforge.meta.table.api.service.MetaTableCrudService;
 import com.lesofn.archforge.meta.table.internal.ddl.SqlIdentifier;
 import com.lesofn.archforge.meta.table.internal.exception.MetaTableException;
 import com.lesofn.archforge.meta.table.internal.validator.MetaTableValidator;
-import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.sql.Date;
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,6 +37,9 @@ public class MetaTableCrudServiceImpl implements MetaTableCrudService {
     private final NamedParameterJdbcTemplate jdbcTemplate;
     private final MetaTableAdminService metaTableAdminService;
     private final MetaTableValidator validator;
+    private final MetaTableDataInserter inserter;
+    private final MetaTableDataExporter exporter;
+    private final MetaTableDataImporter importer;
 
     @Override
     @Transactional("metaTableTransactionManager")
@@ -47,37 +47,7 @@ public class MetaTableCrudServiceImpl implements MetaTableCrudService {
         MetaTable table = metaTableAdminService.findById(tableId);
         List<MetaColumn> columns = metaTableAdminService.findColumns(tableId);
         validator.validateValues(row, columns, true);
-
-        String physicalName = SqlIdentifier.quote(table.physicalTableName());
-        MapSqlParameterSource params = new MapSqlParameterSource();
-        params.addValue("creatorId", currentUid);
-        params.addValue("createTime", LocalDateTime.now());
-        params.addValue("deleted", 0);
-
-        List<String> fields = new ArrayList<>();
-        fields.add(SqlIdentifier.quote("creator_id"));
-        fields.add(SqlIdentifier.quote("create_time"));
-        fields.add(SqlIdentifier.quote("deleted"));
-
-        List<String> placeholders = new ArrayList<>();
-        placeholders.add(":creatorId");
-        placeholders.add(":createTime");
-        placeholders.add(":deleted");
-
-        appendValueColumns(columns, row, fields, placeholders, params);
-
-        String sql = String.format(
-                "INSERT INTO %s (%s) VALUES (%s)",
-                physicalName,
-                String.join(", ", fields),
-                String.join(", ", placeholders));
-
-        KeyHolder keyHolder = new GeneratedKeyHolder();
-        jdbcTemplate.update(sql, params, keyHolder, new String[] {
-                "id"
-        });
-        Number key = keyHolder.getKey();
-        return Objects.requireNonNull(key).longValue();
+        return inserter.insert(table, columns, row, currentUid);
     }
 
     @Override
@@ -91,7 +61,7 @@ public class MetaTableCrudServiceImpl implements MetaTableCrudService {
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("id", dataId);
         params.addValue("updaterId", currentUid);
-        params.addValue("updateTime", LocalDateTime.now());
+        params.addValue("updateTime", java.time.LocalDateTime.now());
 
         List<String> sets = new ArrayList<>();
         sets.add(SqlIdentifier.quote("updater_id") + " = :updaterId");
@@ -117,7 +87,7 @@ public class MetaTableCrudServiceImpl implements MetaTableCrudService {
         params.addValue("id", dataId);
         params.addValue("deleted", 1);
         params.addValue("updaterId", currentUid);
-        params.addValue("updateTime", LocalDateTime.now());
+        params.addValue("updateTime", java.time.LocalDateTime.now());
 
         String sql = String.format(
                 "UPDATE %s SET deleted = :deleted, updater_id = :updaterId, update_time = :updateTime " +
@@ -158,34 +128,13 @@ public class MetaTableCrudServiceImpl implements MetaTableCrudService {
     }
 
     @Override
-    public void export(Long tableId, OutputStream out) {
-        MetaTable table = metaTableAdminService.findById(tableId);
-        List<MetaColumn> columns = metaTableAdminService.findColumns(tableId);
-        List<MetaColumn> visibleColumns = columns.stream()
-                .filter(MetaColumn::isListVisibleColumn)
-                .toList();
+    public void export(Long tableId, MetaDataFormat format, OutputStream out) {
+        exporter.export(tableId, format, out);
+    }
 
-        String physicalName = SqlIdentifier.quote(table.physicalTableName());
-        List<String> quotedColumns = buildQuotedColumns(columns);
-        String querySql = "SELECT " + String.join(", ", quotedColumns) + " FROM " + physicalName +
-                " WHERE deleted = 0 ORDER BY id DESC";
-
-        List<Map<String, Object>> rows = jdbcTemplate.queryForList(querySql, Map.of());
-
-        List<String> headers = visibleColumns.stream()
-                .map(MetaColumn::getColumnName)
-                .toList();
-        List<List<String>> body = rows.stream()
-                .map(row -> visibleColumns.stream()
-                        .map(c -> validator.formatValue(c, row.get(c.getColumnCode())))
-                        .collect(Collectors.toList()))
-                .collect(Collectors.toList());
-
-        try {
-            FastExcelUtil.write(out, table.getTableName(), headers, body);
-        } catch (IOException e) {
-            throw new RuntimeException("导出 Excel 失败", e);
-        }
+    @Override
+    public ImportResult importData(Long tableId, MetaDataFormat format, InputStream in, Long currentUid) {
+        return importer.importData(tableId, format, in, currentUid);
     }
 
     private List<String> buildQuotedColumns(List<MetaColumn> columns) {
@@ -281,22 +230,6 @@ public class MetaTableCrudServiceImpl implements MetaTableCrudService {
         return row;
     }
 
-    private void appendValueColumns(
-            List<MetaColumn> columns,
-            Map<String, Object> row,
-            List<String> fields,
-            List<String> placeholders,
-            MapSqlParameterSource params) {
-        for (MetaColumn column : columns) {
-            Object value = row.get(column.getColumnCode());
-            if (value != null) {
-                fields.add(SqlIdentifier.quote(column.getColumnCode()));
-                placeholders.add(":" + column.getColumnCode());
-                params.addValue(column.getColumnCode(), validator.convertValue(column, value));
-            }
-        }
-    }
-
     private void appendUpdateColumns(
             List<MetaColumn> columns,
             Map<String, Object> row,
@@ -315,5 +248,4 @@ public class MetaTableCrudServiceImpl implements MetaTableCrudService {
             }
         }
     }
-
 }

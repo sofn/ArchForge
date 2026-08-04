@@ -5,7 +5,9 @@ import com.lesofn.archforge.infrastructure.frame.context.RequestContext;
 import com.lesofn.archforge.meta.table.api.domain.MetaColumn;
 import com.lesofn.archforge.meta.table.api.domain.MetaTable;
 import com.lesofn.archforge.meta.table.api.domain.MetaTableMigration;
+import com.lesofn.archforge.meta.table.api.dto.ImportResult;
 import com.lesofn.archforge.meta.table.api.dto.MetaPageResult;
+import com.lesofn.archforge.meta.table.api.enums.MetaDataFormat;
 import com.lesofn.archforge.meta.table.api.service.MetaTableAdminService;
 import com.lesofn.archforge.meta.table.api.service.MetaTableCrudService;
 import com.lesofn.archforge.meta.table.internal.generator.CodeGenOptions;
@@ -44,7 +46,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * 元表格管理接口
@@ -227,10 +231,36 @@ public class MetaTableController {
 
     @Operation(summary = "导出元表格数据")
     @GetMapping("/{id}/export")
-    public void export(@PathVariable Long id, HttpServletResponse response) throws IOException {
-        String fileName = "meta_table_" + id + ".xlsx";
-        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+    public void export(
+            @PathVariable Long id,
+            @RequestParam(defaultValue = "EXCEL") String format,
+            HttpServletResponse response) throws IOException {
+        MetaDataFormat dataFormat = MetaDataFormat.of(format);
+        String suffix = switch (dataFormat) {
+            case CSV -> ".csv";
+            case JSON -> ".json";
+            default -> ".xlsx";
+        };
+        String contentType = switch (dataFormat) {
+            case CSV -> "text/csv";
+            case JSON -> "application/json";
+            default -> "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+        };
+        String fileName = "meta_table_" + id + suffix;
+        response.setContentType(contentType);
         response.setHeader("Content-Disposition", "attachment; filename=" + fileName);
-        metaTableCrudService.export(id, response.getOutputStream());
+        metaTableCrudService.export(id, dataFormat, response.getOutputStream());
+    }
+
+    @Log
+    @Operation(summary = "导入元表格数据")
+    @PostMapping("/{id}/import")
+    public ImportResult importData(
+            RequestContext rc,
+            @PathVariable Long id,
+            @RequestParam(defaultValue = "CSV") String format,
+            @RequestPart("file") MultipartFile file) throws IOException {
+        MetaDataFormat dataFormat = MetaDataFormat.of(format);
+        return metaTableCrudService.importData(id, dataFormat, file.getInputStream(), rc.getCurrentUid());
     }
 }

@@ -1,6 +1,9 @@
 package com.lesofn.archforge.meta.table.api.service;
 
+import com.lesofn.archforge.meta.table.api.dto.ImportResult;
 import com.lesofn.archforge.meta.table.api.dto.MetaPageResult;
+import com.lesofn.archforge.meta.table.api.enums.MetaDataFormat;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Map;
 
@@ -17,5 +20,7 @@ public interface MetaTableCrudService {
 
     MetaPageResult<Map<String, Object>> list(Long tableId, Map<String, Object> filters, int currentPage, int pageSize);
 
-    void export(Long tableId, OutputStream out);
+    void export(Long tableId, MetaDataFormat format, OutputStream out);
+
+    ImportResult importData(Long tableId, MetaDataFormat format, InputStream in, Long currentUid);
 }
