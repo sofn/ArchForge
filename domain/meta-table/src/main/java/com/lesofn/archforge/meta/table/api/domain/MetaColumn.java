@@ -41,7 +41,7 @@ public class MetaColumn extends BasePO {
     private String columnName;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "data_type", nullable = false)
+    @Column(name = "data_type", nullable = false, columnDefinition = "VARCHAR(32)")
     private MetaColumnType dataType;
 
     @Column(name = "length")

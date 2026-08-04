@@ -3,6 +3,7 @@ package com.lesofn.archforge.meta.table.internal.service;
 import static com.lesofn.archforge.meta.table.internal.exception.MetaTableErrorCode.META_TABLE_DATA_NOT_EXISTS;
 
 import com.lesofn.archforge.meta.table.api.domain.MetaColumn;
+import com.lesofn.archforge.meta.table.internal.exception.MetaTableErrorCode;
 import com.lesofn.archforge.meta.table.api.domain.MetaTable;
 import com.lesofn.archforge.meta.table.api.dto.ImportResult;
 import com.lesofn.archforge.meta.table.api.dto.MetaPageResult;
@@ -14,13 +15,19 @@ import com.lesofn.archforge.meta.table.internal.exception.MetaTableException;
 import com.lesofn.archforge.meta.table.internal.validator.MetaTableValidator;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.sql.Array;
 import java.sql.Date;
+import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
+import org.postgresql.util.PGobject;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -221,13 +228,36 @@ public class MetaTableCrudServiceImpl implements MetaTableCrudService {
     private Map<String, Object> convertRow(Map<String, Object> row) {
         for (Map.Entry<String, Object> entry : row.entrySet()) {
             Object value = entry.getValue();
+            if (value == null) {
+                continue;
+            }
             if (value instanceof Timestamp timestamp) {
                 entry.setValue(timestamp.toLocalDateTime());
             } else if (value instanceof Date date) {
                 entry.setValue(date.toLocalDate());
+            } else if (value instanceof OffsetDateTime offsetDateTime) {
+                entry.setValue(offsetDateTime.toString());
+            } else if (value instanceof UUID uuid) {
+                entry.setValue(uuid.toString());
+            } else if (value instanceof Array sqlArray) {
+                entry.setValue(convertSqlArray(sqlArray));
+            } else if (value instanceof PGobject pgObject) {
+                entry.setValue(pgObject.getValue());
             }
         }
         return row;
+    }
+
+    private List<Object> convertSqlArray(Array sqlArray) {
+        try {
+            Object array = sqlArray.getArray();
+            if (array instanceof Object[]) {
+                return Arrays.asList((Object[]) array);
+            }
+            return Collections.singletonList(array.toString());
+        } catch (SQLException e) {
+            throw new MetaTableException(MetaTableErrorCode.META_COLUMN_VALUE_INVALID, "读取数组字段失败");
+        }
     }
 
     private void appendUpdateColumns(

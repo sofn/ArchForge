@@ -10,6 +10,8 @@ import com.lesofn.archforge.meta.table.internal.ddl.SqlIdentifier;
 import com.lesofn.archforge.meta.table.internal.exception.MetaTableErrorCode;
 import com.lesofn.archforge.meta.table.internal.exception.MetaTableException;
 import java.math.BigDecimal;
+import java.sql.Array;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
@@ -387,6 +389,20 @@ public class MetaTableValidator {
     private String formatArrayValue(Object value) {
         if (value instanceof PGobject pgObject) {
             return pgObject.getValue();
+        }
+        if (value instanceof List<?> list) {
+            return list.toString();
+        }
+        if (value instanceof Array sqlArray) {
+            try {
+                Object array = sqlArray.getArray();
+                if (array instanceof Object[]) {
+                    return Arrays.toString((Object[]) array);
+                }
+                return array.toString();
+            } catch (SQLException e) {
+                throw new MetaTableException(MetaTableErrorCode.META_COLUMN_VALUE_INVALID, "读取数组字段失败");
+            }
         }
         return value.toString();
     }

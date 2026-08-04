@@ -14,7 +14,10 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
+import java.sql.Array;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +25,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
+import org.postgresql.util.PGobject;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
 
@@ -133,6 +137,20 @@ public class MetaTableDataExporter {
         }
         if (value instanceof Number || value instanceof Boolean) {
             return value;
+        }
+        if (value instanceof PGobject pgObject) {
+            return pgObject.getValue();
+        }
+        if (value instanceof Array sqlArray) {
+            try {
+                Object array = sqlArray.getArray();
+                if (array instanceof Object[]) {
+                    return Arrays.asList((Object[]) array);
+                }
+                return array.toString();
+            } catch (SQLException e) {
+                throw new MetaTableException(MetaTableErrorCode.META_COLUMN_VALUE_INVALID, "读取数组字段失败");
+            }
         }
         return value.toString();
     }
