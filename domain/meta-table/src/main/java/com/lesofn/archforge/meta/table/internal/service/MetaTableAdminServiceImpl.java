@@ -12,6 +12,7 @@ import com.lesofn.archforge.meta.table.api.domain.MetaTableMigration;
 import com.lesofn.archforge.meta.table.api.service.MetaTableAdminService;
 import com.lesofn.archforge.meta.table.internal.ddl.AlterTableDdlGenerator;
 import com.lesofn.archforge.meta.table.internal.ddl.MetaTableDdlGenerator;
+import com.lesofn.archforge.meta.table.internal.ddl.SchemaDdl;
 import com.lesofn.archforge.meta.table.internal.exception.MetaTableErrorCode;
 import com.lesofn.archforge.meta.table.internal.exception.MetaTableException;
 import com.lesofn.archforge.meta.table.internal.schema.SchemaChange;
@@ -104,7 +105,7 @@ public class MetaTableAdminServiceImpl implements MetaTableAdminService {
             return;
         }
 
-        var ddlStatements = alterTableDdlGenerator.generate(existing, changes);
+        List<SchemaDdl> ddlStatements = alterTableDdlGenerator.generate(existing, changes);
 
         int currentVersion = existing.getSchemaVersion() == null ? 1 : existing.getSchemaVersion();
         int nextVersion = currentVersion + 1;
@@ -112,8 +113,10 @@ public class MetaTableAdminServiceImpl implements MetaTableAdminService {
         List<MetaTableMigration> records = migrationService.createPendingRecords(existing, nextVersion, ddlStatements,
                 operatorId);
 
-        for (var ddl : ddlStatements) {
-            jdbcTemplate.getJdbcOperations().execute(ddl.sql());
+        for (SchemaDdl ddl : ddlStatements) {
+            for (String sql : ddl.sqls()) {
+                jdbcTemplate.getJdbcOperations().execute(sql);
+            }
         }
 
         existing.setSchemaVersion(nextVersion);

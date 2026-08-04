@@ -18,15 +18,15 @@ public class AlterTableDdlGenerator {
 
     private final ColumnTypeResolver columnTypeResolver;
 
-    public List<AlterDdl> generate(MetaTable table, List<SchemaChange> changes) {
-        List<AlterDdl> statements = new ArrayList<>();
+    public List<SchemaDdl> generate(MetaTable table, List<SchemaChange> changes) {
+        List<SchemaDdl> result = new ArrayList<>();
         for (SchemaChange change : changes) {
-            statements.addAll(generateForChange(table, change));
+            result.addAll(generateForChange(table, change));
         }
-        return statements;
+        return result;
     }
 
-    private List<AlterDdl> generateForChange(MetaTable table, SchemaChange change) {
+    private List<SchemaDdl> generateForChange(MetaTable table, SchemaChange change) {
         return switch (change.getType()) {
             case ADD_COLUMN -> generateAddColumn(table, change);
             case DROP_COLUMN -> generateDropColumn(table, change);
@@ -38,8 +38,8 @@ public class AlterTableDdlGenerator {
         };
     }
 
-    private List<AlterDdl> generateAddColumn(MetaTable table, SchemaChange change) {
-        List<AlterDdl> result = new ArrayList<>();
+    private List<SchemaDdl> generateAddColumn(MetaTable table, SchemaChange change) {
+        List<String> statements = new ArrayList<>();
         MetaColumn column = change.getNewColumn();
         String physicalName = SqlIdentifier.quote(table.physicalTableName());
         StringBuilder sb = new StringBuilder();
@@ -54,66 +54,65 @@ public class AlterTableDdlGenerator {
         if (column.getDefaultValue() != null && !column.getDefaultValue().isEmpty()) {
             sb.append(" DEFAULT ").append(columnTypeResolver.formatDefaultValue(column));
         }
-        result.add(new AlterDdl(change, sb.toString()));
+        statements.add(sb.toString());
 
         String index = indexStatement(table, column, column.getColumnCode());
         if (index != null) {
-            result.add(new AlterDdl(change, index));
+            statements.add(index);
         }
-        return result;
+        return List.of(new SchemaDdl(change, statements));
     }
 
-    private List<AlterDdl> generateDropColumn(MetaTable table, SchemaChange change) {
-        List<AlterDdl> result = new ArrayList<>();
+    private List<SchemaDdl> generateDropColumn(MetaTable table, SchemaChange change) {
+        List<String> statements = new ArrayList<>();
         MetaColumn column = change.getOldColumn();
         String oldCode = column.getColumnCode();
         String physicalName = SqlIdentifier.quote(table.physicalTableName());
-        dropIndexStatement(result, change, table, oldCode, true);
-        dropIndexStatement(result, change, table, oldCode, false);
-        result.add(new AlterDdl(change, "ALTER TABLE " + physicalName + " DROP COLUMN IF EXISTS " + SqlIdentifier.quote(
-                oldCode)));
-        return result;
+        dropIndexStatement(statements, table, oldCode, true);
+        dropIndexStatement(statements, table, oldCode, false);
+        statements.add("ALTER TABLE " + physicalName + " DROP COLUMN IF EXISTS " + SqlIdentifier.quote(oldCode));
+        return List.of(new SchemaDdl(change, statements));
     }
 
-    private List<AlterDdl> generateRenameColumn(MetaTable table, SchemaChange change) {
+    private List<SchemaDdl> generateRenameColumn(MetaTable table, SchemaChange change) {
         String physicalName = SqlIdentifier.quote(table.physicalTableName());
-        return List.of(new AlterDdl(change, "ALTER TABLE " + physicalName + " RENAME COLUMN " + SqlIdentifier.quote(change
-                .getOldColumn().getColumnCode()) + " TO " + SqlIdentifier.quote(change.getNewColumn().getColumnCode())));
+        return List.of(new SchemaDdl(change, List.of("ALTER TABLE " + physicalName + " RENAME COLUMN " + SqlIdentifier.quote(
+                change.getOldColumn().getColumnCode()) + " TO " + SqlIdentifier.quote(change.getNewColumn().getColumnCode()))));
     }
 
-    private List<AlterDdl> generateAlterType(MetaTable table, SchemaChange change) {
+    private List<SchemaDdl> generateAlterType(MetaTable table, SchemaChange change) {
         String physicalName = SqlIdentifier.quote(table.physicalTableName());
         MetaColumn oldColumn = change.getOldColumn();
         MetaColumn newColumn = change.getNewColumn();
         String oldType = columnTypeResolver.resolve(oldColumn);
         String newType = columnTypeResolver.resolve(newColumn);
         String using = buildUsingExpression(newColumn.getColumnCode(), oldType, newType);
-        return List.of(new AlterDdl(change, "ALTER TABLE " + physicalName + " ALTER COLUMN " + SqlIdentifier.quote(newColumn
-                .getColumnCode()) + " TYPE " + newType + " USING " + using));
+        return List.of(new SchemaDdl(change, List.of("ALTER TABLE " + physicalName + " ALTER COLUMN " + SqlIdentifier.quote(
+                newColumn.getColumnCode()) + " TYPE " + newType + " USING " + using)));
     }
 
-    private List<AlterDdl> generateAlterDefault(MetaTable table, SchemaChange change) {
+    private List<SchemaDdl> generateAlterDefault(MetaTable table, SchemaChange change) {
         String physicalName = SqlIdentifier.quote(table.physicalTableName());
         MetaColumn newColumn = change.getNewColumn();
         String newDefault = newColumn.getDefaultValue();
         if (newDefault == null || newDefault.isEmpty()) {
-            return List.of(new AlterDdl(change, "ALTER TABLE " + physicalName + " ALTER COLUMN " + SqlIdentifier.quote(newColumn
-                    .getColumnCode()) + " DROP DEFAULT"));
+            return List.of(new SchemaDdl(change, List.of("ALTER TABLE " + physicalName + " ALTER COLUMN " + SqlIdentifier.quote(
+                    newColumn.getColumnCode()) + " DROP DEFAULT")));
         }
-        return List.of(new AlterDdl(change, "ALTER TABLE " + physicalName + " ALTER COLUMN " + SqlIdentifier.quote(newColumn
-                .getColumnCode()) + " SET DEFAULT " + columnTypeResolver.formatDefaultValue(newColumn)));
+        return List.of(new SchemaDdl(change, List.of("ALTER TABLE " + physicalName + " ALTER COLUMN " + SqlIdentifier.quote(
+                newColumn.getColumnCode()) + " SET DEFAULT " + columnTypeResolver.formatDefaultValue(newColumn))));
     }
 
-    private List<AlterDdl> generateAlterNull(MetaTable table, SchemaChange change) {
+    private List<SchemaDdl> generateAlterNull(MetaTable table, SchemaChange change) {
         String physicalName = SqlIdentifier.quote(table.physicalTableName());
         MetaColumn newColumn = change.getNewColumn();
         String action = Boolean.TRUE.equals(newColumn.getRequired()) ? "SET NOT NULL" : "DROP NOT NULL";
-        return List.of(new AlterDdl(change, "ALTER TABLE " + physicalName + " ALTER COLUMN " + SqlIdentifier.quote(newColumn
-                .getColumnCode()) + " " + action));
+        return List.of(new SchemaDdl(change, List.of("ALTER TABLE " + physicalName + " ALTER COLUMN " + SqlIdentifier.quote(
+                newColumn.getColumnCode()) + " " + action)));
     }
 
-    private List<AlterDdl> generateAlterIndex(MetaTable table, SchemaChange change) {
-        List<AlterDdl> result = new ArrayList<>();
+    private List<SchemaDdl> generateAlterIndex(MetaTable table, SchemaChange change) {
+        List<String> statements = new ArrayList<>();
         MetaColumn oldColumn = change.getOldColumn();
         MetaColumn newColumn = change.getNewColumn();
         String oldCode = oldColumn.getColumnCode();
@@ -123,12 +122,12 @@ public class AlterTableDdlGenerator {
         String newEffective = effectiveIndexType(newColumn.getUnique(), newColumn.getIndex());
 
         if (oldEffective != null && !oldEffective.equals(newEffective)) {
-            dropIndexStatement(result, change, table, oldCode, "UNIQUE".equals(oldEffective));
+            dropIndexStatement(statements, table, oldCode, "UNIQUE".equals(oldEffective));
         }
         if (newEffective != null && !newEffective.equals(oldEffective)) {
-            result.add(new AlterDdl(change, buildCreateIndex(table, newCode, "UNIQUE".equals(newEffective))));
+            statements.add(buildCreateIndex(table, newCode, "UNIQUE".equals(newEffective)));
         }
-        return result;
+        return List.of(new SchemaDdl(change, statements));
     }
 
     private String buildUsingExpression(String columnCode, String oldType, String newType) {
@@ -157,8 +156,8 @@ public class AlterTableDdlGenerator {
         return buildCreateIndex(table, code, "UNIQUE".equals(effective));
     }
 
-    private void dropIndexStatement(List<AlterDdl> out, SchemaChange change, MetaTable table, String code, boolean unique) {
-        out.add(new AlterDdl(change, "DROP INDEX IF EXISTS " + SqlIdentifier.quote(buildIndexName(table, code, unique))));
+    private void dropIndexStatement(List<String> out, MetaTable table, String code, boolean unique) {
+        out.add("DROP INDEX IF EXISTS " + SqlIdentifier.quote(buildIndexName(table, code, unique)));
     }
 
     private String buildCreateIndex(MetaTable table, String code, boolean unique) {
