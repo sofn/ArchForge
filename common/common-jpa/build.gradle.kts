@@ -7,6 +7,7 @@ dependencies {
         exclude(group = "org.springframework.boot", module = "spring-boot-starter-logging")
     }
     api("com.baomidou:dynamic-datasource-spring-boot4-starter")
+    api("com.alibaba:druid")
     api("org.postgresql:postgresql")
 
     // Hibernate Static Metamodel Generator (类型安全字段引用，替代 QueryDSL Q-classes)

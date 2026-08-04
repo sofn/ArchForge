@@ -28,6 +28,8 @@ include("common:common-error")
 include("infrastructure")
 include("dependencies")
 include("server-admin")
+include("domain:blog")
+include("server-web")
 
 include("domain:admin-user")
 include("domain:meta-table")
