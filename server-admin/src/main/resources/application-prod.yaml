@@ -96,6 +96,8 @@ arch-forge:
     enabled: true
   monitor:
     enabled: true
+  web:
+    public-url: ${WEB_PUBLIC_URL}
   jwt:
     secret: ${JWT_SECRET}
     expire-seconds: 604800

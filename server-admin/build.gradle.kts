@@ -84,6 +84,7 @@ dependencies {
     api(project(":infrastructure"))
     api(project(":domain:admin-user"))
     api(project(":domain:meta-table"))
+    api(project(":domain:blog"))
     api(project(":example:example-task"))
 
     // 排除logback，使用log4j2

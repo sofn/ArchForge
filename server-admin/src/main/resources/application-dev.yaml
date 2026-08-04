@@ -92,6 +92,8 @@ arch-forge:
     enabled: false
   monitor:
     enabled: true
+  web:
+    public-url: http://localhost:8081
   jwt:
     secret: ${JWT_SECRET:5/jDAWs7a63GRgjS+uF2mP7dcLwI6GAgxf+Z0+fOAbgMR/jksG5r0v10nDOkrM0btxtb2FAuol8fSzSJis8gIA==}
     expire-seconds: 604800
