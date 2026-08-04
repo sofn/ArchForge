@@ -53,6 +53,8 @@ public class MetaTableCreateRequest {
     @Data
     public static class MetaColumnRequest {
 
+        private Long id;
+
         @NotBlank
         private String columnCode;
 
@@ -86,8 +88,17 @@ public class MetaTableCreateRequest {
 
         private List<com.lesofn.archforge.meta.table.api.domain.OptionItem> options;
 
+        private String referenceTable;
+
+        private String referenceColumn;
+
+        private Boolean tenantColumn = false;
+
+        private Boolean ownerColumn = false;
+
         public com.lesofn.archforge.meta.table.api.domain.MetaColumn toColumn() {
             com.lesofn.archforge.meta.table.api.domain.MetaColumn column = new com.lesofn.archforge.meta.table.api.domain.MetaColumn();
+            column.setId(id);
             column.setColumnCode(columnCode);
             column.setColumnName(columnName);
             column.setDataType(com.lesofn.archforge.meta.table.api.domain.MetaColumnType.valueOf(dataType));
@@ -103,6 +114,10 @@ public class MetaTableCreateRequest {
             column.setIndex(index);
             column.setSort(sort);
             column.setOptions(options);
+            column.setReferenceTable(referenceTable);
+            column.setReferenceColumn(referenceColumn);
+            column.setTenantColumn(tenantColumn);
+            column.setOwnerColumn(ownerColumn);
             return column;
         }
     }

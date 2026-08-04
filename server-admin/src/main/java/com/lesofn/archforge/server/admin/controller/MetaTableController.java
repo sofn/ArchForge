@@ -4,26 +4,28 @@ import com.lesofn.archforge.infrastructure.annotation.Log;
 import com.lesofn.archforge.infrastructure.frame.context.RequestContext;
 import com.lesofn.archforge.meta.table.api.domain.MetaColumn;
 import com.lesofn.archforge.meta.table.api.domain.MetaTable;
+import com.lesofn.archforge.meta.table.api.domain.MetaTableMigration;
 import com.lesofn.archforge.meta.table.api.dto.MetaPageResult;
 import com.lesofn.archforge.meta.table.api.service.MetaTableAdminService;
 import com.lesofn.archforge.meta.table.api.service.MetaTableCrudService;
 import com.lesofn.archforge.meta.table.internal.generator.CodeGenOptions;
 import com.lesofn.archforge.meta.table.internal.generator.GeneratedResult;
 import com.lesofn.archforge.meta.table.internal.generator.MetaTableCodeGenerator;
+import com.lesofn.archforge.meta.table.internal.service.MetaTableMigrationExporter;
+import com.lesofn.archforge.meta.table.internal.service.MetaTableMigrationService;
+import com.lesofn.archforge.server.admin.config.CodeGenWorkspaceResolver;
 import com.lesofn.archforge.server.admin.dto.AdminPageResult;
 import com.lesofn.archforge.server.admin.dto.MetaTableResponse;
 import com.lesofn.archforge.server.admin.dto.request.MetaDataListRequest;
-import com.lesofn.archforge.server.admin.dto.request.MetaTableGenerateRequest;
-import com.lesofn.archforge.server.admin.dto.response.MetaTableGenerateResponse;
-import java.nio.file.Path;
 import com.lesofn.archforge.server.admin.dto.request.MetaTableCreateRequest;
+import com.lesofn.archforge.server.admin.dto.request.MetaTableGenerateRequest;
 import com.lesofn.archforge.server.admin.dto.request.MetaTableListRequest;
 import com.lesofn.archforge.server.admin.dto.request.MetaTableUpdateRequest;
+import com.lesofn.archforge.server.admin.dto.response.MetaTableGenerateResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import com.lesofn.archforge.server.admin.config.CodeGenWorkspaceResolver;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
@@ -59,6 +61,8 @@ public class MetaTableController {
     private final MetaTableCrudService metaTableCrudService;
     private final MetaTableCodeGenerator metaTableCodeGenerator;
     private final CodeGenWorkspaceResolver codeGenWorkspaceResolver;
+    private final MetaTableMigrationService metaTableMigrationService;
+    private final MetaTableMigrationExporter metaTableMigrationExporter;
 
     @Operation(summary = "获取元表格列表")
     @PostMapping
@@ -104,7 +108,8 @@ public class MetaTableController {
     public Boolean update(RequestContext rc, @PathVariable Long id, @RequestBody @Valid MetaTableUpdateRequest request) {
         MetaTable table = request.toTable();
         table.setUpdaterId(rc.getCurrentUid());
-        metaTableAdminService.update(id, table, null);
+        List<MetaColumn> columns = request.toColumns();
+        metaTableAdminService.update(id, table, columns, rc.getCurrentUid());
         return true;
     }
 
@@ -162,6 +167,22 @@ public class MetaTableController {
     public Boolean delete(@PathVariable Long id, @RequestParam(defaultValue = "false") Boolean force) {
         metaTableAdminService.delete(id, Boolean.TRUE.equals(force));
         return true;
+    }
+
+    @Operation(summary = "获取元表格 Schema 迁移历史")
+    @GetMapping("/{id}/migrations")
+    public List<MetaTableMigration> migrations(@PathVariable Long id) {
+        return metaTableMigrationService.listByTableId(id);
+    }
+
+    @Log
+    @Operation(summary = "导出元表格 Schema 迁移为 Flyway SQL")
+    @GetMapping("/{id}/export-migration")
+    public String exportMigration(@PathVariable Long id) throws IOException {
+        Path projectRoot = codeGenWorkspaceResolver.resolve();
+        Path outputDir = projectRoot.resolve("server-admin/src/main/resources/db/migration");
+        Path file = metaTableMigrationExporter.export(id, outputDir);
+        return file.toString();
     }
 
     @Operation(summary = "获取元表格数据")
