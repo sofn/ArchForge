@@ -36,13 +36,27 @@ tasks.bootRun {
 }
 
 tasks.named<JavaExec>("processAot") {
+    enabled = false
     jvmArgs("--enable-preview", "--enable-native-access=ALL-UNNAMED")
     systemProperty("spring.profiles.active", "prod")
 }
 
 tasks.named<JavaExec>("processTestAot") {
+    enabled = false
     jvmArgs("--enable-preview", "--enable-native-access=ALL-UNNAMED")
     systemProperty("spring.profiles.active", "test")
+}
+
+tasks.named("compileAotJava") {
+    enabled = false
+}
+
+tasks.named("processAotResources") {
+    enabled = false
+}
+
+tasks.named("aotClasses") {
+    enabled = false
 }
 
 tasks.withType<Test> {

@@ -49,6 +49,9 @@ public class WebAuthInterceptor implements HandlerInterceptor {
         if ("OPTIONS".equalsIgnoreCase(method)) {
             return true;
         }
+        if ("GET".equalsIgnoreCase(method) && uri.equals("/web/categories")) {
+            return true;
+        }
         if ("GET".equalsIgnoreCase(method) && isPublicArticlePath(uri)) {
             return true;
         }

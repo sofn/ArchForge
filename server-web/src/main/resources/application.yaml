@@ -9,6 +9,11 @@ spring:
     active: ${SPRING_PROFILES_ACTIVE:dev}
   jackson:
     default-property-inclusion: non_null
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.security.autoconfigure.SecurityAutoConfiguration
+      - org.springframework.boot.security.autoconfigure.UserDetailsServiceAutoConfiguration
+      - org.springframework.boot.security.autoconfigure.servlet.ManagementWebSecurityAutoConfiguration
 
 springdoc:
   api-docs:

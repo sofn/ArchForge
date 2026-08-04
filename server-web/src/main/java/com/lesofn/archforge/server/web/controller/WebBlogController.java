@@ -84,7 +84,7 @@ public class WebBlogController {
         Long authorId = WebUserContext.getUserId();
         String baseSlug = request.getTitle().trim()
                 .replaceAll("\\s+", "-")
-                .replaceAll("[^a-zA-Z0-9\\u4e00-\\u9fa5-]", "")
+                .replaceAll("[^a-zA-Z0-9-]", "")
                 .toLowerCase(Locale.ROOT);
         if (baseSlug.isBlank()) {
             baseSlug = "article";
