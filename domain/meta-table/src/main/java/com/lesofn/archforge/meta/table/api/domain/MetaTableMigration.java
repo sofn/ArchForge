@@ -53,7 +53,7 @@ public class MetaTableMigration extends BasePO {
     @Column(name = "new_default", length = 255)
     private String newDefault;
 
-    @Column(name = "ddl_sql", nullable = false, length = 4000)
+    @Column(name = "ddl_sql", nullable = false, columnDefinition = "TEXT")
     private String ddlSql;
 
     @Column(name = "status", nullable = false, length = 16)

@@ -25,10 +25,10 @@ public class MetaTableMigrationService {
     /**
      * 为一次 Schema 演进创建 PENDING 迁移记录。
      *
-     * @param table         元表格
-     * @param version       本次迁移版本号
+     * @param table 元表格
+     * @param version 本次迁移版本号
      * @param ddlStatements 生成的 DDL 语句（每条对应一个 SchemaChange）
-     * @param operatorId    操作人 ID
+     * @param operatorId 操作人 ID
      * @return 创建的记录列表
      */
     @Transactional("metaTableTransactionManager")

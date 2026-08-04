@@ -28,7 +28,8 @@ public class SchemaDiffEngine {
     /**
      * 比较旧字段列表与新字段列表，生成有序的 Schema 变更列表。
      *
-     * <p>执行顺序：RENAME → DROP → ADD → ALTER（type/default/null/index）。
+     * <p>
+     * 执行顺序：RENAME → DROP → ADD → ALTER（type/default/null/index）。
      */
     public List<SchemaChange> diff(MetaTable table, List<MetaColumn> oldColumns, List<MetaColumn> newColumns) {
         validate(table, oldColumns, newColumns);
@@ -109,8 +110,7 @@ public class SchemaDiffEngine {
                 throw new MetaTableException(META_COLUMN_CODE_INVALID, "字段编码重复: " + next.getColumnCode());
             }
             if (next.getId() != null && !oldById.containsKey(next.getId())) {
-                throw new MetaTableException(META_COLUMN_CODE_INVALID,
-                        "字段 id 不存在: " + next.getId() + "，请清空新增字段的 id");
+                throw new MetaTableException(META_COLUMN_CODE_INVALID, "字段 id 不存在: " + next.getId() + "，请清空新增字段的 id");
             }
         }
     }
@@ -140,10 +140,9 @@ public class SchemaDiffEngine {
     private List<SchemaChange> alter(MetaColumn oldColumn, MetaColumn newColumn) {
         List<SchemaChange> changes = new ArrayList<>();
 
-        boolean typeChanged = !Objects.equals(oldColumn.getDataType(), newColumn.getDataType())
-                || !Objects.equals(oldColumn.getLength(), newColumn.getLength())
-                || !Objects.equals(oldColumn.getPrecision(), newColumn.getPrecision())
-                || !Objects.equals(oldColumn.getScale(), newColumn.getScale());
+        boolean typeChanged = !Objects.equals(oldColumn.getDataType(), newColumn.getDataType()) || !Objects.equals(oldColumn
+                .getLength(), newColumn.getLength()) || !Objects.equals(oldColumn.getPrecision(), newColumn.getPrecision()) ||
+                !Objects.equals(oldColumn.getScale(), newColumn.getScale());
 
         if (typeChanged) {
             SchemaChange change = new SchemaChange();
@@ -177,8 +176,8 @@ public class SchemaDiffEngine {
             changes.add(change);
         }
 
-        boolean indexChanged = !Objects.equals(oldColumn.getUnique(), newColumn.getUnique())
-                || !Objects.equals(oldColumn.getIndex(), newColumn.getIndex());
+        boolean indexChanged = !Objects.equals(oldColumn.getUnique(), newColumn.getUnique()) || !Objects.equals(oldColumn
+                .getIndex(), newColumn.getIndex());
         if (indexChanged) {
             SchemaChange change = new SchemaChange();
             change.setType(SchemaChangeType.ALTER_INDEX);

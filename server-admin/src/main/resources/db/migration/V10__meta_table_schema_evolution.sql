@@ -8,8 +8,8 @@ ALTER TABLE sys_meta_table
 ALTER TABLE sys_meta_table_column
     ADD COLUMN reference_table  VARCHAR(64),
     ADD COLUMN reference_column VARCHAR(64),
-    ADD COLUMN tenant_column    BOOLEAN DEFAULT FALSE,
-    ADD COLUMN owner_column     BOOLEAN DEFAULT FALSE;
+    ADD COLUMN tenant_column    INT DEFAULT 0,
+    ADD COLUMN owner_column     INT DEFAULT 0;
 
 -- 元表格迁移记录表
 CREATE TABLE IF NOT EXISTS sys_meta_table_migration

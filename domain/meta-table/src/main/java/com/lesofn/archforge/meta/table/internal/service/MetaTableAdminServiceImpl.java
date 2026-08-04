@@ -109,8 +109,8 @@ public class MetaTableAdminServiceImpl implements MetaTableAdminService {
         int currentVersion = existing.getSchemaVersion() == null ? 1 : existing.getSchemaVersion();
         int nextVersion = currentVersion + 1;
 
-        List<MetaTableMigration> records =
-                migrationService.createPendingRecords(existing, nextVersion, ddlStatements, operatorId);
+        List<MetaTableMigration> records = migrationService.createPendingRecords(existing, nextVersion, ddlStatements,
+                operatorId);
 
         for (var ddl : ddlStatements) {
             jdbcTemplate.getJdbcOperations().execute(ddl.sql());
@@ -126,9 +126,8 @@ public class MetaTableAdminServiceImpl implements MetaTableAdminService {
 
         // 软删除被 DROP 的字段
         for (MetaColumn old : oldColumns) {
-            if (changes.stream().anyMatch(c -> c.getType() == SchemaChangeType.DROP_COLUMN
-                    && old.getId() != null
-                    && Objects.equals(old.getId(), c.getOldColumn().getId()))) {
+            if (changes.stream().anyMatch(c -> c.getType() == SchemaChangeType.DROP_COLUMN && old.getId() != null && Objects
+                    .equals(old.getId(), c.getOldColumn().getId()))) {
                 old.setDeleted(true);
                 metaColumnRepository.save(old);
             }
