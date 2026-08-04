@@ -1,7 +1,7 @@
 -- 默认博客目录
-INSERT INTO blog_category (id, name, slug, sort_order, status, creator_id, create_time, updater_id, update_time, deleted)
-VALUES (1, 'Tech', 'tech', 0, 1, 0, CURRENT_TIMESTAMP, null, null, 0)
-ON CONFLICT (id) DO NOTHING;
+INSERT INTO blog_category (name, slug, sort_order, status, creator_id, create_time, updater_id, update_time, deleted)
+VALUES ('Tech', 'tech', 0, 1, 0, CURRENT_TIMESTAMP, null, null, 0)
+ON CONFLICT (slug) DO NOTHING;
 
 -- 博客管理（目录）
 INSERT INTO sys_menu (menu_id, menu_name, menu_type, router_name, parent_id, path, is_button, permission, meta_info, status, remark, creator_id, create_time, updater_id, update_time, deleted)

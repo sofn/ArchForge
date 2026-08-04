@@ -39,6 +39,7 @@ public class InitDbMockServer {
             populator.addScript(new ClassPathResource("sql/data-admin-dept.sql"));
             populator.addScript(new ClassPathResource("sql/data-admin-config.sql"));
             populator.addScript(new ClassPathResource("sql/data-admin-quartz.sql"));
+            populator.addScript(new ClassPathResource("sql/data-admin-blog.sql"));
             populator.setSqlScriptEncoding(StandardCharsets.UTF_8.name());
             populator.setContinueOnError(true);
 
@@ -66,7 +67,9 @@ public class InitDbMockServer {
                 "sys_notice_notice_id_seq",
                 "sys_oper_log_oper_id_seq",
                 "sys_login_log_info_id_seq",
-                "sys_file_file_id_seq"
+                "sys_file_file_id_seq",
+                "blog_category_id_seq",
+                "blog_article_id_seq"
         };
         String[] tables = {
                 "sys_user",
@@ -77,7 +80,9 @@ public class InitDbMockServer {
                 "sys_notice",
                 "sys_oper_log",
                 "sys_login_log",
-                "sys_file"
+                "sys_file",
+                "blog_category",
+                "blog_article"
         };
         String[] idCols = {
                 "user_id",
@@ -88,7 +93,9 @@ public class InitDbMockServer {
                 "notice_id",
                 "oper_id",
                 "info_id",
-                "file_id"
+                "file_id",
+                "id",
+                "id"
         };
         for (int i = 0; i < sequences.length; i++) {
             try {

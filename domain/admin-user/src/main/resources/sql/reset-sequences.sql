@@ -8,3 +8,5 @@ SELECT setval('sys_notice_notice_id_seq', COALESCE((SELECT MAX(notice_id) FROM s
 SELECT setval('sys_oper_log_oper_id_seq', COALESCE((SELECT MAX(oper_id) FROM sys_oper_log), 1));
 SELECT setval('sys_login_log_info_id_seq', COALESCE((SELECT MAX(info_id) FROM sys_login_log), 1));
 SELECT setval('sys_file_file_id_seq', COALESCE((SELECT MAX(file_id) FROM sys_file), 1));
+SELECT setval('blog_category_id_seq', COALESCE((SELECT MAX(id) FROM blog_category), 1));
+SELECT setval('blog_article_id_seq', COALESCE((SELECT MAX(id) FROM blog_article), 1));
