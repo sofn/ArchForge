@@ -1,6 +1,7 @@
 package com.lesofn.archforge.meta.table.internal.schema;
 
 import com.lesofn.archforge.meta.table.api.domain.MetaColumn;
+import java.util.List;
 import lombok.Data;
 
 /**
@@ -34,4 +35,16 @@ public class SchemaChange {
     private Boolean oldUnique;
 
     private Boolean newUnique;
+
+    private String oldIndexType;
+
+    private String newIndexType;
+
+    private String oldIndexGroup;
+
+    private String newIndexGroup;
+
+    private List<MetaColumn> oldGroupColumns;
+
+    private List<MetaColumn> newGroupColumns;
 }

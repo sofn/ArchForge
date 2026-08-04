@@ -13,5 +13,9 @@ public enum MetaColumnType {
     DATETIME,
     ENUM,
     JSON,
-    FILE
+    FILE,
+    UUID,
+    TIMESTAMPTZ,
+    ARRAY,
+    GEO
 }

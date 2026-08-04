@@ -1,5 +1,7 @@
 package com.lesofn.archforge.meta.table.internal.validator;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lesofn.archforge.meta.table.api.domain.MetaColumn;
 import com.lesofn.archforge.meta.table.api.domain.MetaColumnType;
 import com.lesofn.archforge.meta.table.api.domain.MetaTable;
@@ -10,13 +12,19 @@ import com.lesofn.archforge.meta.table.internal.exception.MetaTableException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
+import org.postgresql.util.PGobject;
 import org.springframework.stereotype.Component;
 
 /**
@@ -27,6 +35,9 @@ public class MetaTableValidator {
 
     private static final String DATE_PATTERN = "yyyy-MM-dd";
     private static final String DATE_TIME_PATTERN = "yyyy-MM-dd HH:mm:ss";
+    private static final String TIMESTAMPTZ_PATTERN = "yyyy-MM-dd HH:mm:ssXXX";
+    private static final DateTimeFormatter TIMESTAMPTZ_FORMATTER = DateTimeFormatter.ofPattern(TIMESTAMPTZ_PATTERN);
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     /** 校验表定义与字段定义。 */
     public void validate(MetaTable table, List<MetaColumn> columns) {
@@ -40,6 +51,7 @@ public class MetaTableValidator {
         }
 
         Set<String> columnCodes = new HashSet<>();
+        Set<String> groupNames = new HashSet<>();
         for (MetaColumn column : columns) {
             if (column.getColumnCode() == null || column.getColumnCode().isEmpty()) {
                 throw new MetaTableException(MetaTableErrorCode.META_COLUMN_CODE_INVALID);
@@ -52,6 +64,7 @@ public class MetaTableValidator {
                 throw new MetaTableException(MetaTableErrorCode.META_COLUMN_TYPE_INVALID);
             }
             validateColumnConfig(column);
+            validateIndexGroup(column, columns, groupNames);
         }
     }
 
@@ -79,6 +92,50 @@ public class MetaTableValidator {
         if (type == MetaColumnType.ENUM && (column.getOptions() == null || column.getOptions().isEmpty())) {
             throw new MetaTableException(MetaTableErrorCode.META_COLUMN_TYPE_INVALID, "枚举类型必须配置选项");
         }
+        if (type == MetaColumnType.ARRAY && (column.getArrayElementType() == null || column.getArrayElementType().isEmpty())) {
+            throw new MetaTableException(MetaTableErrorCode.META_COLUMN_TYPE_INVALID, "ARRAY 类型必须配置元素类型");
+        }
+        if (column.getIndexType() != null && !column.getIndexType().isEmpty()) {
+            Set<String> validTypes = Set.of("BTREE", "GIN", "GIST", "FULLTEXT");
+            if (!validTypes.contains(column.getIndexType().toUpperCase())) {
+                throw new MetaTableException(MetaTableErrorCode.META_COLUMN_TYPE_INVALID, "不支持的索引类型: " + column.getIndexType());
+            }
+        }
+    }
+
+    private void validateIndexGroup(MetaColumn column, List<MetaColumn> columns, Set<String> groupNames) {
+        String group = column.getIndexGroup();
+        if (group == null || group.isEmpty()) {
+            return;
+        }
+        if (!isIndexEnabled(column)) {
+            throw new MetaTableException(MetaTableErrorCode.META_COLUMN_TYPE_INVALID, "字段 " + column.getColumnCode() +
+                    " 加入索引组但未启用索引");
+        }
+        if (!groupNames.add(group)) {
+            return;
+        }
+        List<MetaColumn> members = columns.stream()
+                .filter(c -> group.equals(c.getIndexGroup()))
+                .toList();
+        String indexType = null;
+        boolean first = true;
+        for (MetaColumn member : members) {
+            String memberType = member.getIndexType();
+            if (memberType == null || memberType.isEmpty()) {
+                memberType = "BTREE";
+            }
+            if (first) {
+                indexType = memberType;
+                first = false;
+            } else if (!indexType.equalsIgnoreCase(memberType)) {
+                throw new MetaTableException(MetaTableErrorCode.META_COLUMN_TYPE_INVALID, "索引组 " + group + " 内的字段索引类型必须一致");
+            }
+        }
+    }
+
+    private boolean isIndexEnabled(MetaColumn column) {
+        return Boolean.TRUE.equals(column.getUnique()) || Boolean.TRUE.equals(column.getIndex());
     }
 
     private void validateValue(MetaColumn column, Object value) {
@@ -92,15 +149,13 @@ public class MetaTableValidator {
                 case BOOLEAN -> parseBoolean(value);
                 case DATE -> LocalDate.parse(value.toString());
                 case DATETIME -> LocalDateTime.parse(value.toString().replace(' ', 'T'));
-                case JSON -> {
-                    // 仅校验非空字符串；复杂 JSON 由数据库保证
-                    if (!(value instanceof String) || ((String) value).trim().isEmpty()) {
-                        throw new MetaTableException(MetaTableErrorCode.META_COLUMN_VALUE_INVALID, column.getColumnName() +
-                                " JSON 格式错误");
-                    }
-                }
+                case UUID -> UUID.fromString(value.toString());
+                case TIMESTAMPTZ -> parseTimestampTz(value.toString());
+                case JSON -> validateJson(value);
+                case GEO -> validateGeo(value);
+                case ARRAY -> validateArray(column, value);
             }
-        } catch (DateTimeParseException | NumberFormatException e) {
+        } catch (DateTimeParseException | IllegalArgumentException e) {
             throw new MetaTableException(MetaTableErrorCode.META_COLUMN_VALUE_INVALID, column.getColumnName() + " 格式错误: " +
                     value);
         }
@@ -126,6 +181,93 @@ public class MetaTableValidator {
         }
     }
 
+    private void validateJson(Object value) {
+        if (!(value instanceof String)) {
+            return;
+        }
+        String str = ((String) value).trim();
+        if (str.isEmpty()) {
+            throw new MetaTableException(MetaTableErrorCode.META_COLUMN_VALUE_INVALID, "JSON 不能为空");
+        }
+        try {
+            OBJECT_MAPPER.readTree(str);
+        } catch (Exception e) {
+            throw new MetaTableException(MetaTableErrorCode.META_COLUMN_VALUE_INVALID, "JSON 格式错误");
+        }
+    }
+
+    private void validateGeo(Object value) {
+        JsonNode node = parseJsonNode(value);
+        if (!node.has("lat") || !node.has("lng")) {
+            throw new MetaTableException(MetaTableErrorCode.META_COLUMN_VALUE_INVALID, "地理位置必须包含 lat 和 lng");
+        }
+        if (!node.get("lat").isNumber() || !node.get("lng").isNumber()) {
+            throw new MetaTableException(MetaTableErrorCode.META_COLUMN_VALUE_INVALID, "lat 和 lng 必须是数字");
+        }
+    }
+
+    private void validateArray(MetaColumn column, Object value) {
+        List<String> elements = parseArrayElements(value);
+        String elementType = column.getArrayElementType() == null ? "STRING" : column.getArrayElementType().toUpperCase();
+        for (String element : elements) {
+            switch (elementType) {
+                case "INTEGER" -> Long.parseLong(element);
+                case "DECIMAL" -> new BigDecimal(element);
+                case "BOOLEAN" -> parseBooleanString(element);
+                case "STRING" -> {
+                    // 字符串无需额外校验
+                }
+                default -> throw new MetaTableException(MetaTableErrorCode.META_COLUMN_VALUE_INVALID, "不支持的数组元素类型: " +
+                        elementType);
+            }
+        }
+    }
+
+    private JsonNode parseJsonNode(Object value) {
+        try {
+            if (value instanceof String) {
+                return OBJECT_MAPPER.readTree((String) value);
+            }
+            return OBJECT_MAPPER.valueToTree(value);
+        } catch (Exception e) {
+            throw new MetaTableException(MetaTableErrorCode.META_COLUMN_VALUE_INVALID, "JSON 格式错误: " + value);
+        }
+    }
+
+    private List<String> parseArrayElements(Object value) {
+        if (value instanceof Collection<?> collection) {
+            return collection.stream().map(Object::toString).toList();
+        }
+        if (value instanceof String string) {
+            String trimmed = string.trim();
+            if (trimmed.startsWith("[") && trimmed.endsWith("]")) {
+                trimmed = trimmed.substring(1, trimmed.length() - 1);
+            }
+            if (trimmed.isEmpty()) {
+                return List.of();
+            }
+            return Arrays.stream(trimmed.split(","))
+                    .map(s -> {
+                        String e = s.trim();
+                        if (e.startsWith("\"") && e.endsWith("\"")) {
+                            e = e.substring(1, e.length() - 1);
+                        }
+                        return e;
+                    })
+                    .toList();
+        }
+        throw new MetaTableException(MetaTableErrorCode.META_COLUMN_VALUE_INVALID, "ARRAY 值格式错误: " + value);
+    }
+
+    private OffsetDateTime parseTimestampTz(String value) {
+        String normalized = value.trim().replace(' ', 'T');
+        try {
+            return OffsetDateTime.parse(normalized);
+        } catch (DateTimeParseException e) {
+            return OffsetDateTime.parse(value, TIMESTAMPTZ_FORMATTER);
+        }
+    }
+
     private long parseLong(Object value) {
         if (value instanceof Number number) {
             return number.longValue();
@@ -137,8 +279,18 @@ public class MetaTableValidator {
         if (value instanceof Boolean b) {
             return b;
         }
-        String str = value.toString().trim();
-        return "true".equalsIgnoreCase(str) || "1".equals(str);
+        return parseBooleanString(value.toString());
+    }
+
+    private boolean parseBooleanString(String value) {
+        String str = value.trim();
+        if ("true".equalsIgnoreCase(str) || "1".equals(str)) {
+            return true;
+        }
+        if ("false".equalsIgnoreCase(str) || "0".equals(str)) {
+            return false;
+        }
+        throw new IllegalArgumentException("Invalid boolean value: " + value);
     }
 
     private boolean isEmpty(Object value) {
@@ -157,8 +309,54 @@ public class MetaTableValidator {
             case BOOLEAN -> parseBoolean(value);
             case DATE -> java.sql.Date.valueOf(LocalDate.parse(value.toString()));
             case DATETIME -> java.sql.Timestamp.valueOf(LocalDateTime.parse(value.toString().replace(' ', 'T')));
-            case JSON -> value.toString();
+            case TIMESTAMPTZ -> parseTimestampTz(value.toString());
+            case UUID -> UUID.fromString(value.toString());
+            case JSON, GEO -> toPgJsonb(value.toString());
+            case ARRAY -> toPgArray(column, value);
         };
+    }
+
+    private PGobject toPgJsonb(String value) {
+        try {
+            PGobject pgObject = new PGobject();
+            pgObject.setType("jsonb");
+            pgObject.setValue(value);
+            return pgObject;
+        } catch (Exception e) {
+            throw new MetaTableException(MetaTableErrorCode.META_COLUMN_VALUE_INVALID, "JSONB 转换失败: " + value);
+        }
+    }
+
+    private PGobject toPgArray(MetaColumn column, Object value) {
+        List<String> elements = parseArrayElements(value);
+        String elementType = column.getArrayElementType() == null ? "STRING" : column.getArrayElementType().toUpperCase();
+        String arrayType = switch (elementType) {
+            case "INTEGER" -> "bigint[]";
+            case "DECIMAL" -> "numeric[]";
+            case "BOOLEAN" -> "boolean[]";
+            default -> "text[]";
+        };
+        String arrayValue = buildPgArrayLiteral(elements, elementType);
+        try {
+            PGobject pgObject = new PGobject();
+            pgObject.setType(arrayType);
+            pgObject.setValue(arrayValue);
+            return pgObject;
+        } catch (Exception e) {
+            throw new MetaTableException(MetaTableErrorCode.META_COLUMN_VALUE_INVALID, "ARRAY 转换失败: " + value);
+        }
+    }
+
+    private String buildPgArrayLiteral(List<String> elements, String elementType) {
+        if (elements.isEmpty()) {
+            return "{}";
+        }
+        if ("STRING".equalsIgnoreCase(elementType)) {
+            return "{" + elements.stream()
+                    .map(e -> "\"" + e.replace("\\", "\\\\").replace("\"", "\\\"") + "\"")
+                    .collect(Collectors.joining(",")) + "}";
+        }
+        return "{" + String.join(",", elements) + "}";
     }
 
     /** 解析日期/时间字符串为显示文本。 */
@@ -167,8 +365,10 @@ public class MetaTableValidator {
             return "";
         }
         return switch (column.getDataType()) {
-            case DATE, DATETIME -> value.toString();
+            case DATE, DATETIME, TIMESTAMPTZ -> value.toString();
             case BOOLEAN -> Boolean.TRUE.equals(value) ? "是" : "否";
+            case JSON, GEO -> value.toString();
+            case ARRAY -> formatArrayValue(value);
             case ENUM -> {
                 if (column.getOptions() == null) {
                     yield value.toString();
@@ -182,5 +382,12 @@ public class MetaTableValidator {
             }
             default -> value.toString();
         };
+    }
+
+    private String formatArrayValue(Object value) {
+        if (value instanceof PGobject pgObject) {
+            return pgObject.getValue();
+        }
+        return value.toString();
     }
 }

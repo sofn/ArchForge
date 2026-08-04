@@ -65,12 +65,16 @@ public class MetaTableMigrationService {
         MetaColumn oldColumn = ddl.change().getOldColumn();
         MetaColumn newColumn = ddl.change().getNewColumn();
 
-        if (oldColumn != null) {
+        if (ddl.change().getOldIndexGroup() != null) {
+            record.setColumnCode(ddl.change().getOldIndexGroup());
+        } else if (ddl.change().getNewIndexGroup() != null) {
+            record.setColumnCode(ddl.change().getNewIndexGroup());
+        } else if (oldColumn != null) {
             record.setColumnCode(oldColumn.getColumnCode());
         } else if (newColumn != null) {
             record.setColumnCode(newColumn.getColumnCode());
         }
-        if (newColumn != null && oldColumn != null) {
+        if (newColumn != null && oldColumn != null && ddl.change().getOldIndexGroup() == null) {
             record.setOldColumnCode(oldColumn.getColumnCode());
         }
 

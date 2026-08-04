@@ -215,23 +215,58 @@ public class MetaTableCrudServiceImpl implements MetaTableCrudService {
             if (value == null || (value instanceof String s && s.isEmpty())) {
                 continue;
             }
-            MetaColumn column = columnMap.get(key);
-            if (column == null || !column.isSearchableColumn()) {
+            FilterPath filterPath = parseFilterKey(columnMap, key);
+            if (filterPath == null || !filterPath.column().isSearchableColumn()) {
                 continue;
             }
-            String paramName = "filter_" + key;
-            params.addValue(paramName, value);
-            String quoted = SqlIdentifier.quote(key);
-            if (column.getDataType() == com.lesofn.archforge.meta.table.api.domain.MetaColumnType.STRING || column
-                    .getDataType() == com.lesofn.archforge.meta.table.api.domain.MetaColumnType.TEXT || column
-                            .getDataType() == com.lesofn.archforge.meta.table.api.domain.MetaColumnType.ENUM) {
+            MetaColumn column = filterPath.column();
+            String paramName = "filter_" + key.replace('.', '_').replace(' ', '_');
+            if (filterPath.jsonPath() != null) {
+                params.addValue(paramName, value.toString());
+                sb.append(" AND ").append(buildJsonPathExpression(column, filterPath.jsonPath(), paramName, value));
+            } else if (isLikeSearchType(column)) {
                 params.addValue(paramName, "%" + value + "%");
-                sb.append(" AND ").append(quoted).append(" LIKE :").append(paramName);
+                sb.append(" AND ").append(SqlIdentifier.quote(key)).append("::text LIKE :").append(paramName);
             } else {
-                sb.append(" AND ").append(quoted).append(" = :").append(paramName);
+                params.addValue(paramName, validator.convertValue(column, value));
+                sb.append(" AND ").append(SqlIdentifier.quote(key)).append(" = :").append(paramName);
             }
         }
         return sb.toString();
+    }
+
+    private FilterPath parseFilterKey(Map<String, MetaColumn> columnMap, String key) {
+        int dot = key.indexOf('.');
+        if (dot > 0) {
+            String columnCode = key.substring(0, dot);
+            MetaColumn column = columnMap.get(columnCode);
+            if (column != null) {
+                return new FilterPath(column, key.substring(dot + 1));
+            }
+        }
+        MetaColumn column = columnMap.get(key);
+        return column == null ? null : new FilterPath(column, null);
+    }
+
+    private boolean isLikeSearchType(MetaColumn column) {
+        return switch (column.getDataType()) {
+            case STRING, TEXT, FILE, ENUM, JSON, GEO -> true;
+            default -> false;
+        };
+    }
+
+    private String buildJsonPathExpression(MetaColumn column, String jsonPath, String paramName, Object value) {
+        String quoted = SqlIdentifier.quote(column.getColumnCode());
+        String[] parts = jsonPath.split("\\.");
+        if (parts.length == 1) {
+            return quoted + " ->> '" + parts[0] + "' LIKE :" + paramName;
+        }
+        return quoted + " #>> ARRAY[" + java.util.Arrays.stream(parts)
+                .map(p -> "'" + p.replace("'", "''") + "'")
+                .collect(Collectors.joining(", ")) + "] LIKE :" + paramName;
+    }
+
+    private record FilterPath(MetaColumn column, String jsonPath) {
     }
 
     private Map<String, Object> convertRow(Map<String, Object> row) {

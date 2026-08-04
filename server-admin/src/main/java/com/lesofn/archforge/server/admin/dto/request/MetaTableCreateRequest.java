@@ -84,7 +84,13 @@ public class MetaTableCreateRequest {
 
         private Boolean index = false;
 
+        private String indexType;
+
+        private String indexGroup;
+
         private Integer sort = 0;
+
+        private String arrayElementType;
 
         private List<com.lesofn.archforge.meta.table.api.domain.OptionItem> options;
 
@@ -112,12 +118,15 @@ public class MetaTableCreateRequest {
             column.setSearchable(searchable);
             column.setListVisible(listVisible);
             column.setIndex(index);
+            column.setIndexType(indexType);
+            column.setIndexGroup(indexGroup);
             column.setSort(sort);
             column.setOptions(options);
             column.setReferenceTable(referenceTable);
             column.setReferenceColumn(referenceColumn);
             column.setTenantColumn(tenantColumn);
             column.setOwnerColumn(ownerColumn);
+            column.setArrayElementType(arrayElementType);
             return column;
         }
     }

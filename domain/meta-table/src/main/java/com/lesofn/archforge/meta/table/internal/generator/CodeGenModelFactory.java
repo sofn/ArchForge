@@ -129,6 +129,10 @@ public final class CodeGenModelFactory {
         col.put("isDate", type == MetaColumnType.DATE);
         col.put("isDateTime", type == MetaColumnType.DATETIME);
         col.put("isEnum", type == MetaColumnType.ENUM);
+        col.put("isUuid", type == MetaColumnType.UUID);
+        col.put("isTimestampTz", type == MetaColumnType.TIMESTAMPTZ);
+        col.put("isArray", type == MetaColumnType.ARRAY);
+        col.put("isGeo", type == MetaColumnType.GEO);
         col.put("searchable", Boolean.TRUE.equals(column.getSearchable()));
         col.put("listVisible", Boolean.TRUE.equals(column.getListVisible()));
         col.put("required", Boolean.TRUE.equals(column.getRequired()));
@@ -202,7 +206,7 @@ public final class CodeGenModelFactory {
 
     private static String javaType(MetaColumnType type) {
         return switch (type) {
-            case STRING, TEXT, JSON, FILE, ENUM -> "String";
+            case STRING, TEXT, JSON, FILE, ENUM, UUID, TIMESTAMPTZ, ARRAY, GEO -> "String";
             case INTEGER -> "Long";
             case DECIMAL -> "BigDecimal";
             case BOOLEAN -> "Boolean";
@@ -213,7 +217,7 @@ public final class CodeGenModelFactory {
 
     private static String tsType(MetaColumnType type) {
         return switch (type) {
-            case STRING, TEXT, JSON, FILE, ENUM, DATE, DATETIME -> "string";
+            case STRING, TEXT, JSON, FILE, ENUM, DATE, DATETIME, UUID, TIMESTAMPTZ, ARRAY, GEO -> "string";
             case INTEGER, DECIMAL -> "number";
             case BOOLEAN -> "boolean";
         };
@@ -221,7 +225,7 @@ public final class CodeGenModelFactory {
 
     private static String componentType(MetaColumnType type) {
         return switch (type) {
-            case STRING, TEXT, JSON, FILE -> "input";
+            case STRING, TEXT, JSON, FILE, UUID, TIMESTAMPTZ, ARRAY, GEO -> "input";
             case INTEGER, DECIMAL -> "input-number";
             case BOOLEAN -> "switch";
             case DATE, DATETIME -> "date-picker";
@@ -231,7 +235,7 @@ public final class CodeGenModelFactory {
 
     private static String inputType(MetaColumnType type) {
         return switch (type) {
-            case TEXT, JSON -> "textarea";
+            case TEXT, JSON, GEO -> "textarea";
             case FILE -> "file";
             default -> "text";
         };
@@ -260,7 +264,7 @@ public final class CodeGenModelFactory {
 
     private static String javaDefaultValue(MetaColumnType type, List<OptionItem> options) {
         return switch (type) {
-            case STRING, TEXT, JSON, FILE -> "\"测试\"";
+            case STRING, TEXT, JSON, FILE, UUID, TIMESTAMPTZ, ARRAY, GEO -> "\"测试\"";
             case INTEGER -> "1L";
             case DECIMAL -> "new BigDecimal(\"1.00\")";
             case BOOLEAN -> "true";

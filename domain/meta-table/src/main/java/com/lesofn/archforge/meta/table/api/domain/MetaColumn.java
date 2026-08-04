@@ -93,6 +93,15 @@ public class MetaColumn extends BasePO {
     @Column(name = "owner_column")
     private Boolean ownerColumn;
 
+    @Column(name = "index_type")
+    private String indexType;
+
+    @Column(name = "index_group")
+    private String indexGroup;
+
+    @Column(name = "array_element_type")
+    private String arrayElementType;
+
     public boolean isUniqueColumn() { return Boolean.TRUE.equals(unique); }
 
     public boolean isIndexedColumn() { return Boolean.TRUE.equals(index); }

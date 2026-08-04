@@ -3,7 +3,12 @@ package com.lesofn.archforge.meta.table.internal.ddl;
 import com.lesofn.archforge.meta.table.api.domain.MetaColumn;
 import com.lesofn.archforge.meta.table.api.domain.MetaTable;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -13,6 +18,8 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class MetaTableDdlGenerator {
+
+    private static final int PG_MAX_IDENTIFIER_LENGTH = 63;
 
     private final ColumnTypeResolver columnTypeResolver;
 
@@ -36,21 +43,14 @@ public class MetaTableDdlGenerator {
         createSql.append("    update_time TIMESTAMP,\n");
         createSql.append("    deleted INT DEFAULT 0 NOT NULL");
 
-        List<String> indexStatements = new ArrayList<>();
         for (MetaColumn column : columns) {
             SqlIdentifier.validateColumnCode(column.getColumnCode());
             String columnDef = buildColumnDefinition(column);
             createSql.append(",\n    ").append(columnDef);
-
-            if (column.isUniqueColumn()) {
-                indexStatements.add(buildCreateIndex(table, column, true));
-            } else if (column.isIndexedColumn()) {
-                indexStatements.add(buildCreateIndex(table, column, false));
-            }
         }
 
         createSql.append("\n)");
-        return new DdlResult(createSql.toString(), indexStatements);
+        return new DdlResult(createSql.toString(), buildIndexStatements(table, columns));
     }
 
     /** 生成删除物理表 SQL。 */
@@ -72,12 +72,88 @@ public class MetaTableDdlGenerator {
         return sb.toString();
     }
 
-    private String buildCreateIndex(MetaTable table, MetaColumn column, boolean unique) {
-        String physicalName = physicalTableName(table);
-        String indexName = (unique ? "uq_" : "idx_") + physicalName + "_" + column.getColumnCode();
-        String prefix = indexName.length() > 63 ? indexName.substring(0, 63) : indexName;
-        return "CREATE " + (unique ? "UNIQUE " : "") + "INDEX IF NOT EXISTS " + SqlIdentifier.quote(prefix) + " ON " +
-                SqlIdentifier.quote(physicalName) + " (" + SqlIdentifier.quote(column.getColumnCode()) + ")";
+    private List<String> buildIndexStatements(MetaTable table, List<MetaColumn> columns) {
+        List<String> statements = new ArrayList<>();
+        String physicalTableCode = physicalTableName(table);
+
+        // 复合索引：按 indexGroup 分组
+        Map<String, List<MetaColumn>> grouped = columns.stream()
+                .filter(c -> c.getIndexGroup() != null && !c.getIndexGroup().isEmpty())
+                .filter(this::isIndexEnabled)
+                .collect(Collectors.groupingBy(MetaColumn::getIndexGroup, LinkedHashMap::new, Collectors.toList()));
+
+        for (Map.Entry<String, List<MetaColumn>> entry : grouped.entrySet()) {
+            List<MetaColumn> groupColumns = entry.getValue().stream()
+                    .sorted(Comparator.comparingInt(c -> c.getSort() == null ? 0 : c.getSort()))
+                    .toList();
+            boolean unique = groupColumns.stream().anyMatch(c -> Boolean.TRUE.equals(c.getUnique()));
+            String indexType = groupColumns.get(0).getIndexType();
+            if (indexType == null || indexType.isEmpty()) {
+                indexType = "BTREE";
+            }
+            statements.add(buildCreateIndex(physicalTableCode, entry.getKey(), groupColumns, indexType, unique));
+        }
+
+        // 单列索引
+        for (MetaColumn column : columns) {
+            if (column.getIndexGroup() != null && !column.getIndexGroup().isEmpty()) {
+                continue;
+            }
+            if (!isIndexEnabled(column)) {
+                continue;
+            }
+            boolean unique = Boolean.TRUE.equals(column.getUnique());
+            String indexType = column.getIndexType();
+            if (indexType == null || indexType.isEmpty()) {
+                indexType = "BTREE";
+            }
+            statements.add(buildCreateIndex(physicalTableCode, column.getColumnCode(), List.of(column), indexType, unique));
+        }
+
+        return statements;
+    }
+
+    private boolean isIndexEnabled(MetaColumn column) {
+        return Boolean.TRUE.equals(column.getUnique()) || Boolean.TRUE.equals(column.getIndex());
+    }
+
+    private String buildCreateIndex(String physicalTableCode, String indexKey, List<MetaColumn> columns, String indexType,
+            boolean unique) {
+        String physicalName = SqlIdentifier.quote(physicalTableCode);
+        String rawName = (unique ? "uq_" : "idx_") + physicalTableCode + "_" + indexKey;
+        String indexName = rawName.length() > PG_MAX_IDENTIFIER_LENGTH ? rawName.substring(0, PG_MAX_IDENTIFIER_LENGTH)
+                : rawName;
+
+        List<String> indexedExpressions = columns.stream()
+                .map(c -> indexExpression(c, indexType))
+                .filter(Objects::nonNull)
+                .toList();
+        if (indexedExpressions.isEmpty()) {
+            return "";
+        }
+
+        String columnsPart = String.join(", ", indexedExpressions);
+        StringBuilder sb = new StringBuilder();
+        sb.append("CREATE ");
+        if (unique) {
+            sb.append("UNIQUE ");
+        }
+        sb.append("INDEX IF NOT EXISTS ").append(SqlIdentifier.quote(indexName))
+                .append(" ON ").append(physicalName);
+        if ("GIN".equalsIgnoreCase(indexType) || "GIST".equalsIgnoreCase(indexType) || "FULLTEXT".equalsIgnoreCase(indexType)) {
+            String pgType = "FULLTEXT".equalsIgnoreCase(indexType) ? "GIN" : indexType.toUpperCase();
+            sb.append(" USING ").append(pgType);
+        }
+        sb.append(" (").append(columnsPart).append(")");
+        return sb.toString();
+    }
+
+    private String indexExpression(MetaColumn column, String indexType) {
+        String quoted = SqlIdentifier.quote(column.getColumnCode());
+        if ("FULLTEXT".equalsIgnoreCase(indexType)) {
+            return "to_tsvector('chinese', " + quoted + ")";
+        }
+        return quoted;
     }
 
     /** DDL 生成结果：建表语句 + 索引语句列表。 */

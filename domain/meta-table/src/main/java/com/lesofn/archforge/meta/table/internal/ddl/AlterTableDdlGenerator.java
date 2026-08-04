@@ -5,6 +5,7 @@ import com.lesofn.archforge.meta.table.api.domain.MetaTable;
 import com.lesofn.archforge.meta.table.internal.schema.SchemaChange;
 import com.lesofn.archforge.meta.table.internal.schema.SchemaChangeType;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -15,6 +16,8 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class AlterTableDdlGenerator {
+
+    private static final int PG_MAX_IDENTIFIER_LENGTH = 63;
 
     private final ColumnTypeResolver columnTypeResolver;
 
@@ -56,21 +59,17 @@ public class AlterTableDdlGenerator {
         }
         statements.add(sb.toString());
 
-        String index = indexStatement(table, column, column.getColumnCode());
-        if (index != null) {
-            statements.add(index);
-        }
+        List<String> indexStatements = buildIndexStatements(table, List.of(column));
+        statements.addAll(indexStatements);
         return List.of(new SchemaDdl(change, statements));
     }
 
     private List<SchemaDdl> generateDropColumn(MetaTable table, SchemaChange change) {
         List<String> statements = new ArrayList<>();
         MetaColumn column = change.getOldColumn();
-        String oldCode = column.getColumnCode();
         String physicalName = SqlIdentifier.quote(table.physicalTableName());
-        dropIndexStatement(statements, table, oldCode, true);
-        dropIndexStatement(statements, table, oldCode, false);
-        statements.add("ALTER TABLE " + physicalName + " DROP COLUMN IF EXISTS " + SqlIdentifier.quote(oldCode));
+        statements.add("ALTER TABLE " + physicalName + " DROP COLUMN IF EXISTS " + SqlIdentifier.quote(column.getColumnCode()) +
+                " CASCADE");
         return List.of(new SchemaDdl(change, statements));
     }
 
@@ -84,8 +83,8 @@ public class AlterTableDdlGenerator {
         String physicalName = SqlIdentifier.quote(table.physicalTableName());
         MetaColumn oldColumn = change.getOldColumn();
         MetaColumn newColumn = change.getNewColumn();
-        String oldType = columnTypeResolver.resolve(oldColumn);
-        String newType = columnTypeResolver.resolve(newColumn);
+        String oldType = change.getOldType();
+        String newType = change.getNewType();
         String using = buildUsingExpression(newColumn.getColumnCode(), oldType, newType);
         return List.of(new SchemaDdl(change, List.of("ALTER TABLE " + physicalName + " ALTER COLUMN " + SqlIdentifier.quote(
                 newColumn.getColumnCode()) + " TYPE " + newType + " USING " + using)));
@@ -113,62 +112,127 @@ public class AlterTableDdlGenerator {
 
     private List<SchemaDdl> generateAlterIndex(MetaTable table, SchemaChange change) {
         List<String> statements = new ArrayList<>();
-        MetaColumn oldColumn = change.getOldColumn();
-        MetaColumn newColumn = change.getNewColumn();
-        String oldCode = oldColumn.getColumnCode();
-        String newCode = newColumn.getColumnCode();
+        String physicalTableCode = table.physicalTableName();
 
-        String oldEffective = effectiveIndexType(oldColumn.getUnique(), oldColumn.getIndex());
-        String newEffective = effectiveIndexType(newColumn.getUnique(), newColumn.getIndex());
+        List<MetaColumn> oldMembers = change.getOldGroupColumns();
+        List<MetaColumn> newMembers = change.getNewGroupColumns();
 
-        if (oldEffective != null && !oldEffective.equals(newEffective)) {
-            dropIndexStatement(statements, table, oldCode, "UNIQUE".equals(oldEffective));
+        if (oldMembers != null && !oldMembers.isEmpty()) {
+            statements.add(buildDropIndex(physicalTableCode, oldMembers, change.getOldIndexGroup(), change.getOldIndexType()));
         }
-        if (newEffective != null && !newEffective.equals(oldEffective)) {
-            statements.add(buildCreateIndex(table, newCode, "UNIQUE".equals(newEffective)));
+        if (newMembers != null && !newMembers.isEmpty()) {
+            statements.add(buildCreateIndex(physicalTableCode, newMembers, change.getNewIndexGroup(),
+                    change.getNewIndexType(), change.getNewUnique()));
         }
+
         return List.of(new SchemaDdl(change, statements));
+    }
+
+    private List<String> buildIndexStatements(MetaTable table, List<MetaColumn> columns) {
+        List<String> statements = new ArrayList<>();
+        String physicalTableCode = table.physicalTableName();
+
+        // 单列索引
+        for (MetaColumn column : columns) {
+            if (!isIndexEnabled(column)) {
+                continue;
+            }
+            if (column.getIndexGroup() != null && !column.getIndexGroup().isEmpty()) {
+                continue;
+            }
+            String indexType = column.getIndexType();
+            if (indexType == null || indexType.isEmpty()) {
+                indexType = "BTREE";
+            }
+            statements.add(buildCreateIndex(physicalTableCode, List.of(column), column.getColumnCode(), indexType,
+                    column.getUnique()));
+        }
+
+        // 复合索引（按 group 分组）
+        List<String> processedGroups = new ArrayList<>();
+        for (MetaColumn column : columns) {
+            if (column.getIndexGroup() == null || column.getIndexGroup().isEmpty()) {
+                continue;
+            }
+            if (processedGroups.contains(column.getIndexGroup())) {
+                continue;
+            }
+            if (!isIndexEnabled(column)) {
+                continue;
+            }
+            List<MetaColumn> groupColumns = columns.stream()
+                    .filter(c -> column.getIndexGroup().equals(c.getIndexGroup()) && isIndexEnabled(c))
+                    .sorted(Comparator.comparingInt(c -> c.getSort() == null ? 0 : c.getSort()))
+                    .toList();
+            if (groupColumns.isEmpty()) {
+                continue;
+            }
+            String indexType = groupColumns.get(0).getIndexType();
+            if (indexType == null || indexType.isEmpty()) {
+                indexType = "BTREE";
+            }
+            boolean unique = groupColumns.stream().anyMatch(c -> Boolean.TRUE.equals(c.getUnique()));
+            statements.add(buildCreateIndex(physicalTableCode, groupColumns, column.getIndexGroup(), indexType, unique));
+            processedGroups.add(column.getIndexGroup());
+        }
+
+        return statements;
+    }
+
+    private boolean isIndexEnabled(MetaColumn column) {
+        return Boolean.TRUE.equals(column.getUnique()) || Boolean.TRUE.equals(column.getIndex());
+    }
+
+    private String buildDropIndex(String physicalTableCode, List<MetaColumn> members, String indexNameOrGroup,
+            String indexType) {
+        String indexName = buildIndexName(physicalTableCode, indexNameOrGroup, members);
+        return "DROP INDEX IF EXISTS " + SqlIdentifier.quote(indexName);
+    }
+
+    private String buildCreateIndex(String physicalTableCode, List<MetaColumn> members, String indexNameOrGroup,
+            String indexType, Boolean unique) {
+        String physicalName = SqlIdentifier.quote(physicalTableCode);
+        String indexName = buildIndexName(physicalTableCode, indexNameOrGroup, members);
+
+        List<String> expressions = members.stream()
+                .map(c -> indexExpression(c, indexType))
+                .toList();
+        String columnsPart = String.join(", ", expressions);
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("CREATE ");
+        if (Boolean.TRUE.equals(unique)) {
+            sb.append("UNIQUE ");
+        }
+        sb.append("INDEX IF NOT EXISTS ").append(SqlIdentifier.quote(indexName))
+                .append(" ON ").append(physicalName);
+        if ("GIN".equalsIgnoreCase(indexType) || "GIST".equalsIgnoreCase(indexType) || "FULLTEXT".equalsIgnoreCase(indexType)) {
+            String pgType = "FULLTEXT".equalsIgnoreCase(indexType) ? "GIN" : indexType.toUpperCase();
+            sb.append(" USING ").append(pgType);
+        }
+        sb.append(" (").append(columnsPart).append(")");
+        return sb.toString();
+    }
+
+    private String buildIndexName(String physicalTableCode, String indexNameOrGroup, List<MetaColumn> members) {
+        boolean unique = members.stream().anyMatch(c -> Boolean.TRUE.equals(c.getUnique()));
+        String raw = (unique ? "uq_" : "idx_") + physicalTableCode + "_" + indexNameOrGroup;
+        return raw.length() > PG_MAX_IDENTIFIER_LENGTH ? raw.substring(0, PG_MAX_IDENTIFIER_LENGTH) : raw;
+    }
+
+    private String indexExpression(MetaColumn column, String indexType) {
+        String quoted = SqlIdentifier.quote(column.getColumnCode());
+        if ("FULLTEXT".equalsIgnoreCase(indexType)) {
+            return "to_tsvector('chinese', " + quoted + ")";
+        }
+        return quoted;
     }
 
     private String buildUsingExpression(String columnCode, String oldType, String newType) {
         String quoted = SqlIdentifier.quote(columnCode);
-        if ("JSONB".equals(oldType)) {
+        if (oldType != null && (oldType.toUpperCase().startsWith("JSONB") || oldType.toUpperCase().endsWith("[]"))) {
             return quoted + "::text::" + newType;
         }
         return quoted + "::" + newType;
-    }
-
-    private String effectiveIndexType(Boolean unique, Boolean index) {
-        if (Boolean.TRUE.equals(unique)) {
-            return "UNIQUE";
-        }
-        if (Boolean.TRUE.equals(index)) {
-            return "INDEX";
-        }
-        return null;
-    }
-
-    private String indexStatement(MetaTable table, MetaColumn column, String code) {
-        String effective = effectiveIndexType(column.getUnique(), column.getIndex());
-        if (effective == null) {
-            return null;
-        }
-        return buildCreateIndex(table, code, "UNIQUE".equals(effective));
-    }
-
-    private void dropIndexStatement(List<String> out, MetaTable table, String code, boolean unique) {
-        out.add("DROP INDEX IF EXISTS " + SqlIdentifier.quote(buildIndexName(table, code, unique)));
-    }
-
-    private String buildCreateIndex(MetaTable table, String code, boolean unique) {
-        String physicalName = SqlIdentifier.quote(table.physicalTableName());
-        return "CREATE " + (unique ? "UNIQUE " : "") + "INDEX IF NOT EXISTS " + SqlIdentifier.quote(buildIndexName(table, code,
-                unique)) + " ON " + physicalName + " (" + SqlIdentifier.quote(code) + ")";
-    }
-
-    private String buildIndexName(MetaTable table, String code, boolean unique) {
-        String raw = table.physicalTableName() + "_" + code;
-        String name = (unique ? "uq_" : "idx_") + raw;
-        return name.length() > 63 ? name.substring(0, 63) : name;
     }
 }
