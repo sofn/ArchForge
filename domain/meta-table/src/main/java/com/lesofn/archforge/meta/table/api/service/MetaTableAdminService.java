@@ -14,7 +14,7 @@ public interface MetaTableAdminService {
 
     Long create(MetaTable table, List<MetaColumn> columns);
 
-    void update(Long id, MetaTable table, List<MetaColumn> columns);
+    void update(Long id, MetaTable table, List<MetaColumn> columns, Long operatorId);
 
     Long copy(Long id);
 

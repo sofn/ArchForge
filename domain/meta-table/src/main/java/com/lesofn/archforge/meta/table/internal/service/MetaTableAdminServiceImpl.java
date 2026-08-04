@@ -8,14 +8,22 @@ import com.lesofn.archforge.meta.table.api.dao.MetaColumnRepository;
 import com.lesofn.archforge.meta.table.api.dao.MetaTableRepository;
 import com.lesofn.archforge.meta.table.api.domain.MetaColumn;
 import com.lesofn.archforge.meta.table.api.domain.MetaTable;
+import com.lesofn.archforge.meta.table.api.domain.MetaTableMigration;
 import com.lesofn.archforge.meta.table.api.service.MetaTableAdminService;
+import com.lesofn.archforge.meta.table.internal.ddl.AlterTableDdlGenerator;
 import com.lesofn.archforge.meta.table.internal.ddl.MetaTableDdlGenerator;
 import com.lesofn.archforge.meta.table.internal.exception.MetaTableErrorCode;
 import com.lesofn.archforge.meta.table.internal.exception.MetaTableException;
+import com.lesofn.archforge.meta.table.internal.schema.SchemaChange;
+import com.lesofn.archforge.meta.table.internal.schema.SchemaChangeType;
+import com.lesofn.archforge.meta.table.internal.schema.SchemaDiffEngine;
 import com.lesofn.archforge.meta.table.internal.validator.MetaTableValidator;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -37,6 +45,9 @@ public class MetaTableAdminServiceImpl implements MetaTableAdminService {
     private final MetaTableDdlGenerator ddlGenerator;
     private final MetaTableValidator validator;
     private final NamedParameterJdbcTemplate jdbcTemplate;
+    private final SchemaDiffEngine schemaDiffEngine;
+    private final AlterTableDdlGenerator alterTableDdlGenerator;
+    private final MetaTableMigrationService migrationService;
 
     @Override
     @Transactional("metaTableTransactionManager")
@@ -49,6 +60,7 @@ public class MetaTableAdminServiceImpl implements MetaTableAdminService {
             table.setTablePrefix("meta_");
         }
         table.setStatus(1);
+        table.setSchemaVersion(1);
         MetaTable saved = metaTableRepository.save(table);
 
         for (MetaColumn column : columns) {
@@ -65,17 +77,76 @@ public class MetaTableAdminServiceImpl implements MetaTableAdminService {
 
     @Override
     @Transactional("metaTableTransactionManager")
-    public void update(Long id, MetaTable table, List<MetaColumn> columns) {
+    public void update(Long id, MetaTable table, List<MetaColumn> columns, Long operatorId) {
         MetaTable existing = findById(id);
-        if (columns != null && !columns.isEmpty()) {
-            throw new MetaTableException(MetaTableErrorCode.META_COLUMN_TYPE_INVALID, "已创建的元表格不支持修改字段，请复制后重新创建");
+
+        if (columns == null || columns.isEmpty()) {
+            existing.setTableName(table.getTableName());
+            existing.setDescription(table.getDescription());
+            if (table.getStatus() != null) {
+                existing.setStatus(table.getStatus());
+            }
+            metaTableRepository.save(existing);
+            return;
         }
+
+        validator.validate(existing, columns);
+
+        List<MetaColumn> oldColumns = findColumns(id);
+        List<SchemaChange> changes = schemaDiffEngine.diff(existing, oldColumns, columns);
+        if (changes.isEmpty()) {
+            existing.setTableName(table.getTableName());
+            existing.setDescription(table.getDescription());
+            if (table.getStatus() != null) {
+                existing.setStatus(table.getStatus());
+            }
+            metaTableRepository.save(existing);
+            return;
+        }
+
+        var ddlStatements = alterTableDdlGenerator.generate(existing, changes);
+
+        int currentVersion = existing.getSchemaVersion() == null ? 1 : existing.getSchemaVersion();
+        int nextVersion = currentVersion + 1;
+
+        List<MetaTableMigration> records =
+                migrationService.createPendingRecords(existing, nextVersion, ddlStatements, operatorId);
+
+        for (var ddl : ddlStatements) {
+            jdbcTemplate.getJdbcOperations().execute(ddl.sql());
+        }
+
+        existing.setSchemaVersion(nextVersion);
         existing.setTableName(table.getTableName());
         existing.setDescription(table.getDescription());
         if (table.getStatus() != null) {
             existing.setStatus(table.getStatus());
         }
         metaTableRepository.save(existing);
+
+        // 软删除被 DROP 的字段
+        for (MetaColumn old : oldColumns) {
+            if (changes.stream().anyMatch(c -> c.getType() == SchemaChangeType.DROP_COLUMN
+                    && old.getId() != null
+                    && Objects.equals(old.getId(), c.getOldColumn().getId()))) {
+                old.setDeleted(true);
+                metaColumnRepository.save(old);
+            }
+        }
+
+        for (MetaColumn col : columns) {
+            if (col.getTableId() == null) {
+                col.setTableId(id);
+            }
+        }
+        metaColumnRepository.saveAll(columns);
+
+        LocalDateTime executedAt = LocalDateTime.now();
+        records.forEach(r -> {
+            r.setStatus("APPLIED");
+            r.setExecutedAt(executedAt);
+        });
+        migrationService.saveAll(records);
     }
 
     @Override
@@ -177,6 +248,10 @@ public class MetaTableAdminServiceImpl implements MetaTableAdminService {
         copy.setIndex(source.getIndex());
         copy.setSort(source.getSort());
         copy.setOptions(source.getOptions());
+        copy.setReferenceTable(source.getReferenceTable());
+        copy.setReferenceColumn(source.getReferenceColumn());
+        copy.setTenantColumn(source.getTenantColumn());
+        copy.setOwnerColumn(source.getOwnerColumn());
         return copy;
     }
 

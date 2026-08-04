@@ -46,6 +46,11 @@ public class MetaTableMigrationService {
         return migrationRepository.findByTableIdAndDeletedFalseOrderByVersionAsc(tableId);
     }
 
+    @Transactional("metaTableTransactionManager")
+    public List<MetaTableMigration> saveAll(List<MetaTableMigration> records) {
+        return migrationRepository.saveAll(records);
+    }
+
     private MetaTableMigration toMigration(MetaTable table, int version, AlterDdl ddl, Long operatorId, LocalDateTime now) {
         MetaTableMigration record = new MetaTableMigration();
         record.setTableId(table.getId());
