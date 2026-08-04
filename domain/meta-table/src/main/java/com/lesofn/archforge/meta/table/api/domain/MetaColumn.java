@@ -81,6 +81,18 @@ public class MetaColumn extends BasePO {
     @Column(name = "options")
     private List<OptionItem> options;
 
+    @Column(name = "reference_table")
+    private String referenceTable;
+
+    @Column(name = "reference_column")
+    private String referenceColumn;
+
+    @Column(name = "tenant_column")
+    private Boolean tenantColumn;
+
+    @Column(name = "owner_column")
+    private Boolean ownerColumn;
+
     public boolean isUniqueColumn() { return Boolean.TRUE.equals(unique); }
 
     public boolean isIndexedColumn() { return Boolean.TRUE.equals(index); }
@@ -90,4 +102,8 @@ public class MetaColumn extends BasePO {
     public boolean isListVisibleColumn() { return Boolean.TRUE.equals(listVisible); }
 
     public boolean isSearchableColumn() { return Boolean.TRUE.equals(searchable); }
+
+    public boolean isTenantColumn() { return Boolean.TRUE.equals(tenantColumn); }
+
+    public boolean isOwnerColumn() { return Boolean.TRUE.equals(ownerColumn); }
 }

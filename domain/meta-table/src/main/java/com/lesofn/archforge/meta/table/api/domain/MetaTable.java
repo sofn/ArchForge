@@ -41,6 +41,9 @@ public class MetaTable extends BasePO {
     @Column(name = "status")
     private Integer status;
 
+    @Column(name = "schema_version")
+    private Integer schemaVersion = 1;
+
     public String physicalTableName() {
         String prefix = tablePrefix == null ? "meta_" : tablePrefix;
         return prefix + tableCode;
