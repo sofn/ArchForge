@@ -33,7 +33,7 @@ public class ${entityName}DbConfig {
     @Bean
     LocalContainerEntityManagerFactoryBean ${entityName?uncap_first}EntityManagerFactory() {
         HibernateJpaVendorAdapter jpaVendorAdapter = new HibernateJpaVendorAdapter();
-        jpaVendorAdapter.setGenerateDdl(true);
+        jpaVendorAdapter.setGenerateDdl(false);
         jpaVendorAdapter.setShowSql(false);
         jpaVendorAdapter.setDatabasePlatform("org.hibernate.dialect.PostgreSQLDialect");
 
@@ -44,7 +44,7 @@ public class ${entityName}DbConfig {
         factoryBean.setPackagesToScan("${packageBase}.domain", "${packageBase}.dao");
 
         Map<String, Object> properties = new HashMap<>();
-        properties.put("hibernate.hbm2ddl.auto", "update");
+        properties.put("hibernate.hbm2ddl.auto", "none");
         properties.put("hibernate.dialect", "org.hibernate.dialect.PostgreSQLDialect");
         properties.put(
                 "hibernate.physical_naming_strategy",

@@ -15,7 +15,7 @@ import lombok.*;
 @EqualsAndHashCode(of = "id", callSuper = false)
 @NoArgsConstructor
 @Entity
-@Table(name = "${tableCode}")
+@Table(name = "${physicalTableName}")
 public class ${entityName} extends BaseEntity<${entityName}> {
 
     @Id

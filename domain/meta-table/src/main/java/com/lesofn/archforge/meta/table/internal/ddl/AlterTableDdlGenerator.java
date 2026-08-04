@@ -5,7 +5,6 @@ import com.lesofn.archforge.meta.table.api.domain.MetaTable;
 import com.lesofn.archforge.meta.table.internal.schema.SchemaChange;
 import com.lesofn.archforge.meta.table.internal.schema.SchemaChangeType;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -59,8 +58,6 @@ public class AlterTableDdlGenerator {
         }
         statements.add(sb.toString());
 
-        List<String> indexStatements = buildIndexStatements(table, List.of(column));
-        statements.addAll(indexStatements);
         return List.of(new SchemaDdl(change, statements));
     }
 
@@ -126,57 +123,6 @@ public class AlterTableDdlGenerator {
         }
 
         return List.of(new SchemaDdl(change, statements));
-    }
-
-    private List<String> buildIndexStatements(MetaTable table, List<MetaColumn> columns) {
-        List<String> statements = new ArrayList<>();
-        String physicalTableCode = table.physicalTableName();
-
-        // 单列索引
-        for (MetaColumn column : columns) {
-            if (!isIndexEnabled(column)) {
-                continue;
-            }
-            if (column.getIndexGroup() != null && !column.getIndexGroup().isEmpty()) {
-                continue;
-            }
-            String indexType = column.getIndexType();
-            if (indexType == null || indexType.isEmpty()) {
-                indexType = "BTREE";
-            }
-            statements.add(buildCreateIndex(physicalTableCode, List.of(column), column.getColumnCode(), indexType,
-                    column.getUnique()));
-        }
-
-        // 复合索引（按 group 分组）
-        List<String> processedGroups = new ArrayList<>();
-        for (MetaColumn column : columns) {
-            if (column.getIndexGroup() == null || column.getIndexGroup().isEmpty()) {
-                continue;
-            }
-            if (processedGroups.contains(column.getIndexGroup())) {
-                continue;
-            }
-            if (!isIndexEnabled(column)) {
-                continue;
-            }
-            List<MetaColumn> groupColumns = columns.stream()
-                    .filter(c -> column.getIndexGroup().equals(c.getIndexGroup()) && isIndexEnabled(c))
-                    .sorted(Comparator.comparingInt(c -> c.getSort() == null ? 0 : c.getSort()))
-                    .toList();
-            if (groupColumns.isEmpty()) {
-                continue;
-            }
-            String indexType = groupColumns.get(0).getIndexType();
-            if (indexType == null || indexType.isEmpty()) {
-                indexType = "BTREE";
-            }
-            boolean unique = groupColumns.stream().anyMatch(c -> Boolean.TRUE.equals(c.getUnique()));
-            statements.add(buildCreateIndex(physicalTableCode, groupColumns, column.getIndexGroup(), indexType, unique));
-            processedGroups.add(column.getIndexGroup());
-        }
-
-        return statements;
     }
 
     private boolean isIndexEnabled(MetaColumn column) {

@@ -42,6 +42,7 @@ public final class CodeGenModelFactory {
         model.put("packageBase", packageBase);
         model.put("basePath", basePath);
         model.put("moduleCode", generateModuleCode(tableCode));
+        model.put("physicalTableName", table.physicalTableName());
 
         List<Map<String, Object>> columnModels = new ArrayList<>();
         boolean hasDecimal = false;
