@@ -4,7 +4,8 @@ import type {
   ${className}UpdateRequest,
   ${className}ListRequest,
   ${className}Response,
-  ${className}PageResult
+  ${className}PageResult,
+  ${className}ImportResult
 } from "@/views/${tableCode}/utils/types";
 
 type Result<T = any> = {
@@ -13,8 +14,10 @@ type Result<T = any> = {
   data?: T;
 };
 
+type ${className}Page = ${className}PageResult<${className}Response>;
+
 export const get${className}List = (data?: ${className}ListRequest) => {
-  return http.request<Result<${className}PageResult<${className}Response>>>(
+  return http.request<Result<${className}Page>>(
     "post",
     "${basePath}",
     { data }
@@ -35,4 +38,17 @@ export const delete${className} = (id: number) => {
 
 export const get${className}Detail = (id: number) => {
   return http.request<Result<${className}Response>>("get", `${basePath}/${r"${id}"}`);
+};
+
+export const export${className}Data = (format = "EXCEL") => {
+  return http.request<Blob>("get", "${basePath}/export?format=" + format, { responseType: "blob" });
+};
+
+export const import${className}Data = (file: File, format = "CSV") => {
+  const formData = new FormData();
+  formData.append("file", file);
+  return http.request<Result<${className}ImportResult>>("post", "${basePath}/import?format=" + format, {
+    data: formData,
+    headers: { "Content-Type": "multipart/form-data" }
+  });
 };

@@ -1,99 +1,133 @@
 package com.lesofn.archforge.meta.table.internal.generator;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.lesofn.archforge.meta.table.api.domain.MetaColumn;
 import com.lesofn.archforge.meta.table.api.domain.MetaColumnType;
 import com.lesofn.archforge.meta.table.api.domain.MetaTable;
 import com.lesofn.archforge.meta.table.api.domain.OptionItem;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+import com.lesofn.archforge.meta.table.internal.generator.extension.CodeGenExtensionRegistry;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class MetaTableCodeGeneratorTest {
 
     @TempDir
     Path tempDir;
 
+    private final MetaTableCodeGenerator generator = new MetaTableCodeGenerator(new CodeGenExtensionRegistry());
+
     @Test
-    void shouldGenerateAllFiles() throws Exception {
+    void shouldGenerateAllTypes() throws Exception {
         MetaTable table = new MetaTable();
+        table.setId(1L);
         table.setTableCode("demo_project");
         table.setTableName("演示项目");
-        table.setDescription("A demo table for code generation");
+        table.setDescription("测试所有类型生成");
 
-        List<MetaColumn> columns = List.of(
-                column("name", "名称", MetaColumnType.STRING, true, true),
-                column("description", "描述", MetaColumnType.TEXT, false, false),
-                column("age", "年龄", MetaColumnType.INTEGER, true, true),
-                column("price", "价格", MetaColumnType.DECIMAL, true, true),
-                column("active", "启用", MetaColumnType.BOOLEAN, true, true),
-                column("birthday", "生日", MetaColumnType.DATE, true, true),
-                column("created_at", "创建时间", MetaColumnType.DATETIME, false, true),
-                column("status", "状态", MetaColumnType.ENUM, true, true, new OptionItem("启用", "ENABLED"),
-                        new OptionItem("禁用", "DISABLED")),
-                column("attachment", "附件", MetaColumnType.FILE, false, false),
-                column("metadata", "元数据", MetaColumnType.JSON, false, false));
+        List<MetaColumn> columns = new ArrayList<>();
+        columns.add(column("name", "名称", MetaColumnType.STRING, true, true));
+        columns.add(column("description", "描述", MetaColumnType.TEXT, true, true));
+        columns.add(column("age", "年龄", MetaColumnType.INTEGER, true, true));
+        columns.add(column("price", "价格", MetaColumnType.DECIMAL, true, true, 10, 2));
+        columns.add(column("active", "启用", MetaColumnType.BOOLEAN, true, true));
+        columns.add(column("birthday", "生日", MetaColumnType.DATE, true, true));
+        columns.add(column("event_time", "事件时间", MetaColumnType.DATETIME, true, true));
+        columns.add(column("status", "状态", MetaColumnType.ENUM, true, true, new OptionItem("启用", "ENABLED"),
+                new OptionItem("禁用", "DISABLED")));
+        columns.add(column("metadata", "元数据", MetaColumnType.JSON, true, true));
+        columns.add(column("attachment", "附件", MetaColumnType.FILE, true, true));
+        columns.add(column("uuid_col", "UUID列", MetaColumnType.UUID, true, true));
+        columns.add(column("created_at_tz", "创建时间TZ", MetaColumnType.TIMESTAMPTZ, true, true));
+        columns.add(arrayColumn("tags", "标签", MetaColumnType.ARRAY, true, true, "STRING"));
+        columns.add(column("location", "位置", MetaColumnType.GEO, true, true));
 
         CodeGenOptions options = new CodeGenOptions();
         options.setProjectRoot(tempDir);
-        options.setBackendOutputDir(tempDir.resolve("example/demo_project"));
+        options.setBackendOutputDir(tempDir.resolve("backend"));
         options.setFrontendOutputDir(tempDir.resolve("src/views/demo_project"));
         options.setBasePath("/generated/demo_project");
-        options.setOverwrite(false);
+        options.setOverwrite(true);
 
-        MetaTableCodeGenerator generator = new MetaTableCodeGenerator();
         GeneratedResult result = generator.generate(table, columns, options);
 
-        assertThat(result.getBackendDir()).exists();
-        assertThat(result.getFrontendDir()).exists();
-        assertThat(result.getFiles()).isNotEmpty();
+        Path entityFile = tempDir.resolve(
+                "backend/src/main/java/com/lesofn/archforge/generated/demoproject/domain/DemoProject.java");
+        Path controllerFile = tempDir.resolve(
+                "backend/src/main/java/com/lesofn/archforge/generated/demoproject/rest/DemoProjectController.java");
+        Path buildGradleFile = tempDir.resolve("backend/build.gradle.kts");
+        Path indexVue = tempDir.resolve("src/views/demo_project/index.vue");
+        Path typesTs = tempDir.resolve("src/views/demo_project/utils/types.ts");
 
-        Path buildFile = result.getBackendDir().resolve("build.gradle.kts");
-        assertThat(buildFile).exists();
+        assertThat(result.getFiles()).contains(entityFile, controllerFile, indexVue, typesTs);
 
-        Path entityFile = result.getBackendDir().resolve(
-                "src/main/java/com/lesofn/archforge/generated/demoproject/domain/DemoProject.java");
-        assertThat(entityFile).exists();
-        String entityContent = Files.readString(entityFile, StandardCharsets.UTF_8);
-        assertThat(entityContent).contains("@Entity");
+        String entityContent = Files.readString(entityFile);
+        assertThat(entityContent).contains("@JdbcTypeCode(SqlTypes.UUID)");
+        assertThat(entityContent).contains("private UUID uuidCol");
+        assertThat(entityContent).contains("@JdbcTypeCode(SqlTypes.ARRAY)");
+        assertThat(entityContent).contains("private String[] tags");
+        assertThat(entityContent).contains("@Type(JsonbStringUserType.class)");
+        assertThat(entityContent).contains("private String metadata");
+        assertThat(entityContent).contains("private OffsetDateTime createdAtTz");
 
-        Path serviceFile = result.getBackendDir().resolve(
-                "src/main/java/com/lesofn/archforge/generated/demoproject/service/DemoProjectService.java");
-        assertThat(serviceFile).exists();
-        String serviceContent = Files.readString(serviceFile, StandardCharsets.UTF_8);
-        assertThat(serviceContent).contains("Specification");
+        String serviceContent = Files.readString(tempDir.resolve(
+                "backend/src/main/java/com/lesofn/archforge/generated/demoproject/service/DemoProjectService.java"));
+        assertThat(serviceContent).contains("cb.equal(root.get(\"uuidCol\"), request.getUuidCol())");
+        assertThat(serviceContent).contains("cb.equal(root.get(\"tags\"), request.getTags())");
+        assertThat(serviceContent).contains("StringUtils.hasText(request.getKeyword())");
 
-        Path indexVue = result.getFrontendDir().resolve("index.vue");
-        assertThat(indexVue).exists();
-        String vueContent = Files.readString(indexVue, StandardCharsets.UTF_8);
-        assertThat(vueContent).contains("el-switch");
+        String controllerContent = Files.readString(controllerFile);
+        assertThat(controllerContent).contains("@GetMapping(\"/export\")");
+        assertThat(controllerContent).contains("@PostMapping(\"/import\")");
+
+        String buildGradleContent = Files.readString(buildGradleFile);
+        assertThat(buildGradleContent).contains("api(project(\":domain:meta-table\"))");
+
+        String typesContent = Files.readString(typesTs);
+        assertThat(typesContent).doesNotContain(": ,");
+        assertThat(typesContent).contains("uuidCol?: string");
+        assertThat(typesContent).contains("tags?: string[]");
+    }
+
+    private MetaColumn column(String code, String name, MetaColumnType type, boolean required, boolean listVisible) {
+        MetaColumn col = new MetaColumn();
+        col.setColumnCode(code);
+        col.setColumnName(name);
+        col.setDataType(type);
+        col.setRequired(required);
+        col.setSearchable(true);
+        col.setListVisible(listVisible);
+        return col;
     }
 
     private MetaColumn column(String code, String name, MetaColumnType type, boolean required, boolean listVisible,
             OptionItem... options) {
-        MetaColumn column = new MetaColumn();
-        column.setColumnCode(code);
-        column.setColumnName(name);
-        column.setDataType(type);
-        column.setRequired(required);
-        column.setSearchable(true);
-        column.setListVisible(listVisible);
-        column.setNullable(!required);
-        if (type == MetaColumnType.ENUM && options.length > 0) {
-            column.setOptions(List.of(options));
+        MetaColumn col = column(code, name, type, required, listVisible);
+        if (options.length > 0) {
+            List<OptionItem> list = new ArrayList<>();
+            for (OptionItem option : options) {
+                list.add(option);
+            }
+            col.setOptions(list);
         }
-        if (type == MetaColumnType.STRING) {
-            column.setLength(255);
-        }
-        if (type == MetaColumnType.DECIMAL) {
-            column.setPrecision(10);
-            column.setScale(2);
-        }
-        return column;
+        return col;
+    }
+
+    private MetaColumn column(String code, String name, MetaColumnType type, boolean required, boolean listVisible,
+            int precision, int scale) {
+        MetaColumn col = column(code, name, type, required, listVisible);
+        col.setPrecision(precision);
+        col.setScale(scale);
+        return col;
+    }
+
+    private MetaColumn arrayColumn(String code, String name, MetaColumnType type, boolean required, boolean listVisible,
+            String elementType) {
+        MetaColumn col = column(code, name, type, required, listVisible);
+        col.setArrayElementType(elementType);
+        return col;
     }
 }

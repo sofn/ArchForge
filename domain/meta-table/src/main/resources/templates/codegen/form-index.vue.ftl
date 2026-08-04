@@ -24,24 +24,18 @@ defineExpose({ getRef });
   <el-form ref="formRef" :model="form" label-width="120px">
 <#list columns as col>
     <el-form-item label="${col.columnName}" prop="${col.fieldName}">
-<#if col.isString>
+<#if col.isString || col.isUuid || col.isFile>
       <el-input
         v-model="form.${col.fieldName}"
         placeholder="请输入${col.columnName}"
         clearable
       />
-<#elseif col.isText || col.isJson>
+<#elseif col.isText || col.isJson || col.isGeo>
       <el-input
         v-model="form.${col.fieldName}"
         type="textarea"
         :rows="3"
         placeholder="请输入${col.columnName}"
-      />
-<#elseif col.isFile>
-      <el-input
-        v-model="form.${col.fieldName}"
-        placeholder="请输入${col.columnName}"
-        clearable
       />
 <#elseif col.isInteger || col.isDecimal>
       <el-input-number
@@ -56,7 +50,7 @@ defineExpose({ getRef });
         :active-value="true"
         :inactive-value="false"
       />
-<#elseif col.isDate || col.isDateTime>
+<#elseif col.isDate || col.isDateTime || col.isTimestampTz>
       <el-date-picker
         v-model="form.${col.fieldName}"
         type="${col.dateType}"
@@ -75,6 +69,18 @@ defineExpose({ getRef });
         <el-option label="${opt.label}" value="${opt.value}" />
         </#list>
       </el-select>
+<#elseif col.isArray>
+      <el-select
+        v-model="form.${col.fieldName}"
+        multiple
+        allow-create
+        filterable
+        default-first-option
+        collapse-tags
+        placeholder="请输入${col.columnName}"
+        clearable
+        class="w-full"
+      />
 </#if>
     </el-form-item>
 </#list>

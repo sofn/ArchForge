@@ -3,11 +3,11 @@ package com.lesofn.archforge.meta.table.internal.generator;
 import com.lesofn.archforge.meta.table.api.domain.MetaColumn;
 import com.lesofn.archforge.meta.table.api.domain.MetaTable;
 import com.lesofn.archforge.meta.table.internal.exception.MetaTableException;
+import com.lesofn.archforge.meta.table.internal.generator.extension.CodeGenExtensionRegistry;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateExceptionHandler;
 import java.io.IOException;
-import org.springframework.stereotype.Component;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
@@ -21,6 +21,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Stream;
+import org.springframework.stereotype.Component;
 
 @Component
 public class MetaTableCodeGenerator {
@@ -29,8 +31,10 @@ public class MetaTableCodeGenerator {
     private static final String ENCODING = "UTF-8";
 
     private final Configuration configuration;
+    private final CodeGenExtensionRegistry extensionRegistry;
 
-    public MetaTableCodeGenerator() {
+    public MetaTableCodeGenerator(CodeGenExtensionRegistry extensionRegistry) {
+        this.extensionRegistry = extensionRegistry != null ? extensionRegistry : new CodeGenExtensionRegistry();
         this.configuration = new Configuration(Configuration.VERSION_2_3_33);
         this.configuration.setDefaultEncoding(ENCODING);
         this.configuration.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
@@ -65,11 +69,13 @@ public class MetaTableCodeGenerator {
             deleteIfExists(frontendOutputDir);
         }
 
-        Map<String, Object> model = CodeGenModelFactory.buildModel(table, columns, options);
+        Map<String, Object> model = CodeGenModelFactory.buildModel(table, columns, options, extensionRegistry);
 
         List<Path> files = new ArrayList<>();
         files.addAll(renderBackend(backendOutputDir, model));
         files.addAll(renderFrontend(frontendRoot, frontendOutputDir, model));
+
+        extensionRegistry.postProcess(backendOutputDir, frontendRoot, model, files);
 
         GeneratedResult result = new GeneratedResult();
         result.setBackendDir(backendOutputDir);
@@ -127,7 +133,7 @@ public class MetaTableCodeGenerator {
         if (!Files.isDirectory(dir)) {
             throw new MetaTableException("Output path exists but is not a directory: " + dir);
         }
-        try (var stream = Files.list(dir)) {
+        try (Stream<Path> stream = Files.list(dir)) {
             if (stream.findAny().isPresent()) {
                 throw new MetaTableException("Output directory is not empty: " + dir);
             }
@@ -186,6 +192,11 @@ public class MetaTableCodeGenerator {
                 "IntegrationTest.java");
         templateToPath.put("db-config.java.ftl", "src/main/java/" + packagePath + "/config/" + entityName + "DbConfig.java");
 
+        Map<String, String> extras = extensionRegistry.extraBackendTemplates(model);
+        for (Map.Entry<String, String> entry : extras.entrySet()) {
+            templateToPath.put(entry.getKey(), entry.getValue());
+        }
+
         return renderAll(backendDir, templateToPath, model);
     }
 
@@ -200,6 +211,11 @@ public class MetaTableCodeGenerator {
         templateToPath.put("hook.tsx.ftl", "src/views/" + tableCode + "/utils/hook.tsx");
         templateToPath.put("index.vue.ftl", "src/views/" + tableCode + "/index.vue");
         templateToPath.put("form-index.vue.ftl", "src/views/" + tableCode + "/form/index.vue");
+
+        Map<String, String> extras = extensionRegistry.extraFrontendTemplates(model);
+        for (Map.Entry<String, String> entry : extras.entrySet()) {
+            templateToPath.put(entry.getKey(), entry.getValue());
+        }
 
         List<Path> files = new ArrayList<>();
         for (Map.Entry<String, String> entry : templateToPath.entrySet()) {

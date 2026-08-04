@@ -4,6 +4,7 @@ plugins {
 
 dependencies {
     api(project(":infrastructure"))
+    api(project(":domain:meta-table"))
 
     // Lombok
     compileOnly("org.projectlombok:lombok")

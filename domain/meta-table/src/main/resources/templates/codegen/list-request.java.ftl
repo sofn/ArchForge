@@ -1,8 +1,8 @@
 package ${packageBase}.dto;
 
-<#if hasDecimal>import java.math.BigDecimal;</#if>
-<#if hasDate>import java.time.LocalDate;</#if>
-<#if hasDateTime>import java.time.LocalDateTime;</#if>
+<#list imports as imp>
+import ${imp};
+</#list>
 import lombok.Data;
 
 @Data

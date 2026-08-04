@@ -1,5 +1,3 @@
-import { $t } from "@/plugins/i18n";
-
 export default {
   path: "/${tableCode}",
   redirect: "/${tableCode}/index",

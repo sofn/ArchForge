@@ -21,10 +21,13 @@ const {
   dataList,
   pagination,
   hasPerms,
+  importInput,
   onSearch,
   resetForm,
   openDialog,
   handleDelete,
+  handleExport,
+  handleImport,
   handleSizeChange,
   handleCurrentChange
 } = use${className}();
@@ -48,7 +51,7 @@ const {
       </el-form-item>
 <#list searchableColumns as col>
       <el-form-item label="${col.columnName}" prop="${col.fieldName}">
-<#if col.isString || col.isText || col.isJson || col.isFile>
+<#if col.isString || col.isText || col.isJson || col.isFile || col.isUuid || col.isGeo>
         <el-input
           v-model="form.${col.fieldName}"
           placeholder="${col.columnName}"
@@ -58,6 +61,7 @@ const {
 <#elseif col.isInteger || col.isDecimal>
         <el-input-number
           v-model="form.${col.fieldName}"
+          :precision="<#if col.isDecimal>${col.scale?c}<#else>0</#if>"
           placeholder="${col.columnName}"
           class="w-30!"
         />
@@ -67,7 +71,7 @@ const {
           :active-value="true"
           :inactive-value="false"
         />
-<#elseif col.isDate || col.isDateTime>
+<#elseif col.isDate || col.isDateTime || col.isTimestampTz>
         <el-date-picker
           v-model="form.${col.fieldName}"
           type="${col.dateType}"
@@ -86,6 +90,18 @@ const {
           <el-option label="${opt.label}" value="${opt.value}" />
           </#list>
         </el-select>
+<#elseif col.isArray>
+        <el-select
+          v-model="form.${col.fieldName}"
+          multiple
+          allow-create
+          filterable
+          default-first-option
+          collapse-tags
+          placeholder="${col.columnName}"
+          clearable
+          class="w-30!"
+        />
 </#if>
       </el-form-item>
 </#list>
@@ -114,6 +130,29 @@ const {
         >
           新增
         </el-button>
+        <el-button
+          v-if="hasPerms(['${tableCode}:export'])"
+          type="primary"
+          :icon="useRenderIcon('ri/download-line')"
+          @click="handleExport('EXCEL')"
+        >
+          导出
+        </el-button>
+        <el-button
+          v-if="hasPerms(['${tableCode}:import'])"
+          type="primary"
+          :icon="useRenderIcon('ri/upload-line')"
+          @click="importInput?.click()"
+        >
+          导入
+        </el-button>
+        <input
+          ref="importInput"
+          type="file"
+          accept=".xlsx,.csv,.json"
+          style="display: none"
+          @change="handleImport"
+        />
       </template>
       <template v-slot="{ size, dynamicColumns }">
         <pure-table

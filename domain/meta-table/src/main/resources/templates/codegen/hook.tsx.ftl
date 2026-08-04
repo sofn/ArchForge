@@ -4,10 +4,8 @@ import type { PaginationProps } from "@pureadmin/table";
 import { message } from "@/utils/message";
 import { hasPerms } from "@/utils/auth";
 import { addDialog } from "@/components/ReDialog";
-import { useRenderIcon } from "@/components/ReIcon/src/hooks";
 import ${className}Form from "../form/index.vue";
 import type {
-  ${className}CreateRequest,
   ${className}UpdateRequest,
   ${className}ListRequest,
   ${className}Response
@@ -17,11 +15,10 @@ import {
   get${className}List,
   create${className},
   update${className},
-  delete${className}
+  delete${className},
+  export${className}Data,
+  import${className}Data
 } from "@/api/${tableCode}";
-import Delete from "~icons/ep/delete";
-import EditPen from "~icons/ep/edit-pen";
-import AddFill from "~icons/ri/add-circle-line";
 
 export function use${className}() {
   const form = reactive<${className}ListRequest>({
@@ -30,6 +27,7 @@ export function use${className}() {
     keyword: ""
   });
   const formRef = ref();
+  const importInput = ref<HTMLInputElement | null>(null);
   const dataList = ref<${className}Response[]>([]);
   const loading = ref(true);
   const pagination = reactive<PaginationProps>({
@@ -49,7 +47,9 @@ export function use${className}() {
     {
       label: "${col.columnName}",
       prop: "${col.fieldName}",
-      minWidth: 140
+      minWidth: 140<#if col.isDate || col.isDateTime || col.isTimestampTz>,
+      formatter: ({ ${col.fieldName} }) => ${col.fieldName} ? dayjs(${col.fieldName}).format("${col.dateValueFormat}") : ""</#if><#if col.isArray>,
+      formatter: ({ ${col.fieldName} }) => ${col.fieldName} ? JSON.stringify(${col.fieldName}) : ""</#if>
     },
 </#list>
     {
@@ -81,6 +81,44 @@ export function use${className}() {
     if (!formEl) return;
     formEl.resetFields();
     onSearch();
+  }
+
+  async function handleExport(format = "EXCEL") {
+    try {
+      const blob = await export${className}Data(format);
+      const link = document.createElement("a");
+      link.href = window.URL.createObjectURL(blob);
+      const suffix = format.toLowerCase() === "csv" ? ".csv" : format.toLowerCase() === "json" ? ".json" : ".xlsx";
+      link.download = "${tableCode}_${tableId?c}" + suffix;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(link.href);
+      message("导出成功", { type: "success" });
+    } catch {
+      message("导出失败", { type: "error" });
+    }
+  }
+
+  async function handleImport(event: Event) {
+    const target = event.target as HTMLInputElement;
+    const file = target.files?.[0];
+    if (!file) return;
+    try {
+      const { data, code, message: msg } = await import${className}Data(file, "CSV");
+      if (code === 0) {
+<#noparse>        message(`导入完成：总记录 ${data?.total ?? 0}，成功 ${data?.success ?? 0}`, {
+          type: "success"
+        });</#noparse>
+        onSearch();
+      } else {
+        message(msg || "导入失败", { type: "error" });
+      }
+    } catch {
+      message("导入失败", { type: "error" });
+    } finally {
+      target.value = "";
+    }
   }
 
   async function onSearch() {
@@ -151,6 +189,7 @@ export function use${className}() {
   return {
     form,
     formRef,
+    importInput,
     loading,
     columns,
     dataList,
@@ -160,6 +199,8 @@ export function use${className}() {
     resetForm,
     openDialog,
     handleDelete,
+    handleExport,
+    handleImport,
     handleSizeChange,
     handleCurrentChange
   };

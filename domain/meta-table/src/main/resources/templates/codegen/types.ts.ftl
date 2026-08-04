@@ -29,8 +29,14 @@ export interface ${className}PageResult<T> {
   currentPage: number;
 }
 
+export interface ${className}ImportResult {
+  total: number;
+  success: number;
+  errors: string[];
+}
+
 export const init${className}Form = (): ${className}CreateRequest => ({
 <#list columns as col>
-  ${col.fieldName}: <#if col.isString || col.isText || col.isJson || col.isFile || col.isEnum || col.isDate || col.isDateTime>""<#elseif col.isInteger || col.isDecimal>0<#elseif col.isBoolean>false</#if>,
+  ${col.fieldName}: ${col.tsDefaultValue},
 </#list>
 });

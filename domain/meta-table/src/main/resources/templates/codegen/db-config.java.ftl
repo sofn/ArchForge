@@ -4,6 +4,7 @@ import com.lesofn.archforge.infrastructure.frame.database.GroupDataSourceProxy;
 import java.util.HashMap;
 import java.util.Map;
 import javax.sql.DataSource;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
@@ -19,6 +20,9 @@ import org.springframework.transaction.PlatformTransactionManager;
         basePackages = "${packageBase}.dao")
 public class ${entityName}DbConfig {
 
+<#noparse>    @Value("${spring.jpa.hibernate.ddl-auto:none}")</#noparse>
+    private String ddlAuto;
+
     private final DataSource dataSource;
 
     public ${entityName}DbConfig(DataSource dataSource) {
@@ -33,7 +37,7 @@ public class ${entityName}DbConfig {
     @Bean
     LocalContainerEntityManagerFactoryBean ${entityName?uncap_first}EntityManagerFactory() {
         HibernateJpaVendorAdapter jpaVendorAdapter = new HibernateJpaVendorAdapter();
-        jpaVendorAdapter.setGenerateDdl(false);
+        jpaVendorAdapter.setGenerateDdl(true);
         jpaVendorAdapter.setShowSql(false);
         jpaVendorAdapter.setDatabasePlatform("org.hibernate.dialect.PostgreSQLDialect");
 
@@ -44,7 +48,7 @@ public class ${entityName}DbConfig {
         factoryBean.setPackagesToScan("${packageBase}.domain", "${packageBase}.dao");
 
         Map<String, Object> properties = new HashMap<>();
-        properties.put("hibernate.hbm2ddl.auto", "none");
+        properties.put("hibernate.hbm2ddl.auto", ddlAuto);
         properties.put("hibernate.dialect", "org.hibernate.dialect.PostgreSQLDialect");
         properties.put(
                 "hibernate.physical_naming_strategy",

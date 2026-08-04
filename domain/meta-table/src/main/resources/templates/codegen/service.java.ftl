@@ -74,21 +74,15 @@ public class ${entityName}Service {
             List<Predicate> predicates = new ArrayList<>();
             predicates.add(cb.equal(root.get("deleted"), false));
 <#list searchableColumns as col>
-<#if col.isString || col.isText || col.isJson || col.isFile || col.isEnum>
-            if (StringUtils.hasText(request.get${col.fieldName?cap_first}())) {
-                predicates.add(cb.like(root.get("${col.fieldName}"), "%" + request.get${col.fieldName?cap_first}() + "%", '!'));
+            if (${col.searchCondition}) {
+                predicates.add(${col.searchPredicate});
             }
-<#else>
-            if (request.get${col.fieldName?cap_first}() != null) {
-                predicates.add(cb.equal(root.get("${col.fieldName}"), request.get${col.fieldName?cap_first}()));
-            }
-</#if>
 </#list>
 <#if keywordColumns?? && keywordColumns?size gt 0>
             if (StringUtils.hasText(request.getKeyword())) {
                 List<Predicate> keywordPredicates = new ArrayList<>();
 <#list keywordColumns as col>
-                keywordPredicates.add(cb.like(root.get("${col.fieldName}"), "%" + request.getKeyword() + "%", '!'));
+                keywordPredicates.add(${col.keywordPredicate});
 </#list>
                 predicates.add(cb.or(keywordPredicates.toArray(new Predicate[0])));
             }

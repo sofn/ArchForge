@@ -3,9 +3,9 @@ package ${packageBase};
 import ${packageBase}.dto.${entityName}CreateRequest;
 import ${packageBase}.dto.${entityName}UpdateRequest;
 import ${packageBase}.service.${entityName}Service;
-<#if hasDecimal>import java.math.BigDecimal;</#if>
-<#if hasDate>import java.time.LocalDate;</#if>
-<#if hasDateTime>import java.time.LocalDateTime;</#if>
+<#list imports as imp>
+import ${imp};
+</#list>
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -32,6 +32,7 @@ class ${entityName}IntegrationTest {
         registry.add("spring.datasource.dynamic.datasource.user_master.url", postgres::getJdbcUrl);
         registry.add("spring.datasource.dynamic.datasource.user_master.username", postgres::getUsername);
         registry.add("spring.datasource.dynamic.datasource.user_master.password", postgres::getPassword);
+        registry.add("spring.jpa.hibernate.ddl-auto", () -> "create-drop");
     }
 
     @Autowired
@@ -41,7 +42,7 @@ class ${entityName}IntegrationTest {
     void shouldCreateAndFind() {
         ${entityName}CreateRequest request = new ${entityName}CreateRequest();
 <#list columns as col>
-        request.set${col.fieldName?cap_first}(${col.defaultJavaValue});
+        request.set${col.fieldName?cap_first}(${col.javaDefaultValue});
 </#list>
         Long id = service.create(request);
         assertThat(id).isNotNull();
@@ -52,14 +53,14 @@ class ${entityName}IntegrationTest {
     void shouldUpdate() {
         ${entityName}CreateRequest create = new ${entityName}CreateRequest();
 <#list columns as col>
-        create.set${col.fieldName?cap_first}(${col.defaultJavaValue});
+        create.set${col.fieldName?cap_first}(${col.javaDefaultValue});
 </#list>
         Long id = service.create(create);
 
         ${entityName}UpdateRequest update = new ${entityName}UpdateRequest();
         update.setId(id);
 <#list columns as col>
-        update.set${col.fieldName?cap_first}(${col.defaultJavaValue});
+        update.set${col.fieldName?cap_first}(${col.javaDefaultValue});
 </#list>
         assertThat(service.update(update)).isTrue();
         assertThat(service.detail(id)).isNotNull();
@@ -69,7 +70,7 @@ class ${entityName}IntegrationTest {
     void shouldDelete() {
         ${entityName}CreateRequest request = new ${entityName}CreateRequest();
 <#list columns as col>
-        request.set${col.fieldName?cap_first}(${col.defaultJavaValue});
+        request.set${col.fieldName?cap_first}(${col.javaDefaultValue});
 </#list>
         Long id = service.create(request);
         assertThat(service.delete(id)).isTrue();

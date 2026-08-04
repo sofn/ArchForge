@@ -3,9 +3,9 @@ package ${packageBase}.domain;
 import com.lesofn.archforge.common.repository.BaseEntity;
 import ${packageBase}.dto.${entityName}CreateRequest;
 import ${packageBase}.dto.${entityName}UpdateRequest;
-<#if hasDecimal>import java.math.BigDecimal;</#if>
-<#if hasDate>import java.time.LocalDate;</#if>
-<#if hasDateTime>import java.time.LocalDateTime;</#if>
+<#list entityImports as imp>
+import ${imp};
+</#list>
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -23,13 +23,10 @@ public class ${entityName} extends BaseEntity<${entityName}> {
     private Long id;
 
 <#list columns as col>
-<#assign attrs = []>
-<#if !col.nullable><#assign attrs = attrs + ["nullable = false"]></#if>
-<#if (col.isString || col.isText || col.isJson || col.isFile || col.isEnum) && (col.length > 0)><#assign attrs = attrs + ["length = ${col.length?c}"]></#if>
-<#if col.isDecimal><#assign attrs = attrs + ["precision = ${col.precision?c}", "scale = ${col.scale?c}"]></#if>
-<#if col.unique><#assign attrs = attrs + ["unique = true"]></#if>
-<#if attrs?size gt 0>    @Column(${attrs?join(", ")})
-</#if>    private ${col.javaType} ${col.fieldName};
+<#list col.jpaAnnotations as anno>
+    ${anno}
+</#list>
+    private ${col.javaType} ${col.fieldName};
 </#list>
 
     public static ${entityName} create(${entityName}CreateRequest request) {
