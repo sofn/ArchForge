@@ -16,7 +16,6 @@ import org.springframework.stereotype.Component;
 public class ColumnTypeResolver {
 
     private static final int DEFAULT_VARCHAR_LENGTH = 255;
-    private static final int DEFAULT_FILE_LENGTH = 512;
     private static final int DEFAULT_DECIMAL_PRECISION = 18;
     private static final int DEFAULT_DECIMAL_SCALE = 2;
 
@@ -42,8 +41,8 @@ public class ColumnTypeResolver {
             case DATE -> "DATE";
             case DATETIME -> "TIMESTAMP";
             case TIMESTAMPTZ -> "TIMESTAMPTZ";
-            case JSON, GEO -> "JSONB";
-            case FILE -> "VARCHAR(" + DEFAULT_FILE_LENGTH + ")";
+            case JSON, GEO, MULTI_IMAGE -> "JSONB";
+            case FILE, IMAGE -> "BIGINT";
             case UUID -> "UUID";
             case ARRAY -> resolveArrayType(column);
         };
@@ -56,14 +55,15 @@ public class ColumnTypeResolver {
             return "NULL";
         }
         return switch (column.getDataType()) {
-            case STRING, TEXT, FILE, ENUM -> "'" + value.replace("'", "''") + "'";
+            case STRING, TEXT, ENUM -> "'" + value.replace("'", "''") + "'";
+            case FILE, IMAGE -> value;
             case INTEGER -> value;
             case DECIMAL -> value;
             case BOOLEAN -> Boolean.parseBoolean(value) ? "TRUE" : "FALSE";
             case DATE -> "'" + value + "'";
             case DATETIME -> "'" + value + "'";
             case TIMESTAMPTZ -> "'" + value + "'::timestamptz";
-            case JSON, GEO -> "'" + value.replace("'", "''") + "'" + "::jsonb";
+            case JSON, GEO, MULTI_IMAGE -> "'" + value.replace("'", "''") + "'" + "::jsonb";
             case UUID -> "'" + value.replace("'", "''") + "'" + "::uuid";
             case ARRAY -> formatArrayDefaultValue(column);
         };

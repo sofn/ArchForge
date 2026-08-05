@@ -15,6 +15,12 @@ public class ${entityName}ListRequest {
     private String keyword;
 
 <#list searchableColumns as col>
+    <#if col.rangeSearch>
+    private ${col.javaType} ${col.fieldName}Start;
+
+    private ${col.javaType} ${col.fieldName}End;
+    <#else>
     private ${col.javaType} ${col.fieldName};
+    </#if>
 </#list>
 }

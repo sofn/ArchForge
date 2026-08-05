@@ -24,6 +24,8 @@ import com.lesofn.archforge.server.admin.dto.request.MetaTableGenerateRequest;
 import com.lesofn.archforge.server.admin.dto.request.MetaTableListRequest;
 import com.lesofn.archforge.server.admin.dto.request.MetaTableUpdateRequest;
 import com.lesofn.archforge.server.admin.dto.response.MetaTableGenerateResponse;
+import com.lesofn.archforge.user.api.domain.SysUser;
+import com.lesofn.archforge.user.api.service.SysUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
@@ -32,6 +34,9 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -67,6 +72,7 @@ public class MetaTableController {
     private final CodeGenWorkspaceResolver codeGenWorkspaceResolver;
     private final MetaTableMigrationService metaTableMigrationService;
     private final MetaTableMigrationExporter metaTableMigrationExporter;
+    private final SysUserService sysUserService;
 
     @Operation(summary = "获取元表格列表")
     @PostMapping
@@ -79,10 +85,33 @@ public class MetaTableController {
                 : 10;
         Pageable pageable = PageRequest.of(currentPage - 1, pageSize);
         Page<MetaTable> page = metaTableAdminService.list(request.getKeyword(), pageable);
+        Map<Long, String> userNameMap = buildUserNameMap(page.getContent());
         List<MetaTableResponse> list = page.getContent().stream()
-                .map(MetaTableResponse::of)
+                .map(table -> {
+                    MetaTableResponse response = MetaTableResponse.of(table);
+                    response.setCreatorName(userNameMap.getOrDefault(table.getCreatorId(), ""));
+                    response.setUpdaterName(userNameMap.getOrDefault(table.getUpdaterId(), ""));
+                    return response;
+                })
                 .toList();
         return AdminPageResult.of(list, page.getTotalElements(), pageSize, currentPage);
+    }
+
+    private Map<Long, String> buildUserNameMap(List<MetaTable> tables) {
+        Set<Long> userIds = tables.stream()
+                .flatMap(t -> java.util.stream.Stream.of(t.getCreatorId(), t.getUpdaterId()))
+                .filter(id -> id != null)
+                .collect(Collectors.toSet());
+        return userIds.stream()
+                .collect(Collectors.toMap(
+                        id -> id,
+                        id -> resolveUserName(id)));
+    }
+
+    private String resolveUserName(Long userId) {
+        Optional<SysUser> user = sysUserService.findById(userId);
+        return user.map(u -> u.getNickname() != null && !u.getNickname().isEmpty() ? u.getNickname() : u.getUsername())
+                .orElse("");
     }
 
     @Operation(summary = "获取元表格详情")

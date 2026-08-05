@@ -97,6 +97,13 @@ public class MetaTableValidator {
         if (type == MetaColumnType.ARRAY && (column.getArrayElementType() == null || column.getArrayElementType().isEmpty())) {
             throw new MetaTableException(MetaTableErrorCode.META_COLUMN_TYPE_INVALID, "ARRAY 类型必须配置元素类型");
         }
+        if (column.getSearchType() != null && !column.getSearchType().isEmpty()) {
+            Set<String> validSearchTypes = Set.of("EXACT", "LIKE", "RANGE");
+            if (!validSearchTypes.contains(column.getSearchType().toUpperCase())) {
+                throw new MetaTableException(MetaTableErrorCode.META_COLUMN_TYPE_INVALID, "不支持的搜索方式: " + column
+                        .getSearchType());
+            }
+        }
         if (column.getIndexType() != null && !column.getIndexType().isEmpty()) {
             Set<String> validTypes = Set.of("BTREE", "GIN", "GIST", "FULLTEXT");
             if (!validTypes.contains(column.getIndexType().toUpperCase())) {
@@ -144,7 +151,9 @@ public class MetaTableValidator {
         MetaColumnType type = column.getDataType();
         try {
             switch (type) {
-                case STRING, TEXT, FILE -> validateString(column, value);
+                case STRING, TEXT -> validateString(column, value);
+                case FILE, IMAGE -> validateFileReference(column, value);
+                case MULTI_IMAGE -> validateMultiImage(value);
                 case ENUM -> validateEnum(column, value);
                 case INTEGER -> parseLong(value);
                 case DECIMAL -> new BigDecimal(value.toString());
@@ -168,6 +177,40 @@ public class MetaTableValidator {
         if (column.getLength() != null && column.getLength() > 0 && str.length() > column.getLength()) {
             throw new MetaTableException(MetaTableErrorCode.META_COLUMN_VALUE_INVALID, column.getColumnName() + " 超过最大长度 " +
                     column.getLength());
+        }
+    }
+
+    private void validateFileReference(MetaColumn column, Object value) {
+        if (value instanceof Number) {
+            return;
+        }
+        String str = value.toString();
+        if (str.isBlank()) {
+            throw new MetaTableException(MetaTableErrorCode.META_COLUMN_VALUE_INVALID, column.getColumnName() + " 文件引用不能为空");
+        }
+        try {
+            Long.parseLong(str);
+        } catch (NumberFormatException e) {
+            throw new MetaTableException(MetaTableErrorCode.META_COLUMN_VALUE_INVALID, column.getColumnName() +
+                    " 文件引用必须是 fileId");
+        }
+    }
+
+    private void validateMultiImage(Object value) {
+        if (value instanceof Collection<?>) {
+            return;
+        }
+        String str = value.toString().trim();
+        if (str.isEmpty()) {
+            throw new MetaTableException(MetaTableErrorCode.META_COLUMN_VALUE_INVALID, "多图片不能为空");
+        }
+        try {
+            JsonNode node = OBJECT_MAPPER.readTree(str);
+            if (!node.isArray()) {
+                throw new MetaTableException(MetaTableErrorCode.META_COLUMN_VALUE_INVALID, "多图片必须是 JSON 数组");
+            }
+        } catch (Exception e) {
+            throw new MetaTableException(MetaTableErrorCode.META_COLUMN_VALUE_INVALID, "多图片格式错误");
         }
     }
 
@@ -305,7 +348,9 @@ public class MetaTableValidator {
             return null;
         }
         return switch (column.getDataType()) {
-            case STRING, TEXT, FILE, ENUM -> value.toString();
+            case STRING, TEXT, ENUM -> value.toString();
+            case FILE, IMAGE -> parseLong(value);
+            case MULTI_IMAGE -> toPgJsonb(toJsonString(value));
             case INTEGER -> parseLong(value);
             case DECIMAL -> new BigDecimal(value.toString());
             case BOOLEAN -> parseBoolean(value);
@@ -326,6 +371,17 @@ public class MetaTableValidator {
             return pgObject;
         } catch (Exception e) {
             throw new MetaTableException(MetaTableErrorCode.META_COLUMN_VALUE_INVALID, "JSONB 转换失败: " + value);
+        }
+    }
+
+    private String toJsonString(Object value) {
+        if (value instanceof String string) {
+            return string;
+        }
+        try {
+            return OBJECT_MAPPER.writeValueAsString(value);
+        } catch (Exception e) {
+            throw new MetaTableException(MetaTableErrorCode.META_COLUMN_VALUE_INVALID, "JSON 序列化失败: " + value);
         }
     }
 
@@ -369,8 +425,9 @@ public class MetaTableValidator {
         return switch (column.getDataType()) {
             case DATE, DATETIME, TIMESTAMPTZ -> value.toString();
             case BOOLEAN -> Boolean.TRUE.equals(value) ? "是" : "否";
-            case JSON, GEO -> value.toString();
+            case JSON, GEO, MULTI_IMAGE -> formatJsonValue(value);
             case ARRAY -> formatArrayValue(value);
+            case FILE, IMAGE -> value.toString();
             case ENUM -> {
                 if (column.getOptions() == null) {
                     yield value.toString();
@@ -384,6 +441,13 @@ public class MetaTableValidator {
             }
             default -> value.toString();
         };
+    }
+
+    private String formatJsonValue(Object value) {
+        if (value instanceof PGobject pgObject) {
+            return pgObject.getValue();
+        }
+        return value.toString();
     }
 
     private String formatArrayValue(Object value) {

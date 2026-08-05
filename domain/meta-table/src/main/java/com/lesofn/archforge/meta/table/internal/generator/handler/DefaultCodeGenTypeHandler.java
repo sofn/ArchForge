@@ -30,14 +30,24 @@ public class DefaultCodeGenTypeHandler implements CodeGenTypeHandler {
             case ENUM -> handleEnum(col, meta);
             case JSON -> handleJson(col, meta);
             case FILE -> handleFile(col, meta);
+            case IMAGE -> handleImage(col, meta);
+            case MULTI_IMAGE -> handleMultiImage(col, meta);
             case UUID -> handleUuid(col, meta);
             case TIMESTAMPTZ -> handleTimestampTz(col, meta);
             case ARRAY -> handleArray(col, meta);
             case GEO -> handleGeo(col, meta);
         }
+        setSearchAttributes(col, meta);
         col.setSearchCondition(buildSearchCondition(col));
         col.setSearchPredicate(buildSearchPredicate(col));
         col.setKeywordPredicate(buildKeywordPredicate(col));
+    }
+
+    private void setSearchAttributes(CodeGenColumn col, MetaColumn meta) {
+        String searchType = resolveSearchType(meta, defaultSearchType(meta.getDataType()));
+        col.setSearchType(searchType);
+        col.setLikeSearch("LIKE".equalsIgnoreCase(searchType));
+        col.setRangeSearch("RANGE".equalsIgnoreCase(searchType));
     }
 
     private void setTypeFlags(CodeGenColumn col, MetaColumnType type) {
@@ -45,6 +55,8 @@ public class DefaultCodeGenTypeHandler implements CodeGenTypeHandler {
         col.setText(type == MetaColumnType.TEXT);
         col.setJson(type == MetaColumnType.JSON);
         col.setFile(type == MetaColumnType.FILE);
+        col.setImage(type == MetaColumnType.IMAGE);
+        col.setMultiImage(type == MetaColumnType.MULTI_IMAGE);
         col.setEnumType(type == MetaColumnType.ENUM);
         col.setInteger(type == MetaColumnType.INTEGER);
         col.setDecimal(type == MetaColumnType.DECIMAL);
@@ -201,18 +213,51 @@ public class DefaultCodeGenTypeHandler implements CodeGenTypeHandler {
     }
 
     private void handleFile(CodeGenColumn col, MetaColumn meta) {
-        col.setJavaType("String");
-        col.setTsType("string");
-        col.setComponentType("input");
+        col.setJavaType("Long");
+        col.setTsType("number");
+        col.setComponentType("upload");
         col.setInputType("file");
-        col.setLikeSearch(true);
-        col.setKeywordSearchable(true);
-        int len = defaultLength(col.getLength(), 500);
-        col.setLength(len);
-        col.setJavaDefaultValue(escape("https://example.com/file.txt"));
-        col.setTsDefaultValue(escape(""));
-        addStringValidators(col, len);
+        col.setFileSizeLimit(meta.getLength());
+        col.setJavaDefaultValue("1L");
+        col.setTsDefaultValue("null");
+        col.setFile(true);
+        col.setInteger(true);
+        addNotNullValidator(col);
         addColumnAnnotation(col);
+    }
+
+    private void handleImage(CodeGenColumn col, MetaColumn meta) {
+        col.setJavaType("Long");
+        col.setTsType("number");
+        col.setComponentType("upload");
+        col.setInputType("image");
+        col.setFileSizeLimit(meta.getLength());
+        col.setJavaDefaultValue("1L");
+        col.setTsDefaultValue("null");
+        col.setImage(true);
+        col.setInteger(true);
+        addNotNullValidator(col);
+        addColumnAnnotation(col);
+    }
+
+    private void handleMultiImage(CodeGenColumn col, MetaColumn meta) {
+        col.setJavaType("String");
+        col.setTsType("number[]");
+        col.setComponentType("upload");
+        col.setInputType("multi-image");
+        col.setMultiImage(true);
+        col.setFileSizeLimit(meta.getLength());
+        col.setJavaDefaultValue(escape("[]"));
+        col.setTsDefaultValue("[]");
+        col.getJpaAnnotations().add("@Type(JsonbStringUserType.class)");
+        col.getJpaAnnotations().add(buildJsonbColumnAnnotation(col));
+        col.getJpaImports().add("com.lesofn.archforge.common.repository.converter.JsonbStringUserType");
+        col.getJpaImports().add("org.hibernate.annotations.Type");
+        col.setSearchType(resolveSearchType(meta, "EXACT"));
+        if (col.isRequired()) {
+            col.getValidatorAnnotations().add("@NotBlank(message = \"" + col.getColumnName() + "不能为空\")");
+            col.getValidatorImports().add("jakarta.validation.constraints.NotBlank");
+        }
     }
 
     private void handleUuid(CodeGenColumn col, MetaColumn meta) {
@@ -338,7 +383,7 @@ public class DefaultCodeGenTypeHandler implements CodeGenTypeHandler {
         if (col.isUnique()) {
             attrs.add("unique = true");
         }
-        if (col.isString() || col.isText() || col.isFile() || col.isEnum()) {
+        if (col.isString() || col.isText() || col.isEnum()) {
             if (col.getLength() != null && col.getLength() > 0) {
                 attrs.add("length = " + col.getLength());
             }
@@ -366,6 +411,11 @@ public class DefaultCodeGenTypeHandler implements CodeGenTypeHandler {
 
     private String buildSearchCondition(CodeGenColumn col) {
         String getter = "request.get" + cap(col.getFieldName()) + "()";
+        if (col.isRangeSearch()) {
+            String start = "request.get" + cap(col.getFieldName()) + "Start()";
+            String end = "request.get" + cap(col.getFieldName()) + "End()";
+            return start + " != null || " + end + " != null";
+        }
         if (col.isArray()) {
             return getter + " != null && " + getter + ".length > 0";
         }
@@ -377,10 +427,19 @@ public class DefaultCodeGenTypeHandler implements CodeGenTypeHandler {
 
     private String buildSearchPredicate(CodeGenColumn col) {
         String field = col.getFieldName();
-        if (col.isLikeSearch()) {
-            return "cb.like(root.get(\"" + field + "\"), \"%\" + request.get" + cap(field) + "() + \"%\", '!')";
+        String getter = "request.get" + cap(field) + "()";
+        String rootGet = "root.get(\"" + field + "\")";
+        if (col.isRangeSearch()) {
+            String start = "request.get" + cap(field) + "Start()";
+            String end = "request.get" + cap(field) + "End()";
+            return "cb.and(" + start + " != null ? cb.greaterThanOrEqualTo(" + rootGet + ", " + start +
+                    ") : cb.conjunction(), " + end + " != null ? cb.lessThanOrEqualTo(" + rootGet + ", " + end +
+                    ") : cb.conjunction())";
         }
-        return "cb.equal(root.get(\"" + field + "\"), request.get" + cap(field) + "())";
+        if (col.isLikeSearch()) {
+            return "cb.like(" + rootGet + ", \"%\" + " + getter + " + \"%\", '!')";
+        }
+        return "cb.equal(" + rootGet + ", " + getter + ")";
     }
 
     private String buildKeywordPredicate(CodeGenColumn col) {
@@ -407,5 +466,19 @@ public class DefaultCodeGenTypeHandler implements CodeGenTypeHandler {
 
     private String escape(String value) {
         return "\"" + value.replace("\"", "\\\"") + "\"";
+    }
+
+    private String resolveSearchType(MetaColumn meta, String defaultType) {
+        if (meta.getSearchType() != null && !meta.getSearchType().isEmpty()) {
+            return meta.getSearchType().toUpperCase();
+        }
+        return defaultType;
+    }
+
+    private String defaultSearchType(MetaColumnType type) {
+        return switch (type) {
+            case STRING, TEXT, ENUM, JSON, GEO -> "LIKE";
+            default -> "EXACT";
+        };
     }
 }

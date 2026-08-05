@@ -54,6 +54,8 @@ public class CodeGenColumn {
     private boolean text;
     private boolean json;
     private boolean file;
+    private boolean image;
+    private boolean multiImage;
     private boolean enumType;
     private boolean integer;
     private boolean decimal;
@@ -67,6 +69,10 @@ public class CodeGenColumn {
 
     private boolean likeSearch;
     private boolean keywordSearchable;
+
+    private String searchType;
+    private boolean rangeSearch;
+    private Integer fileSizeLimit;
 
     public boolean isEnum() { return enumType; }
 

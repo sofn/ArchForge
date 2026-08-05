@@ -29,18 +29,25 @@ public class MetaTableDataInserter {
     public Long insert(MetaTable table, List<MetaColumn> columns, Map<String, Object> row, Long currentUid) {
         String physicalName = SqlIdentifier.quote(table.physicalTableName());
         MapSqlParameterSource params = new MapSqlParameterSource();
+        LocalDateTime now = LocalDateTime.now();
         params.addValue("creatorId", currentUid);
-        params.addValue("createTime", LocalDateTime.now());
+        params.addValue("createTime", now);
+        params.addValue("updaterId", currentUid);
+        params.addValue("updateTime", now);
         params.addValue("deleted", 0);
 
         List<String> fields = new ArrayList<>();
         fields.add(SqlIdentifier.quote("creator_id"));
         fields.add(SqlIdentifier.quote("create_time"));
+        fields.add(SqlIdentifier.quote("updater_id"));
+        fields.add(SqlIdentifier.quote("update_time"));
         fields.add(SqlIdentifier.quote("deleted"));
 
         List<String> placeholders = new ArrayList<>();
         placeholders.add(":creatorId");
         placeholders.add(":createTime");
+        placeholders.add(":updaterId");
+        placeholders.add(":updateTime");
         placeholders.add(":deleted");
 
         for (MetaColumn column : columns) {

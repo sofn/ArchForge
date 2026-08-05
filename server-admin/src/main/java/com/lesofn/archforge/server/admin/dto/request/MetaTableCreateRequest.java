@@ -92,6 +92,8 @@ public class MetaTableCreateRequest {
 
         private String arrayElementType;
 
+        private String searchType;
+
         private List<com.lesofn.archforge.meta.table.api.domain.OptionItem> options;
 
         private String referenceTable;
@@ -127,6 +129,7 @@ public class MetaTableCreateRequest {
             column.setTenantColumn(tenantColumn);
             column.setOwnerColumn(ownerColumn);
             column.setArrayElementType(arrayElementType);
+            column.setSearchType(searchType);
             return column;
         }
     }

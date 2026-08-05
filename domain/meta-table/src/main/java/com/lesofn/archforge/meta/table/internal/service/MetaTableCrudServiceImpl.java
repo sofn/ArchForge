@@ -22,6 +22,7 @@ import java.sql.Timestamp;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -168,7 +169,7 @@ public class MetaTableCrudServiceImpl implements MetaTableCrudService {
         for (Map.Entry<String, Object> entry : filters.entrySet()) {
             String key = entry.getKey();
             Object value = entry.getValue();
-            if (value == null || (value instanceof String s && s.isEmpty())) {
+            if (value == null || isEmptyFilterValue(value)) {
                 continue;
             }
             FilterPath filterPath = parseFilterKey(columnMap, key);
@@ -180,7 +181,9 @@ public class MetaTableCrudServiceImpl implements MetaTableCrudService {
             if (filterPath.jsonPath() != null) {
                 params.addValue(paramName, value.toString());
                 sb.append(" AND ").append(buildJsonPathExpression(column, filterPath.jsonPath(), paramName, value));
-            } else if (isLikeSearchType(column)) {
+            } else if (isRangeSearch(column, value)) {
+                appendRangeCondition(sb, column, key, value, paramName, params);
+            } else if (isLikeSearch(column)) {
                 params.addValue(paramName, "%" + value + "%");
                 sb.append(" AND ").append(SqlIdentifier.quote(key)).append("::text LIKE :").append(paramName);
             } else {
@@ -204,11 +207,61 @@ public class MetaTableCrudServiceImpl implements MetaTableCrudService {
         return column == null ? null : new FilterPath(column, null);
     }
 
-    private boolean isLikeSearchType(MetaColumn column) {
+    private boolean isLikeSearch(MetaColumn column) {
+        return "LIKE".equalsIgnoreCase(resolveSearchType(column));
+    }
+
+    private boolean isRangeSearch(MetaColumn column, Object value) {
+        if (!"RANGE".equalsIgnoreCase(resolveSearchType(column))) {
+            return false;
+        }
+        return value instanceof Map<?, ?> map && (map.containsKey("start") || map.containsKey("end")) ||
+                value instanceof List<?> list && list.size() == 2;
+    }
+
+    private String resolveSearchType(MetaColumn column) {
+        if (column.getSearchType() != null && !column.getSearchType().isEmpty()) {
+            return column.getSearchType();
+        }
         return switch (column.getDataType()) {
-            case STRING, TEXT, FILE, ENUM, JSON, GEO -> true;
-            default -> false;
+            case STRING, TEXT, ENUM, JSON, GEO -> "LIKE";
+            default -> "EXACT";
         };
+    }
+
+    private void appendRangeCondition(StringBuilder sb, MetaColumn column, String key, Object value, String paramName,
+            MapSqlParameterSource params) {
+        Object start = null;
+        Object end = null;
+        if (value instanceof Map<?, ?> map) {
+            start = map.get("start");
+            end = map.get("end");
+        } else if (value instanceof List<?> list) {
+            start = list.get(0);
+            end = list.get(1);
+        }
+        String quoted = SqlIdentifier.quote(key);
+        if (start != null && !isEmptyFilterValue(start)) {
+            params.addValue(paramName + "_start", validator.convertValue(column, start));
+            sb.append(" AND ").append(quoted).append(" >= :").append(paramName).append("_start");
+        }
+        if (end != null && !isEmptyFilterValue(end)) {
+            params.addValue(paramName + "_end", validator.convertValue(column, end));
+            sb.append(" AND ").append(quoted).append(" <= :").append(paramName).append("_end");
+        }
+    }
+
+    private boolean isEmptyFilterValue(Object value) {
+        if (value == null) {
+            return true;
+        }
+        if (value instanceof String string) {
+            return string.isEmpty();
+        }
+        if (value instanceof Collection<?> collection) {
+            return collection.isEmpty();
+        }
+        return false;
     }
 
     private String buildJsonPathExpression(MetaColumn column, String jsonPath, String paramName, Object value) {

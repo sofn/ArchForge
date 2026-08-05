@@ -51,7 +51,58 @@ const {
       </el-form-item>
 <#list searchableColumns as col>
       <el-form-item label="${col.columnName}" prop="${col.fieldName}">
-<#if col.isString || col.isText || col.isJson || col.isFile || col.isUuid || col.isGeo>
+<#if col.isFile || col.isImage>
+        <el-input-number
+          v-model="form.${col.fieldName}"
+          placeholder="${col.columnName} fileId"
+          class="w-30!"
+        />
+<#elseif col.rangeSearch>
+        <div class="flex gap-2">
+<#if col.isDate || col.isDateTime || col.isTimestampTz>
+          <el-date-picker
+            v-model="form.${col.fieldName}Start"
+            type="${col.dateType}"
+            value-format="${col.dateValueFormat}"
+            placeholder="开始"
+            class="w-30!"
+          />
+          <el-date-picker
+            v-model="form.${col.fieldName}End"
+            type="${col.dateType}"
+            value-format="${col.dateValueFormat}"
+            placeholder="结束"
+            class="w-30!"
+          />
+<#elseif col.isInteger || col.isDecimal>
+          <el-input-number
+            v-model="form.${col.fieldName}Start"
+            :precision="<#if col.isDecimal>${col.scale?c}<#else>0</#if>"
+            placeholder="开始"
+            class="w-30!"
+          />
+          <el-input-number
+            v-model="form.${col.fieldName}End"
+            :precision="<#if col.isDecimal>${col.scale?c}<#else>0</#if>"
+            placeholder="结束"
+            class="w-30!"
+          />
+<#else>
+          <el-input
+            v-model="form.${col.fieldName}Start"
+            placeholder="开始"
+            clearable
+            class="w-30!"
+          />
+          <el-input
+            v-model="form.${col.fieldName}End"
+            placeholder="结束"
+            clearable
+            class="w-30!"
+          />
+</#if>
+        </div>
+<#elseif col.isString || col.isText || col.isJson || col.isUuid || col.isGeo>
         <el-input
           v-model="form.${col.fieldName}"
           placeholder="${col.columnName}"

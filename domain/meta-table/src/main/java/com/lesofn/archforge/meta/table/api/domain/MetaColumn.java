@@ -102,6 +102,9 @@ public class MetaColumn extends BasePO {
     @Column(name = "array_element_type")
     private String arrayElementType;
 
+    @Column(name = "search_type")
+    private String searchType;
+
     public boolean isUniqueColumn() { return Boolean.TRUE.equals(unique); }
 
     public boolean isIndexedColumn() { return Boolean.TRUE.equals(index); }

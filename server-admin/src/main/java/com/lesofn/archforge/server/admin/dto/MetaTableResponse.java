@@ -24,7 +24,17 @@ public class MetaTableResponse {
 
     private Integer status;
 
+    private Long creatorId;
+
+    private String creatorName;
+
     private LocalDateTime createTime;
+
+    private Long updaterId;
+
+    private String updaterName;
+
+    private LocalDateTime updateTime;
 
     private List<MetaColumn> columns;
 
@@ -36,7 +46,10 @@ public class MetaTableResponse {
         response.setDescription(table.getDescription());
         response.setTablePrefix(table.getTablePrefix());
         response.setStatus(table.getStatus());
+        response.setCreatorId(table.getCreatorId());
         response.setCreateTime(table.getCreateTime());
+        response.setUpdaterId(table.getUpdaterId());
+        response.setUpdateTime(table.getUpdateTime());
         return response;
     }
 

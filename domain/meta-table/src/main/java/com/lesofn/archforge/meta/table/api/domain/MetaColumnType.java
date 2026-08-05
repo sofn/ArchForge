@@ -14,6 +14,8 @@ public enum MetaColumnType {
     ENUM,
     JSON,
     FILE,
+    IMAGE,
+    MULTI_IMAGE,
     UUID,
     TIMESTAMPTZ,
     ARRAY,

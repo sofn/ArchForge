@@ -164,10 +164,15 @@ public final class CodeGenModelFactory {
         map.put("precision", col.getPrecision());
         map.put("scale", col.getScale());
         map.put("arrayElementType", col.getArrayElementType());
+        map.put("searchType", col.getSearchType());
+        map.put("rangeSearch", col.isRangeSearch());
+        map.put("fileSizeLimit", col.getFileSizeLimit());
         map.put("isString", col.isString());
         map.put("isText", col.isText());
         map.put("isJson", col.isJson());
         map.put("isFile", col.isFile());
+        map.put("isImage", col.isImage());
+        map.put("isMultiImage", col.isMultiImage());
         map.put("isEnum", col.isEnum());
         map.put("isInteger", col.isInteger());
         map.put("isDecimal", col.isDecimal());

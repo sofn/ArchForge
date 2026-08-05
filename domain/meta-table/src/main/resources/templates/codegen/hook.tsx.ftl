@@ -48,7 +48,7 @@ export function use${className}() {
       label: "${col.columnName}",
       prop: "${col.fieldName}",
       minWidth: 140<#if col.isDate || col.isDateTime || col.isTimestampTz>,
-      formatter: ({ ${col.fieldName} }) => ${col.fieldName} ? dayjs(${col.fieldName}).format("${col.dateValueFormat}") : ""</#if><#if col.isArray>,
+      formatter: ({ ${col.fieldName} }) => ${col.fieldName} ? dayjs(${col.fieldName}).format("${col.dateValueFormat}") : ""</#if><#if col.isArray || col.isMultiImage>,
       formatter: ({ ${col.fieldName} }) => ${col.fieldName} ? JSON.stringify(${col.fieldName}) : ""</#if>
     },
 </#list>

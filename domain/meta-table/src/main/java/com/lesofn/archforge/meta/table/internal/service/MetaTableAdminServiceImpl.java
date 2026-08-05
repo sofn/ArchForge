@@ -62,6 +62,12 @@ public class MetaTableAdminServiceImpl implements MetaTableAdminService {
         }
         table.setStatus(1);
         table.setSchemaVersion(1);
+        if (table.getUpdaterId() == null && table.getCreatorId() != null) {
+            table.setUpdaterId(table.getCreatorId());
+        }
+        if (table.getUpdateTime() == null) {
+            table.setUpdateTime(LocalDateTime.now());
+        }
         MetaTable saved = metaTableRepository.save(table);
 
         for (MetaColumn column : columns) {
@@ -80,6 +86,7 @@ public class MetaTableAdminServiceImpl implements MetaTableAdminService {
     @Transactional("metaTableTransactionManager")
     public void update(Long id, MetaTable table, List<MetaColumn> columns, Long operatorId) {
         MetaTable existing = findById(id);
+        existing.setUpdaterId(operatorId);
 
         if (columns == null || columns.isEmpty()) {
             existing.setTableName(table.getTableName());

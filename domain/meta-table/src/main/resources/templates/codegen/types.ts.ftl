@@ -1,6 +1,7 @@
 export interface ${className}CreateRequest {
 <#list columns as col>
   ${col.fieldName}?: ${col.tsType};
+  <#if col.isFile || col.isImage || col.isMultiImage>${col.fieldName}FileList?: any[];</#if>
 </#list>
 }
 
@@ -13,7 +14,12 @@ export interface ${className}ListRequest {
   pageSize?: number;
   keyword?: string;
 <#list searchableColumns as col>
+  <#if col.rangeSearch>
+  ${col.fieldName}Start?: ${col.tsType};
+  ${col.fieldName}End?: ${col.tsType};
+  <#else>
   ${col.fieldName}?: ${col.tsType};
+  </#if>
 </#list>
 }
 
@@ -38,5 +44,6 @@ export interface ${className}ImportResult {
 export const init${className}Form = (): ${className}CreateRequest => ({
 <#list columns as col>
   ${col.fieldName}: ${col.tsDefaultValue},
+  <#if col.isFile || col.isImage || col.isMultiImage>${col.fieldName}FileList: [],</#if>
 </#list>
 });
