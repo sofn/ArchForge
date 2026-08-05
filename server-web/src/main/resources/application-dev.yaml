@@ -39,9 +39,3 @@ arch-forge:
   file-storage:
     type: ${FILE_STORAGE_TYPE:local}
     local-dir: ${FILE_STORAGE_LOCAL_DIR:../uploads}
-  jwt:
-    # HS512 要求密钥长度 >= 64 字节；开发环境复用该默认值即可
-    secret: ${JWT_SECRET:archforge-demo-secret-key-2026-08-05-make-it-long-enough-for-hs512!}
-  token:
-    header: Authorization
-    secret: ${JWT_SECRET:archforge-demo-secret-key-2026-08-05-make-it-long-enough-for-hs512!}

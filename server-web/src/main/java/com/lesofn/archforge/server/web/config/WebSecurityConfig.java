@@ -16,7 +16,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
  * C 端 Web 安全配置。
  *
  * <p>
- * Spring Security 仅负责放行所有请求；具体 JWT 鉴权由 {@link
+ * Spring Security 仅负责放行所有请求；具体 Sa-Token 鉴权由 {@link
  * com.lesofn.archforge.server.web.interceptor.WebAuthInterceptor} 完成。
  * </p>
  */

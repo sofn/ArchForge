@@ -41,6 +41,10 @@ dependencies {
         api("io.jsonwebtoken:jjwt-api:0.12.7")
         api("io.jsonwebtoken:jjwt-impl:0.12.7")
         api("io.jsonwebtoken:jjwt-jackson:0.12.7")
+
+        // Sa-Token
+        api("cn.dev33:sa-token-spring-boot3-starter:1.45.0")
+        api("cn.dev33:sa-token-redis-jackson:1.45.0")
         
         // 其他
         api("com.google.code.findbugs:annotations:3.0.1")

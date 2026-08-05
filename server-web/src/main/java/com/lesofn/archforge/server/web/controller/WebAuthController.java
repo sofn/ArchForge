@@ -1,8 +1,8 @@
 package com.lesofn.archforge.server.web.controller;
 
+import cn.dev33.satoken.stp.StpUtil;
 import com.lesofn.archforge.server.web.dto.WebLoginRequest;
 import com.lesofn.archforge.server.web.dto.WebLoginResponse;
-import com.lesofn.archforge.server.web.util.WebJwtTokenUtil;
 import com.lesofn.archforge.user.api.domain.SysUser;
 import com.lesofn.archforge.user.api.service.SysUserService;
 import com.lesofn.archforge.user.domain.adapter.port.PasswordEncoderPort;
@@ -25,7 +25,6 @@ public class WebAuthController {
 
     private final SysUserService sysUserService;
     private final PasswordEncoderPort passwordEncoderPort;
-    private final WebJwtTokenUtil webJwtTokenUtil;
 
     @PostMapping("/login")
     public WebLoginResponse login(@RequestBody @Valid WebLoginRequest request) {
@@ -37,23 +36,34 @@ public class WebAuthController {
         if (!passwordEncoderPort.matches(request.getPassword(), user.getPassword())) {
             throw new com.lesofn.archforge.user.api.errors.AdminUserException("用户名或密码错误");
         }
-        String token = webJwtTokenUtil.generateToken(user.getUserId(), user.getUsername());
+
+        StpUtil.login(user.getUserId());
+        StpUtil.getSession().set("userId", user.getUserId());
+        StpUtil.getSession().set("username", user.getUsername());
+        StpUtil.getSession().set("nickname", user.getNickname());
+
+        String tokenValue = StpUtil.getTokenValue();
+        String tokenName = StpUtil.getTokenName();
+        long timeout = StpUtil.getTokenTimeout();
         String expires = EXPIRES_FORMATTER.format(
-                Instant.now().plusSeconds(webJwtTokenUtil.getExpireSeconds())
+                Instant.now().plusSeconds(timeout)
                         .atZone(ZoneId.systemDefault())
                         .toLocalDateTime());
+
         return WebLoginResponse.builder()
                 .userId(user.getUserId())
                 .username(user.getUsername())
                 .nickname(user.getNickname())
                 .avatar(user.getAvatar())
-                .accessToken(token)
+                .accessToken(tokenValue)
+                .tokenName(tokenName)
                 .expires(expires)
                 .build();
     }
 
     @PostMapping("/logout")
     public Boolean logout() {
+        StpUtil.logout();
         return true;
     }
 }

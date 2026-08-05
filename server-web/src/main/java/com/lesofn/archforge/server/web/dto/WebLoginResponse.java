@@ -16,5 +16,7 @@ public class WebLoginResponse {
     private String nickname;
     private String avatar;
     private String accessToken;
+    private String tokenName;
+    private String refreshToken;
     private String expires;
 }

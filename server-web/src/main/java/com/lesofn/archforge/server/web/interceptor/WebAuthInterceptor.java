@@ -1,8 +1,7 @@
 package com.lesofn.archforge.server.web.interceptor;
 
-import tools.jackson.databind.ObjectMapper;
+import cn.dev33.satoken.stp.StpUtil;
 import com.lesofn.archforge.server.web.context.WebUserContext;
-import com.lesofn.archforge.server.web.util.WebJwtTokenUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Map;
@@ -10,15 +9,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
+import tools.jackson.databind.ObjectMapper;
 
 @Component
 @RequiredArgsConstructor
 public class WebAuthInterceptor implements HandlerInterceptor {
 
-    private static final String AUTHORIZATION_HEADER = "Authorization";
-    private static final String BEARER_PREFIX = "Bearer ";
-
-    private final WebJwtTokenUtil webJwtTokenUtil;
     private final ObjectMapper objectMapper;
 
     @Override
@@ -26,13 +22,12 @@ public class WebAuthInterceptor implements HandlerInterceptor {
         if (isPublicRequest(request)) {
             return true;
         }
-        String token = extractToken(request);
-        if (token == null || !webJwtTokenUtil.validateToken(token)) {
+        if (!StpUtil.isLogin()) {
             writeUnauthorized(response);
             return false;
         }
-        Long userId = webJwtTokenUtil.getUserId(token);
-        String username = webJwtTokenUtil.getUsername(token);
+        Long userId = StpUtil.getLoginIdAsLong();
+        String username = (String) StpUtil.getSession().get("username");
         WebUserContext.set(userId, username);
         return true;
     }
@@ -69,14 +64,6 @@ public class WebAuthInterceptor implements HandlerInterceptor {
             return false;
         }
         return !uri.equals("/web/articles/me") && !uri.startsWith("/web/articles/me/");
-    }
-
-    private String extractToken(HttpServletRequest request) {
-        String header = request.getHeader(AUTHORIZATION_HEADER);
-        if (header != null && header.startsWith(BEARER_PREFIX)) {
-            return header.substring(BEARER_PREFIX.length());
-        }
-        return null;
     }
 
     private void writeUnauthorized(HttpServletResponse response) throws Exception {

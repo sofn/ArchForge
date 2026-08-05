@@ -28,3 +28,11 @@ management:
     web:
       exposure:
         include: health,info
+
+sa-token:
+  token-name: Authorization
+  token-prefix: Bearer
+  timeout: 86400
+  active-timeout: -1
+  is-concurrent: true
+  is-share: false
