@@ -2,6 +2,7 @@ package com.lesofn.archforge.meta.table.internal.generator;
 
 import com.lesofn.archforge.meta.table.api.domain.MetaColumn;
 import com.lesofn.archforge.meta.table.api.domain.MetaTable;
+import com.lesofn.archforge.meta.table.api.service.DictionaryProvider;
 import com.lesofn.archforge.meta.table.internal.exception.MetaTableException;
 import com.lesofn.archforge.meta.table.internal.generator.extension.CodeGenExtensionRegistry;
 import freemarker.template.Configuration;
@@ -22,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Stream;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -32,6 +34,7 @@ public class MetaTableCodeGenerator {
 
     private final Configuration configuration;
     private final CodeGenExtensionRegistry extensionRegistry;
+    private DictionaryProvider dictionaryProvider;
 
     public MetaTableCodeGenerator(CodeGenExtensionRegistry extensionRegistry) {
         this.extensionRegistry = extensionRegistry != null ? extensionRegistry : new CodeGenExtensionRegistry();
@@ -41,6 +44,9 @@ public class MetaTableCodeGenerator {
         this.configuration.setTemplateLoader(
                 new freemarker.cache.ClassTemplateLoader(MetaTableCodeGenerator.class, TEMPLATE_DIR));
     }
+
+    @Autowired(required = false)
+    public void setDictionaryProvider(DictionaryProvider dictionaryProvider) { this.dictionaryProvider = dictionaryProvider; }
 
     public GeneratedResult generate(MetaTable table, List<MetaColumn> columns, CodeGenOptions options)
             throws MetaTableException {
@@ -69,7 +75,8 @@ public class MetaTableCodeGenerator {
             deleteIfExists(frontendOutputDir);
         }
 
-        Map<String, Object> model = CodeGenModelFactory.buildModel(table, columns, options, extensionRegistry);
+        Map<String, Object> model = CodeGenModelFactory.buildModel(table, columns, options, extensionRegistry,
+                dictionaryProvider);
 
         List<Path> files = new ArrayList<>();
         files.addAll(renderBackend(backendOutputDir, model));

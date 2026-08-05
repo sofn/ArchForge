@@ -4,6 +4,7 @@ import com.lesofn.archforge.meta.table.api.domain.MetaColumn;
 import com.lesofn.archforge.meta.table.api.domain.MetaColumnType;
 import com.lesofn.archforge.meta.table.api.domain.MetaTable;
 import com.lesofn.archforge.meta.table.api.domain.OptionItem;
+import com.lesofn.archforge.meta.table.api.service.DictionaryProvider;
 import com.lesofn.archforge.meta.table.internal.generator.extension.CodeGenExtensionRegistry;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -22,7 +23,7 @@ public final class CodeGenModelFactory {
     }
 
     public static Map<String, Object> buildModel(MetaTable table, List<MetaColumn> columns, CodeGenOptions options,
-            CodeGenExtensionRegistry extensionRegistry) {
+            CodeGenExtensionRegistry extensionRegistry, DictionaryProvider dictionaryProvider) {
         if (extensionRegistry == null) {
             extensionRegistry = new CodeGenExtensionRegistry();
         }
@@ -55,7 +56,7 @@ public final class CodeGenModelFactory {
         CodeGenTypeRegistry typeRegistry = new CodeGenTypeRegistry();
         List<CodeGenColumn> codeGenColumns = new ArrayList<>();
         for (MetaColumn column : columns) {
-            CodeGenColumn col = toCodeGenColumn(column, typeRegistry);
+            CodeGenColumn col = toCodeGenColumn(column, typeRegistry, dictionaryProvider);
             codeGenColumns.add(col);
         }
 
@@ -110,7 +111,8 @@ public final class CodeGenModelFactory {
         return model;
     }
 
-    private static CodeGenColumn toCodeGenColumn(MetaColumn column, CodeGenTypeRegistry typeRegistry) {
+    private static CodeGenColumn toCodeGenColumn(MetaColumn column, CodeGenTypeRegistry typeRegistry,
+            DictionaryProvider dictionaryProvider) {
         CodeGenColumn col = new CodeGenColumn();
         col.setColumnCode(column.getColumnCode());
         col.setFieldName(toCamelCase(column.getColumnCode()));
@@ -124,12 +126,22 @@ public final class CodeGenModelFactory {
         col.setLength(column.getLength());
         col.setPrecision(column.getPrecision());
         col.setScale(column.getScale());
-        col.setOptions(buildOptions(column.getOptions()));
-        col.setHasOptions(column.getDataType() == MetaColumnType.ENUM && column.getOptions() != null && !column.getOptions()
+        col.setDictCode(column.getDictCode());
+        col.setHasDict(column.getDataType() == MetaColumnType.ENUM && column.getDictCode() != null && !column.getDictCode()
                 .isEmpty());
+        col.setOptions(buildOptions(column.getOptions()));
+        col.setHasOptions(column.getDataType() == MetaColumnType.ENUM && !col.isHasDict() && column.getOptions() != null &&
+                !column
+                        .getOptions().isEmpty());
         col.setArrayElementType(column.getArrayElementType());
 
         typeRegistry.resolve(column.getDataType()).enrich(col, column);
+
+        if (col.isHasDict() && dictionaryProvider != null) {
+            List<OptionItem> dictItems = dictionaryProvider.findItems(column.getDictCode());
+            col.setOptions(buildOptions(dictItems));
+            col.setHasOptions(!dictItems.isEmpty());
+        }
 
         return col;
     }
@@ -155,6 +167,8 @@ public final class CodeGenModelFactory {
         map.put("validatorAnnotations", col.getValidatorAnnotations());
         map.put("options", col.getOptions());
         map.put("hasOptions", col.isHasOptions());
+        map.put("dictCode", col.getDictCode());
+        map.put("hasDict", col.isHasDict());
         map.put("searchable", col.isSearchable());
         map.put("listVisible", col.isListVisible());
         map.put("required", col.isRequired());

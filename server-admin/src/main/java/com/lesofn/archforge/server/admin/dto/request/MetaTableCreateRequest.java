@@ -94,6 +94,8 @@ public class MetaTableCreateRequest {
 
         private String searchType;
 
+        private String dictCode;
+
         private List<com.lesofn.archforge.meta.table.api.domain.OptionItem> options;
 
         private String referenceTable;
@@ -130,6 +132,7 @@ public class MetaTableCreateRequest {
             column.setOwnerColumn(ownerColumn);
             column.setArrayElementType(arrayElementType);
             column.setSearchType(searchType);
+            column.setDictCode(dictCode);
             return column;
         }
     }

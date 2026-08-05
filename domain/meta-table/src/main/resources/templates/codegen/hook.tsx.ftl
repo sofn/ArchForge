@@ -37,6 +37,14 @@ export function use${className}() {
     background: true
   });
 
+<#list listVisibleColumns as col>
+<#if col.isEnum && col.hasOptions>
+  const ${col.fieldName}Options = [
+    <#list col.options as opt>{ label: "${opt.label}", value: "${opt.value}" }<#if opt_has_next>,</#if></#list>
+  ];
+</#if>
+</#list>
+
   const columns: TableColumnList = [
     {
       label: "ID",
@@ -49,7 +57,8 @@ export function use${className}() {
       prop: "${col.fieldName}",
       minWidth: 140<#if col.isDate || col.isDateTime || col.isTimestampTz>,
       formatter: ({ ${col.fieldName} }) => ${col.fieldName} ? dayjs(${col.fieldName}).format("${col.dateValueFormat}") : ""</#if><#if col.isArray || col.isMultiImage>,
-      formatter: ({ ${col.fieldName} }) => ${col.fieldName} ? JSON.stringify(${col.fieldName}) : ""</#if>
+      formatter: ({ ${col.fieldName} }) => ${col.fieldName} ? JSON.stringify(${col.fieldName}) : ""</#if><#if col.isEnum && col.hasOptions>,
+      formatter: ({ ${col.fieldName} }) => ${col.fieldName}Options.find(o => String(o.value) === String(${col.fieldName}))?.label ?? ${col.fieldName}</#if>
     },
 </#list>
     {

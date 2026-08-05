@@ -181,6 +181,12 @@ public class DefaultCodeGenTypeHandler implements CodeGenTypeHandler {
         col.setKeywordSearchable(true);
         int len = defaultLength(col.getLength(), 50);
         col.setLength(len);
+
+        if (meta.getDictCode() != null && !meta.getDictCode().isEmpty()) {
+            col.setDictCode(meta.getDictCode());
+            col.setHasDict(true);
+        }
+
         List<OptionItem> options = meta.getOptions();
         String defaultValue = "A";
         if (options != null && !options.isEmpty() && options.get(0).getValue() != null) {

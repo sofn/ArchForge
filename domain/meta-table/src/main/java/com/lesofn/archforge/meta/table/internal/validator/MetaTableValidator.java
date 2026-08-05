@@ -6,9 +6,11 @@ import com.lesofn.archforge.meta.table.api.domain.MetaColumn;
 import com.lesofn.archforge.meta.table.api.domain.MetaColumnType;
 import com.lesofn.archforge.meta.table.api.domain.MetaTable;
 import com.lesofn.archforge.meta.table.api.domain.OptionItem;
+import com.lesofn.archforge.meta.table.api.service.DictionaryProvider;
 import com.lesofn.archforge.meta.table.internal.ddl.SqlIdentifier;
 import com.lesofn.archforge.meta.table.internal.exception.MetaTableErrorCode;
 import com.lesofn.archforge.meta.table.internal.exception.MetaTableException;
+import org.springframework.beans.factory.annotation.Autowired;
 import java.math.BigDecimal;
 import java.sql.Array;
 import java.sql.SQLException;
@@ -34,6 +36,11 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class MetaTableValidator {
+
+    private DictionaryProvider dictionaryProvider;
+
+    @Autowired(required = false)
+    public void setDictionaryProvider(DictionaryProvider dictionaryProvider) { this.dictionaryProvider = dictionaryProvider; }
 
     private static final String DATE_PATTERN = "yyyy-MM-dd";
     private static final String DATE_TIME_PATTERN = "yyyy-MM-dd HH:mm:ss";
@@ -91,8 +98,8 @@ public class MetaTableValidator {
                 throw new MetaTableException(MetaTableErrorCode.META_COLUMN_TYPE_INVALID, "精度必须大于等于小数位数");
             }
         }
-        if (type == MetaColumnType.ENUM && (column.getOptions() == null || column.getOptions().isEmpty())) {
-            throw new MetaTableException(MetaTableErrorCode.META_COLUMN_TYPE_INVALID, "枚举类型必须配置选项");
+        if (type == MetaColumnType.ENUM && (column.getDictCode() == null || column.getDictCode().isEmpty())) {
+            throw new MetaTableException(MetaTableErrorCode.META_COLUMN_TYPE_INVALID, "枚举类型必须选择字典");
         }
         if (type == MetaColumnType.ARRAY && (column.getArrayElementType() == null || column.getArrayElementType().isEmpty())) {
             throw new MetaTableException(MetaTableErrorCode.META_COLUMN_TYPE_INVALID, "ARRAY 类型必须配置元素类型");
@@ -215,15 +222,26 @@ public class MetaTableValidator {
     }
 
     private void validateEnum(MetaColumn column, Object value) {
-        if (column.getOptions() == null || column.getOptions().isEmpty()) {
+        List<OptionItem> items = findDictItems(column);
+        if (items == null || items.isEmpty()) {
             return;
         }
-        Set<Object> optionValues = column.getOptions().stream()
+        Set<Object> optionValues = items.stream()
                 .map(OptionItem::getValue)
                 .collect(Collectors.toSet());
         if (!optionValues.contains(value) && !optionValues.contains(value.toString())) {
             throw new MetaTableException(MetaTableErrorCode.META_COLUMN_VALUE_INVALID, column.getColumnName() + " 不是有效枚举值");
         }
+    }
+
+    private List<OptionItem> findDictItems(MetaColumn column) {
+        if (column.getDictCode() == null || column.getDictCode().isEmpty()) {
+            return column.getOptions();
+        }
+        if (dictionaryProvider == null) {
+            return column.getOptions();
+        }
+        return dictionaryProvider.findItems(column.getDictCode());
     }
 
     private void validateJson(Object value) {
@@ -429,10 +447,11 @@ public class MetaTableValidator {
             case ARRAY -> formatArrayValue(value);
             case FILE, IMAGE -> value.toString();
             case ENUM -> {
-                if (column.getOptions() == null) {
+                List<OptionItem> items = findDictItems(column);
+                if (items == null || items.isEmpty()) {
                     yield value.toString();
                 }
-                yield column.getOptions().stream()
+                yield items.stream()
                         .filter(o -> Objects.equals(o.getValue(), value) || Objects.equals(o.getValue().toString(), value
                                 .toString()))
                         .findFirst()

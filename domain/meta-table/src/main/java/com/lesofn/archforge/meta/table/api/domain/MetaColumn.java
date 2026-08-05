@@ -105,6 +105,9 @@ public class MetaColumn extends BasePO {
     @Column(name = "search_type")
     private String searchType;
 
+    @Column(name = "dict_code")
+    private String dictCode;
+
     public boolean isUniqueColumn() { return Boolean.TRUE.equals(unique); }
 
     public boolean isIndexedColumn() { return Boolean.TRUE.equals(index); }

@@ -255,8 +255,13 @@ public class MetaTableAdminServiceImpl implements MetaTableAdminService {
         copy.setSearchable(source.getSearchable());
         copy.setListVisible(source.getListVisible());
         copy.setIndex(source.getIndex());
+        copy.setIndexType(source.getIndexType());
+        copy.setIndexGroup(source.getIndexGroup());
         copy.setSort(source.getSort());
+        copy.setArrayElementType(source.getArrayElementType());
+        copy.setSearchType(source.getSearchType());
         copy.setOptions(source.getOptions());
+        copy.setDictCode(source.getDictCode());
         copy.setReferenceTable(source.getReferenceTable());
         copy.setReferenceColumn(source.getReferenceColumn());
         copy.setTenantColumn(source.getTenantColumn());

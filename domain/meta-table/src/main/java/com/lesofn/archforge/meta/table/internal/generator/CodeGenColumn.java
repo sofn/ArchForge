@@ -39,6 +39,9 @@ public class CodeGenColumn {
     private List<Map<String, Object>> options = new ArrayList<>();
     private boolean hasOptions;
 
+    private String dictCode;
+    private boolean hasDict;
+
     private boolean searchable;
     private boolean listVisible;
     private boolean required;
