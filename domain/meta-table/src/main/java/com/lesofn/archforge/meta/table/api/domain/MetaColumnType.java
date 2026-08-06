@@ -19,5 +19,6 @@ public enum MetaColumnType {
     UUID,
     TIMESTAMPTZ,
     ARRAY,
-    GEO
+    GEO,
+    REFERENCE
 }

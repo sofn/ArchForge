@@ -3,6 +3,7 @@ package com.lesofn.archforge.meta.table.internal.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lesofn.archforge.common.utils.excel.FastExcelUtil;
 import com.lesofn.archforge.meta.table.api.domain.MetaColumn;
+import com.lesofn.archforge.meta.table.api.domain.MetaColumnType;
 import com.lesofn.archforge.meta.table.api.domain.MetaTable;
 import com.lesofn.archforge.meta.table.api.enums.MetaDataFormat;
 import com.lesofn.archforge.meta.table.api.service.MetaTableAdminService;
@@ -64,7 +65,7 @@ public class MetaTableDataExporter {
                 .toList();
         List<List<String>> body = rows.stream()
                 .map(row -> visibleColumns.stream()
-                        .map(c -> validator.formatValue(c, row.get(c.getColumnCode())))
+                        .map(c -> validator.formatValue(c, getExportValue(c, row)))
                         .collect(Collectors.toList()))
                 .collect(Collectors.toList());
 
@@ -91,7 +92,7 @@ public class MetaTableDataExporter {
                         new String[0])).build())) {
             for (Map<String, Object> row : rows) {
                 List<String> values = visibleColumns.stream()
-                        .map(c -> validator.formatValue(c, row.get(c.getColumnCode())))
+                        .map(c -> validator.formatValue(c, getExportValue(c, row)))
                         .toList();
                 printer.printRecord(values);
             }
@@ -121,14 +122,23 @@ public class MetaTableDataExporter {
 
     private List<Map<String, Object>> queryAllRows(MetaTable table, List<MetaColumn> columns) {
         String physicalName = SqlIdentifier.quote(table.physicalTableName());
-        List<String> quotedColumns = new ArrayList<>();
-        quotedColumns.add(SqlIdentifier.quote("id"));
-        for (MetaColumn column : columns) {
-            quotedColumns.add(SqlIdentifier.quote(column.getColumnCode()));
-        }
-        String querySql = "SELECT " + String.join(", ", quotedColumns) + " FROM " + physicalName +
-                " WHERE deleted = 0 ORDER BY id DESC";
+        String mainAlias = "main";
+        List<String> selectColumns = ReferenceDisplayBuilder.buildSelectColumns(columns, mainAlias);
+        List<String> joins = ReferenceDisplayBuilder.buildJoins(columns, mainAlias);
+        String querySql = "SELECT " + String.join(", ", selectColumns) + " FROM " + physicalName + " " + mainAlias +
+                " " + String.join(" ", joins) + " WHERE " + mainAlias + ".deleted = 0 ORDER BY " + mainAlias +
+                ".id DESC";
         return jdbcTemplate.queryForList(querySql, Map.of());
+    }
+
+    private Object getExportValue(MetaColumn column, Map<String, Object> row) {
+        if (column.getDataType() == MetaColumnType.REFERENCE) {
+            Object display = row.get(column.getColumnCode() + "_display");
+            if (display != null) {
+                return display;
+            }
+        }
+        return row.get(column.getColumnCode());
     }
 
     private Object toJsonValue(Object value) {

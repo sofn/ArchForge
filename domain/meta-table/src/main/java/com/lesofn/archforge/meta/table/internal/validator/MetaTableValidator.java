@@ -11,6 +11,8 @@ import com.lesofn.archforge.meta.table.internal.ddl.SqlIdentifier;
 import com.lesofn.archforge.meta.table.internal.exception.MetaTableErrorCode;
 import com.lesofn.archforge.meta.table.internal.exception.MetaTableException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import java.math.BigDecimal;
 import java.sql.Array;
 import java.sql.SQLException;
@@ -38,9 +40,15 @@ import org.springframework.stereotype.Component;
 public class MetaTableValidator {
 
     private DictionaryProvider dictionaryProvider;
+    private NamedParameterJdbcTemplate jdbcTemplate;
 
     @Autowired(required = false)
     public void setDictionaryProvider(DictionaryProvider dictionaryProvider) { this.dictionaryProvider = dictionaryProvider; }
+
+    @Autowired(required = false)
+    public void setJdbcTemplate(@Qualifier("metaTableJdbcTemplate") NamedParameterJdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
 
     private static final String DATE_PATTERN = "yyyy-MM-dd";
     private static final String DATE_TIME_PATTERN = "yyyy-MM-dd HH:mm:ss";
@@ -101,6 +109,18 @@ public class MetaTableValidator {
         if (type == MetaColumnType.ENUM && (column.getDictCode() == null || column.getDictCode().isEmpty())) {
             throw new MetaTableException(MetaTableErrorCode.META_COLUMN_TYPE_INVALID, "枚举类型必须选择字典");
         }
+        if (type == MetaColumnType.REFERENCE) {
+            if (column.getReferenceTable() == null || column.getReferenceTable().isEmpty()) {
+                throw new MetaTableException(MetaTableErrorCode.META_COLUMN_TYPE_INVALID, "关联类型必须填写被关联表");
+            }
+            if (column.getReferenceColumn() == null || column.getReferenceColumn().isEmpty()) {
+                column.setReferenceColumn("id");
+            }
+            if (column.getDisplayExpression() == null || column.getDisplayExpression().isEmpty()) {
+                throw new MetaTableException(MetaTableErrorCode.META_COLUMN_TYPE_INVALID, "关联类型必须填写显示表达式");
+            }
+            validateDisplayExpression(column.getDisplayExpression());
+        }
         if (type == MetaColumnType.ARRAY && (column.getArrayElementType() == null || column.getArrayElementType().isEmpty())) {
             throw new MetaTableException(MetaTableErrorCode.META_COLUMN_TYPE_INVALID, "ARRAY 类型必须配置元素类型");
         }
@@ -116,6 +136,33 @@ public class MetaTableValidator {
             if (!validTypes.contains(column.getIndexType().toUpperCase())) {
                 throw new MetaTableException(MetaTableErrorCode.META_COLUMN_TYPE_INVALID, "不支持的索引类型: " + column.getIndexType());
             }
+        }
+    }
+
+    private static final Set<String> FORBIDDEN_EXPRESSION_KEYWORDS = Set.of(
+            "SELECT", "FROM", "WHERE", "JOIN", "UNION", "INTERSECT", "EXCEPT", "WITH",
+            "INSERT", "UPDATE", "DELETE", "DROP", "CREATE", "ALTER", "TRUNCATE", "GRANT", "REVOKE",
+            "EXEC", "EXECUTE");
+
+    private void validateDisplayExpression(String expression) {
+        if (expression == null || expression.isBlank()) {
+            return;
+        }
+        String noStrings = expression.replaceAll("'(?:''|[^'])*'", "''");
+        String upper = noStrings.toUpperCase();
+        if (upper.contains("--") || upper.contains("/*") || upper.contains("*/") || upper.contains(";")) {
+            throw new MetaTableException(MetaTableErrorCode.META_COLUMN_TYPE_INVALID, "显示表达式包含非法字符");
+        }
+        for (String keyword : FORBIDDEN_EXPRESSION_KEYWORDS) {
+            if (upper.matches(".*\\b" + keyword + "\\b.*")) {
+                throw new MetaTableException(MetaTableErrorCode.META_COLUMN_TYPE_INVALID, "显示表达式不允许使用关键字: " + keyword);
+            }
+        }
+        if (upper.matches(".*\\b(COUNT|SUM|AVG|MIN|MAX)\\s*\\(.*")) {
+            throw new MetaTableException(MetaTableErrorCode.META_COLUMN_TYPE_INVALID, "显示表达式不允许使用聚合函数");
+        }
+        if (upper.matches(".*\\(\\s*(SELECT|WITH)\\b.*")) {
+            throw new MetaTableException(MetaTableErrorCode.META_COLUMN_TYPE_INVALID, "显示表达式不允许包含子查询");
         }
     }
 
@@ -163,6 +210,7 @@ public class MetaTableValidator {
                 case MULTI_IMAGE -> validateMultiImage(value);
                 case ENUM -> validateEnum(column, value);
                 case INTEGER -> parseLong(value);
+                case REFERENCE -> validateReference(column, value);
                 case DECIMAL -> new BigDecimal(value.toString());
                 case BOOLEAN -> parseBoolean(value);
                 case DATE -> LocalDate.parse(value.toString());
@@ -231,6 +279,26 @@ public class MetaTableValidator {
                 .collect(Collectors.toSet());
         if (!optionValues.contains(value) && !optionValues.contains(value.toString())) {
             throw new MetaTableException(MetaTableErrorCode.META_COLUMN_VALUE_INVALID, column.getColumnName() + " 不是有效枚举值");
+        }
+    }
+
+    private void validateReference(MetaColumn column, Object value) {
+        long id = parseLong(value);
+        if (jdbcTemplate == null) {
+            return;
+        }
+        String table = column.getReferenceTable();
+        String refColumn = column.getReferenceColumn();
+        if (table == null || table.isEmpty() || refColumn == null || refColumn.isEmpty()) {
+            throw new MetaTableException(MetaTableErrorCode.META_COLUMN_VALUE_INVALID, column.getColumnName() + " 关联配置不完整");
+        }
+        String sql = "SELECT COUNT(*) FROM " + SqlIdentifier.quote(table) + " WHERE " + SqlIdentifier.quote(refColumn) +
+                " = :id";
+        Map<String, Object> params = Map.of("id", id);
+        Integer count = jdbcTemplate.queryForObject(sql, params, Integer.class);
+        if (count == null || count == 0) {
+            throw new MetaTableException(MetaTableErrorCode.META_COLUMN_VALUE_INVALID, column.getColumnName() + " 引用的记录不存在: " +
+                    id);
         }
     }
 
@@ -369,7 +437,7 @@ public class MetaTableValidator {
             case STRING, TEXT, ENUM -> value.toString();
             case FILE, IMAGE -> parseLong(value);
             case MULTI_IMAGE -> toPgJsonb(toJsonString(value));
-            case INTEGER -> parseLong(value);
+            case INTEGER, REFERENCE -> parseLong(value);
             case DECIMAL -> new BigDecimal(value.toString());
             case BOOLEAN -> parseBoolean(value);
             case DATE -> java.sql.Date.valueOf(LocalDate.parse(value.toString()));

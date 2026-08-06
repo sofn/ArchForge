@@ -134,6 +134,9 @@ public final class CodeGenModelFactory {
                 !column
                         .getOptions().isEmpty());
         col.setArrayElementType(column.getArrayElementType());
+        col.setReferenceTable(column.getReferenceTable());
+        col.setReferenceColumn(column.getReferenceColumn());
+        col.setDisplayExpression(column.getDisplayExpression());
 
         typeRegistry.resolve(column.getDataType()).enrich(col, column);
 
@@ -197,6 +200,10 @@ public final class CodeGenModelFactory {
         map.put("isTimestampTz", col.isTimestampTz());
         map.put("isArray", col.isArray());
         map.put("isGeo", col.isGeo());
+        map.put("isReference", col.isReference());
+        map.put("referenceTable", col.getReferenceTable());
+        map.put("referenceColumn", col.getReferenceColumn());
+        map.put("displayExpression", col.getDisplayExpression());
         map.put("likeSearch", col.isLikeSearch());
         map.put("keywordSearchable", col.isKeywordSearchable());
         return map;

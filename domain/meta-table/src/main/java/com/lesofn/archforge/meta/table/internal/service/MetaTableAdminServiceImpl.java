@@ -264,6 +264,7 @@ public class MetaTableAdminServiceImpl implements MetaTableAdminService {
         copy.setDictCode(source.getDictCode());
         copy.setReferenceTable(source.getReferenceTable());
         copy.setReferenceColumn(source.getReferenceColumn());
+        copy.setDisplayExpression(source.getDisplayExpression());
         copy.setTenantColumn(source.getTenantColumn());
         copy.setOwnerColumn(source.getOwnerColumn());
         return copy;

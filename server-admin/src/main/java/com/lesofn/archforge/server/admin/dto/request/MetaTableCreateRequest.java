@@ -102,6 +102,8 @@ public class MetaTableCreateRequest {
 
         private String referenceColumn;
 
+        private String displayExpression;
+
         private Boolean tenantColumn = false;
 
         private Boolean ownerColumn = false;
@@ -127,7 +129,8 @@ public class MetaTableCreateRequest {
             column.setSort(sort);
             column.setOptions(options);
             column.setReferenceTable(referenceTable);
-            column.setReferenceColumn(referenceColumn);
+            column.setReferenceColumn(referenceColumn == null || referenceColumn.isEmpty() ? "id" : referenceColumn);
+            column.setDisplayExpression(displayExpression);
             column.setTenantColumn(tenantColumn);
             column.setOwnerColumn(ownerColumn);
             column.setArrayElementType(arrayElementType);

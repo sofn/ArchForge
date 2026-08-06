@@ -42,7 +42,7 @@ public class ColumnTypeResolver {
             case DATETIME -> "TIMESTAMP";
             case TIMESTAMPTZ -> "TIMESTAMPTZ";
             case JSON, GEO, MULTI_IMAGE -> "JSONB";
-            case FILE, IMAGE -> "BIGINT";
+            case FILE, IMAGE, REFERENCE -> "BIGINT";
             case UUID -> "UUID";
             case ARRAY -> resolveArrayType(column);
         };
@@ -56,7 +56,7 @@ public class ColumnTypeResolver {
         }
         return switch (column.getDataType()) {
             case STRING, TEXT, ENUM -> "'" + value.replace("'", "''") + "'";
-            case FILE, IMAGE -> value;
+            case FILE, IMAGE, REFERENCE -> value;
             case INTEGER -> value;
             case DECIMAL -> value;
             case BOOLEAN -> Boolean.parseBoolean(value) ? "TRUE" : "FALSE";

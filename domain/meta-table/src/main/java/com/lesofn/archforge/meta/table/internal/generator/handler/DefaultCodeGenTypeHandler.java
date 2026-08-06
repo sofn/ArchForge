@@ -36,6 +36,7 @@ public class DefaultCodeGenTypeHandler implements CodeGenTypeHandler {
             case TIMESTAMPTZ -> handleTimestampTz(col, meta);
             case ARRAY -> handleArray(col, meta);
             case GEO -> handleGeo(col, meta);
+            case REFERENCE -> handleReference(col, meta);
         }
         setSearchAttributes(col, meta);
         col.setSearchCondition(buildSearchCondition(col));
@@ -67,6 +68,7 @@ public class DefaultCodeGenTypeHandler implements CodeGenTypeHandler {
         col.setTimestampTz(type == MetaColumnType.TIMESTAMPTZ);
         col.setArray(type == MetaColumnType.ARRAY);
         col.setGeo(type == MetaColumnType.GEO);
+        col.setReference(type == MetaColumnType.REFERENCE);
     }
 
     private void handleString(CodeGenColumn col, MetaColumn meta) {
@@ -355,6 +357,20 @@ public class DefaultCodeGenTypeHandler implements CodeGenTypeHandler {
             col.getValidatorAnnotations().add("@NotBlank(message = \"" + col.getColumnName() + "不能为空\")");
             col.getValidatorImports().add("jakarta.validation.constraints.NotBlank");
         }
+    }
+
+    private void handleReference(CodeGenColumn col, MetaColumn meta) {
+        col.setJavaType("Long");
+        col.setTsType("number");
+        col.setComponentType("input-number");
+        col.setInputType("number");
+        col.setJavaDefaultValue("1L");
+        col.setTsDefaultValue("0");
+        col.setReference(true);
+        col.setLikeSearch(false);
+        col.setKeywordSearchable(false);
+        addNotNullValidator(col);
+        addColumnAnnotation(col);
     }
 
     private void addStringValidators(CodeGenColumn col, int len) {

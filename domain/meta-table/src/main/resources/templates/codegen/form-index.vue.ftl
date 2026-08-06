@@ -122,7 +122,7 @@ function beforeUpload(file: any, maxSize: number) {
         :rows="3"
         placeholder="请输入${col.columnName}"
       />
-<#elseif col.isInteger || col.isDecimal>
+<#elseif col.isInteger || col.isDecimal || col.isReference>
       <el-input-number
         v-model="form.${col.fieldName}"
         :precision="<#if col.isDecimal>${col.scale?c}<#else>0</#if>"

@@ -58,7 +58,8 @@ export function use${className}() {
       minWidth: 140<#if col.isDate || col.isDateTime || col.isTimestampTz>,
       formatter: ({ ${col.fieldName} }) => ${col.fieldName} ? dayjs(${col.fieldName}).format("${col.dateValueFormat}") : ""</#if><#if col.isArray || col.isMultiImage>,
       formatter: ({ ${col.fieldName} }) => ${col.fieldName} ? JSON.stringify(${col.fieldName}) : ""</#if><#if col.isEnum && col.hasOptions>,
-      formatter: ({ ${col.fieldName} }) => ${col.fieldName}Options.find(o => String(o.value) === String(${col.fieldName}))?.label ?? ${col.fieldName}</#if>
+      formatter: ({ ${col.fieldName} }) => ${col.fieldName}Options.find(o => String(o.value) === String(${col.fieldName}))?.label ?? ${col.fieldName}</#if><#if col.isReference>,
+      formatter: ({ ${col.fieldName}, ${col.fieldName}_display }) => ${col.fieldName}_display ?? ${col.fieldName}</#if>
     },
 </#list>
     {

@@ -87,6 +87,9 @@ public class MetaColumn extends BasePO {
     @Column(name = "reference_column")
     private String referenceColumn;
 
+    @Column(name = "display_expression")
+    private String displayExpression;
+
     @Column(name = "tenant_column")
     private Boolean tenantColumn;
 

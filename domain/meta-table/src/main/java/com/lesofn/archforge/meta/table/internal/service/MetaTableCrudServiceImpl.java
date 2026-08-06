@@ -113,12 +113,15 @@ public class MetaTableCrudServiceImpl implements MetaTableCrudService {
         List<MetaColumn> columns = metaTableAdminService.findColumns(tableId);
 
         String physicalName = SqlIdentifier.quote(table.physicalTableName());
-        List<String> quotedColumns = buildQuotedColumns(columns);
+        String mainAlias = "main";
+        List<String> selectColumns = ReferenceDisplayBuilder.buildSelectColumns(columns, mainAlias);
+        List<String> joins = ReferenceDisplayBuilder.buildJoins(columns, mainAlias);
 
         MapSqlParameterSource params = new MapSqlParameterSource();
-        String whereClause = buildWhereClause(columns, filters, params);
+        String whereClause = buildWhereClause(columns, filters, params, mainAlias);
 
-        String countSql = "SELECT COUNT(*) FROM " + physicalName + " WHERE deleted = 0" + whereClause;
+        String fromClause = " FROM " + physicalName + " " + mainAlias + " " + String.join(" ", joins);
+        String countSql = "SELECT COUNT(*)" + fromClause + " WHERE " + mainAlias + ".deleted = 0" + whereClause;
         Long total = jdbcTemplate.queryForObject(countSql, params, Long.class);
         long finalTotal = total == null ? 0L : total;
 
@@ -126,8 +129,8 @@ public class MetaTableCrudServiceImpl implements MetaTableCrudService {
         params.addValue("limit", pageSize);
         params.addValue("offset", offset);
 
-        String querySql = "SELECT " + String.join(", ", quotedColumns) + " FROM " + physicalName + " WHERE deleted = 0" +
-                whereClause + " ORDER BY id DESC LIMIT :limit OFFSET :offset";
+        String querySql = "SELECT " + String.join(", ", selectColumns) + fromClause + " WHERE " + mainAlias +
+                ".deleted = 0" + whereClause + " ORDER BY " + mainAlias + ".id DESC LIMIT :limit OFFSET :offset";
 
         List<Map<String, Object>> rows = jdbcTemplate.queryForList(querySql, params);
         List<Map<String, Object>> converted = rows.stream().map(this::convertRow).toList();
@@ -145,21 +148,8 @@ public class MetaTableCrudServiceImpl implements MetaTableCrudService {
         return importer.importData(tableId, format, in, currentUid);
     }
 
-    private List<String> buildQuotedColumns(List<MetaColumn> columns) {
-        List<String> result = new ArrayList<>();
-        result.add(SqlIdentifier.quote("id"));
-        for (MetaColumn column : columns) {
-            result.add(SqlIdentifier.quote(column.getColumnCode()));
-        }
-        result.add(SqlIdentifier.quote("creator_id"));
-        result.add(SqlIdentifier.quote("create_time"));
-        result.add(SqlIdentifier.quote("updater_id"));
-        result.add(SqlIdentifier.quote("update_time"));
-        result.add(SqlIdentifier.quote("deleted"));
-        return result;
-    }
-
-    private String buildWhereClause(List<MetaColumn> columns, Map<String, Object> filters, MapSqlParameterSource params) {
+    private String buildWhereClause(List<MetaColumn> columns, Map<String, Object> filters, MapSqlParameterSource params,
+            String mainAlias) {
         if (filters == null || filters.isEmpty()) {
             return "";
         }
@@ -180,15 +170,18 @@ public class MetaTableCrudServiceImpl implements MetaTableCrudService {
             String paramName = "filter_" + key.replace('.', '_').replace(' ', '_');
             if (filterPath.jsonPath() != null) {
                 params.addValue(paramName, value.toString());
-                sb.append(" AND ").append(buildJsonPathExpression(column, filterPath.jsonPath(), paramName, value));
+                sb.append(" AND ")
+                        .append(buildJsonPathExpression(column, filterPath.jsonPath(), paramName, value, mainAlias));
             } else if (isRangeSearch(column, value)) {
-                appendRangeCondition(sb, column, key, value, paramName, params);
+                appendRangeCondition(sb, column, key, value, paramName, params, mainAlias);
             } else if (isLikeSearch(column)) {
                 params.addValue(paramName, "%" + value + "%");
-                sb.append(" AND ").append(SqlIdentifier.quote(key)).append("::text LIKE :").append(paramName);
+                sb.append(" AND ").append(mainAlias).append(".").append(SqlIdentifier.quote(key)).append("::text LIKE :")
+                        .append(paramName);
             } else {
                 params.addValue(paramName, validator.convertValue(column, value));
-                sb.append(" AND ").append(SqlIdentifier.quote(key)).append(" = :").append(paramName);
+                sb.append(" AND ").append(mainAlias).append(".").append(SqlIdentifier.quote(key)).append(" = :")
+                        .append(paramName);
             }
         }
         return sb.toString();
@@ -230,7 +223,7 @@ public class MetaTableCrudServiceImpl implements MetaTableCrudService {
     }
 
     private void appendRangeCondition(StringBuilder sb, MetaColumn column, String key, Object value, String paramName,
-            MapSqlParameterSource params) {
+            MapSqlParameterSource params, String mainAlias) {
         Object start = null;
         Object end = null;
         if (value instanceof Map<?, ?> map) {
@@ -240,7 +233,7 @@ public class MetaTableCrudServiceImpl implements MetaTableCrudService {
             start = list.get(0);
             end = list.get(1);
         }
-        String quoted = SqlIdentifier.quote(key);
+        String quoted = mainAlias + "." + SqlIdentifier.quote(key);
         if (start != null && !isEmptyFilterValue(start)) {
             params.addValue(paramName + "_start", validator.convertValue(column, start));
             sb.append(" AND ").append(quoted).append(" >= :").append(paramName).append("_start");
@@ -264,8 +257,9 @@ public class MetaTableCrudServiceImpl implements MetaTableCrudService {
         return false;
     }
 
-    private String buildJsonPathExpression(MetaColumn column, String jsonPath, String paramName, Object value) {
-        String quoted = SqlIdentifier.quote(column.getColumnCode());
+    private String buildJsonPathExpression(MetaColumn column, String jsonPath, String paramName, Object value,
+            String mainAlias) {
+        String quoted = mainAlias + "." + SqlIdentifier.quote(column.getColumnCode());
         String[] parts = jsonPath.split("\\.");
         if (parts.length == 1) {
             return quoted + " ->> '" + parts[0] + "' LIKE :" + paramName;

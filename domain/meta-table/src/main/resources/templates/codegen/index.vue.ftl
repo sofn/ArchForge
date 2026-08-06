@@ -74,7 +74,7 @@ const {
             placeholder="结束"
             class="w-30!"
           />
-<#elseif col.isInteger || col.isDecimal>
+<#elseif col.isInteger || col.isDecimal || col.isReference>
           <el-input-number
             v-model="form.${col.fieldName}Start"
             :precision="<#if col.isDecimal>${col.scale?c}<#else>0</#if>"
@@ -109,7 +109,7 @@ const {
           clearable
           class="w-30!"
         />
-<#elseif col.isInteger || col.isDecimal>
+<#elseif col.isInteger || col.isDecimal || col.isReference>
         <el-input-number
           v-model="form.${col.fieldName}"
           :precision="<#if col.isDecimal>${col.scale?c}<#else>0</#if>"

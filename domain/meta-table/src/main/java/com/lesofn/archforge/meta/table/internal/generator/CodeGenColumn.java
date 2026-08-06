@@ -69,6 +69,11 @@ public class CodeGenColumn {
     private boolean timestampTz;
     private boolean array;
     private boolean geo;
+    private boolean reference;
+
+    private String referenceTable;
+    private String referenceColumn;
+    private String displayExpression;
 
     private boolean likeSearch;
     private boolean keywordSearchable;
