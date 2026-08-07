@@ -28,6 +28,18 @@ spring:
           url: ${DB_USER_SLAVE_URL}
           username: ${DB_USERNAME}
           password: ${DB_PASSWORD}
+  data:
+    redis:
+      host: ${REDIS_HOST:redis}
+      port: ${REDIS_PORT:6379}
+      database: 0
+      timeout: 10s
+      lettuce:
+        pool:
+          min-idle: 2
+          max-idle: 8
+          max-active: 16
+          max-wait: 1s
 
 management:
   endpoints:

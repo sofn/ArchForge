@@ -14,6 +14,18 @@ spring:
       - org.springframework.boot.security.autoconfigure.SecurityAutoConfiguration
       - org.springframework.boot.security.autoconfigure.UserDetailsServiceAutoConfiguration
       - org.springframework.boot.security.autoconfigure.servlet.ManagementWebSecurityAutoConfiguration
+  data:
+    redis:
+      host: ${REDIS_HOST:127.0.0.1}
+      port: ${REDIS_PORT:6379}
+      database: 0
+      timeout: 10s
+      lettuce:
+        pool:
+          min-idle: 0
+          max-idle: 8
+          max-active: 8
+          max-wait: -1ms
 
 springdoc:
   api-docs:

@@ -22,6 +22,7 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.redisson.api.RBucket;
 import org.redisson.api.RedissonClient;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.DefaultParameterNameDiscoverer;
 import org.springframework.core.annotation.Order;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
@@ -41,6 +42,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Order(1)
 @RequiredArgsConstructor
+@ConditionalOnProperty(prefix = "arch-forge.idempotent", name = "enabled", havingValue = "true", matchIfMissing = true)
 public class IdempotentAspect {
 
     private static final String ANONYMOUS = "anonymous";
