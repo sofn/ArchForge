@@ -2,18 +2,17 @@ package com.lesofn.archforge.common.enums.dictionary;
 
 import java.lang.annotation.*;
 
-/**
- * 字典类型注解
- *
- * @author sofn
- */
-@Target({
-        ElementType.TYPE
-})
+@Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface Dictionary {
 
-    /** 字典类型名称 */
-    String name() default "";
+    /** 字典类型编码 */
+    String name();
+
+    /** 字典类型显示名称 */
+    String label() default "";
+
+    /** 描述 */
+    String description() default "";
 }

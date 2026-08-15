@@ -71,6 +71,9 @@ public class ArchForgeConfig {
     /** 安全配置 */
     private Security security = new Security();
 
+    /** 字典配置 */
+    private Dictionary dictionary = new Dictionary();
+
     @Setter
     @Getter
     public static class Token {
@@ -235,5 +238,16 @@ public class ArchForgeConfig {
     public static class Security {
         /** 可信反向代理 IP 列表，用于安全地解析 X-Forwarded-For 获取客户端真实 IP */
         private List<String> trustedProxies = List.of();
+    }
+
+    @Setter
+    @Getter
+    public static class Dictionary {
+
+        /** 是否启用枚举字典扫描 */
+        private boolean enabled = true;
+
+        /** 扫描根包，支持子包递归 */
+        private List<String> enumBasePackages = List.of("com.lesofn.archforge");
     }
 }
