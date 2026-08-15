@@ -36,7 +36,11 @@ public class SysDictServiceImpl implements SysDictService {
 
     @Override
     public Optional<SysDictType> findTypeById(Long dictTypeId) {
-        return typeRepository.findById(dictTypeId);
+        Optional<SysDictType> dbType = typeRepository.findById(dictTypeId);
+        if (dbType.isPresent()) {
+            return dbType;
+        }
+        return enumDictionaryRegistry.findByTypeId(dictTypeId).map(this::toSysDictType);
     }
 
     @Override
@@ -157,6 +161,9 @@ public class SysDictServiceImpl implements SysDictService {
         }
         List<SysDictItem> toSave = new ArrayList<>();
         for (SysDictItem item : items) {
+            if (item.getDictItemId() != null) {
+                assertNotEnumDictItemId(item.getDictItemId());
+            }
             item.setDictTypeId(saved.getDictTypeId());
             toSave.add(item);
         }
