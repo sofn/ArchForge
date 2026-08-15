@@ -13,7 +13,7 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-@Dictionary(name = "sysUser.status")
+@Dictionary(name = "sysUser.status", label = "用户状态")
 public enum UserStatusEnum implements DictionaryEnum {
 
     /** 用户账户状态 */

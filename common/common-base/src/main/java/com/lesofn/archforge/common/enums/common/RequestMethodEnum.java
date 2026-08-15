@@ -1,6 +1,7 @@
 package com.lesofn.archforge.common.enums.common;
 
 import com.lesofn.archforge.common.enums.BasicEnum;
+import com.lesofn.archforge.common.enums.dictionary.Dictionary;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -11,6 +12,7 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
+@Dictionary(name = "common.requestMethod", label = "请求方式")
 public enum RequestMethodEnum implements BasicEnum {
 
     /** 菜单类型 */

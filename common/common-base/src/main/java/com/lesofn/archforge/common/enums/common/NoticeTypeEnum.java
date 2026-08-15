@@ -13,7 +13,7 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-@Dictionary(name = "sysNotice.noticeType")
+@Dictionary(name = "sysNotice.noticeType", label = "通知类型")
 public enum NoticeTypeEnum implements DictionaryEnum {
 
     /** 通知类型 */

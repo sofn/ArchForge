@@ -13,7 +13,7 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-@Dictionary(name = "common.status")
+@Dictionary(name = "common.status", label = "状态")
 public enum StatusEnum implements DictionaryEnum {
     /** 开关状态 */
     ENABLE(1, "正常", CssTag.PRIMARY),

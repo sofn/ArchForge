@@ -13,7 +13,7 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-@Dictionary(name = "sysUser.sex")
+@Dictionary(name = "sysUser.sex", label = "性别")
 public enum GenderEnum implements DictionaryEnum {
 
     /** 用户性别 */

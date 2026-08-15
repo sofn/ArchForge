@@ -13,7 +13,7 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-@Dictionary(name = "sysOperationLog.businessType")
+@Dictionary(name = "sysOperationLog.businessType", label = "业务类型")
 public enum BusinessTypeEnum implements DictionaryEnum {
 
     /** 操作类型 */

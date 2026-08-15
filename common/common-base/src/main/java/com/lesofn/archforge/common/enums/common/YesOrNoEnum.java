@@ -13,7 +13,7 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-@Dictionary(name = "common.yesOrNo")
+@Dictionary(name = "common.yesOrNo", label = "是否")
 public enum YesOrNoEnum implements DictionaryEnum {
     /** 是与否 */
     YES(1, "是", CssTag.PRIMARY),

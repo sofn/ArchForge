@@ -13,7 +13,7 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-@Dictionary(name = "sysLoginLog.status")
+@Dictionary(name = "sysLoginLog.status", label = "登录状态")
 public enum LoginStatusEnum implements DictionaryEnum {
     /** status of user */
     LOGIN_SUCCESS(1, "登录成功", CssTag.SUCCESS),

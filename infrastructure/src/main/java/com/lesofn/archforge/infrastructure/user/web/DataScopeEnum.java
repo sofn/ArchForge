@@ -1,6 +1,7 @@
 package com.lesofn.archforge.infrastructure.user.web;
 
 import com.lesofn.archforge.common.enums.BasicEnum;
+import com.lesofn.archforge.common.enums.dictionary.Dictionary;
 import lombok.Getter;
 
 /**
@@ -9,6 +10,7 @@ import lombok.Getter;
  * @author sofn
  */
 @Getter
+@Dictionary(name = "sysRole.dataScope", label = "数据权限范围")
 public enum DataScopeEnum implements BasicEnum {
 
     /** 数据权限范围 */

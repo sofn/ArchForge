@@ -1,12 +1,14 @@
 package com.lesofn.archforge.user.api.enums;
 
 import com.lesofn.archforge.common.enums.BasicEnum;
+import com.lesofn.archforge.common.enums.dictionary.Dictionary;
 import lombok.Getter;
 
 /**
  * @author sofn 对应 sys_menu表的menu_type字段
  */
 @Getter
+@Dictionary(name = "sysMenu.menuType", label = "菜单类型")
 public enum MenuTypeEnum implements BasicEnum {
 
     /** 菜单类型 */

@@ -12,7 +12,7 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-@Dictionary(name = "sysOperationLog.operatorType")
+@Dictionary(name = "sysOperationLog.operatorType", label = "操作者类型")
 public enum OperatorTypeEnum implements BasicEnum {
 
     /** 菜单类型 */

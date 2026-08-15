@@ -13,7 +13,7 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-@Dictionary(name = "sysMenu.isVisible")
+@Dictionary(name = "sysMenu.isVisible", label = "可见状态")
 public enum VisibleStatusEnum implements DictionaryEnum {
 
     /** 显示与否 */
