@@ -1,18 +1,28 @@
 package com.lesofn.archforge.infrastructure.dictionary;
 
 import java.util.List;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Value;
 
-@Data
-@AllArgsConstructor
+@Value
 public class EnumDictionary {
 
-    private Long dictTypeId;
-    private String dictCode;
-    private String dictName;
-    private String description;
-    private Integer status;
-    private Integer sort;
-    private List<EnumDictionaryItem> items;
+    Long dictTypeId;
+    String dictCode;
+    String dictName;
+    String description;
+    Integer status;
+    Integer sort;
+    List<EnumDictionaryItem> items;
+
+    public EnumDictionary(Long dictTypeId, String dictCode, String dictName,
+            String description, Integer status, Integer sort,
+            List<EnumDictionaryItem> items) {
+        this.dictTypeId = dictTypeId;
+        this.dictCode = dictCode;
+        this.dictName = dictName;
+        this.description = description;
+        this.status = status;
+        this.sort = sort;
+        this.items = List.copyOf(items);
+    }
 }

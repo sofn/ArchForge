@@ -1,17 +1,15 @@
 package com.lesofn.archforge.infrastructure.dictionary;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Value;
 
-@Data
-@AllArgsConstructor
+@Value
 public class EnumDictionaryItem {
 
-    private Long dictTypeId;
-    private Long dictItemId;
-    private String code;
-    private String label;
-    private Integer sort;
-    private Integer status;
-    private String cssTag;
+    Long dictTypeId;
+    Long dictItemId;
+    String code;
+    String label;
+    Integer sort;
+    Integer status;
+    String cssTag;
 }

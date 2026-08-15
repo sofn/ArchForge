@@ -25,7 +25,7 @@ public class EnumDictionaryRegistry {
 
     private final ArchForgeConfig config;
 
-    private final Map<String, EnumDictionary> byCode = new HashMap<>();
+    private final Map<String, EnumDictionary> byCode = new LinkedHashMap<>();
     private final Map<Long, EnumDictionary> byTypeId = new HashMap<>();
     private final Map<Long, EnumDictionaryItem> byItemId = new HashMap<>();
 
@@ -41,6 +41,7 @@ public class EnumDictionaryRegistry {
         for (String basePackage : config.getDictionary().getEnumBasePackages()) {
             scanPackage(basePackage, resolver, factory, classLoader);
         }
+        factory.clearCache();
         log.info("Loaded {} enum dictionaries", byCode.size());
     }
 
@@ -66,7 +67,7 @@ public class EnumDictionaryRegistry {
                 try {
                     Class<?> clazz = Class.forName(className, false, classLoader);
                     loadIfDictionary(clazz);
-                } catch (ClassNotFoundException e) {
+                } catch (ClassNotFoundException | LinkageError e) {
                     log.warn("Failed to load class {}", className, e);
                 }
             }
@@ -113,14 +114,24 @@ public class EnumDictionaryRegistry {
         byTypeId.put(dictTypeId, dictionary);
     }
 
+    private static final long TYPE_ID_MASK = (1L << 62) - 1;
+    private static final long ITEM_ID_SPACE_OFFSET = 1L << 62;
+
+    private static long hash64(String input) {
+        long h = 0xcbf29ce484222325L;
+        for (int i = 0; i < input.length(); i++) {
+            h ^= input.charAt(i);
+            h *= 0x100000001b3L;
+        }
+        return h;
+    }
+
     private Long syntheticId(String dictCode) {
-        long base = ((long) dictCode.hashCode()) & 0xffffffffL;
-        return Long.MIN_VALUE + base;
+        return Long.MIN_VALUE + (hash64(dictCode) & TYPE_ID_MASK);
     }
 
     private Long syntheticItemId(String dictCode, String itemCode) {
-        long base = ((long) Objects.hash(dictCode, itemCode)) & 0xffffffffL;
-        return Long.MIN_VALUE + base;
+        return Long.MIN_VALUE + ITEM_ID_SPACE_OFFSET + (hash64(dictCode + "\0" + itemCode) & TYPE_ID_MASK);
     }
 
     public Optional<EnumDictionary> findByCode(String dictCode) {
@@ -152,11 +163,14 @@ public class EnumDictionaryRegistry {
     }
 
     public Map<String, List<DictionaryData>> asDictionaryDataMap() {
-        return byCode.values().stream()
+        Map<String, List<DictionaryData>> result = byCode.values().stream()
                 .collect(Collectors.toMap(
                         EnumDictionary::getDictCode,
                         d -> d.getItems().stream()
                                 .map(i -> new DictionaryData(i.getLabel(), Integer.parseInt(i.getCode()), i.getCssTag()))
-                                .toList()));
+                                .toList(),
+                        (a, b) -> a,
+                        LinkedHashMap::new));
+        return Map.copyOf(result);
     }
 }
