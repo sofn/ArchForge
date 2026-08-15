@@ -16,7 +16,8 @@ public enum AdminUserErrorCode implements ErrorCode {
     USER_NON_EXIST(1, "用户不存在"),
     USER_IS_DISABLE(2, "用户已被停用"),
     ACCOUNT_EXISTS(3, "账号已存在"),
-    ACCOUNT_NOT_EXISTS(4, "账号不存在");
+    ACCOUNT_NOT_EXISTS(4, "账号不存在"),
+    DICT_READONLY(5, "枚举字典[{}]为只读，不允许修改");
 
     private final int nodeNum;
     private final String msg;

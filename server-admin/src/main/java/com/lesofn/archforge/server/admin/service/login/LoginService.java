@@ -11,7 +11,7 @@ import com.lesofn.archforge.infrastructure.auth.model.SystemLoginUser;
 import com.lesofn.archforge.infrastructure.config.ArchForgeConfig;
 import com.lesofn.archforge.infrastructure.config.CaptchaType;
 import com.lesofn.archforge.infrastructure.frame.context.ScopedValueContext;
-import com.lesofn.archforge.infrastructure.frame.utils.MapCache;
+import com.lesofn.archforge.infrastructure.dictionary.EnumDictionaryRegistry;
 import com.lesofn.archforge.server.admin.dto.CaptchaDTO;
 import com.lesofn.archforge.server.admin.dto.ConfigDTO;
 import com.lesofn.archforge.server.admin.dto.LoginCommand;
@@ -54,6 +54,7 @@ public class LoginService {
     private final SysLoginLogService loginLogService;
     private final ArchForgeConfig appForgeConfig;
     private final Environment environment;
+    private final EnumDictionaryRegistry enumDictionaryRegistry;
 
     @Resource(name = "captchaProducer")
     private Producer captchaProducer;
@@ -248,7 +249,7 @@ public class LoginService {
         ConfigDTO configDTO = new ConfigDTO();
         boolean isCaptchaOn = appForgeConfig.getCaptcha().isEnabled();
         configDTO.setIsCaptchaOn(isCaptchaOn);
-        configDTO.setDictionary(MapCache.dictionaryCache());
+        configDTO.setDictionary(enumDictionaryRegistry.asDictionaryDataMap());
         return configDTO;
     }
 

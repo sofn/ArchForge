@@ -20,6 +20,7 @@ import com.lesofn.archforge.infrastructure.auth.errors.AdminAuthException;
 import com.lesofn.archforge.infrastructure.auth.model.SystemLoginUser;
 import com.lesofn.archforge.infrastructure.config.ArchForgeConfig;
 import com.lesofn.archforge.infrastructure.config.CaptchaType;
+import com.lesofn.archforge.infrastructure.dictionary.EnumDictionaryRegistry;
 import com.lesofn.archforge.infrastructure.user.web.RoleInfo;
 import com.lesofn.archforge.server.admin.dto.CaptchaDTO;
 import com.lesofn.archforge.server.admin.dto.ConfigDTO;
@@ -70,6 +71,9 @@ class LoginServiceTest {
     @Mock
     private Environment environment;
 
+    @Mock
+    private EnumDictionaryRegistry enumDictionaryRegistry;
+
     @Mock(name = "captchaProducer")
     private Producer captchaProducer;
 
@@ -87,6 +91,7 @@ class LoginServiceTest {
         ReflectionTestUtils.setField(loginService, "captchaProducer", captchaProducer);
         ReflectionTestUtils.setField(loginService, "captchaProducerMath", captchaProducerMath);
         when(environment.matchesProfiles("prod")).thenReturn(false);
+        when(enumDictionaryRegistry.asDictionaryDataMap()).thenReturn(Map.of());
         when(loginLogService.create(any(SysLoginLog.class))).thenReturn(new SysLoginLog());
     }
 
