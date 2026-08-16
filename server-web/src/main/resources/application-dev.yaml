@@ -51,3 +51,13 @@ arch-forge:
   file-storage:
     type: ${FILE_STORAGE_TYPE:local}
     local-dir: ${FILE_STORAGE_LOCAL_DIR:../uploads}
+  register:
+    enabled: true
+  verification-code:
+    expire-seconds: 300
+    resend-seconds: 60
+    daily-max-per-email: 20
+  mail:
+    enabled: false
+    from: no-reply@archforge.com
+    verification-subject: 您的验证码

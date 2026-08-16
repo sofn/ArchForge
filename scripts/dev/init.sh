@@ -111,10 +111,11 @@ import_seed() {
                "${REPO_ROOT}/domain/admin-user/src/main/resources/sql/data-admin-dept.sql" \
                "${REPO_ROOT}/domain/admin-user/src/main/resources/sql/data-admin-config.sql" \
                "${REPO_ROOT}/domain/admin-user/src/main/resources/sql/data-admin-quartz.sql" \
-               "${REPO_ROOT}/domain/admin-user/src/main/resources/sql/data-admin-blog.sql"; do
+               "${REPO_ROOT}/domain/admin-user/src/main/resources/sql/data-admin-blog.sql" \
+               "${REPO_ROOT}/domain/admin-user/src/main/resources/sql/reset-sequences.sql"; do
         filename=$(basename "${sql}")
         docker cp "${sql}" "${POSTGRES_CONTAINER}:/tmp/${filename}"
-        docker exec "${POSTGRES_CONTAINER}" psql -U "${DB_USERNAME}" -d "${DB_NAME_USER}" -f "/tmp/${filename}"
+        docker exec "${POSTGRES_CONTAINER}" psql -U "${DB_USERNAME}" -d "${DB_NAME_USER}" -v ON_ERROR_STOP=0 -f "/tmp/${filename}"
     done
 
     echo "Creating S3 bucket if needed..."
