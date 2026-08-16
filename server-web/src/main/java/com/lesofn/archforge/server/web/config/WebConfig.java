@@ -43,7 +43,14 @@ public class WebConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(webAuthInterceptor)
                 .addPathPatterns("/web/**")
-                .excludePathPatterns("/web/login", "/web/refresh-token", "/web/categories");
+                .excludePathPatterns(
+                        "/web/login",
+                        "/web/refresh-token",
+                        "/web/categories",
+                        "/web/verification-code/send",
+                        "/web/register",
+                        "/web/forgot-password",
+                        "/web/reset-password");
     }
 
     @Override

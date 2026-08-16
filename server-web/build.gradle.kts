@@ -94,6 +94,11 @@ dependencies {
     // 密码加密（复用 domain:admin-user 的 PasswordEncoderPort）
     api("org.springframework.security:spring-security-crypto")
 
+    // 邮件发送（真实 SMTP 配置通过 spring.mail.* 在 yml 中开启）
+    api("org.springframework.boot:spring-boot-starter-mail") {
+        exclude(group = "org.springframework.boot", module = "spring-boot-starter-logging")
+    }
+
     api("org.springdoc:springdoc-openapi-starter-webmvc-ui")
 
     developmentOnly("org.springframework.boot:spring-boot-devtools:4.1.0")

@@ -10,7 +10,7 @@ class ModulithDocumentationTest {
 
     @Test
     void generateDocumentation() {
-        new Documenter(Application.class).writeDocumentation();
+        new Documenter(ModulithRoot.class).writeDocumentation();
 
         assertThat(Path.of("build/spring-modulith-docs/components.puml"))
                 .exists()

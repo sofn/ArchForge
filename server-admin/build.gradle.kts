@@ -60,7 +60,7 @@ tasks.withType<Test> {
 graalvmNative {
     binaries {
         named("main") {
-            mainClass.set("com.lesofn.archforge.Application")
+            mainClass.set("com.lesofn.archforge.server.admin.Application")
             javaLauncher.set(javaToolchains.launcherFor {
                 languageVersion.set(JavaLanguageVersion.of(25))
             })

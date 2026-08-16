@@ -7,6 +7,6 @@ class ModulithIntegrationTest {
 
     @Test
     void modulesAreValid() {
-        ApplicationModules.of(Application.class).verify();
+        ApplicationModules.of(ModulithRoot.class).verify();
     }
 }

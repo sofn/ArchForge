@@ -44,6 +44,12 @@ public class ArchForgeConfig {
     /** 验证码配置 */
     private Captcha captcha = new Captcha();
 
+    /** 邮箱验证码配置 */
+    private VerificationCode verificationCode = new VerificationCode();
+
+    /** 邮件发送配置 */
+    private Mail mail = new Mail();
+
     /** 注册功能配置 */
     private Register register = new Register();
 
@@ -105,6 +111,32 @@ public class ArchForgeConfig {
     public static class Captcha {
         /** 是否开启验证码 */
         private boolean enabled = true;
+    }
+
+    @Setter
+    @Getter
+    public static class VerificationCode {
+        /** 验证码有效期（秒，默认 5 分钟） */
+        private int expireSeconds = 300;
+
+        /** 同一邮箱两次发送间隔（秒，默认 60 秒） */
+        private int resendSeconds = 60;
+
+        /** 同一邮箱每天最多发送次数，0 表示不限制 */
+        private int dailyMaxPerEmail = 20;
+    }
+
+    @Setter
+    @Getter
+    public static class Mail {
+        /** 是否启用真实邮件发送（false 时使用日志/console 输出，便于开发调试） */
+        private boolean enabled = false;
+
+        /** 发件人地址 */
+        private String from = "no-reply@archforge.com";
+
+        /** 验证码邮件主题 */
+        private String verificationSubject = "您的验证码";
     }
 
     @Setter
