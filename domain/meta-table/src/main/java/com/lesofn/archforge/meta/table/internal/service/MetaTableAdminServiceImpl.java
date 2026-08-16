@@ -1,8 +1,8 @@
 package com.lesofn.archforge.meta.table.internal.service;
 
-import static com.lesofn.archforge.meta.table.internal.exception.MetaTableErrorCode.META_TABLE_CODE_EXISTS;
-import static com.lesofn.archforge.meta.table.internal.exception.MetaTableErrorCode.META_TABLE_HAS_DATA;
-import static com.lesofn.archforge.meta.table.internal.exception.MetaTableErrorCode.META_TABLE_NOT_EXISTS;
+import static com.lesofn.archforge.meta.table.api.errors.MetaTableErrorCode.META_TABLE_CODE_EXISTS;
+import static com.lesofn.archforge.meta.table.api.errors.MetaTableErrorCode.META_TABLE_HAS_DATA;
+import static com.lesofn.archforge.meta.table.api.errors.MetaTableErrorCode.META_TABLE_NOT_EXISTS;
 
 import com.lesofn.archforge.meta.table.api.dao.MetaColumnRepository;
 import com.lesofn.archforge.meta.table.api.dao.MetaTableRepository;
@@ -13,8 +13,8 @@ import com.lesofn.archforge.meta.table.api.service.MetaTableAdminService;
 import com.lesofn.archforge.meta.table.internal.ddl.AlterTableDdlGenerator;
 import com.lesofn.archforge.meta.table.internal.ddl.MetaTableDdlGenerator;
 import com.lesofn.archforge.meta.table.internal.ddl.SchemaDdl;
-import com.lesofn.archforge.meta.table.internal.exception.MetaTableErrorCode;
-import com.lesofn.archforge.meta.table.internal.exception.MetaTableException;
+import com.lesofn.archforge.meta.table.api.errors.MetaTableErrorCode;
+import com.lesofn.archforge.meta.table.api.errors.MetaTableException;
 import com.lesofn.archforge.meta.table.internal.schema.SchemaChange;
 import com.lesofn.archforge.meta.table.internal.schema.SchemaChangeType;
 import com.lesofn.archforge.meta.table.internal.schema.SchemaDiffEngine;

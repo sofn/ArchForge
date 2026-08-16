@@ -24,6 +24,7 @@ public class SysUserServiceImpl implements SysUserService {
 
     private static final char LIKE_ESCAPE_CHAR = '!';
 
+    // TODO(ddd): replace SysUserRepository with UserRepository after SysUser migration
     private final SysUserRepository userRepository;
 
     public Optional<SysUser> findById(Long id) {

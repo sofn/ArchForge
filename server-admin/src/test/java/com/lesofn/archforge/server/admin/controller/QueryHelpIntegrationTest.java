@@ -51,7 +51,7 @@ class QueryHelpIntegrationTest {
     void setup() throws Exception {
         rest = RestClient.builder().baseUrl("http://localhost:" + port).build();
         String resp = rest.post()
-                .uri("/login")
+                .uri("/auth/login")
                 .header("Content-Type", "application/json")
                 .body(Map.of("username", "admin", "password", "admin123"))
                 .retrieve()
@@ -63,6 +63,31 @@ class QueryHelpIntegrationTest {
     }
 
     @SuppressWarnings("unchecked")
+    private Map<String, Object> get(String path, Map<String, Object> params) {
+        try {
+            StringBuilder uri = new StringBuilder(path);
+            if (params != null && !params.isEmpty()) {
+                uri.append("?");
+                boolean first = true;
+                for (Map.Entry<String, Object> entry : params.entrySet()) {
+                    if (!first) {
+                        uri.append("&");
+                    }
+                    first = false;
+                    uri.append(entry.getKey()).append("=").append(entry.getValue());
+                }
+            }
+            String resp = rest.get()
+                    .uri(uri.toString())
+                    .header("Authorization", "Bearer " + accessToken)
+                    .retrieve()
+                    .body(String.class);
+            return M.readValue(resp, Map.class);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private Map<String, Object> post(String path, Object body) {
         try {
             String resp = rest.post()
@@ -86,7 +111,7 @@ class QueryHelpIntegrationTest {
     @Order(1)
     @SuppressWarnings("unchecked")
     void searchUserByExactUsernameReturnsAdmin() {
-        Map<String, Object> resp = post("/user", Map.of("username", "admin", "currentPage", 1, "pageSize", 10));
+        Map<String, Object> resp = post("/admin/user", Map.of("username", "admin", "currentPage", 1, "pageSize", 10));
         assertEquals(0, resp.get("code"), "response code must be 0");
 
         Map<String, Object> data = (Map<String, Object>) resp.get("data");
@@ -102,7 +127,7 @@ class QueryHelpIntegrationTest {
     @SuppressWarnings("unchecked")
     void innerLikeUsernameExcludesNonMatchingUsers() {
         // "zzz_no_match" should not match any seeded user
-        Map<String, Object> resp = post("/user", Map.of("username", "zzz_no_match", "currentPage", 1, "pageSize", 10));
+        Map<String, Object> resp = post("/admin/user", Map.of("username", "zzz_no_match", "currentPage", 1, "pageSize", 10));
         assertEquals(0, resp.get("code"));
 
         Map<String, Object> data = (Map<String, Object>) resp.get("data");
@@ -120,7 +145,7 @@ class QueryHelpIntegrationTest {
     void blurrySearchMatchesAcrossFields() {
         // seeded admin: username="admin", nickname="Admin", email="admin@archforge.com"
         // "dmin" matches all three
-        Map<String, Object> resp = post("/user", Map.of("blurry", "dmin", "currentPage", 1, "pageSize", 50));
+        Map<String, Object> resp = post("/admin/user", Map.of("blurry", "dmin", "currentPage", 1, "pageSize", 50));
         assertEquals(0, resp.get("code"));
 
         Map<String, Object> data = (Map<String, Object>) resp.get("data");
@@ -140,7 +165,7 @@ class QueryHelpIntegrationTest {
     @SuppressWarnings("unchecked")
     void searchByStatusFiltersActive() {
         // status=1 means active; seeded admin has status=1
-        Map<String, Object> resp = post("/user", Map.of("status", "1", "currentPage", 1, "pageSize", 100));
+        Map<String, Object> resp = post("/admin/user", Map.of("status", "1", "currentPage", 1, "pageSize", 100));
         assertEquals(0, resp.get("code"));
 
         Map<String, Object> data = (Map<String, Object>) resp.get("data");
@@ -161,7 +186,7 @@ class QueryHelpIntegrationTest {
     @SuppressWarnings("unchecked")
     void quartzListFiltersByJobNameInnerLike() {
         // seeded demo-hello from data-admin-quartz.sql
-        Map<String, Object> resp = post("/quartz/list", Map.of("jobName", "demo", "currentPage", 1, "pageSize", 10));
+        Map<String, Object> resp = get("/quartz", Map.of("jobName", "demo", "currentPage", 1, "pageSize", 10));
         assertEquals(0, resp.get("code"));
 
         Map<String, Object> data = (Map<String, Object>) resp.get("data");
@@ -176,8 +201,8 @@ class QueryHelpIntegrationTest {
     @Order(6)
     @SuppressWarnings("unchecked")
     void quartzListNoMatchReturnsEmptyPage() {
-        Map<String, Object> resp = post(
-                "/quartz/list",
+        Map<String, Object> resp = get(
+                "/quartz",
                 Map.of("jobName", "zzz_no_such_job", "currentPage", 1, "pageSize", 10));
         assertEquals(0, resp.get("code"));
 

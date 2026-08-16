@@ -1,6 +1,6 @@
 package com.lesofn.archforge.server.admin.dto.quartz;
 
-import com.lesofn.archforge.server.admin.dto.PageQuery;
+import com.lesofn.archforge.server.admin.dto.BasePageRequest;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class QuartzLogListRequest extends PageQuery {
+public class QuartzLogListRequest extends BasePageRequest {
 
     private Long jobId;
 

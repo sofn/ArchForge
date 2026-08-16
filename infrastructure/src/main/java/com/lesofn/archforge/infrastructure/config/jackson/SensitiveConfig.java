@@ -1,7 +1,7 @@
 package com.lesofn.archforge.infrastructure.config.jackson;
 
 import com.lesofn.archforge.common.sensitive.jackson.SensitiveJacksonModule;
-import com.lesofn.archforge.infrastructure.config.ArchForgeConfig;
+import com.lesofn.archforge.infrastructure.config.ArchForgeProperties;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,7 +23,7 @@ import org.springframework.context.annotation.Configuration;
 public class SensitiveConfig {
 
     @Bean
-    public SensitiveJacksonModule sensitiveJacksonModule(ArchForgeConfig appForgeConfig) {
+    public SensitiveJacksonModule sensitiveJacksonModule(ArchForgeProperties appForgeConfig) {
         return new SensitiveJacksonModule();
     }
 }

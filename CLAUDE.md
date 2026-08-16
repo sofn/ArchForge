@@ -57,7 +57,7 @@ ArchForge/
 
 ## Configuration
 
-- Config prefix: `arch-forge` — mapped to `ArchForgeConfig` bean
+- Config prefix: `arch-forge` — mapped to `ArchForgeProperties` bean
 - Profiles: `dev` (default), `test`, `staging`, `prod`
   - `application.yaml`: base config
   - `application-dev.yaml`: local Docker PostgreSQL/Redis/RustFS, script-initialized SQL

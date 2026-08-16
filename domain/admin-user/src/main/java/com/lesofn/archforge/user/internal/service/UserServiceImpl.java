@@ -13,10 +13,11 @@ import org.springframework.stereotype.Service;
  *
  * @author lesofn
  */
-@Service("adminUserServiceImpl")
+@Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
+    // TODO(ddd): replace SysUserRepository with UserRepository after SysUser migration
     private final SysUserRepository userRepository;
 
     /** 根据用户名查询用户 */

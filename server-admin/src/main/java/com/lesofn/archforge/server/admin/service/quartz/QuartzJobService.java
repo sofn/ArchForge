@@ -1,7 +1,7 @@
 package com.lesofn.archforge.server.admin.service.quartz;
 
 import com.lesofn.archforge.common.utils.query.QueryHelp;
-import com.lesofn.archforge.server.admin.dto.quartz.SysQuartzJobQueryCriteria;
+import com.lesofn.archforge.server.admin.dto.quartz.SysQuartzJobQueryRequest;
 import com.lesofn.archforge.user.api.dao.SysQuartzJobRepository;
 import com.lesofn.archforge.user.api.dao.SysQuartzLogRepository;
 import com.lesofn.archforge.user.api.domain.SysQuartzJob;
@@ -40,8 +40,8 @@ public class QuartzJobService {
     private final Scheduler scheduler;
 
     @Transactional(readOnly = true)
-    public Page<SysQuartzJob> page(SysQuartzJobQueryCriteria criteria, Pageable pageable) {
-        SysQuartzJobQueryCriteria effective = criteria == null ? new SysQuartzJobQueryCriteria() : criteria;
+    public Page<SysQuartzJob> page(SysQuartzJobQueryRequest criteria, Pageable pageable) {
+        SysQuartzJobQueryRequest effective = criteria == null ? new SysQuartzJobQueryRequest() : criteria;
         if (effective.getDeleted() == null) {
             effective.setDeleted(false);
         }

@@ -18,13 +18,13 @@ import com.lesofn.archforge.common.encrypt.RsaEncrypter;
 import com.lesofn.archforge.infrastructure.auth.errors.AdminAuthErrorCode;
 import com.lesofn.archforge.infrastructure.auth.errors.AdminAuthException;
 import com.lesofn.archforge.infrastructure.auth.model.SystemLoginUser;
-import com.lesofn.archforge.infrastructure.config.ArchForgeConfig;
+import com.lesofn.archforge.infrastructure.config.ArchForgeProperties;
 import com.lesofn.archforge.infrastructure.config.CaptchaType;
 import com.lesofn.archforge.infrastructure.dictionary.EnumDictionaryRegistry;
 import com.lesofn.archforge.infrastructure.user.web.RoleInfo;
-import com.lesofn.archforge.server.admin.dto.CaptchaDTO;
-import com.lesofn.archforge.server.admin.dto.ConfigDTO;
-import com.lesofn.archforge.server.admin.dto.LoginCommand;
+import com.lesofn.archforge.server.admin.dto.CaptchaResponse;
+import com.lesofn.archforge.server.admin.dto.LoginConfigResponse;
+import com.lesofn.archforge.server.admin.dto.LoginRequest;
 import com.lesofn.archforge.server.admin.service.cache.RedisCacheService;
 import com.lesofn.archforge.server.admin.service.cache.RedisCacheTemplate;
 import com.lesofn.archforge.user.api.domain.SysLoginLog;
@@ -66,7 +66,7 @@ class LoginServiceTest {
     private SysLoginLogService loginLogService;
 
     @Spy
-    private ArchForgeConfig appForgeConfig = new ArchForgeConfig();
+    private ArchForgeProperties appForgeConfig = new ArchForgeProperties();
 
     @Mock
     private Environment environment;
@@ -99,7 +99,7 @@ class LoginServiceTest {
     void login_CaptchaDisabled_Success() {
         appForgeConfig.getCaptcha().setEnabled(false);
 
-        LoginCommand command = new LoginCommand();
+        LoginRequest command = new LoginRequest();
         command.setUsername("admin");
         command.setPassword("plain");
 
@@ -121,7 +121,7 @@ class LoginServiceTest {
     void login_BadCredentials_ThrowsAndRecordsFailure() {
         appForgeConfig.getCaptcha().setEnabled(false);
 
-        LoginCommand command = new LoginCommand();
+        LoginRequest command = new LoginRequest();
         command.setUsername("admin");
         command.setPassword("plain");
 
@@ -139,7 +139,7 @@ class LoginServiceTest {
     void login_CaptchaWrong_ThrowsCaptchaError() {
         appForgeConfig.getCaptcha().setEnabled(true);
 
-        LoginCommand command = new LoginCommand();
+        LoginRequest command = new LoginRequest();
         command.setUsername("admin");
         command.setPassword("plain");
         command.setCaptchaCodeKey("uuid");
@@ -158,7 +158,7 @@ class LoginServiceTest {
     void login_CaptchaMissing_ThrowsCaptchaRequired() {
         appForgeConfig.getCaptcha().setEnabled(true);
 
-        LoginCommand command = new LoginCommand();
+        LoginRequest command = new LoginRequest();
         command.setUsername("admin");
         command.setPassword("plain");
         command.setCaptchaCodeKey("uuid");
@@ -173,7 +173,7 @@ class LoginServiceTest {
     void login_CaptchaExpired_ThrowsCaptchaExpired() {
         appForgeConfig.getCaptcha().setEnabled(true);
 
-        LoginCommand command = new LoginCommand();
+        LoginRequest command = new LoginRequest();
         command.setUsername("admin");
         command.setPassword("plain");
         command.setCaptchaCodeKey("uuid");
@@ -192,7 +192,7 @@ class LoginServiceTest {
     void generateCaptchaImg_Disabled_ReturnsEmptyDto() {
         appForgeConfig.getCaptcha().setEnabled(false);
 
-        CaptchaDTO captcha = loginService.generateCaptchaImg();
+        CaptchaResponse captcha = loginService.generateCaptchaImg();
 
         assertFalse(captcha.getIsCaptchaOn());
         assertTrue(captcha.getCaptchaCodeKey().isEmpty());
@@ -209,7 +209,7 @@ class LoginServiceTest {
                 .thenReturn(new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB));
         when(redisCacheService.getCaptchaCache()).thenReturn(captchaCache);
 
-        CaptchaDTO captcha = loginService.generateCaptchaImg();
+        CaptchaResponse captcha = loginService.generateCaptchaImg();
 
         assertTrue(captcha.getIsCaptchaOn());
         assertNotNull(captcha.getCaptchaCodeKey());
@@ -227,7 +227,7 @@ class LoginServiceTest {
                 .thenReturn(new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB));
         when(redisCacheService.getCaptchaCache()).thenReturn(captchaCache);
 
-        CaptchaDTO captcha = loginService.generateCaptchaImg();
+        CaptchaResponse captcha = loginService.generateCaptchaImg();
 
         assertTrue(captcha.getIsCaptchaOn());
         assertNotNull(captcha.getCaptchaCodeKey());
@@ -239,7 +239,7 @@ class LoginServiceTest {
     void getConfig_ReturnsCaptchaStatusAndDictionary() {
         appForgeConfig.getCaptcha().setEnabled(true);
 
-        ConfigDTO config = loginService.getConfig();
+        LoginConfigResponse config = loginService.getConfig();
 
         assertTrue(config.getIsCaptchaOn());
         assertNotNull(config.getDictionary());

@@ -1,11 +1,11 @@
 package com.lesofn.archforge.meta.table.internal.schema;
 
-import static com.lesofn.archforge.meta.table.internal.exception.MetaTableErrorCode.META_COLUMN_CODE_INVALID;
+import static com.lesofn.archforge.meta.table.api.errors.MetaTableErrorCode.META_COLUMN_CODE_INVALID;
 
 import com.lesofn.archforge.meta.table.api.domain.MetaColumn;
 import com.lesofn.archforge.meta.table.api.domain.MetaTable;
 import com.lesofn.archforge.meta.table.internal.ddl.ColumnTypeResolver;
-import com.lesofn.archforge.meta.table.internal.exception.MetaTableException;
+import com.lesofn.archforge.meta.table.api.errors.MetaTableException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;

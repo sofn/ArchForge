@@ -42,7 +42,7 @@ class QuartzJobIntegrationTest {
     void setup() throws Exception {
         rest = RestClient.builder().baseUrl("http://localhost:" + port).build();
         String resp = rest.post()
-                .uri("/login")
+                .uri("/auth/login")
                 .header("Content-Type", "application/json")
                 .body(Map.of("username", "admin", "password", "admin123"))
                 .retrieve()
@@ -51,6 +51,31 @@ class QuartzJobIntegrationTest {
         Map<String, Object> data = (Map<String, Object>) body.get("data");
         accessToken = (String) data.get("accessToken");
         assertNotNull(accessToken);
+    }
+
+    private Map<String, Object> get(String path, Map<String, Object> params) {
+        try {
+            StringBuilder uri = new StringBuilder(path);
+            if (params != null && !params.isEmpty()) {
+                uri.append("?");
+                boolean first = true;
+                for (Map.Entry<String, Object> entry : params.entrySet()) {
+                    if (!first) {
+                        uri.append("&");
+                    }
+                    first = false;
+                    uri.append(entry.getKey()).append("=").append(entry.getValue());
+                }
+            }
+            String resp = rest.get()
+                    .uri(uri.toString())
+                    .header("Authorization", "Bearer " + accessToken)
+                    .retrieve()
+                    .body(String.class);
+            return M.readValue(resp, Map.class);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private Map<String, Object> post(String path, Object body) {
@@ -133,8 +158,8 @@ class QuartzJobIntegrationTest {
     @Order(3)
     @SuppressWarnings("unchecked")
     void listJobs() {
-        Map<String, Object> resp = post(
-                "/quartz/list",
+        Map<String, Object> resp = get(
+                "/quartz",
                 Map.of("jobName", "it-demo", "currentPage", 1, "pageSize", 10));
         assertEquals(0, resp.get("code"));
         Map<String, Object> data = (Map<String, Object>) resp.get("data");
@@ -155,8 +180,8 @@ class QuartzJobIntegrationTest {
         boolean found = false;
         while (System.currentTimeMillis() < deadline) {
             @SuppressWarnings("unchecked")
-            Map<String, Object> logResp = post(
-                    "/quartz/log/list",
+            Map<String, Object> logResp = get(
+                    "/quartz/log",
                     Map.of("jobId", createdJobId, "currentPage", 1, "pageSize", 10));
             assertEquals(0, logResp.get("code"));
             @SuppressWarnings("unchecked")
@@ -202,7 +227,7 @@ class QuartzJobIntegrationTest {
     @Test
     @Order(7)
     void deleteJob() {
-        Map<String, Object> resp = delete("/quartz/delete/" + createdJobId);
+        Map<String, Object> resp = delete("/quartz/" + createdJobId);
         assertEquals(0, resp.get("code"));
     }
 }

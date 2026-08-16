@@ -297,7 +297,7 @@ For paged search endpoints, prefer **declarative criteria DTOs** over hand-rolle
 ```java
 // 1. Annotate the criteria DTO
 @Data
-public class SysUserQueryCriteria {
+public class SysUserQueryRequest {
     @Query(blurry = "username,nickname,email") private String blurry;
     @Query(type = Query.Type.INNER_LIKE)       private String username;
     @Query                                      private Integer status;

@@ -1,0 +1,49 @@
+# Test environment: Testcontainers + isolated runtime
+server:
+  port: 0
+
+spring:
+  devtools:
+    restart:
+      enabled: false
+    livereload:
+      enabled: false
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  sql:
+    init:
+      mode: never
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+      database: 0
+      timeout: 10s
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+arch-forge:
+  embedded:
+    redis: true
+    postgresql: true
+    db-init: true
+    s3: true
+  file-storage:
+    type: local
+    local-dir: ../uploads
+  register:
+    enabled: true
+  verification-code:
+    expire-seconds: 300
+    resend-seconds: 60
+    daily-max-per-email: 20
+  mail:
+    enabled: false
+    from: no-reply@archforge.com
+    verification-subject: 您的验证码

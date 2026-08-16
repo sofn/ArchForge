@@ -2,7 +2,7 @@ package com.lesofn.archforge.server.admin.config;
 
 import tools.jackson.databind.ObjectMapper;
 import com.lesofn.archforge.infrastructure.auth.errors.AdminAuthErrorCode;
-import com.lesofn.archforge.infrastructure.config.ArchForgeConfig;
+import com.lesofn.archforge.infrastructure.config.ArchForgeProperties;
 import com.lesofn.archforge.infrastructure.frame.response.model.ResponseResult;
 import com.lesofn.archforge.server.admin.filter.JwtAuthenticationFilter;
 import com.lesofn.archforge.server.admin.service.login.AdminUserDetailsService;
@@ -61,7 +61,7 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final TokenService tokenService;
     private final ObjectMapper objectMapper;
-    private final ArchForgeConfig archForgeConfig;
+    private final ArchForgeProperties archForgeConfig;
     private final Environment environment;
 
     /** 配置密码加密器 */
@@ -112,7 +112,7 @@ public class SecurityConfig {
     @Bean
     public CorsFilter corsFilter() {
         CorsConfiguration config = new CorsConfiguration();
-        ArchForgeConfig.Cors corsConfig = archForgeConfig.getCors();
+        ArchForgeProperties.Cors corsConfig = archForgeConfig.getCors();
 
         List<String> allowedOrigins = Objects.requireNonNullElse(corsConfig.getAllowedOrigins(), List.of());
 
@@ -164,6 +164,11 @@ public class SecurityConfig {
                         auth -> auth
                                 // 对于登录login 注册register 验证码captchaImage 以及公共Api的请求允许匿名访问
                                 .requestMatchers(
+                                        "/auth/login",
+                                        "/auth/register",
+                                        "/auth/getConfig",
+                                        "/auth/captchaImage",
+                                        "/auth/refresh-token",
                                         "/login",
                                         "/register",
                                         "/getConfig",

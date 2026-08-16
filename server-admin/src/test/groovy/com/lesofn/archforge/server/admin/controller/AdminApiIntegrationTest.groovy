@@ -69,7 +69,7 @@ class AdminApiIntegrationTest extends Specification {
 
     def "1.1 登录成功并获取token"() {
         when:
-        Map response = doPost("/login", [username: "admin", password: "admin123"])
+        Map response = doPost("/auth/login", [username: "admin", password: "admin123"])
         accessToken = response.data.accessToken
 
         then:
@@ -86,7 +86,7 @@ class AdminApiIntegrationTest extends Specification {
 
     def "1.2 错误密码登录失败"() {
         when:
-        Map response = doPost("/login", [username: "admin", password: "wrongpassword"])
+        Map response = doPost("/auth/login", [username: "admin", password: "wrongpassword"])
 
         then:
         response.code != 0
@@ -94,11 +94,11 @@ class AdminApiIntegrationTest extends Specification {
 
     def "1.3 刷新token"() {
         given:
-        Map loginResponse = doPost("/login", [username: "admin", password: "admin123"])
+        Map loginResponse = doPost("/auth/login", [username: "admin", password: "admin123"])
         String freshRefreshToken = loginResponse.data.refreshToken
 
         when:
-        Map response = doPost("/refresh-token", [refreshToken: freshRefreshToken])
+        Map response = doPost("/auth/refresh-token", [refreshToken: freshRefreshToken])
 
         then:
         response != null
@@ -107,7 +107,7 @@ class AdminApiIntegrationTest extends Specification {
 
     def "1.4 未认证请求返回401"() {
         when:
-        Map response = doGet("/get-async-routes")
+        Map response = doGet("/auth/get-async-routes")
 
         then:
         response.code != 0
@@ -115,7 +115,7 @@ class AdminApiIntegrationTest extends Specification {
 
     def "1.5 获取异步路由"() {
         when:
-        Map response = doGet("/get-async-routes", accessToken)
+        Map response = doGet("/auth/get-async-routes", accessToken)
 
         then:
         response.code == 0
@@ -126,7 +126,7 @@ class AdminApiIntegrationTest extends Specification {
 
     def "2.1 查询用户列表"() {
         when:
-        Map response = doPost("/user", [username: "", status: "", currentPage: 1, pageSize: 10], accessToken)
+        Map response = doPost("/admin/user", [username: "", status: "", currentPage: 1, pageSize: 10], accessToken)
 
         then:
         response.code == 0
@@ -144,13 +144,13 @@ class AdminApiIntegrationTest extends Specification {
 
     def "2.2 创建用户"() {
         given: "clean up any existing testuser from previous test runs"
-        Map existing = doPost("/user", [username: "", currentPage: 1, pageSize: 100], accessToken)
+        Map existing = doPost("/admin/user", [username: "", currentPage: 1, pageSize: 100], accessToken)
         existing.data.list.findAll { it.username == "testuser" }.each {
-            doPost("/user/delete", [id: it.id], accessToken)
+            doPost("/admin/user/delete", [id: it.id], accessToken)
         }
 
         when:
-        Map response = doPost("/user/create", [
+        Map response = doPost("/admin/user/create", [
             username : "testuser",
             nickname : "测试用户",
             phone    : "13800138000",
@@ -169,7 +169,7 @@ class AdminApiIntegrationTest extends Specification {
 
     def "2.3 创建后查询验证用户存在"() {
         when:
-        Map response = doPost("/user", [username: "", currentPage: 1, pageSize: 100], accessToken)
+        Map response = doPost("/admin/user", [username: "", currentPage: 1, pageSize: 100], accessToken)
 
         then:
         response.code == 0
@@ -178,11 +178,11 @@ class AdminApiIntegrationTest extends Specification {
 
     def "2.4 修改用户"() {
         given:
-        Map listResp = doPost("/user", [username: "", currentPage: 1, pageSize: 100], accessToken)
+        Map listResp = doPost("/admin/user", [username: "", currentPage: 1, pageSize: 100], accessToken)
         Long userId = listResp.data.list.find { it.username == "testuser" }?.id as Long
 
         when:
-        Map response = doPut("/user/update", [
+        Map response = doPut("/admin/user/update", [
             id      : userId,
             nickname: "测试用户-已修改",
             email   : "updated@archforge.com"
@@ -195,7 +195,7 @@ class AdminApiIntegrationTest extends Specification {
 
     def "2.5 修改后查询验证昵称已变"() {
         when:
-        Map response = doPost("/user", [username: "", currentPage: 1, pageSize: 100], accessToken)
+        Map response = doPost("/admin/user", [username: "", currentPage: 1, pageSize: 100], accessToken)
 
         then:
         response.code == 0
@@ -206,11 +206,11 @@ class AdminApiIntegrationTest extends Specification {
 
     def "2.6 修改用户状态（停用）"() {
         given:
-        Map listResp = doPost("/user", [username: "", currentPage: 1, pageSize: 100], accessToken)
+        Map listResp = doPost("/admin/user", [username: "", currentPage: 1, pageSize: 100], accessToken)
         Long userId = listResp.data.list.find { it.username == "testuser" }?.id as Long
 
         when:
-        Map response = doPost("/user/status", [id: userId, status: 0], accessToken)
+        Map response = doPost("/admin/user/status", [id: userId, status: 0], accessToken)
 
         then:
         response.code == 0
@@ -219,11 +219,11 @@ class AdminApiIntegrationTest extends Specification {
 
     def "2.7 重置用户密码"() {
         given:
-        Map listResp = doPost("/user", [username: "", currentPage: 1, pageSize: 100], accessToken)
+        Map listResp = doPost("/admin/user", [username: "", currentPage: 1, pageSize: 100], accessToken)
         Long userId = listResp.data.list.find { it.username == "testuser" }?.id as Long
 
         when:
-        Map response = doPost("/user/reset-password", [id: userId, newPwd: "NewPass123"], accessToken)
+        Map response = doPost("/admin/user/reset-password", [id: userId, newPwd: "NewPass123"], accessToken)
 
         then:
         response.code == 0
@@ -232,11 +232,11 @@ class AdminApiIntegrationTest extends Specification {
 
     def "2.8 分配用户角色"() {
         given:
-        Map listResp = doPost("/user", [username: "", currentPage: 1, pageSize: 100], accessToken)
+        Map listResp = doPost("/admin/user", [username: "", currentPage: 1, pageSize: 100], accessToken)
         Long userId = listResp.data.list.find { it.username == "testuser" }?.id as Long
 
         when:
-        Map response = doPost("/user/assign-role", [id: userId, ids: [2]], accessToken)
+        Map response = doPost("/admin/user/assign-role", [id: userId, ids: [2]], accessToken)
 
         then:
         response.code == 0
@@ -245,11 +245,11 @@ class AdminApiIntegrationTest extends Specification {
 
     def "2.9 分配角色后查询验证"() {
         given:
-        Map listResp = doPost("/user", [username: "", currentPage: 1, pageSize: 100], accessToken)
+        Map listResp = doPost("/admin/user", [username: "", currentPage: 1, pageSize: 100], accessToken)
         Long userId = listResp.data.list.find { it.username == "testuser" }?.id as Long
 
         when:
-        Map response = doPost("/list-role-ids", [userId: userId], accessToken)
+        Map response = doPost("/admin/user/list-role-ids", [userId: userId], accessToken)
 
         then:
         response.code == 0
@@ -259,11 +259,11 @@ class AdminApiIntegrationTest extends Specification {
 
     def "2.10 删除用户"() {
         given:
-        Map listResp = doPost("/user", [username: "", currentPage: 1, pageSize: 100], accessToken)
+        Map listResp = doPost("/admin/user", [username: "", currentPage: 1, pageSize: 100], accessToken)
         Long userId = listResp.data.list.find { it.username == "testuser" }?.id as Long
 
         when:
-        Map response = doPost("/user/delete", [id: userId], accessToken)
+        Map response = doPost("/admin/user/delete", [id: userId], accessToken)
 
         then:
         response.code == 0
@@ -272,7 +272,7 @@ class AdminApiIntegrationTest extends Specification {
 
     def "2.11 删除后查询验证用户已不存在"() {
         when:
-        Map response = doPost("/user", [username: "", currentPage: 1, pageSize: 100], accessToken)
+        Map response = doPost("/admin/user", [username: "", currentPage: 1, pageSize: 100], accessToken)
 
         then:
         response.code == 0
@@ -286,7 +286,7 @@ class AdminApiIntegrationTest extends Specification {
 
     def "3.1 查询角色列表"() {
         when:
-        Map response = doPost("/role", [name: "", code: "", status: "", currentPage: 1, pageSize: 10], accessToken)
+        Map response = doPost("/admin/role", [name: "", code: "", status: "", currentPage: 1, pageSize: 10], accessToken)
 
         then:
         response.code == 0
@@ -297,7 +297,7 @@ class AdminApiIntegrationTest extends Specification {
 
     def "3.2 获取全量角色列表"() {
         when:
-        Map response = doGet("/list-all-role", accessToken)
+        Map response = doGet("/admin/role/all", accessToken)
 
         then:
         response.code == 0
@@ -309,13 +309,13 @@ class AdminApiIntegrationTest extends Specification {
 
     def "3.3 创建角色"() {
         given: "clean up any existing test_role from previous test runs"
-        Map existing = doPost("/role", [name: "", code: "", status: "", currentPage: 1, pageSize: 100], accessToken)
+        Map existing = doPost("/admin/role", [name: "", code: "", status: "", currentPage: 1, pageSize: 100], accessToken)
         existing.data.list.findAll { it.code == "test_role" }.each {
-            doPost("/role/delete", [id: it.id], accessToken)
+            doPost("/admin/role/delete", [id: it.id], accessToken)
         }
 
         when:
-        Map response = doPost("/role/create", [
+        Map response = doPost("/admin/role/create", [
             name  : "测试角色",
             code  : "test_role",
             remark: "集成测试创建"
@@ -329,7 +329,7 @@ class AdminApiIntegrationTest extends Specification {
 
     def "3.4 创建后查询验证角色存在"() {
         when:
-        Map response = doPost("/role", [name: "测试角色", code: "", status: "", currentPage: 1, pageSize: 10], accessToken)
+        Map response = doPost("/admin/role", [name: "测试角色", code: "", status: "", currentPage: 1, pageSize: 10], accessToken)
 
         then:
         response.code == 0
@@ -338,11 +338,11 @@ class AdminApiIntegrationTest extends Specification {
 
     def "3.5 修改角色"() {
         given:
-        Map listResp = doPost("/role", [name: "测试角色", code: "", status: "", currentPage: 1, pageSize: 10], accessToken)
+        Map listResp = doPost("/admin/role", [name: "测试角色", code: "", status: "", currentPage: 1, pageSize: 10], accessToken)
         Long roleId = listResp.data.list.find { it.code == "test_role" }?.id as Long
 
         when:
-        Map response = doPut("/role/update", [
+        Map response = doPut("/admin/role/update", [
             id    : roleId,
             name  : "测试角色-已修改",
             remark: "修改后备注"
@@ -355,7 +355,7 @@ class AdminApiIntegrationTest extends Specification {
 
     def "3.6 修改后查询验证角色名已变"() {
         when:
-        Map response = doPost("/role", [name: "测试角色-已修改", code: "", status: "", currentPage: 1, pageSize: 10], accessToken)
+        Map response = doPost("/admin/role", [name: "测试角色-已修改", code: "", status: "", currentPage: 1, pageSize: 10], accessToken)
 
         then:
         response.code == 0
@@ -364,11 +364,11 @@ class AdminApiIntegrationTest extends Specification {
 
     def "3.7 修改角色状态（停用）"() {
         given:
-        Map listResp = doPost("/role", [name: "", code: "test_role", status: "", currentPage: 1, pageSize: 10], accessToken)
+        Map listResp = doPost("/admin/role", [name: "", code: "test_role", status: "", currentPage: 1, pageSize: 10], accessToken)
         Long roleId = listResp.data.list.find { it.code == "test_role" }?.id as Long
 
         when:
-        Map response = doPost("/role/status", [id: roleId, status: 0], accessToken)
+        Map response = doPost("/admin/role/status", [id: roleId, status: 0], accessToken)
 
         then:
         response.code == 0
@@ -377,11 +377,11 @@ class AdminApiIntegrationTest extends Specification {
 
     def "3.8 保存角色菜单权限"() {
         given:
-        Map listResp = doPost("/role", [name: "", code: "test_role", status: "", currentPage: 1, pageSize: 10], accessToken)
+        Map listResp = doPost("/admin/role", [name: "", code: "test_role", status: "", currentPage: 1, pageSize: 10], accessToken)
         Long roleId = listResp.data.list.find { it.code == "test_role" }?.id as Long
 
         when:
-        Map response = doPost("/role/save-menu", [id: roleId, menuIds: [1, 5, 6, 7, 8]], accessToken)
+        Map response = doPost("/admin/role/save-menu", [id: roleId, menuIds: [1, 5, 6, 7, 8]], accessToken)
 
         then:
         response.code == 0
@@ -390,11 +390,11 @@ class AdminApiIntegrationTest extends Specification {
 
     def "3.9 保存权限后查询验证菜单ID列表"() {
         given:
-        Map listResp = doPost("/role", [name: "", code: "test_role", status: "", currentPage: 1, pageSize: 10], accessToken)
+        Map listResp = doPost("/admin/role", [name: "", code: "test_role", status: "", currentPage: 1, pageSize: 10], accessToken)
         Long roleId = listResp.data.list.find { it.code == "test_role" }?.id as Long
 
         when:
-        Map response = doPost("/role-menu-ids", [id: roleId], accessToken)
+        Map response = doPost("/admin/role/menu-ids", [id: roleId], accessToken)
 
         then:
         response.code == 0
@@ -404,11 +404,11 @@ class AdminApiIntegrationTest extends Specification {
 
     def "3.10 删除角色"() {
         given:
-        Map listResp = doPost("/role", [name: "", code: "test_role", status: "", currentPage: 1, pageSize: 10], accessToken)
+        Map listResp = doPost("/admin/role", [name: "", code: "test_role", status: "", currentPage: 1, pageSize: 10], accessToken)
         Long roleId = listResp.data.list.find { it.code == "test_role" }?.id as Long
 
         when:
-        Map response = doPost("/role/delete", [id: roleId], accessToken)
+        Map response = doPost("/admin/role/delete", [id: roleId], accessToken)
 
         then:
         response.code == 0
@@ -419,7 +419,7 @@ class AdminApiIntegrationTest extends Specification {
 
     def "4.1 查询菜单列表"() {
         when:
-        Map response = doPost("/menu", [:], accessToken)
+        Map response = doPost("/admin/menu", [:], accessToken)
 
         then:
         response.code == 0
@@ -436,7 +436,7 @@ class AdminApiIntegrationTest extends Specification {
 
     def "4.2 获取角色权限菜单树"() {
         when:
-        Map response = doPost("/role-menu", [:], accessToken)
+        Map response = doPost("/admin/role/menu", [:], accessToken)
 
         then:
         response.code == 0
@@ -449,13 +449,13 @@ class AdminApiIntegrationTest extends Specification {
 
     def "4.3 创建菜单"() {
         given: "clean up any existing TestMenu from previous test runs"
-        Map existing = doPost("/menu", [:], accessToken)
+        Map existing = doPost("/admin/menu", [:], accessToken)
         existing.data.findAll { it.name == "TestMenu" }.each {
-            doPost("/menu/delete", [id: it.id], accessToken)
+            doPost("/admin/menu/delete", [id: it.id], accessToken)
         }
 
         when:
-        Map response = doPost("/menu/create", [
+        Map response = doPost("/admin/menu/create", [
             parentId  : 1,
             menuType  : 1,
             title     : "测试菜单",
@@ -475,7 +475,7 @@ class AdminApiIntegrationTest extends Specification {
 
     def "4.4 创建后查询验证菜单存在"() {
         when:
-        Map response = doPost("/menu", [:], accessToken)
+        Map response = doPost("/admin/menu", [:], accessToken)
 
         then:
         response.code == 0
@@ -484,11 +484,11 @@ class AdminApiIntegrationTest extends Specification {
 
     def "4.5 修改菜单"() {
         given:
-        Map listResp = doPost("/menu", [:], accessToken)
+        Map listResp = doPost("/admin/menu", [:], accessToken)
         Long menuId = listResp.data.find { it.title == "测试菜单" }?.id as Long
 
         when:
-        Map response = doPut("/menu/update", [
+        Map response = doPut("/admin/menu/update", [
             id   : menuId,
             title: "测试菜单-已修改",
             icon : "ep:setting"
@@ -501,7 +501,7 @@ class AdminApiIntegrationTest extends Specification {
 
     def "4.6 修改后查询验证菜单标题和图标已变"() {
         when:
-        Map response = doPost("/menu", [:], accessToken)
+        Map response = doPost("/admin/menu", [:], accessToken)
 
         then:
         response.code == 0
@@ -512,11 +512,11 @@ class AdminApiIntegrationTest extends Specification {
 
     def "4.7 删除菜单"() {
         given:
-        Map listResp = doPost("/menu", [:], accessToken)
+        Map listResp = doPost("/admin/menu", [:], accessToken)
         Long menuId = listResp.data.find { it.name == "TestMenu" }?.id as Long
 
         when:
-        Map response = doPost("/menu/delete", [id: menuId], accessToken)
+        Map response = doPost("/admin/menu/delete", [id: menuId], accessToken)
 
         then:
         response.code == 0
@@ -525,7 +525,7 @@ class AdminApiIntegrationTest extends Specification {
 
     def "4.8 删除后查询验证菜单已不存在"() {
         when:
-        Map response = doPost("/menu", [:], accessToken)
+        Map response = doPost("/admin/menu", [:], accessToken)
 
         then:
         response.code == 0
@@ -536,7 +536,7 @@ class AdminApiIntegrationTest extends Specification {
 
     def "5.1 查询部门列表"() {
         when:
-        Map response = doPost("/dept", [:], accessToken)
+        Map response = doPost("/admin/dept", [:], accessToken)
 
         then:
         response.code == 0
@@ -553,13 +553,13 @@ class AdminApiIntegrationTest extends Specification {
 
     def "5.2 创建部门"() {
         given: "clean up any existing 测试部门 from previous test runs"
-        Map existing = doPost("/dept", [:], accessToken)
+        Map existing = doPost("/admin/dept", [:], accessToken)
         existing.data.findAll { it.name == "测试部门" || it.name == "测试部门-已修改" }.each {
-            doPost("/dept/delete", [id: it.id], accessToken)
+            doPost("/admin/dept/delete", [id: it.id], accessToken)
         }
 
         when:
-        Map response = doPost("/dept/create", [
+        Map response = doPost("/admin/dept/create", [
             parentId : 100,
             name     : "测试部门",
             principal: "测试负责人",
@@ -578,7 +578,7 @@ class AdminApiIntegrationTest extends Specification {
 
     def "5.3 创建后查询验证部门存在"() {
         when:
-        Map response = doPost("/dept", [:], accessToken)
+        Map response = doPost("/admin/dept", [:], accessToken)
 
         then:
         response.code == 0
@@ -587,11 +587,11 @@ class AdminApiIntegrationTest extends Specification {
 
     def "5.4 修改部门"() {
         given:
-        Map listResp = doPost("/dept", [:], accessToken)
+        Map listResp = doPost("/admin/dept", [:], accessToken)
         Long deptId = listResp.data.find { it.name == "测试部门" }?.id as Long
 
         when:
-        Map response = doPut("/dept/update", [
+        Map response = doPut("/admin/dept/update", [
             id       : deptId,
             name     : "测试部门-已修改",
             principal: "新负责人",
@@ -605,7 +605,7 @@ class AdminApiIntegrationTest extends Specification {
 
     def "5.5 修改后查询验证部门名已变"() {
         when:
-        Map response = doPost("/dept", [:], accessToken)
+        Map response = doPost("/admin/dept", [:], accessToken)
 
         then:
         response.code == 0
@@ -616,11 +616,11 @@ class AdminApiIntegrationTest extends Specification {
 
     def "5.6 删除部门"() {
         given:
-        Map listResp = doPost("/dept", [:], accessToken)
+        Map listResp = doPost("/admin/dept", [:], accessToken)
         Long deptId = listResp.data.find { it.name == "测试部门-已修改" }?.id as Long
 
         when:
-        Map response = doPost("/dept/delete", [id: deptId], accessToken)
+        Map response = doPost("/admin/dept/delete", [id: deptId], accessToken)
 
         then:
         response.code == 0
@@ -629,7 +629,7 @@ class AdminApiIntegrationTest extends Specification {
 
     def "5.7 删除后查询验证部门已不存在"() {
         when:
-        Map response = doPost("/dept", [:], accessToken)
+        Map response = doPost("/admin/dept", [:], accessToken)
 
         then:
         response.code == 0
@@ -640,7 +640,7 @@ class AdminApiIntegrationTest extends Specification {
 
     def "6.1 查询参数列表"() {
         when:
-        Map response = doPost("/config", [currentPage: 1, pageSize: 10], accessToken)
+        Map response = doPost("/admin/config", [currentPage: 1, pageSize: 10], accessToken)
 
         then:
         response.code == 0
@@ -651,13 +651,13 @@ class AdminApiIntegrationTest extends Specification {
 
     def "6.2 创建参数"() {
         given: "clean up existing test config"
-        Map existing = doPost("/config", [currentPage: 1, pageSize: 100], accessToken)
+        Map existing = doPost("/admin/config", [currentPage: 1, pageSize: 100], accessToken)
         existing.data.list.findAll { it.configKey == "test.config.key" }.each {
-            doPost("/config/delete", [id: it.id], accessToken)
+            doPost("/admin/config/delete", [id: it.id], accessToken)
         }
 
         when:
-        Map response = doPost("/config/create", [
+        Map response = doPost("/admin/config/create", [
             configName : "测试参数",
             configKey  : "test.config.key",
             configValue: "test_value",
@@ -672,7 +672,7 @@ class AdminApiIntegrationTest extends Specification {
 
     def "6.3 创建后查询验证参数存在"() {
         when:
-        Map response = doPost("/config", [currentPage: 1, pageSize: 100], accessToken)
+        Map response = doPost("/admin/config", [currentPage: 1, pageSize: 100], accessToken)
 
         then:
         response.code == 0
@@ -681,11 +681,11 @@ class AdminApiIntegrationTest extends Specification {
 
     def "6.4 修改参数"() {
         given:
-        Map listResp = doPost("/config", [currentPage: 1, pageSize: 100], accessToken)
+        Map listResp = doPost("/admin/config", [currentPage: 1, pageSize: 100], accessToken)
         Long configId = listResp.data.list.find { it.configKey == "test.config.key" }?.id as Long
 
         when:
-        Map response = doPut("/config/update", [
+        Map response = doPut("/admin/config/update", [
             id         : configId,
             configValue: "updated_value",
             remark     : "修改后备注"
@@ -698,7 +698,7 @@ class AdminApiIntegrationTest extends Specification {
 
     def "6.5 修改后查询验证参数值已变"() {
         when:
-        Map response = doPost("/config", [currentPage: 1, pageSize: 100], accessToken)
+        Map response = doPost("/admin/config", [currentPage: 1, pageSize: 100], accessToken)
 
         then:
         response.code == 0
@@ -708,11 +708,11 @@ class AdminApiIntegrationTest extends Specification {
 
     def "6.6 删除参数"() {
         given:
-        Map listResp = doPost("/config", [currentPage: 1, pageSize: 100], accessToken)
+        Map listResp = doPost("/admin/config", [currentPage: 1, pageSize: 100], accessToken)
         Long configId = listResp.data.list.find { it.configKey == "test.config.key" }?.id as Long
 
         when:
-        Map response = doPost("/config/delete", [id: configId], accessToken)
+        Map response = doPost("/admin/config/delete", [id: configId], accessToken)
 
         then:
         response.code == 0
@@ -723,7 +723,7 @@ class AdminApiIntegrationTest extends Specification {
 
     def "7.1 查询通知公告列表"() {
         when:
-        Map response = doPost("/notice", [currentPage: 1, pageSize: 10], accessToken)
+        Map response = doPost("/admin/notice", [currentPage: 1, pageSize: 10], accessToken)
 
         then:
         response.code == 0
@@ -733,13 +733,13 @@ class AdminApiIntegrationTest extends Specification {
 
     def "7.2 创建通知公告"() {
         given: "clean up existing test notice"
-        Map existing = doPost("/notice", [currentPage: 1, pageSize: 100], accessToken)
+        Map existing = doPost("/admin/notice", [currentPage: 1, pageSize: 100], accessToken)
         existing.data.list.findAll { it.noticeTitle == "测试通知" }.each {
-            doPost("/notice/delete", [id: it.id], accessToken)
+            doPost("/admin/notice/delete", [id: it.id], accessToken)
         }
 
         when:
-        Map response = doPost("/notice/create", [
+        Map response = doPost("/admin/notice/create", [
             noticeTitle  : "测试通知",
             noticeType   : 1,
             noticeContent: "这是一条测试通知内容",
@@ -754,7 +754,7 @@ class AdminApiIntegrationTest extends Specification {
 
     def "7.3 创建后查询验证公告存在"() {
         when:
-        Map response = doPost("/notice", [currentPage: 1, pageSize: 100], accessToken)
+        Map response = doPost("/admin/notice", [currentPage: 1, pageSize: 100], accessToken)
 
         then:
         response.code == 0
@@ -763,11 +763,11 @@ class AdminApiIntegrationTest extends Specification {
 
     def "7.4 修改通知公告"() {
         given:
-        Map listResp = doPost("/notice", [currentPage: 1, pageSize: 100], accessToken)
+        Map listResp = doPost("/admin/notice", [currentPage: 1, pageSize: 100], accessToken)
         Long noticeId = listResp.data.list.find { it.noticeTitle == "测试通知" }?.id as Long
 
         when:
-        Map response = doPut("/notice/update", [
+        Map response = doPut("/admin/notice/update", [
             id           : noticeId,
             noticeTitle  : "测试通知-已修改",
             noticeContent: "修改后的通知内容"
@@ -780,7 +780,7 @@ class AdminApiIntegrationTest extends Specification {
 
     def "7.5 修改后查询验证公告标题已变"() {
         when:
-        Map response = doPost("/notice", [currentPage: 1, pageSize: 100], accessToken)
+        Map response = doPost("/admin/notice", [currentPage: 1, pageSize: 100], accessToken)
 
         then:
         response.code == 0
@@ -789,11 +789,11 @@ class AdminApiIntegrationTest extends Specification {
 
     def "7.6 删除通知公告"() {
         given:
-        Map listResp = doPost("/notice", [currentPage: 1, pageSize: 100], accessToken)
+        Map listResp = doPost("/admin/notice", [currentPage: 1, pageSize: 100], accessToken)
         Long noticeId = listResp.data.list.find { it.noticeTitle == "测试通知-已修改" }?.id as Long
 
         when:
-        Map response = doPost("/notice/delete", [id: noticeId], accessToken)
+        Map response = doPost("/admin/notice/delete", [id: noticeId], accessToken)
 
         then:
         response.code == 0
@@ -804,7 +804,7 @@ class AdminApiIntegrationTest extends Specification {
 
     def "8.1 查询操作日志列表"() {
         when:
-        Map response = doPost("/operation-logs", [currentPage: 1, pageSize: 10], accessToken)
+        Map response = doPost("/admin/operation-log", [currentPage: 1, pageSize: 10], accessToken)
 
         then:
         response.code == 0
@@ -814,11 +814,11 @@ class AdminApiIntegrationTest extends Specification {
 
     def "8.2 删除操作日志"() {
         given:
-        Map listResp = doPost("/operation-logs", [currentPage: 1, pageSize: 10], accessToken)
+        Map listResp = doPost("/admin/operation-log", [currentPage: 1, pageSize: 10], accessToken)
         Long logId = listResp.data.list[0]?.id as Long
 
         when:
-        Map response = doPost("/operation-logs/delete", [id: logId], accessToken)
+        Map response = doPost("/admin/operation-log/delete", [id: logId], accessToken)
 
         then:
         response.code == 0
@@ -827,7 +827,7 @@ class AdminApiIntegrationTest extends Specification {
 
     def "8.3 清空操作日志"() {
         when:
-        Map response = doPost("/operation-logs/clear", [:], accessToken)
+        Map response = doPost("/admin/operation-log/clear", [:], accessToken)
 
         then:
         response.code == 0
@@ -838,7 +838,7 @@ class AdminApiIntegrationTest extends Specification {
 
     def "9.1 查询登录日志列表"() {
         when:
-        Map response = doPost("/login-logs", [currentPage: 1, pageSize: 10], accessToken)
+        Map response = doPost("/admin/login-log", [currentPage: 1, pageSize: 10], accessToken)
 
         then:
         response.code == 0
@@ -848,11 +848,11 @@ class AdminApiIntegrationTest extends Specification {
 
     def "9.2 删除登录日志"() {
         given:
-        Map listResp = doPost("/login-logs", [currentPage: 1, pageSize: 10], accessToken)
+        Map listResp = doPost("/admin/login-log", [currentPage: 1, pageSize: 10], accessToken)
         Long logId = listResp.data.list[0]?.id as Long
 
         when:
-        Map response = doPost("/login-logs/delete", [id: logId], accessToken)
+        Map response = doPost("/admin/login-log/delete", [id: logId], accessToken)
 
         then:
         response.code == 0
@@ -861,7 +861,7 @@ class AdminApiIntegrationTest extends Specification {
 
     def "9.3 清空登录日志"() {
         when:
-        Map response = doPost("/login-logs/clear", [:], accessToken)
+        Map response = doPost("/admin/login-log/clear", [:], accessToken)
 
         then:
         response.code == 0

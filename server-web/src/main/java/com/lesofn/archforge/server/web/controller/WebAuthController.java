@@ -1,7 +1,7 @@
 package com.lesofn.archforge.server.web.controller;
 
 import cn.dev33.satoken.stp.StpUtil;
-import com.lesofn.archforge.infrastructure.config.ArchForgeConfig;
+import com.lesofn.archforge.infrastructure.config.ArchForgeProperties;
 import com.lesofn.archforge.server.web.dto.WebLoginRequest;
 import com.lesofn.archforge.server.web.dto.WebLoginResponse;
 import com.lesofn.archforge.server.web.dto.WebLogoutRequest;
@@ -46,7 +46,7 @@ public class WebAuthController {
     private final PasswordEncoderPort passwordEncoderPort;
     private final WebRefreshTokenService webRefreshTokenService;
     private final VerificationCodeService verificationCodeService;
-    private final ArchForgeConfig archForgeConfig;
+    private final ArchForgeProperties archForgeConfig;
 
     @PostMapping("/login")
     public WebLoginResponse login(@RequestBody @Valid WebLoginRequest request) {

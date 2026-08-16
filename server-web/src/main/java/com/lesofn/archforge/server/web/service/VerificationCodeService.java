@@ -1,6 +1,6 @@
 package com.lesofn.archforge.server.web.service;
 
-import com.lesofn.archforge.infrastructure.config.ArchForgeConfig;
+import com.lesofn.archforge.infrastructure.config.ArchForgeProperties;
 import com.lesofn.archforge.server.web.errors.WebAuthErrorCode;
 import com.lesofn.archforge.server.web.errors.WebAuthException;
 import com.lesofn.archforge.server.web.mail.MailSender;
@@ -28,7 +28,7 @@ public class VerificationCodeService {
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd");
 
     private final StringRedisTemplate redisTemplate;
-    private final ArchForgeConfig archForgeConfig;
+    private final ArchForgeProperties archForgeConfig;
     private final MailSender mailSender;
 
     /**

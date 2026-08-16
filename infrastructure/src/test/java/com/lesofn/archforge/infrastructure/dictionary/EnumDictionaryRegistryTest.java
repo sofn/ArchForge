@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.lesofn.archforge.infrastructure.config.ArchForgeConfig;
+import com.lesofn.archforge.infrastructure.config.ArchForgeProperties;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
@@ -12,7 +12,7 @@ public class EnumDictionaryRegistryTest {
 
     @Test
     void shouldLoadYesOrNoEnum() {
-        ArchForgeConfig config = new ArchForgeConfig();
+        ArchForgeProperties config = new ArchForgeProperties();
         config.getDictionary().setEnumBasePackages(List.of("com.lesofn.archforge.common.enums.common"));
         EnumDictionaryRegistry registry = new EnumDictionaryRegistry(config);
         registry.init();
@@ -29,7 +29,7 @@ public class EnumDictionaryRegistryTest {
 
     @Test
     void shouldNotLoadEnumWithoutDictionaryAnnotation() {
-        ArchForgeConfig config = new ArchForgeConfig();
+        ArchForgeProperties config = new ArchForgeProperties();
         config.getDictionary().setEnumBasePackages(List.of("com.lesofn.archforge.server.admin.service.cache"));
         EnumDictionaryRegistry registry = new EnumDictionaryRegistry(config);
         registry.init();

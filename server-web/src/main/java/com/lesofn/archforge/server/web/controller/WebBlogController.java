@@ -10,7 +10,7 @@ import com.lesofn.archforge.server.web.dto.WebArticleCreateRequest;
 import com.lesofn.archforge.server.web.dto.WebArticleDetailResponse;
 import com.lesofn.archforge.server.web.dto.WebArticleSummaryResponse;
 import com.lesofn.archforge.server.web.dto.WebCategoryResponse;
-import com.lesofn.archforge.server.web.dto.WebPageResult;
+import com.lesofn.archforge.server.web.dto.WebPageResponse;
 import com.lesofn.archforge.user.api.domain.SysFile;
 import com.lesofn.archforge.user.api.service.SysFileService;
 import jakarta.validation.Valid;
@@ -55,7 +55,7 @@ public class WebBlogController {
     }
 
     @GetMapping("/articles")
-    public WebPageResult<WebArticleSummaryResponse> getArticles(
+    public WebPageResponse<WebArticleSummaryResponse> getArticles(
             @RequestParam(required = false) Long categoryId,
             @RequestParam(required = false, defaultValue = "1") int currentPage,
             @RequestParam(required = false, defaultValue = "10") int pageSize,
@@ -68,7 +68,7 @@ public class WebBlogController {
         List<WebArticleSummaryResponse> list = page.getContent().stream()
                 .map(this::toSummaryResponse)
                 .collect(Collectors.toList());
-        return new WebPageResult<>(list, page.getTotalElements(), page.getSize(), currentPage);
+        return new WebPageResponse<>(list, page.getTotalElements(), page.getSize(), currentPage);
     }
 
     @GetMapping("/articles/{slug}")
@@ -103,7 +103,7 @@ public class WebBlogController {
     }
 
     @GetMapping("/user/articles")
-    public WebPageResult<WebArticleSummaryResponse> myArticles(
+    public WebPageResponse<WebArticleSummaryResponse> myArticles(
             @RequestParam(required = false, defaultValue = "1") int currentPage,
             @RequestParam(required = false, defaultValue = "10") int pageSize) {
         Long authorId = WebUserContext.getUserId();
@@ -115,7 +115,7 @@ public class WebBlogController {
         List<WebArticleSummaryResponse> list = page.getContent().stream()
                 .map(this::toSummaryResponse)
                 .collect(Collectors.toList());
-        return new WebPageResult<>(list, page.getTotalElements(), page.getSize(), currentPage);
+        return new WebPageResponse<>(list, page.getTotalElements(), page.getSize(), currentPage);
     }
 
     private WebArticleSummaryResponse toSummaryResponse(BlogArticle article) {

@@ -8,7 +8,7 @@ import static org.mockito.Mockito.when;
 
 import com.lesofn.archforge.common.enums.common.UserStatusEnum;
 import com.lesofn.archforge.infrastructure.auth.model.SystemLoginUser;
-import com.lesofn.archforge.infrastructure.config.ArchForgeConfig;
+import com.lesofn.archforge.infrastructure.config.ArchForgeProperties;
 import com.lesofn.archforge.infrastructure.user.web.DataScopeEnum;
 import com.lesofn.archforge.infrastructure.user.web.RoleInfo;
 import com.lesofn.archforge.user.api.domain.SysMenu;
@@ -47,7 +47,7 @@ class AdminUserDetailsServiceTest {
     private TokenService tokenService;
 
     @Spy
-    private ArchForgeConfig appForgeConfig = new ArchForgeConfig();
+    private ArchForgeProperties appForgeConfig = new ArchForgeProperties();
 
     @InjectMocks
     private AdminUserDetailsService adminUserDetailsService;

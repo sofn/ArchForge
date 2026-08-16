@@ -2,7 +2,7 @@ package com.lesofn.archforge.server.admin.util;
 
 import com.lesofn.archforge.common.constant.Constants;
 import com.lesofn.archforge.infrastructure.auth.model.SystemLoginUser;
-import com.lesofn.archforge.infrastructure.config.ArchForgeConfig;
+import com.lesofn.archforge.infrastructure.config.ArchForgeProperties;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import java.util.Date;
@@ -22,9 +22,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class JwtTokenUtil {
 
-    private final ArchForgeConfig appForgeConfig;
+    private final ArchForgeProperties appForgeConfig;
 
-    public JwtTokenUtil(ArchForgeConfig appForgeConfig) {
+    public JwtTokenUtil(ArchForgeProperties appForgeConfig) {
         this.appForgeConfig = appForgeConfig;
     }
 

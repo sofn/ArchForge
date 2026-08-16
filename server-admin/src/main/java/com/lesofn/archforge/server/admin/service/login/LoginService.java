@@ -8,13 +8,13 @@ import com.lesofn.archforge.common.utils.ip.IpRegionUtil;
 import com.lesofn.archforge.common.utils.ip.IpUtil;
 import com.lesofn.archforge.infrastructure.auth.errors.AdminAuthException;
 import com.lesofn.archforge.infrastructure.auth.model.SystemLoginUser;
-import com.lesofn.archforge.infrastructure.config.ArchForgeConfig;
+import com.lesofn.archforge.infrastructure.config.ArchForgeProperties;
 import com.lesofn.archforge.infrastructure.config.CaptchaType;
 import com.lesofn.archforge.infrastructure.frame.context.ScopedValueContext;
 import com.lesofn.archforge.infrastructure.dictionary.EnumDictionaryRegistry;
-import com.lesofn.archforge.server.admin.dto.CaptchaDTO;
-import com.lesofn.archforge.server.admin.dto.ConfigDTO;
-import com.lesofn.archforge.server.admin.dto.LoginCommand;
+import com.lesofn.archforge.server.admin.dto.CaptchaResponse;
+import com.lesofn.archforge.server.admin.dto.LoginConfigResponse;
+import com.lesofn.archforge.server.admin.dto.LoginRequest;
 import com.lesofn.archforge.server.admin.service.cache.RedisCacheService;
 import com.lesofn.archforge.user.api.domain.SysLoginLog;
 import com.lesofn.archforge.user.api.service.SysLoginLogService;
@@ -52,7 +52,7 @@ public class LoginService {
     private final RedisCacheService redisCacheService;
     private final LoginAttemptService loginAttemptService;
     private final SysLoginLogService loginLogService;
-    private final ArchForgeConfig appForgeConfig;
+    private final ArchForgeProperties appForgeConfig;
     private final Environment environment;
     private final EnumDictionaryRegistry enumDictionaryRegistry;
 
@@ -68,7 +68,7 @@ public class LoginService {
      * @param loginCommand 登录参数
      * @return LoginResult 包含token和用户信息
      */
-    public LoginResult login(LoginCommand loginCommand) {
+    public LoginResult login(LoginRequest loginCommand) {
         try {
             // 登录失败锁定检查
             loginAttemptService.checkNotLocked(loginCommand.getUsername());
@@ -196,9 +196,9 @@ public class LoginService {
      *
      * @return 验证码信息
      */
-    public CaptchaDTO generateCaptchaImg() {
+    public CaptchaResponse generateCaptchaImg() {
         if (!appForgeConfig.getCaptcha().isEnabled()) {
-            return new CaptchaDTO(false, "", "");
+            return new CaptchaResponse(false, "", "");
         }
 
         // 生成验证码
@@ -233,7 +233,7 @@ public class LoginService {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             ImageIO.write(image, "jpg", outputStream);
             String base64 = Base64.encodeBase64String(outputStream.toByteArray());
-            return new CaptchaDTO(appForgeConfig.getCaptcha().isEnabled(), uuid, base64);
+            return new CaptchaResponse(appForgeConfig.getCaptcha().isEnabled(), uuid, base64);
         } catch (Exception e) {
             log.error("生成验证码异常", e);
             throw new AdminAuthException(CAPTCHA_GENERATE_ERROR);
@@ -245,8 +245,8 @@ public class LoginService {
      *
      * @return 配置信息
      */
-    public ConfigDTO getConfig() {
-        ConfigDTO configDTO = new ConfigDTO();
+    public LoginConfigResponse getConfig() {
+        LoginConfigResponse configDTO = new LoginConfigResponse();
         boolean isCaptchaOn = appForgeConfig.getCaptcha().isEnabled();
         configDTO.setIsCaptchaOn(isCaptchaOn);
         configDTO.setDictionary(enumDictionaryRegistry.asDictionaryDataMap());

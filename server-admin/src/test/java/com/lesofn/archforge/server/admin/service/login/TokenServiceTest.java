@@ -18,7 +18,7 @@ import com.lesofn.archforge.common.constant.Constants;
 import com.lesofn.archforge.infrastructure.auth.errors.AdminAuthException;
 import com.lesofn.archforge.infrastructure.auth.errors.AdminAuthErrorCode;
 import com.lesofn.archforge.infrastructure.auth.model.SystemLoginUser;
-import com.lesofn.archforge.infrastructure.config.ArchForgeConfig;
+import com.lesofn.archforge.infrastructure.config.ArchForgeProperties;
 import com.lesofn.archforge.infrastructure.user.web.RoleInfo;
 import com.lesofn.archforge.server.admin.service.cache.RedisCacheService;
 import com.lesofn.archforge.server.admin.service.cache.RedisCacheTemplate;
@@ -64,7 +64,7 @@ class TokenServiceTest {
     private RedisCacheTemplate<String> refreshTokenCache;
 
     @Spy
-    private ArchForgeConfig appForgeConfig = new ArchForgeConfig();
+    private ArchForgeProperties appForgeConfig = new ArchForgeProperties();
 
     @Captor
     private ArgumentCaptor<Duration> durationCaptor;

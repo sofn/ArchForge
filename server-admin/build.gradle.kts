@@ -40,14 +40,24 @@ tasks.bootRun {
 
 // Spring AOT processing also needs --enable-preview
 // Use 'prod' profile during AOT to skip Testcontainers (no Docker in CI/native builds)
+// AOT is disabled for standard build/test lifecycle; enable explicitly when running nativeCompile.
 tasks.named<JavaExec>("processAot") {
+    enabled = false
     jvmArgs("--enable-preview", "--enable-native-access=ALL-UNNAMED")
     systemProperty("spring.profiles.active", "prod")
 }
 tasks.named<JavaExec>("processTestAot") {
+    enabled = false
     jvmArgs("--enable-preview", "--enable-native-access=ALL-UNNAMED")
     systemProperty("spring.profiles.active", "test")
 }
+tasks.named("compileAotJava") { enabled = false }
+tasks.named("processAotResources") { enabled = false }
+tasks.named("aotClasses") { enabled = false }
+tasks.named("compileAotTestJava") { enabled = false }
+tasks.named("processAotTestResources") { enabled = false }
+tasks.named("aotTestClasses") { enabled = false }
+tasks.named("collectReachabilityMetadata") { enabled = false }
 
 // Unit / integration tests default to the test profile (Testcontainers + Flyway)
 tasks.withType<Test> {

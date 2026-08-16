@@ -2,7 +2,7 @@ package com.lesofn.archforge.server.admin.service.login;
 
 import com.lesofn.archforge.infrastructure.auth.errors.AdminAuthErrorCode;
 import com.lesofn.archforge.infrastructure.auth.errors.AdminAuthException;
-import com.lesofn.archforge.infrastructure.config.ArchForgeConfig;
+import com.lesofn.archforge.infrastructure.config.ArchForgeProperties;
 import java.time.Duration;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +26,7 @@ public class LoginAttemptService {
     private static final String KEY_PREFIX = "login:attempts:";
 
     private final StringRedisTemplate redisTemplate;
-    private final ArchForgeConfig archForgeConfig;
+    private final ArchForgeProperties archForgeConfig;
 
     /** 检查账户是否已锁定，若已锁定抛出异常。 */
     public void checkNotLocked(String username) {

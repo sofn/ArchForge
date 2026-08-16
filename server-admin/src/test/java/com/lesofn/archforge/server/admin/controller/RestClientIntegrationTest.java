@@ -115,7 +115,7 @@ class RestClientIntegrationTest {
     @Test
     @Order(1)
     void login() {
-        Map<String, Object> response = post("/login", Map.of("username", "admin", "password", "admin123"));
+        Map<String, Object> response = post("/auth/login", Map.of("username", "admin", "password", "admin123"));
         assertEquals(0, response.get("code"));
         @SuppressWarnings("unchecked")
         Map<String, Object> data = (Map<String, Object>) response.get("data");
@@ -129,7 +129,7 @@ class RestClientIntegrationTest {
     @Order(10)
     void createUser() {
         Map<String, Object> response = post(
-                "/user/create",
+                "/admin/user/create",
                 Map.of(
                         "username", "testadmin",
                         "nickname", "测试管理员",
@@ -145,7 +145,7 @@ class RestClientIntegrationTest {
     @Order(11)
     @SuppressWarnings("unchecked")
     void listUsers() {
-        Map<String, Object> response = post("/user", Map.of("username", "", "currentPage", 1, "pageSize", 100));
+        Map<String, Object> response = post("/admin/user", Map.of("username", "", "currentPage", 1, "pageSize", 100));
         assertEquals(0, response.get("code"));
         Map<String, Object> data = (Map<String, Object>) response.get("data");
         List<Map<String, Object>> list = (List<Map<String, Object>>) data.get("list");
@@ -163,7 +163,7 @@ class RestClientIntegrationTest {
     @Order(12)
     void updateUser() {
         Map<String, Object> response = put(
-                "/user/update",
+                "/admin/user/update",
                 Map.of(
                         "id", createdUserId,
                         "nickname", "测试管理员-已修改",
@@ -174,21 +174,21 @@ class RestClientIntegrationTest {
     @Test
     @Order(13)
     void toggleUserStatus() {
-        Map<String, Object> response = post("/user/status", Map.of("id", createdUserId, "status", 2));
+        Map<String, Object> response = post("/admin/user/status", Map.of("id", createdUserId, "status", 2));
         assertEquals(0, response.get("code"));
     }
 
     @Test
     @Order(14)
     void resetUserPassword() {
-        Map<String, Object> response = post("/user/reset-password", Map.of("id", createdUserId, "newPwd", "NewPass123"));
+        Map<String, Object> response = post("/admin/user/reset-password", Map.of("id", createdUserId, "newPwd", "NewPass123"));
         assertEquals(0, response.get("code"));
     }
 
     @Test
     @Order(19)
     void deleteUser() {
-        Map<String, Object> response = post("/user/delete", Map.of("id", createdUserId));
+        Map<String, Object> response = post("/admin/user/delete", Map.of("id", createdUserId));
         assertEquals(0, response.get("code"));
     }
 
@@ -198,7 +198,7 @@ class RestClientIntegrationTest {
     @Order(20)
     void createRole() {
         Map<String, Object> response = post(
-                "/role/create",
+                "/admin/role/create",
                 Map.of(
                         "name", "RestClient测试角色",
                         "code", "restclient_test_role",
@@ -210,7 +210,7 @@ class RestClientIntegrationTest {
     @Order(21)
     @SuppressWarnings("unchecked")
     void listRoles() {
-        Map<String, Object> response = post("/role", Map.of("currentPage", 1, "pageSize", 100));
+        Map<String, Object> response = post("/admin/role", Map.of("currentPage", 1, "pageSize", 100));
         assertEquals(0, response.get("code"));
         Map<String, Object> data = (Map<String, Object>) response.get("data");
         List<Map<String, Object>> list = (List<Map<String, Object>>) data.get("list");
@@ -229,7 +229,7 @@ class RestClientIntegrationTest {
     @Order(22)
     void updateRole() {
         Map<String, Object> response = put(
-                "/role/update",
+                "/admin/role/update",
                 Map.of(
                         "id",
                         createdRoleId,
@@ -246,11 +246,12 @@ class RestClientIntegrationTest {
     @Order(23)
     @SuppressWarnings("unchecked")
     void updateRoleDataScope() {
-        Map<String, Object> response = post("/role/data-scope", Map.of("id", createdRoleId, "dataScope", 2, "deptIds", List
-                .of()));
+        Map<String, Object> response = post("/admin/role/data-scope", Map.of("id", createdRoleId, "dataScope", 2, "deptIds",
+                List
+                        .of()));
         assertEquals(0, response.get("code"), "Update role data scope failed: " + response);
 
-        response = post("/role", Map.of("currentPage", 1, "pageSize", 100));
+        response = post("/admin/role", Map.of("currentPage", 1, "pageSize", 100));
         assertEquals(0, response.get("code"));
         Map<String, Object> data = (Map<String, Object>) response.get("data");
         List<Map<String, Object>> list = (List<Map<String, Object>>) data.get("list");
@@ -266,7 +267,7 @@ class RestClientIntegrationTest {
     @Test
     @Order(29)
     void deleteRole() {
-        Map<String, Object> response = post("/role/delete", Map.of("id", createdRoleId));
+        Map<String, Object> response = post("/admin/role/delete", Map.of("id", createdRoleId));
         assertEquals(0, response.get("code"));
     }
 
@@ -276,7 +277,7 @@ class RestClientIntegrationTest {
     @Order(30)
     void createDept() {
         Map<String, Object> response = post(
-                "/dept/create",
+                "/admin/dept/create",
                 Map.of(
                         "name", "测试部门",
                         "parentId", 100,
@@ -292,7 +293,7 @@ class RestClientIntegrationTest {
     @Order(31)
     @SuppressWarnings("unchecked")
     void listDepts() {
-        Map<String, Object> response = post("/dept", Map.of());
+        Map<String, Object> response = post("/admin/dept", Map.of());
         assertEquals(0, response.get("code"));
         List<Map<String, Object>> data = (List<Map<String, Object>>) response.get("data");
         assertTrue(data.stream().anyMatch(d -> "测试部门".equals(d.get("name"))));
@@ -308,7 +309,7 @@ class RestClientIntegrationTest {
     @Order(32)
     void updateDept() {
         Map<String, Object> response = put(
-                "/dept/update",
+                "/admin/dept/update",
                 Map.of(
                         "id", createdDeptId,
                         "name", "测试部门-已修改",
@@ -320,7 +321,7 @@ class RestClientIntegrationTest {
     @Test
     @Order(39)
     void deleteDept() {
-        Map<String, Object> response = post("/dept/delete", Map.of("id", createdDeptId));
+        Map<String, Object> response = post("/admin/dept/delete", Map.of("id", createdDeptId));
         assertEquals(0, response.get("code"));
     }
 }

@@ -20,7 +20,7 @@ import org.springframework.context.annotation.Configuration;
 @RequiredArgsConstructor
 public class SwaggerConfig {
 
-    private final ArchForgeConfig appForgeConfig;
+    private final ArchForgeProperties appForgeConfig;
 
     @Bean
     public OpenAPI initOpenAPI() {

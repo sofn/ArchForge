@@ -1,6 +1,6 @@
 package com.lesofn.archforge.server.web.controller;
 
-import com.lesofn.archforge.infrastructure.config.ArchForgeConfig;
+import com.lesofn.archforge.infrastructure.config.ArchForgeProperties;
 import com.lesofn.archforge.infrastructure.file.FileStorageService;
 import com.lesofn.archforge.server.web.context.WebUserContext;
 import com.lesofn.archforge.server.web.dto.FileUploadResponse;
@@ -33,7 +33,7 @@ public class WebFileController {
 
     private final SysFileService sysFileService;
     private final FileStorageService fileStorageService;
-    private final ArchForgeConfig appForgeConfig;
+    private final ArchForgeProperties appForgeConfig;
 
     @Value("${arch-forge.web.public-url:http://localhost:8081}")
     private String webPublicUrl;

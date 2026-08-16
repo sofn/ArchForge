@@ -1,7 +1,7 @@
 package com.lesofn.archforge.meta.table.internal.ddl;
 
-import com.lesofn.archforge.meta.table.internal.exception.MetaTableErrorCode;
-import com.lesofn.archforge.meta.table.internal.exception.MetaTableException;
+import com.lesofn.archforge.meta.table.api.errors.MetaTableErrorCode;
+import com.lesofn.archforge.meta.table.api.errors.MetaTableException;
 import java.util.Set;
 
 /**

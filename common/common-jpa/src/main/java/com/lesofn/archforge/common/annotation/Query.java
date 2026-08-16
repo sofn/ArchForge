@@ -16,7 +16,7 @@ import java.lang.annotation.Target;
  * {
  *     &#64;code
  *     &#64;Data
- *     public class SysUserQueryCriteria {
+ *     public class SysUserQueryRequest {
  *         &#64;Query(type = Query.Type.INNER_LIKE)
  *         private String username;
  *

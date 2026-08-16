@@ -4,7 +4,7 @@ import com.lesofn.archforge.common.enums.BasicEnum;
 import com.lesofn.archforge.common.enums.DictionaryEnum;
 import com.lesofn.archforge.common.enums.dictionary.Dictionary;
 import com.lesofn.archforge.common.enums.dictionary.DictionaryData;
-import com.lesofn.archforge.infrastructure.config.ArchForgeConfig;
+import com.lesofn.archforge.infrastructure.config.ArchForgeProperties;
 import jakarta.annotation.PostConstruct;
 import java.io.IOException;
 import java.util.*;
@@ -23,7 +23,7 @@ import org.springframework.util.StringUtils;
 @RequiredArgsConstructor
 public class EnumDictionaryRegistry {
 
-    private final ArchForgeConfig config;
+    private final ArchForgeProperties config;
 
     private final Map<String, EnumDictionary> byCode = new LinkedHashMap<>();
     private final Map<Long, EnumDictionary> byTypeId = new HashMap<>();

@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class WebDashboardController {
 
+    // TODO(ddd): replace SysUserRepository with UserRepository after SysUser migration
     private final SysUserRepository sysUserRepository;
     private final SysLoginLogRepository sysLoginLogRepository;
     private final SysOperLogRepository sysOperLogRepository;

@@ -1,17 +1,17 @@
 package com.lesofn.archforge.meta.table.internal.service;
 
-import static com.lesofn.archforge.meta.table.internal.exception.MetaTableErrorCode.META_TABLE_DATA_NOT_EXISTS;
+import static com.lesofn.archforge.meta.table.api.errors.MetaTableErrorCode.META_TABLE_DATA_NOT_EXISTS;
 
 import com.lesofn.archforge.meta.table.api.domain.MetaColumn;
-import com.lesofn.archforge.meta.table.internal.exception.MetaTableErrorCode;
+import com.lesofn.archforge.meta.table.api.errors.MetaTableErrorCode;
 import com.lesofn.archforge.meta.table.api.domain.MetaTable;
-import com.lesofn.archforge.meta.table.api.dto.ImportResult;
-import com.lesofn.archforge.meta.table.api.dto.MetaPageResult;
+import com.lesofn.archforge.meta.table.api.dto.ImportResponse;
+import com.lesofn.archforge.meta.table.api.dto.MetaPageResponse;
 import com.lesofn.archforge.meta.table.api.enums.MetaDataFormat;
 import com.lesofn.archforge.meta.table.api.service.MetaTableAdminService;
 import com.lesofn.archforge.meta.table.api.service.MetaTableCrudService;
 import com.lesofn.archforge.meta.table.internal.ddl.SqlIdentifier;
-import com.lesofn.archforge.meta.table.internal.exception.MetaTableException;
+import com.lesofn.archforge.meta.table.api.errors.MetaTableException;
 import com.lesofn.archforge.meta.table.internal.validator.MetaTableValidator;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -107,7 +107,7 @@ public class MetaTableCrudServiceImpl implements MetaTableCrudService {
     }
 
     @Override
-    public MetaPageResult<Map<String, Object>> list(
+    public MetaPageResponse<Map<String, Object>> list(
             Long tableId, Map<String, Object> filters, int currentPage, int pageSize) {
         MetaTable table = metaTableAdminService.findById(tableId);
         List<MetaColumn> columns = metaTableAdminService.findColumns(tableId);
@@ -135,7 +135,7 @@ public class MetaTableCrudServiceImpl implements MetaTableCrudService {
         List<Map<String, Object>> rows = jdbcTemplate.queryForList(querySql, params);
         List<Map<String, Object>> converted = rows.stream().map(this::convertRow).toList();
 
-        return MetaPageResult.of(converted, finalTotal, pageSize, currentPage);
+        return MetaPageResponse.of(converted, finalTotal, pageSize, currentPage);
     }
 
     @Override
@@ -144,7 +144,7 @@ public class MetaTableCrudServiceImpl implements MetaTableCrudService {
     }
 
     @Override
-    public ImportResult importData(Long tableId, MetaDataFormat format, InputStream in, Long currentUid) {
+    public ImportResponse importData(Long tableId, MetaDataFormat format, InputStream in, Long currentUid) {
         return importer.importData(tableId, format, in, currentUid);
     }
 

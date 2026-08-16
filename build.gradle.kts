@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "com.lesofn.archforge"
-version = "0.1.SNAPSHOT"
+version = "0.1.0-SNAPSHOT"
 
 allprojects {
     repositories {

@@ -5,11 +5,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.lesofn.archforge.meta.table.api.domain.MetaColumn;
 import com.lesofn.archforge.meta.table.api.domain.MetaTable;
-import com.lesofn.archforge.meta.table.api.dto.ImportResult;
+import com.lesofn.archforge.meta.table.api.dto.ImportResponse;
 import com.lesofn.archforge.meta.table.api.enums.MetaDataFormat;
 import com.lesofn.archforge.meta.table.api.service.MetaTableAdminService;
-import com.lesofn.archforge.meta.table.internal.exception.MetaTableErrorCode;
-import com.lesofn.archforge.meta.table.internal.exception.MetaTableException;
+import com.lesofn.archforge.meta.table.api.errors.MetaTableErrorCode;
+import com.lesofn.archforge.meta.table.api.errors.MetaTableException;
 import com.lesofn.archforge.meta.table.internal.validator.MetaTableValidator;
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,7 +38,7 @@ public class MetaTableDataImporter {
     private final MetaTableValidator validator;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public ImportResult importData(Long tableId, MetaDataFormat format, InputStream in, Long currentUid) {
+    public ImportResponse importData(Long tableId, MetaDataFormat format, InputStream in, Long currentUid) {
         if (format == MetaDataFormat.CSV) {
             return importCsv(tableId, in, currentUid);
         }
@@ -48,7 +48,7 @@ public class MetaTableDataImporter {
         throw new MetaTableException(MetaTableErrorCode.META_COLUMN_VALUE_INVALID, "不支持的导入格式: " + format);
     }
 
-    private ImportResult importCsv(Long tableId, InputStream in, Long currentUid) {
+    private ImportResponse importCsv(Long tableId, InputStream in, Long currentUid) {
         MetaTable table = metaTableAdminService.findById(tableId);
         List<MetaColumn> columns = metaTableAdminService.findColumns(tableId);
 
@@ -78,10 +78,10 @@ public class MetaTableDataImporter {
             throw new MetaTableException(MetaTableErrorCode.META_COLUMN_VALUE_INVALID, "读取 CSV 失败: " + e.getMessage());
         }
 
-        return ImportResult.of(ctx.total, ctx.success, ctx.errors);
+        return ImportResponse.of(ctx.total, ctx.success, ctx.errors);
     }
 
-    private ImportResult importJson(Long tableId, InputStream in, Long currentUid) {
+    private ImportResponse importJson(Long tableId, InputStream in, Long currentUid) {
         MetaTable table = metaTableAdminService.findById(tableId);
         List<MetaColumn> columns = metaTableAdminService.findColumns(tableId);
         ImportContext ctx = new ImportContext(table, columns, currentUid);
@@ -109,7 +109,7 @@ public class MetaTableDataImporter {
             throw new MetaTableException(MetaTableErrorCode.META_COLUMN_VALUE_INVALID, "读取 JSON 失败: " + e.getMessage());
         }
 
-        return ImportResult.of(ctx.total, ctx.success, ctx.errors);
+        return ImportResponse.of(ctx.total, ctx.success, ctx.errors);
     }
 
     private void processRow(ImportContext ctx, Map<String, Object> row, int rowNum) {

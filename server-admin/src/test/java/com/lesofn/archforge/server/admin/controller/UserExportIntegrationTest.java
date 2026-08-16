@@ -42,7 +42,7 @@ class UserExportIntegrationTest {
         restClient = RestClient.builder().baseUrl("http://localhost:" + port).build();
         String resp = restClient
                 .post()
-                .uri("/login")
+                .uri("/auth/login")
                 .header("Content-Type", "application/json")
                 .body(Map.of("username", "admin", "password", "admin123"))
                 .retrieve()
@@ -61,7 +61,7 @@ class UserExportIntegrationTest {
     void exportReturnsXlsxWithUserRows() throws Exception {
         byte[] bytes = restClient
                 .get()
-                .uri("/user/export")
+                .uri("/admin/user/export")
                 .header("Authorization", "Bearer " + accessToken)
                 .retrieve()
                 .body(byte[].class);

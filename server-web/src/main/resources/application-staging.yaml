@@ -1,0 +1,74 @@
+# Staging environment
+server:
+  port: 8081
+
+spring:
+  devtools:
+    restart:
+      enabled: false
+    livereload:
+      enabled: false
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  datasource:
+    dynamic:
+      primary: user_master
+      strict: false
+      datasource:
+        user_master:
+          type: com.alibaba.druid.pool.DruidDataSource
+          driver-class-name: org.postgresql.Driver
+          url: ${DB_USER_MASTER_URL:jdbc:postgresql://postgres:5432/archforge_user}
+          username: ${DB_USERNAME:archforge}
+          password: ${DB_PASSWORD:archforge}
+        user_slave:
+          type: com.alibaba.druid.pool.DruidDataSource
+          driver-class-name: org.postgresql.Driver
+          url: ${DB_USER_SLAVE_URL:jdbc:postgresql://postgres:5432/archforge_user}
+          username: ${DB_USERNAME:archforge}
+          password: ${DB_PASSWORD:archforge}
+  data:
+    redis:
+      host: ${REDIS_HOST:redis}
+      port: ${REDIS_PORT:6379}
+      database: 0
+      timeout: 10s
+      lettuce:
+        pool:
+          min-idle: 0
+          max-idle: 8
+          max-active: 8
+          max-wait: -1ms
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+arch-forge:
+  embedded:
+    redis: false
+    postgresql: false
+    db-init: false
+    s3: false
+  file-storage:
+    type: ${FILE_STORAGE_TYPE:s3}
+    local-dir: ${FILE_STORAGE_LOCAL_DIR:../uploads}
+    s3:
+      endpoint: ${S3_ENDPOINT:http://minio:9000}
+      access-key: ${S3_ACCESS_KEY:minioadmin}
+      secret-key: ${S3_SECRET_KEY:minioadmin}
+      bucket: ${S3_BUCKET:archforge}
+  register:
+    enabled: true
+  verification-code:
+    expire-seconds: 300
+    resend-seconds: 60
+    daily-max-per-email: 20
+  mail:
+    enabled: false
+    from: no-reply@archforge.com
+    verification-subject: 您的验证码

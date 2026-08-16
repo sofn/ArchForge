@@ -5,7 +5,7 @@ import static com.lesofn.archforge.infrastructure.auth.errors.AdminAuthErrorCode
 import com.lesofn.archforge.common.constant.Constants;
 import com.lesofn.archforge.infrastructure.auth.errors.AdminAuthException;
 import com.lesofn.archforge.infrastructure.auth.model.SystemLoginUser;
-import com.lesofn.archforge.infrastructure.config.ArchForgeConfig;
+import com.lesofn.archforge.infrastructure.config.ArchForgeProperties;
 import com.lesofn.archforge.server.admin.service.cache.RedisCacheService;
 import com.lesofn.archforge.server.admin.util.JwtTokenUtil;
 import io.jsonwebtoken.*;
@@ -33,7 +33,7 @@ public class TokenService {
 
     private static final String BLACKLIST_KEY_PREFIX = "token:blacklist:";
 
-    private final ArchForgeConfig appForgeConfig;
+    private final ArchForgeProperties appForgeConfig;
     private final RedisCacheService redisCacheService;
     private final JwtTokenUtil jwtTokenUtil;
     private final StringRedisTemplate redisTemplate;

@@ -4,7 +4,7 @@ import com.lesofn.archforge.common.error.SystemErrorCode;
 import com.lesofn.archforge.common.utils.i18n.MessageUtils;
 import com.lesofn.archforge.common.utils.jackson.JsonUtil;
 import com.lesofn.archforge.infrastructure.annotation.RepeatSubmit;
-import com.lesofn.archforge.infrastructure.config.ArchForgeConfig;
+import com.lesofn.archforge.infrastructure.config.ArchForgeProperties;
 import com.lesofn.archforge.infrastructure.db.redis.RedisUtil;
 import com.lesofn.archforge.infrastructure.frame.filter.RepeatableRequestWrapper;
 import com.lesofn.archforge.infrastructure.frame.response.model.ResponseResult;
@@ -33,7 +33,7 @@ public class RepeatSubmitInterceptor implements HandlerInterceptor {
     private static final String REPEAT_SUBMIT_KEY = "repeat:submit:";
 
     private final RedisUtil redisUtil;
-    private final ArchForgeConfig archForgeConfig;
+    private final ArchForgeProperties archForgeConfig;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)

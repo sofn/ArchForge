@@ -6,7 +6,7 @@ import com.lesofn.archforge.common.utils.ip.IpUtil;
 import com.lesofn.archforge.infrastructure.annotation.RateLimit;
 import com.lesofn.archforge.infrastructure.auth.AuthenticationUtils;
 import com.lesofn.archforge.infrastructure.auth.model.SystemLoginUser;
-import com.lesofn.archforge.infrastructure.config.ArchForgeConfig;
+import com.lesofn.archforge.infrastructure.config.ArchForgeProperties;
 import com.lesofn.archforge.infrastructure.frame.context.RequestContext;
 import com.lesofn.archforge.infrastructure.frame.context.ScopedValueContext;
 import jakarta.servlet.http.HttpServletRequest;
@@ -46,7 +46,7 @@ public class RateLimitAspect {
     private static final DefaultRedisScript<Long> LIMIT_SCRIPT = new DefaultRedisScript<>(LUA_SCRIPT, Long.class);
 
     private final StringRedisTemplate redisTemplate;
-    private final ArchForgeConfig archForgeConfig;
+    private final ArchForgeProperties archForgeConfig;
 
     @Around("@annotation(rateLimit)")
     public Object around(ProceedingJoinPoint point, RateLimit rateLimit) throws Throwable {

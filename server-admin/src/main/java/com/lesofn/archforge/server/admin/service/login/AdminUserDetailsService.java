@@ -2,7 +2,7 @@ package com.lesofn.archforge.server.admin.service.login;
 
 import com.lesofn.archforge.common.enums.BasicEnumUtil;
 import com.lesofn.archforge.infrastructure.auth.model.SystemLoginUser;
-import com.lesofn.archforge.infrastructure.config.ArchForgeConfig;
+import com.lesofn.archforge.infrastructure.config.ArchForgeProperties;
 import com.lesofn.archforge.infrastructure.user.web.DataScopeEnum;
 import com.lesofn.archforge.infrastructure.user.web.RoleInfo;
 import com.lesofn.archforge.user.api.domain.SysMenu;
@@ -44,7 +44,7 @@ public class AdminUserDetailsService implements UserDetailsService {
 
     private final TokenService tokenService;
 
-    private final ArchForgeConfig appForgeConfig;
+    private final ArchForgeProperties appForgeConfig;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

@@ -1,6 +1,6 @@
 package com.lesofn.archforge.infrastructure.file;
 
-import com.lesofn.archforge.infrastructure.config.ArchForgeConfig;
+import com.lesofn.archforge.infrastructure.config.ArchForgeProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,11 +17,11 @@ import org.springframework.context.annotation.Configuration;
 @RequiredArgsConstructor
 public class FileStorageConfig {
 
-    private final ArchForgeConfig appForgeConfig;
+    private final ArchForgeProperties appForgeConfig;
 
     @Bean
     public FileStorageService fileStorageService() {
-        ArchForgeConfig.FileStorage config = appForgeConfig.getFileStorage();
+        ArchForgeProperties.FileStorage config = appForgeConfig.getFileStorage();
         return new AdaptiveFileStorageService(FileStorageServiceFactory.create(config));
     }
 }

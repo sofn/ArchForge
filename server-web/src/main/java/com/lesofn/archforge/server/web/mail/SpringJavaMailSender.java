@@ -1,6 +1,6 @@
 package com.lesofn.archforge.server.web.mail;
 
-import com.lesofn.archforge.infrastructure.config.ArchForgeConfig;
+import com.lesofn.archforge.infrastructure.config.ArchForgeProperties;
 import com.lesofn.archforge.server.web.service.VerificationCodePurpose;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -26,7 +26,7 @@ import org.springframework.stereotype.Component;
 public class SpringJavaMailSender implements MailSender {
 
     private final JavaMailSender javaMailSender;
-    private final ArchForgeConfig archForgeConfig;
+    private final ArchForgeProperties archForgeConfig;
 
     @Override
     public void sendVerificationCode(String email, String code, VerificationCodePurpose purpose) {
