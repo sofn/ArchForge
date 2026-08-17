@@ -1,5 +1,6 @@
 package com.lesofn.archforge.server.web.interceptor;
 
+import com.lesofn.archforge.infrastructure.auth.stp.LoginSessionKeys;
 import com.lesofn.archforge.infrastructure.auth.stp.StpWebUtil;
 import com.lesofn.archforge.server.web.context.WebUserContext;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,8 +28,8 @@ public class WebAuthInterceptor implements HandlerInterceptor {
             return false;
         }
         Long userId = StpWebUtil.getLoginIdAsLong();
-        String username = (String) StpWebUtil.getSession().get("username");
-        WebUserContext.set(userId, username);
+        Object username = StpWebUtil.getSession().get(LoginSessionKeys.USERNAME);
+        WebUserContext.set(userId, username instanceof String value ? value : null);
         return true;
     }
 

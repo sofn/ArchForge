@@ -1,5 +1,6 @@
 package com.lesofn.archforge.infrastructure.auth.stp;
 
+import cn.dev33.satoken.session.SaSession;
 import cn.dev33.satoken.stp.StpInterface;
 import com.lesofn.archforge.infrastructure.auth.model.SystemLoginUser;
 import com.lesofn.archforge.infrastructure.user.web.RoleInfo;
@@ -43,7 +44,11 @@ public class ArchForgeStpInterface implements StpInterface {
     }
 
     private static SystemLoginUser findAdminUser(Object loginId) {
-        Object value = StpAdminUtil.getSessionByLoginId(loginId, false).get(LoginSessionKeys.LOGIN_USER);
+        SaSession session = StpAdminUtil.getSessionByLoginId(loginId, false);
+        if (session == null) {
+            return null;
+        }
+        Object value = session.get(LoginSessionKeys.LOGIN_USER);
         if (value instanceof SystemLoginUser loginUser) {
             return loginUser;
         }

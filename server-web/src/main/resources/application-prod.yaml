@@ -67,6 +67,8 @@ arch-forge:
       access-key: ${S3_ACCESS_KEY}
       secret-key: ${S3_SECRET_KEY}
       bucket: ${S3_BUCKET}
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS}
   jwt:
     secret: ${JWT_SECRET}
   token:

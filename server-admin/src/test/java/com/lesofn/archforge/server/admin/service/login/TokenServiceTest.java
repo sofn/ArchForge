@@ -36,6 +36,9 @@ class TokenServiceTest {
     @Mock
     private RedisCacheTemplate<String> refreshTokenCache;
 
+    @Mock
+    private AdminLoginUserFactory adminLoginUserFactory;
+
     @Spy
     private ArchForgeProperties appForgeConfig = new ArchForgeProperties();
 
@@ -78,10 +81,10 @@ class TokenServiceTest {
     }
 
     @Test
-    void getLoginUserByRefreshTokenReadsSession() {
+    void getLoginUserByRefreshTokenReloadsUser() {
         SystemLoginUser user = new SystemLoginUser(1L, false, "admin", "pass", RoleInfo.EMPTY_ROLE, 1L);
-        tokenService.createTokenAndPutUserInCache(user);
         when(refreshTokenCache.get("refresh")).thenReturn("1");
+        when(adminLoginUserFactory.loadByUserId(1L)).thenReturn(user);
 
         SystemLoginUser result = tokenService.getLoginUserByRefreshToken("refresh");
 

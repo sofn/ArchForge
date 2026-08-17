@@ -1,17 +1,17 @@
 package com.lesofn.archforge.server.admin.controller.monitor;
 
+import cn.dev33.satoken.session.SaSession;
 import com.lesofn.archforge.infrastructure.auth.model.SystemLoginUser;
+import com.lesofn.archforge.infrastructure.auth.stp.LoginSessionKeys;
 import com.lesofn.archforge.infrastructure.db.redis.RedisUtil;
 import com.lesofn.archforge.infrastructure.user.base.LoginInfo;
 import com.lesofn.archforge.server.admin.dto.AdminPageResponse;
 import com.lesofn.archforge.server.admin.dto.request.OnlineLogListRequest;
 import com.lesofn.archforge.server.admin.dto.response.CacheInfoResponse;
 import com.lesofn.archforge.server.admin.dto.response.OnlineUserResponse;
-import com.lesofn.archforge.server.admin.service.cache.CacheKeyEnum;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -44,14 +44,17 @@ public class MonitorController {
         int pageSize = request.getPageSize() != null ? request.getPageSize() : 10;
         String username = Optional.ofNullable(request.getUsername()).orElse("");
 
-        Collection<String> keys = redisUtil.keys(CacheKeyEnum.LOGIN_USER_KEY.key() + "*");
+        List<String> sessionIds = StpAdminUtil.STP_LOGIC.searchSessionId("", 0, -1, false);
         List<SystemLoginUser> all = new ArrayList<>();
-        if (keys != null) {
-            for (String key : keys) {
-                SystemLoginUser user = redisUtil.getCacheObject(key);
-                if (user != null && (username.isBlank() || containsCaseInsensitive(user.getUsername(), username))) {
-                    all.add(user);
-                }
+        for (String sessionId : sessionIds) {
+            SaSession session = StpAdminUtil.STP_LOGIC.getSessionBySessionId(sessionId);
+            if (session == null) {
+                continue;
+            }
+            Object value = session.get(LoginSessionKeys.LOGIN_USER);
+            if (value instanceof SystemLoginUser user && (username.isBlank() || containsCaseInsensitive(user.getUsername(),
+                    username))) {
+                all.add(user);
             }
         }
 

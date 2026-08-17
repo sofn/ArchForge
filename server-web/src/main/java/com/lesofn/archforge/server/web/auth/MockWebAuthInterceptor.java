@@ -43,5 +43,10 @@ public class MockWebAuthInterceptor implements HandlerInterceptor, Ordered {
     }
 
     @Override
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
+        WebUserContext.clear();
+    }
+
+    @Override
     public int getOrder() { return Ordered.HIGHEST_PRECEDENCE; }
 }

@@ -1,5 +1,6 @@
 package com.lesofn.archforge.server.web.controller;
 
+import com.lesofn.archforge.infrastructure.auth.stp.LoginSessionKeys;
 import com.lesofn.archforge.infrastructure.auth.stp.StpWebUtil;
 import com.lesofn.archforge.infrastructure.config.ArchForgeProperties;
 import com.lesofn.archforge.server.web.dto.WebLoginRequest;
@@ -60,10 +61,7 @@ public class WebAuthController {
             throw new AdminUserException("用户名或密码错误");
         }
 
-        StpWebUtil.login(user.getUserId());
-        StpWebUtil.getSession().set("userId", user.getUserId());
-        StpWebUtil.getSession().set("username", user.getUsername());
-        StpWebUtil.getSession().set("nickname", user.getNickname());
+        writeLoginSession(user);
 
         String tokenValue = StpWebUtil.getTokenValue();
         String tokenName = StpWebUtil.getTokenName();
@@ -82,10 +80,7 @@ public class WebAuthController {
             throw new AdminUserException("用户已被停用");
         }
 
-        StpWebUtil.login(userId);
-        StpWebUtil.getSession().set("userId", userId);
-        StpWebUtil.getSession().set("username", user.getUsername());
-        StpWebUtil.getSession().set("nickname", user.getNickname());
+        writeLoginSession(user);
 
         String tokenValue = StpWebUtil.getTokenValue();
         String tokenName = StpWebUtil.getTokenName();
@@ -131,10 +126,7 @@ public class WebAuthController {
         SysUser user = createUserFromRequest(request);
         SysUser savedUser = sysUserService.create(user);
 
-        StpWebUtil.login(savedUser.getUserId());
-        StpWebUtil.getSession().set("userId", savedUser.getUserId());
-        StpWebUtil.getSession().set("username", savedUser.getUsername());
-        StpWebUtil.getSession().set("nickname", savedUser.getNickname());
+        writeLoginSession(savedUser);
 
         String tokenValue = StpWebUtil.getTokenValue();
         String tokenName = StpWebUtil.getTokenName();
@@ -214,6 +206,12 @@ public class WebAuthController {
             username = adjustedBase + suffix;
         }
         throw new WebAuthException("无法生成唯一用户名，请稍后重试");
+    }
+
+    private void writeLoginSession(SysUser user) {
+        StpWebUtil.login(user.getUserId());
+        StpWebUtil.getSession().set(LoginSessionKeys.USERNAME, user.getUsername());
+        StpWebUtil.getSession().set("nickname", user.getNickname());
     }
 
     private WebLoginResponse buildLoginResponse(

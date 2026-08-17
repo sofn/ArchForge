@@ -1,6 +1,5 @@
 package com.lesofn.archforge.server.admin.service.login;
 
-import com.lesofn.archforge.infrastructure.auth.LoginContext;
 import com.lesofn.archforge.infrastructure.auth.model.SystemLoginUser;
 import com.lesofn.archforge.infrastructure.auth.stp.LoginSessionKeys;
 import com.lesofn.archforge.infrastructure.auth.stp.StpAdminUtil;
@@ -18,6 +17,7 @@ public class TokenService {
 
     private final ArchForgeProperties appForgeConfig;
     private final RedisCacheService redisCacheService;
+    private final AdminLoginUserFactory adminLoginUserFactory;
 
     public String createTokenAndPutUserInCache(SystemLoginUser loginUser) {
         StpAdminUtil.login(loginUser.getUserId());
@@ -41,18 +41,25 @@ public class TokenService {
         if (userId == null) {
             return null;
         }
-        Object value = StpAdminUtil.getSessionByLoginId(userId, false).get(LoginSessionKeys.LOGIN_USER);
-        if (value instanceof SystemLoginUser loginUser) {
-            return LoginContext.restoreAuthorities(loginUser);
+        try {
+            return adminLoginUserFactory.loadByUserId(Long.parseLong(userId));
+        } catch (Exception e) {
+            log.warn("Failed to reload login user for refresh token, userId={}", userId, e);
+            return null;
         }
-        return null;
     }
 
     public void removeRefreshToken(String refreshToken) {
         redisCacheService.getRefreshTokenCache().delete(refreshToken);
     }
 
-    public long getExpireSeconds() { return appForgeConfig.getJwt().getExpireSeconds(); }
+    public long getExpireSeconds() {
+        long timeout = StpAdminUtil.getTokenTimeout();
+        if (timeout > 0) {
+            return timeout;
+        }
+        return 604800L;
+    }
 
     public void removeToken(String token) {
         if (token == null || token.isBlank()) {

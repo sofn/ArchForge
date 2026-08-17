@@ -36,6 +36,14 @@ public class AdminLoginUserFactory {
     private final SysRoleService roleService;
     private final ArchForgeProperties appForgeConfig;
 
+    public SystemLoginUser loadByUserId(Long userId) {
+        SysUser user = userService.findById(userId).orElse(null);
+        if (user == null) {
+            throw new AdminUserException(AdminUserErrorCode.USER_NON_EXIST, String.valueOf(userId));
+        }
+        return load(user.getUsername());
+    }
+
     public SystemLoginUser load(String username) {
         SysUser user = userService.getUserByUserName(username);
         if (user == null) {

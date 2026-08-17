@@ -213,7 +213,10 @@ public class LoginController {
 
     /** 计算过期时间字符串 */
     private String calculateExpires() {
-        long expireSeconds = appForgeConfig.getJwt().getExpireSeconds();
+        long expireSeconds = StpAdminUtil.getTokenTimeout();
+        if (expireSeconds <= 0) {
+            expireSeconds = tokenService.getExpireSeconds();
+        }
         Instant expireInstant = Instant.now().plusSeconds(expireSeconds);
         return EXPIRES_FORMATTER.format(
                 expireInstant.atZone(ZoneId.systemDefault()).toLocalDateTime());

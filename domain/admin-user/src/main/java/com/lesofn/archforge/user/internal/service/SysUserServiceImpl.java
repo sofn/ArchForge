@@ -52,7 +52,11 @@ public class SysUserServiceImpl implements SysUserService {
         if (email == null || email.isBlank()) {
             return Optional.empty();
         }
-        return userRepository.findByEmail(new Email(email)).map(sysUserConvertor::toSysUser);
+        try {
+            return userRepository.findByEmail(new Email(email)).map(sysUserConvertor::toSysUser);
+        } catch (IllegalArgumentException ex) {
+            return Optional.empty();
+        }
     }
 
     public Optional<SysUser> findByPhoneNumber(String phoneNumber) {
