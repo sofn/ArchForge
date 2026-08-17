@@ -41,7 +41,7 @@ class ArchForgeStpInterfaceTest {
         List<String> roles = stpInterface.getRoleList(1L, StpAdminUtil.TYPE);
         List<String> permissions = stpInterface.getPermissionList(1L, StpAdminUtil.TYPE);
 
-        assertEquals(List.of("ADMIN"), roles);
+        assertEquals(List.of("ADMIN", RoleInfo.ADMIN_ROLE_KEY), roles);
         assertTrue(permissions.contains("user:list"));
         assertTrue(permissions.contains("user:add"));
     }

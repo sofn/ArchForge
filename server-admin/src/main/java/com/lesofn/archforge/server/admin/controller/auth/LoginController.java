@@ -38,7 +38,6 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @Tag(name = "登录API", description = "登录相关接口")
 @RestController
-@CrossOrigin
 @RequiredArgsConstructor
 @RequestMapping("/auth")
 public class LoginController {
@@ -94,6 +93,17 @@ public class LoginController {
 
         // 构建前端期望的响应格式
         return buildLoginResponse(loginResult.getToken(), refreshToken, loginUser, currentUserResponse);
+    }
+
+    @Operation(summary = "退出登录")
+    @SaCheckLogin(type = StpAdminUtil.TYPE)
+    @PostMapping("/logout")
+    public Boolean logout(@RequestBody(required = false) RefreshTokenRequest command) {
+        if (command != null && command.getRefreshToken() != null && !command.getRefreshToken().isBlank()) {
+            tokenService.removeRefreshToken(command.getRefreshToken());
+        }
+        StpAdminUtil.logout();
+        return true;
     }
 
     /**

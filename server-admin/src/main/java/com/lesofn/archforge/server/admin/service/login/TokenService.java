@@ -20,6 +20,7 @@ public class TokenService {
     private final AdminLoginUserFactory adminLoginUserFactory;
 
     public String createTokenAndPutUserInCache(SystemLoginUser loginUser) {
+        loginUser.setPassword(null);
         StpAdminUtil.login(loginUser.getUserId());
         StpAdminUtil.getSession().set(LoginSessionKeys.LOGIN_USER, loginUser);
         StpAdminUtil.getSession().set(LoginSessionKeys.USERNAME, loginUser.getUsername());

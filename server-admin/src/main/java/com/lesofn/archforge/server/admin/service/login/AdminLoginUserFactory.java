@@ -54,6 +54,10 @@ public class AdminLoginUserFactory {
             log.info("登录用户：{} 已被停用或已删除.", username);
             throw new AdminUserException(AdminUserErrorCode.USER_IS_DISABLE, username);
         }
+        if (!Boolean.TRUE.equals(user.getIsAdmin()) && (user.getRoleId() == null || user.getRoleId() <= 0L)) {
+            log.info("登录用户：{} 无后台角色，拒绝管理端登录.", username);
+            throw new AdminUserException(AdminUserErrorCode.USER_NON_EXIST, username);
+        }
 
         RoleInfo roleInfo = getRoleInfo(user.getRoleId(), Boolean.TRUE.equals(user.getIsAdmin()));
         SystemLoginUser loginUser = new SystemLoginUser(user.getUserId(), user.getIsAdmin(), user.getUsername(), user

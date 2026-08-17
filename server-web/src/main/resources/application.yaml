@@ -48,6 +48,7 @@ sa-token:
   active-timeout: -1
   is-concurrent: true
   is-share: false
+  is-read-cookie: false
 
 arch-forge:
   mock-auth:

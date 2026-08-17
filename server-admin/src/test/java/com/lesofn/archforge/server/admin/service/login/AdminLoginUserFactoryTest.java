@@ -68,6 +68,19 @@ class AdminLoginUserFactoryTest {
     }
 
     @Test
+    void loadUserWithoutAdminRoleIsRejected() {
+        SysUser user = new SysUser();
+        user.setUsername("alice");
+        user.setStatus(UserStatusEnum.NORMAL.getValue());
+        user.setIsAdmin(false);
+        user.setRoleId(0L);
+        when(userService.getUserByUserName("alice")).thenReturn(user);
+
+        AdminUserException exception = assertThrows(AdminUserException.class, () -> factory.load("alice"));
+        assertEquals(AdminUserErrorCode.USER_NON_EXIST.getCode(), exception.getErrorInfo().getCode());
+    }
+
+    @Test
     void loadNormalUserWithRole() {
         SysUser user = new SysUser();
         user.setUserId(1L);

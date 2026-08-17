@@ -34,7 +34,7 @@ public class ArchForgeStpInterface implements StpInterface {
             return Collections.emptyList();
         }
         if (loginUser.isAdmin()) {
-            return List.of("ADMIN");
+            return List.of("ADMIN", RoleInfo.ADMIN_ROLE_KEY);
         }
         RoleInfo roleInfo = loginUser.getRoleInfo();
         if (roleInfo == null || roleInfo.getRoleKey() == null || roleInfo.getRoleKey().isBlank()) {

@@ -182,6 +182,7 @@ sa-token:
   active-timeout: -1
   is-concurrent: true
   is-share: false
+  is-read-cookie: false
   token-style: uuid
   is-log: false
   is-print: false

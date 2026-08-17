@@ -67,6 +67,7 @@ class TokenServiceTest {
         SystemLoginUser stored = (SystemLoginUser) StpAdminUtil.getSession().get(LoginSessionKeys.LOGIN_USER);
         assertEquals("admin", stored.getUsername());
         assertEquals(1L, stored.getUserId());
+        assertNull(stored.getPassword());
     }
 
     @Test

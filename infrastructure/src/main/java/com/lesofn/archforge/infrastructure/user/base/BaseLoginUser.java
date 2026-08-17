@@ -29,6 +29,7 @@ public class BaseLoginUser implements java.io.Serializable {
 
     protected String username;
 
+    @JsonIgnore
     protected String password;
 
     protected List<String> authorities = new ArrayList<>();
