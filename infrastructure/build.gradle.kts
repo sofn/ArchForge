@@ -45,6 +45,10 @@ dependencies {
     // AWS S3 SDK (文件存储)
     api("software.amazon.awssdk:s3")
 
+    // sa-token shared by admin and web
+    api("cn.dev33:sa-token-spring-boot3-starter")
+    api("cn.dev33:sa-token-redis-jackson")
+
     // JUnit for tests
     testImplementation("org.junit.jupiter:junit-jupiter-api")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")

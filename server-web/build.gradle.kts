@@ -87,10 +87,6 @@ dependencies {
         exclude(group = "org.apache.logging.log4j", module = "log4j-to-slf4j")
     }
 
-    // Sa-Token 认证与 Redis 会话存储
-    api("cn.dev33:sa-token-spring-boot3-starter")
-    api("cn.dev33:sa-token-redis-jackson")
-
     // 密码加密（复用 domain:admin-user 的 PasswordEncoderPort）
     api("org.springframework.security:spring-security-crypto")
 
