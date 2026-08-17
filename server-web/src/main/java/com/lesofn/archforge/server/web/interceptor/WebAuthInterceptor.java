@@ -1,6 +1,6 @@
 package com.lesofn.archforge.server.web.interceptor;
 
-import cn.dev33.satoken.stp.StpUtil;
+import com.lesofn.archforge.infrastructure.auth.stp.StpWebUtil;
 import com.lesofn.archforge.server.web.context.WebUserContext;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -19,15 +19,15 @@ public class WebAuthInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        if (isPublicRequest(request)) {
+        if (isPublicRequest(request) || WebUserContext.getUserId() != null) {
             return true;
         }
-        if (!StpUtil.isLogin()) {
+        if (!StpWebUtil.isLogin()) {
             writeUnauthorized(response);
             return false;
         }
-        Long userId = StpUtil.getLoginIdAsLong();
-        String username = (String) StpUtil.getSession().get("username");
+        Long userId = StpWebUtil.getLoginIdAsLong();
+        String username = (String) StpWebUtil.getSession().get("username");
         WebUserContext.set(userId, username);
         return true;
     }

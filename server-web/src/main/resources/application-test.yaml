@@ -29,6 +29,8 @@ management:
         include: health,info
 
 arch-forge:
+  mock-auth:
+    enabled: true
   embedded:
     redis: true
     postgresql: true

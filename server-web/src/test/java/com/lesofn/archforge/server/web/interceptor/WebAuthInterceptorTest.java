@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mockStatic;
 
-import cn.dev33.satoken.stp.StpUtil;
+import com.lesofn.archforge.infrastructure.auth.stp.StpWebUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
@@ -41,8 +41,8 @@ class WebAuthInterceptorTest {
     @Test
     void rejectsProtectedPathWhenNotLoggedIn() throws Exception {
         MockHttpServletResponse response = new MockHttpServletResponse();
-        try (MockedStatic<StpUtil> mocked = mockStatic(StpUtil.class)) {
-            mocked.when(StpUtil::isLogin).thenReturn(false);
+        try (MockedStatic<StpWebUtil> mocked = mockStatic(StpWebUtil.class)) {
+            mocked.when(StpWebUtil::isLogin).thenReturn(false);
 
             boolean allowed = interceptor.preHandle(
                     new MockHttpServletRequest("GET", "/web/user/profile"), response, new Object());
@@ -56,8 +56,8 @@ class WebAuthInterceptorTest {
     @Test
     void rejectsExpiredOrInvalidLoginState() throws Exception {
         MockHttpServletResponse response = new MockHttpServletResponse();
-        try (MockedStatic<StpUtil> mocked = mockStatic(StpUtil.class)) {
-            mocked.when(StpUtil::isLogin).thenReturn(false);
+        try (MockedStatic<StpWebUtil> mocked = mockStatic(StpWebUtil.class)) {
+            mocked.when(StpWebUtil::isLogin).thenReturn(false);
 
             boolean allowed = interceptor.preHandle(
                     new MockHttpServletRequest("GET", "/web/articles/me"), response, new Object());

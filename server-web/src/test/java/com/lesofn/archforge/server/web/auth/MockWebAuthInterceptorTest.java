@@ -1,0 +1,69 @@
+package com.lesofn.archforge.server.web.auth;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.Mockito.when;
+
+import com.lesofn.archforge.server.web.context.WebUserContext;
+import com.lesofn.archforge.user.api.domain.SysUser;
+import com.lesofn.archforge.user.api.service.SysUserService;
+import java.util.Optional;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpServletResponse;
+
+@ExtendWith(MockitoExtension.class)
+class MockWebAuthInterceptorTest {
+
+    @Mock
+    private SysUserService sysUserService;
+
+    @AfterEach
+    void tearDown() {
+        WebUserContext.clear();
+    }
+
+    @Test
+    void setsContextFromExistingUser() {
+        SysUser user = new SysUser();
+        user.setUserId(7L);
+        user.setUsername("alice");
+        when(sysUserService.findById(7L)).thenReturn(Optional.of(user));
+        MockWebAuthInterceptor interceptor = new MockWebAuthInterceptor(sysUserService);
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.addHeader(MockWebAuthInterceptor.MOCK_USERID_HEADER, "7");
+
+        interceptor.preHandle(request, new MockHttpServletResponse(), new Object());
+
+        assertEquals(7L, WebUserContext.getUserId());
+        assertEquals("alice", WebUserContext.getUsername());
+    }
+
+    @Test
+    void usesFallbackNameWhenUserMissing() {
+        when(sysUserService.findById(9L)).thenReturn(Optional.empty());
+        MockWebAuthInterceptor interceptor = new MockWebAuthInterceptor(sysUserService);
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.addHeader(MockWebAuthInterceptor.MOCK_USERID_HEADER, "9");
+
+        interceptor.preHandle(request, new MockHttpServletResponse(), new Object());
+
+        assertEquals(9L, WebUserContext.getUserId());
+        assertEquals("mock-user-9", WebUserContext.getUsername());
+    }
+
+    @Test
+    void ignoresInvalidHeader() {
+        MockWebAuthInterceptor interceptor = new MockWebAuthInterceptor(sysUserService);
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.addHeader(MockWebAuthInterceptor.MOCK_USERID_HEADER, "abc");
+
+        interceptor.preHandle(request, new MockHttpServletResponse(), new Object());
+
+        assertNull(WebUserContext.getUserId());
+    }
+}

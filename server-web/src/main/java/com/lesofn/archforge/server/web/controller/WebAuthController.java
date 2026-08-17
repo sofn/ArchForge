@@ -1,6 +1,6 @@
 package com.lesofn.archforge.server.web.controller;
 
-import cn.dev33.satoken.stp.StpUtil;
+import com.lesofn.archforge.infrastructure.auth.stp.StpWebUtil;
 import com.lesofn.archforge.infrastructure.config.ArchForgeProperties;
 import com.lesofn.archforge.server.web.dto.WebLoginRequest;
 import com.lesofn.archforge.server.web.dto.WebLoginResponse;
@@ -60,14 +60,14 @@ public class WebAuthController {
             throw new AdminUserException("用户名或密码错误");
         }
 
-        StpUtil.login(user.getUserId());
-        StpUtil.getSession().set("userId", user.getUserId());
-        StpUtil.getSession().set("username", user.getUsername());
-        StpUtil.getSession().set("nickname", user.getNickname());
+        StpWebUtil.login(user.getUserId());
+        StpWebUtil.getSession().set("userId", user.getUserId());
+        StpWebUtil.getSession().set("username", user.getUsername());
+        StpWebUtil.getSession().set("nickname", user.getNickname());
 
-        String tokenValue = StpUtil.getTokenValue();
-        String tokenName = StpUtil.getTokenName();
-        long timeout = StpUtil.getTokenTimeout();
+        String tokenValue = StpWebUtil.getTokenValue();
+        String tokenName = StpWebUtil.getTokenName();
+        long timeout = StpWebUtil.getTokenTimeout();
         String refreshToken = webRefreshTokenService.createRefreshToken(user.getUserId());
 
         return buildLoginResponse(user, tokenValue, tokenName, timeout, refreshToken);
@@ -82,14 +82,14 @@ public class WebAuthController {
             throw new AdminUserException("用户已被停用");
         }
 
-        StpUtil.login(userId);
-        StpUtil.getSession().set("userId", userId);
-        StpUtil.getSession().set("username", user.getUsername());
-        StpUtil.getSession().set("nickname", user.getNickname());
+        StpWebUtil.login(userId);
+        StpWebUtil.getSession().set("userId", userId);
+        StpWebUtil.getSession().set("username", user.getUsername());
+        StpWebUtil.getSession().set("nickname", user.getNickname());
 
-        String tokenValue = StpUtil.getTokenValue();
-        String tokenName = StpUtil.getTokenName();
-        long timeout = StpUtil.getTokenTimeout();
+        String tokenValue = StpWebUtil.getTokenValue();
+        String tokenName = StpWebUtil.getTokenName();
+        long timeout = StpWebUtil.getTokenTimeout();
         String refreshToken = webRefreshTokenService.createRefreshToken(userId);
 
         return buildLoginResponse(user, tokenValue, tokenName, timeout, refreshToken);
@@ -100,7 +100,7 @@ public class WebAuthController {
         if (request != null && request.getRefreshToken() != null && !request.getRefreshToken().isBlank()) {
             webRefreshTokenService.removeRefreshToken(request.getRefreshToken());
         }
-        StpUtil.logout();
+        StpWebUtil.logout();
         return true;
     }
 
@@ -131,14 +131,14 @@ public class WebAuthController {
         SysUser user = createUserFromRequest(request);
         SysUser savedUser = sysUserService.create(user);
 
-        StpUtil.login(savedUser.getUserId());
-        StpUtil.getSession().set("userId", savedUser.getUserId());
-        StpUtil.getSession().set("username", savedUser.getUsername());
-        StpUtil.getSession().set("nickname", savedUser.getNickname());
+        StpWebUtil.login(savedUser.getUserId());
+        StpWebUtil.getSession().set("userId", savedUser.getUserId());
+        StpWebUtil.getSession().set("username", savedUser.getUsername());
+        StpWebUtil.getSession().set("nickname", savedUser.getNickname());
 
-        String tokenValue = StpUtil.getTokenValue();
-        String tokenName = StpUtil.getTokenName();
-        long timeout = StpUtil.getTokenTimeout();
+        String tokenValue = StpWebUtil.getTokenValue();
+        String tokenName = StpWebUtil.getTokenName();
+        long timeout = StpWebUtil.getTokenTimeout();
         String refreshToken = webRefreshTokenService.createRefreshToken(savedUser.getUserId());
 
         return buildLoginResponse(savedUser, tokenValue, tokenName, timeout, refreshToken);

@@ -1,5 +1,6 @@
 package com.lesofn.archforge.server.web.config;
 
+import com.lesofn.archforge.server.web.auth.MockWebAuthInterceptor;
 import com.lesofn.archforge.server.web.interceptor.WebAuthInterceptor;
 import java.util.Arrays;
 import java.util.List;
@@ -21,6 +22,7 @@ public class WebConfig implements WebMvcConfigurer {
 
     private final ObjectMapper objectMapper;
     private final WebAuthInterceptor webAuthInterceptor;
+    private final org.springframework.beans.factory.ObjectProvider<MockWebAuthInterceptor> mockWebAuthInterceptor;
 
     @Bean
     public JacksonJsonHttpMessageConverter jacksonJsonHttpMessageConverter() {
@@ -41,6 +43,12 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
+        MockWebAuthInterceptor mockInterceptor = mockWebAuthInterceptor.getIfAvailable();
+        if (mockInterceptor != null) {
+            registry.addInterceptor(mockInterceptor)
+                    .addPathPatterns("/web/**")
+                    .order(mockInterceptor.getOrder());
+        }
         registry.addInterceptor(webAuthInterceptor)
                 .addPathPatterns("/web/**")
                 .excludePathPatterns(
