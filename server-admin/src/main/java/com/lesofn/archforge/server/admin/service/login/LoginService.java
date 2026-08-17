@@ -30,10 +30,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import org.springframework.core.env.Environment;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -47,7 +45,8 @@ import org.springframework.util.StringUtils;
 @RequiredArgsConstructor
 public class LoginService {
 
-    private final AuthenticationManager authenticationManager;
+    private final AdminLoginUserFactory adminLoginUserFactory;
+    private final PasswordEncoder passwordEncoder;
     private final TokenService tokenService;
     private final RedisCacheService redisCacheService;
     private final LoginAttemptService loginAttemptService;
@@ -76,12 +75,11 @@ public class LoginService {
             // 验证码校验
             validateCaptcha(loginCommand.getCaptchaCodeKey(), loginCommand.getCaptchaCode());
 
-            // 用户验证
             String decryptedPassword = decryptPassword(loginCommand.getPassword());
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(loginCommand.getUsername(), decryptedPassword));
-
-            SystemLoginUser loginUser = (SystemLoginUser) authentication.getPrincipal();
+            SystemLoginUser loginUser = adminLoginUserFactory.load(loginCommand.getUsername());
+            if (!passwordEncoder.matches(decryptedPassword, loginUser.getPassword())) {
+                throw new BadCredentialsException("bad credentials");
+            }
             // 登录成功，清除失败计数
             loginAttemptService.clearAttempts(loginCommand.getUsername());
             // 生成token

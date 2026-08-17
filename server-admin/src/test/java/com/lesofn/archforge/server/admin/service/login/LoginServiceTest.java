@@ -41,9 +41,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.springframework.core.env.Environment;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
@@ -51,7 +50,10 @@ import org.springframework.test.util.ReflectionTestUtils;
 class LoginServiceTest {
 
     @Mock
-    private AuthenticationManager authenticationManager;
+    private AdminLoginUserFactory adminLoginUserFactory;
+
+    @Mock
+    private PasswordEncoder passwordEncoder;
 
     @Mock
     private TokenService tokenService;
@@ -104,9 +106,8 @@ class LoginServiceTest {
         command.setPassword("plain");
 
         SystemLoginUser loginUser = new SystemLoginUser(1L, false, "admin", "encoded", RoleInfo.EMPTY_ROLE, 1L);
-        Authentication authentication = mock(Authentication.class);
-        when(authentication.getPrincipal()).thenReturn(loginUser);
-        when(authenticationManager.authenticate(any())).thenReturn(authentication);
+        when(adminLoginUserFactory.load("admin")).thenReturn(loginUser);
+        when(passwordEncoder.matches("plain", "encoded")).thenReturn(true);
         when(tokenService.createTokenAndPutUserInCache(loginUser)).thenReturn("token");
 
         LoginService.LoginResult result = loginService.login(command);
@@ -125,8 +126,9 @@ class LoginServiceTest {
         command.setUsername("admin");
         command.setPassword("plain");
 
-        when(authenticationManager.authenticate(any()))
-                .thenThrow(new BadCredentialsException("bad"));
+        SystemLoginUser loginUser = new SystemLoginUser(1L, false, "admin", "encoded", RoleInfo.EMPTY_ROLE, 1L);
+        when(adminLoginUserFactory.load("admin")).thenReturn(loginUser);
+        when(passwordEncoder.matches("plain", "encoded")).thenReturn(false);
 
         AdminAuthException exception = assertThrows(AdminAuthException.class, () -> loginService.login(command));
         assertEquals(

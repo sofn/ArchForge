@@ -23,7 +23,7 @@ public final class LoginContext {
         }
         Object value = StpAdminUtil.getSession().get(LoginSessionKeys.LOGIN_USER);
         if (value instanceof SystemLoginUser loginUser) {
-            return Optional.of(loginUser);
+            return Optional.of(restoreAuthorities(loginUser));
         }
         return Optional.empty();
     }
@@ -46,5 +46,30 @@ public final class LoginContext {
         }
         Object username = StpWebUtil.getSession().get(LoginSessionKeys.USERNAME);
         return username instanceof String value ? value : null;
+    }
+
+    public static SystemLoginUser restoreAuthorities(SystemLoginUser loginUser) {
+        if (loginUser == null) {
+            return null;
+        }
+        if (loginUser.isAdmin()) {
+            grantIfAbsent(loginUser, "ROLE_ADMIN");
+        }
+        grantIfAbsent(loginUser, "ROLE_USER");
+        if (loginUser.getRoleInfo() != null && loginUser.getRoleInfo().getMenuPermissions() != null) {
+            for (String permission : loginUser.getRoleInfo().getMenuPermissions()) {
+                if (permission != null && !permission.isBlank()) {
+                    grantIfAbsent(loginUser, permission);
+                }
+            }
+        }
+        return loginUser;
+    }
+
+    private static void grantIfAbsent(SystemLoginUser loginUser, String authority) {
+        boolean exists = loginUser.getAuthorities().stream().anyMatch(item -> authority.equals(item.getAuthority()));
+        if (!exists) {
+            loginUser.grantAppPermission(authority);
+        }
     }
 }

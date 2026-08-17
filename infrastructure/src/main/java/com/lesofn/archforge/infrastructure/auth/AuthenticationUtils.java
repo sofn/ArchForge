@@ -30,11 +30,13 @@ public class AuthenticationUtils {
 
     /** 获取系统用户 */
     public static SystemLoginUser getSystemLoginUser() {
-        try {
-            return (SystemLoginUser) getAuthentication().getPrincipal();
-        } catch (Exception e) {
-            throw new AdminAuthException(USER_FAIL_TO_GET_USER_INFO);
-        }
+        return LoginContext.findAdminUser().orElseGet(() -> {
+            try {
+                return (SystemLoginUser) getAuthentication().getPrincipal();
+            } catch (Exception e) {
+                throw new AdminAuthException(USER_FAIL_TO_GET_USER_INFO);
+            }
+        });
     }
 
     /** 获取Authentication */
