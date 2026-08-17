@@ -3,7 +3,7 @@ package ${packageBase}.rest;
 import ${packageBase}.dto.*;
 import ${packageBase}.service.${entityName}Service;
 import com.lesofn.archforge.infrastructure.frame.context.RequestContext;
-import com.lesofn.archforge.meta.table.api.dto.ImportResult;
+import com.lesofn.archforge.meta.table.api.dto.ImportResponse;
 import com.lesofn.archforge.meta.table.api.enums.MetaDataFormat;
 import com.lesofn.archforge.meta.table.api.service.MetaTableCrudService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -78,7 +78,7 @@ public class ${entityName}Controller {
 
     @Operation(summary = "导入${tableName}数据")
     @PostMapping("/import")
-    public ImportResult importData(RequestContext rc, @RequestParam(defaultValue = "CSV") String format, @RequestPart("file") MultipartFile file) throws IOException {
+    public ImportResponse importData(RequestContext rc, @RequestParam(defaultValue = "CSV") String format, @RequestPart("file") MultipartFile file) throws IOException {
         return metaTableCrudService.importData(TABLE_ID, MetaDataFormat.of(format), file.getInputStream(), rc.getCurrentUid());
     }
 }

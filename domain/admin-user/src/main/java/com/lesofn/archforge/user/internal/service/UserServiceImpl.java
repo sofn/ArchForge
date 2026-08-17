@@ -28,7 +28,11 @@ public class UserServiceImpl implements UserService {
         if (username == null || username.isBlank()) {
             return Optional.empty();
         }
-        return userRepository.findByUsername(new Username(username)).map(sysUserConvertor::toSysUser);
+        try {
+            return userRepository.findByUsername(new Username(username)).map(sysUserConvertor::toSysUser);
+        } catch (IllegalArgumentException ex) {
+            return Optional.empty();
+        }
     }
 
     /** 保存用户 */

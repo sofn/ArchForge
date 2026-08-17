@@ -159,7 +159,7 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public long countActiveUsers() {
-        return this.userDao.countByDeletedFalse();
+        return this.userDao.countByDeletedFalseAndStatus(UserStatus.NORMAL.toPersistenceValue());
     }
 
     @Override

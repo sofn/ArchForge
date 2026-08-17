@@ -1,6 +1,5 @@
 package com.lesofn.archforge.server.admin.service.user.impl;
 
-import com.lesofn.archforge.common.enums.common.GenderEnum;
 import com.lesofn.archforge.common.utils.query.QueryHelp;
 import com.lesofn.archforge.infrastructure.auth.model.SystemLoginUser;
 import com.lesofn.archforge.infrastructure.db.redis.RedisUtil;
@@ -138,25 +137,21 @@ public class AdminUserServiceImpl implements AdminUserService {
 
     @Override
     public Boolean updateUser(UserUpdateRequest request) {
-        Optional<SysUser> opt = sysUserService.findById(request.getId());
-        if (opt.isEmpty()) {
+        if (sysUserService.findById(request.getId()).isEmpty()) {
             return false;
         }
-        SysUser user = opt.get();
-        user.updateProfile(
+        sysUserService.updateProfile(
+                request.getId(),
+                request.getUsername(),
                 request.getNickname(),
                 request.getPhone(),
                 request.getEmail(),
-                request.getSex() != null ? GenderEnum.fromValue(request.getSex()) : null,
+                request.getSex(),
                 request.getRemark(),
                 request.getParentId());
         if (request.getStatus() != null) {
-            user.updateStatus(request.getStatus());
+            sysUserService.updateStatus(request.getId(), request.getStatus());
         }
-        if (request.getUsername() != null) {
-            user.setUsername(request.getUsername());
-        }
-        sysUserService.update(user);
         return true;
     }
 
@@ -187,12 +182,7 @@ public class AdminUserServiceImpl implements AdminUserService {
 
     @Override
     public Boolean resetPassword(UserPasswordRequest request) {
-        Optional<SysUser> opt = sysUserService.findById(request.getId());
-        if (opt.isPresent()) {
-            SysUser user = opt.get();
-            user.changePassword(passwordEncoder.encode(request.getNewPwd()));
-            sysUserService.update(user);
-        }
+        sysUserService.resetPassword(request.getId(), passwordEncoder.encode(request.getNewPwd()));
         return true;
     }
 
@@ -200,13 +190,7 @@ public class AdminUserServiceImpl implements AdminUserService {
     public Boolean assignRole(UserRoleRequest request) {
         List<Long> ids = request.getIds();
         if (ids != null && !ids.isEmpty()) {
-            Long roleId = ids.get(0);
-            Optional<SysUser> opt = sysUserService.findById(request.getId());
-            if (opt.isPresent()) {
-                SysUser user = opt.get();
-                user.assignRole(roleId);
-                sysUserService.update(user);
-            }
+            sysUserService.assignRole(request.getId(), ids.get(0));
         }
         return true;
     }

@@ -6,11 +6,14 @@ import com.lesofn.archforge.user.api.menu.SysMenuService;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import cn.dev33.satoken.annotation.SaCheckRole;
+import com.lesofn.archforge.infrastructure.auth.stp.StpAdminUtil;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/system/menu")
+@SaCheckRole(value = "ADMIN", type = StpAdminUtil.TYPE)
 @RequiredArgsConstructor
 public class SystemMenuController {
 

@@ -41,6 +41,10 @@ public class SysUserConvertor {
         sysUser.setIsAdmin(aggregate.getIsAdmin());
         sysUser.setRemark(aggregate.getRemark());
         sysUser.setDeleted(aggregate.isDeleted());
+        sysUser.setCreatorId(aggregate.getCreatorId());
+        sysUser.setCreateTime(aggregate.getCreateTime());
+        sysUser.setUpdaterId(aggregate.getUpdaterId());
+        sysUser.setUpdateTime(aggregate.getUpdateTime());
         return sysUser;
     }
 
@@ -56,10 +60,14 @@ public class SysUserConvertor {
                 PhoneNumber.ofNullable(sysUser.getPhoneNumber()),
                 Password.ofEncrypted(sysUser.getPassword()),
                 UserStatus.fromPersistenceValue(sysUser.getStatus()));
-        RoleId roleId = new RoleId(sysUser.getRoleId() == null ? 0L : sysUser.getRoleId());
-        return new UserAggregate(user, roleId, sysUser.getDeptId(), sysUser.getNickname(), sysUser.getUserType(), sysUser
-                .getSex() == null ? null : sysUser.getSex().getValue(), sysUser.getAvatar(), sysUser.getLoginIp(), sysUser
-                        .getLoginDate(), sysUser.getIsAdmin(), sysUser.getRemark(), Boolean.TRUE.equals(sysUser.getDeleted()));
+        RoleId roleId = new RoleId(sysUser.getRoleId() == null || sysUser.getRoleId() < 0L ? 0L : sysUser.getRoleId());
+        UserAggregate aggregate = new UserAggregate(user, roleId, sysUser.getDeptId(), sysUser.getNickname(), sysUser
+                .getUserType(), sysUser.getSex() == null ? null : sysUser.getSex().getValue(), sysUser.getAvatar(), sysUser
+                        .getLoginIp(), sysUser.getLoginDate(), sysUser.getIsAdmin(), sysUser.getRemark(), Boolean.TRUE.equals(
+                                sysUser.getDeleted()));
+        aggregate.replaceAudit(
+                sysUser.getCreatorId(), sysUser.getCreateTime(), sysUser.getUpdaterId(), sysUser.getUpdateTime());
+        return aggregate;
     }
 
     private static Long zeroToNull(Long value) {

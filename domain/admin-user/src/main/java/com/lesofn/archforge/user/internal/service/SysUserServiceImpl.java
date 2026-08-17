@@ -9,6 +9,7 @@ import com.lesofn.archforge.user.domain.model.query.UserQuery;
 import com.lesofn.archforge.user.domain.valueobject.Email;
 import com.lesofn.archforge.user.domain.valueobject.Password;
 import com.lesofn.archforge.user.domain.valueobject.PhoneNumber;
+import com.lesofn.archforge.user.domain.valueobject.RoleId;
 import com.lesofn.archforge.user.domain.valueobject.UserId;
 import com.lesofn.archforge.user.domain.valueobject.Username;
 import com.lesofn.archforge.user.internal.convert.SysUserConvertor;
@@ -40,7 +41,11 @@ public class SysUserServiceImpl implements SysUserService {
         if (username == null || username.isBlank()) {
             return Optional.empty();
         }
-        return userRepository.findByUsername(new Username(username)).map(sysUserConvertor::toSysUser);
+        try {
+            return userRepository.findByUsername(new Username(username)).map(sysUserConvertor::toSysUser);
+        } catch (IllegalArgumentException ex) {
+            return Optional.empty();
+        }
     }
 
     public Optional<SysUser> findByEmail(String email) {
@@ -69,28 +74,35 @@ public class SysUserServiceImpl implements SysUserService {
         return userRepository.findAll().stream().map(sysUserConvertor::toSysUser).toList();
     }
 
-    @Transactional
+    @Transactional("userDomainTransactionManager")
     public SysUser create(SysUser user) {
         return sysUserConvertor.toSysUser(userRepository.save(sysUserConvertor.toAggregate(user)));
     }
 
-    @Transactional
+    @Transactional("userDomainTransactionManager")
     public SysUser update(SysUser user) {
         return sysUserConvertor.toSysUser(userRepository.save(sysUserConvertor.toAggregate(user)));
     }
 
-    @Transactional
+    @Transactional("userDomainTransactionManager")
     public void deleteById(Long id) {
         userRepository.deleteById(new UserId(id));
     }
 
-    @Transactional
+    @Transactional("userDomainTransactionManager")
     public void softDeleteById(Long id) {
         updateIfPresent(id, UserAggregate::markDeleted);
     }
 
     public boolean existsByUsername(String username) {
-        return username != null && !username.isBlank() && userRepository.existsByUsername(new Username(username));
+        if (username == null || username.isBlank()) {
+            return false;
+        }
+        try {
+            return userRepository.existsByUsername(new Username(username));
+        } catch (IllegalArgumentException ex) {
+            return false;
+        }
     }
 
     public boolean existsByEmail(String email) {
@@ -102,12 +114,12 @@ public class SysUserServiceImpl implements SysUserService {
                 new PhoneNumber(phoneNumber));
     }
 
-    @Transactional
+    @Transactional("userDomainTransactionManager")
     public void updateLoginInfo(Long userId, String loginIp) {
         updateIfPresent(userId, user -> user.recordLogin(loginIp));
     }
 
-    @Transactional
+    @Transactional("userDomainTransactionManager")
     public void resetPassword(Long userId, String newPassword) {
         updateIfPresent(userId, user -> user.changePassword(Password.ofEncrypted(newPassword)));
     }
@@ -123,14 +135,43 @@ public class SysUserServiceImpl implements SysUserService {
         return userRepository.search(userQuery, pageable).map(sysUserConvertor::toSysUser);
     }
 
-    @Transactional
+    @Transactional("userDomainTransactionManager")
     public void updateStatus(Long userId, Integer status) {
         updateIfPresent(userId, user -> user.updateStatus(status));
     }
 
-    @Transactional
+    @Transactional("userDomainTransactionManager")
     public void updatePassword(Long userId, String newPassword) {
         updateIfPresent(userId, user -> user.changePassword(Password.ofEncrypted(newPassword)));
+    }
+
+    @Transactional("userDomainTransactionManager")
+    public void updateProfile(
+            Long userId,
+            String username,
+            String nickname,
+            String phoneNumber,
+            String email,
+            Integer sex,
+            String remark,
+            Long deptId) {
+        updateIfPresent(userId, user -> {
+            user.rename(username);
+            user.updateProfile(nickname, phoneNumber, email, sex, remark, deptId);
+        });
+    }
+
+    @Transactional("userDomainTransactionManager")
+    public void assignRole(Long userId, Long roleId) {
+        if (roleId == null) {
+            return;
+        }
+        updateIfPresent(userId, user -> {
+            RoleId nextRole = new RoleId(roleId);
+            if (!nextRole.equals(user.getRoleId())) {
+                user.assignRole(nextRole);
+            }
+        });
     }
 
     public List<SysUser> findActiveUsers() {

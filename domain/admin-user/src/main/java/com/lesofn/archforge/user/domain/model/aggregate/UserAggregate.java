@@ -43,6 +43,10 @@ public class UserAggregate extends BaseDomainEntity<UserId> {
     private Boolean isAdmin;
     private String remark;
     private boolean deleted;
+    private Long creatorId;
+    private LocalDateTime createTime;
+    private Long updaterId;
+    private LocalDateTime updateTime;
 
     public UserAggregate(User user, RoleId roleId) {
         this(user, roleId, null, null, null, null, null, null, null, Boolean.FALSE, null, false);
@@ -193,6 +197,13 @@ public class UserAggregate extends BaseDomainEntity<UserId> {
 
     public void markDeleted() {
         this.deleted = true;
+    }
+
+    public void replaceAudit(Long creatorId, LocalDateTime createTime, Long updaterId, LocalDateTime updateTime) {
+        this.creatorId = creatorId;
+        this.createTime = createTime;
+        this.updaterId = updaterId;
+        this.updateTime = updateTime;
     }
 
     public boolean isDeleted() { return this.deleted; }

@@ -47,6 +47,11 @@ public interface SysUserService {
 
     void updatePassword(Long userId, String newPassword);
 
+    void updateProfile(Long userId, String username, String nickname, String phoneNumber, String email, Integer sex,
+            String remark, Long deptId);
+
+    void assignRole(Long userId, Long roleId);
+
     List<SysUser> findActiveUsers();
 
     List<SysUser> findByDeptId(Long deptId);

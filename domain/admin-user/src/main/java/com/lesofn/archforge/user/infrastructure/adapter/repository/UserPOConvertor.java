@@ -36,10 +36,12 @@ public interface UserPOConvertor {
                 Password.ofEncrypted(po.getPassword()),
                 UserStatus.fromPersistenceValue(po.getStatus()));
 
-        RoleId roleId = po.getRoleId() == null || po.getRoleId() <= 0L ? new RoleId(1L) : new RoleId(po.getRoleId());
-        return new UserAggregate(user, roleId, po.getDeptId(), po.getNickname(), po.getUserType(), po.getSex(), po
-                .getAvatar(), po.getLoginIp(), po.getLoginDate(), po.getIsAdmin(), po.getRemark(), Boolean.TRUE.equals(po
-                        .getDeleted()));
+        RoleId roleId = new RoleId(po.getRoleId() == null || po.getRoleId() < 0L ? 0L : po.getRoleId());
+        UserAggregate aggregate = new UserAggregate(user, roleId, po.getDeptId(), po.getNickname(), po.getUserType(), po
+                .getSex(), po.getAvatar(), po.getLoginIp(), po.getLoginDate(), po.getIsAdmin(), po.getRemark(), Boolean.TRUE
+                        .equals(po.getDeleted()));
+        aggregate.replaceAudit(po.getCreatorId(), po.getCreateTime(), po.getUpdaterId(), po.getUpdateTime());
+        return aggregate;
     }
 
     /**
@@ -68,6 +70,10 @@ public interface UserPOConvertor {
         po.setIsAdmin(aggregate.getIsAdmin());
         po.setRemark(aggregate.getRemark());
         po.setDeleted(aggregate.isDeleted());
+        po.setCreatorId(aggregate.getCreatorId());
+        po.setCreateTime(aggregate.getCreateTime());
+        po.setUpdaterId(aggregate.getUpdaterId());
+        po.setUpdateTime(aggregate.getUpdateTime());
         return po;
     }
 }

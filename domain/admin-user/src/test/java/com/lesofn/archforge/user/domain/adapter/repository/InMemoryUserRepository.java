@@ -99,7 +99,9 @@ public class InMemoryUserRepository implements UserRepository {
 
     @Override
     public long countActiveUsers() {
-        return findAll().stream().filter(user -> !user.isDeleted()).count();
+        return findAll().stream()
+                .filter(user -> !user.isDeleted() && user.getUser().getStatus() == UserStatus.NORMAL)
+                .count();
     }
 
     @Override

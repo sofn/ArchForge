@@ -56,5 +56,23 @@ class SysUserConvertorTest {
 
         assertNull(converted.getRoleId());
         assertEquals("", converted.getEmail());
+        assertEquals(0L, aggregate.getRoleId().value());
+    }
+
+    @Test
+    void shouldCopyAuditFields() {
+        SysUser source = new SysUser();
+        source.setUserId(1L);
+        source.setUsername("admin");
+        source.setPassword("encrypted");
+        source.setStatus(1);
+        source.setCreatorId(3L);
+        source.setUpdaterId(4L);
+
+        UserAggregate aggregate = convertor.toAggregate(source);
+        SysUser converted = convertor.toSysUser(aggregate);
+
+        assertEquals(3L, converted.getCreatorId());
+        assertEquals(4L, converted.getUpdaterId());
     }
 }

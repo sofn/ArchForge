@@ -5,6 +5,8 @@ import com.lesofn.archforge.user.api.domain.SysRole;
 import com.lesofn.archforge.user.api.service.SysRoleService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import cn.dev33.satoken.annotation.SaCheckRole;
+import com.lesofn.archforge.infrastructure.auth.stp.StpAdminUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/system/role")
+@SaCheckRole(value = "ADMIN", type = StpAdminUtil.TYPE)
 @RequiredArgsConstructor
 public class SystemRoleController {
 

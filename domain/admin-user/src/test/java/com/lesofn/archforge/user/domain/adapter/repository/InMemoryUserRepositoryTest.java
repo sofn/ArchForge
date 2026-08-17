@@ -50,7 +50,7 @@ class InMemoryUserRepositoryTest {
 
     @Test
     void shouldCountActiveAndOnlineUsers() {
-        assertEquals(3L, this.repository.countActiveUsers());
+        assertEquals(2L, this.repository.countActiveUsers());
         assertEquals(2L, this.repository.countOnlineUsers());
     }
 
