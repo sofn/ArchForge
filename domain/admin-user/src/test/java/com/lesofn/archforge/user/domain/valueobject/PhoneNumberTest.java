@@ -2,6 +2,7 @@ package com.lesofn.archforge.user.domain.valueobject;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -25,7 +26,7 @@ class PhoneNumberTest {
 
     @ParameterizedTest
     @ValueSource(strings = {
-            "", "1380013800", "138001380000", "028-12345678", "abcdefghijklmnopqrstuvwxyz"
+            "1380013800", "138001380000", "028-12345678", "abcdefghijklmnopqrstuvwxyz"
     })
     void shouldRejectInvalidPhoneNumbers(String value) {
         assertThrows(IllegalArgumentException.class, () -> new PhoneNumber(value));
@@ -34,5 +35,12 @@ class PhoneNumberTest {
     @Test
     void shouldRejectNullPhoneNumber() {
         assertThrows(IllegalArgumentException.class, () -> new PhoneNumber(null));
+    }
+
+    @Test
+    void shouldAllowBlankPhoneNumberForPersistenceRestore() {
+        PhoneNumber phone = PhoneNumber.ofNullable("");
+        assertEquals("", phone.value());
+        assertTrue(phone.isBlank());
     }
 }

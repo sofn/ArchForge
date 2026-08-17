@@ -12,8 +12,8 @@ public record RoleId(Long value) {
         if (value == null) {
             throw new IllegalArgumentException("Role id must not be null");
         }
-        if (value <= 0L) {
-            throw new IllegalArgumentException("Role id must be greater than 0");
+        if (value < 0L) {
+            throw new IllegalArgumentException("Role id must not be negative");
         }
     }
 }

@@ -90,7 +90,7 @@ public class AdminUserServiceImpl implements AdminUserService {
     }
 
     @Override
-    @DataPermission(deptAlias = "deptId", userAlias = "userId")
+    @DataPermission(deptAlias = "deptId", userAlias = "id")
     public AdminPageResponse<AdminUserDTO> getUserList(AdminUserListRequest request) {
         int currentPage = request.getCurrentPage() != null && request.getCurrentPage() > 0 ? request.getCurrentPage() : 1;
         int pageSize = request.getPageSize() != null && request.getPageSize() > 0 ? request.getPageSize() : 10;
@@ -107,7 +107,7 @@ public class AdminUserServiceImpl implements AdminUserService {
             criteria.setCreateTime(request.getCreateTime());
         }
 
-        Pageable pageable = PageRequest.of(currentPage - 1, pageSize, Sort.by(Sort.Direction.DESC, "userId"));
+        Pageable pageable = PageRequest.of(currentPage - 1, pageSize, Sort.by(Sort.Direction.DESC, "id"));
         Specification<SysUser> spec = (root, q, cb) -> QueryHelp.getPredicate(root, criteria, cb);
         spec = dataScopeSpecification.apply(spec, DataScopeContextHolder.get());
         Page<SysUser> userPage = sysUserService.findAll(spec, pageable);

@@ -34,6 +34,13 @@ class UserTest {
     }
 
     @Test
+    void shouldAllowUnsavedUserWithoutId() {
+        User user = User.create(null, new Username("admin"), new Email("admin@example.com"),
+                new PhoneNumber("13800138000"), Password.ofEncrypted("encrypted"));
+        assertEquals(null, user.getId());
+    }
+
+    @Test
     void shouldRejectCreateWithNullFields() {
         UserId id = new UserId(1L);
         Username username = new Username("admin");
@@ -41,7 +48,6 @@ class UserTest {
         PhoneNumber phone = new PhoneNumber("13800138000");
         Password password = Password.ofEncrypted("encrypted");
 
-        assertThrows(IllegalArgumentException.class, () -> User.create(null, username, email, phone, password));
         assertThrows(IllegalArgumentException.class, () -> User.create(id, null, email, phone, password));
         assertThrows(IllegalArgumentException.class, () -> User.create(id, username, null, phone, password));
         assertThrows(IllegalArgumentException.class, () -> User.create(id, username, email, null, password));

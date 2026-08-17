@@ -13,11 +13,17 @@ public record PhoneNumber(String value) {
     private static final Pattern PATTERN = Pattern.compile("^1[3-9]\\d{9}$");
 
     public PhoneNumber {
-        if (value == null || value.isBlank()) {
-            throw new IllegalArgumentException("Phone number must not be blank");
+        if (value == null) {
+            throw new IllegalArgumentException("Phone number must not be null");
         }
-        if (!PATTERN.matcher(value).matches()) {
+        if (!value.isBlank() && !PATTERN.matcher(value).matches()) {
             throw new IllegalArgumentException("Invalid phone number: " + value);
         }
     }
+
+    public static PhoneNumber ofNullable(String value) {
+        return new PhoneNumber(value == null ? "" : value);
+    }
+
+    public boolean isBlank() { return this.value.isBlank(); }
 }

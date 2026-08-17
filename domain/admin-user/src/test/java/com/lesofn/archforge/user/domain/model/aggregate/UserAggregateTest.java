@@ -99,4 +99,29 @@ class UserAggregateTest {
         UserAggregate aggregate = newAggregate();
         assertThrows(IllegalArgumentException.class, () -> aggregate.assignRole(null));
     }
+
+    @Test
+    void shouldRecordLoginAndUpdateProfile() {
+        UserAggregate aggregate = newAggregate();
+        aggregate.updateProfile("Alice", "13900139000", "alice@example.com", 1, "remark", 8L);
+        aggregate.recordLogin("127.0.0.1");
+        aggregate.assignDept(9L);
+
+        assertEquals("Alice", aggregate.getNickname());
+        assertEquals("13900139000", aggregate.getUser().getPhoneNumber().value());
+        assertEquals("alice@example.com", aggregate.getUser().getEmail().value());
+        assertEquals(Integer.valueOf(1), aggregate.getSex());
+        assertEquals("remark", aggregate.getRemark());
+        assertEquals(Long.valueOf(9L), aggregate.getDeptId());
+        assertEquals("127.0.0.1", aggregate.getLoginIp());
+        assertFalse(aggregate.isDeleted());
+    }
+
+    @Test
+    void shouldSoftDeleteAndBlockLogin() {
+        UserAggregate aggregate = newAggregate();
+        aggregate.markDeleted();
+        assertTrue(aggregate.isDeleted());
+        assertFalse(aggregate.canLogin());
+    }
 }

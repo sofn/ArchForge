@@ -10,6 +10,7 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
 import lombok.Getter;
+import org.jspecify.annotations.Nullable;
 
 /**
  * 用户领域实体。
@@ -23,7 +24,7 @@ public class User implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private final UserId id;
+    private final @Nullable UserId id;
     private Username username;
     private Email email;
     private PhoneNumber phoneNumber;
@@ -31,15 +32,12 @@ public class User implements Serializable {
     private UserStatus status;
 
     private User(
-            UserId id,
+            @Nullable UserId id,
             Username username,
             Email email,
             PhoneNumber phoneNumber,
             Password password,
             UserStatus status) {
-        if (id == null) {
-            throw new IllegalArgumentException("User id must not be null");
-        }
         if (username == null) {
             throw new IllegalArgumentException("Username must not be null");
         }
@@ -118,6 +116,37 @@ public class User implements Serializable {
             throw new IllegalArgumentException("New password must not be null");
         }
         this.password = newPassword;
+    }
+
+    public void rename(Username username) {
+        if (username == null) {
+            throw new IllegalArgumentException("Username must not be null");
+        }
+        this.username = username;
+    }
+
+    public void changeEmail(Email email) {
+        if (email == null) {
+            throw new IllegalArgumentException("Email must not be null");
+        }
+        this.email = email;
+    }
+
+    public void changePhoneNumber(PhoneNumber phoneNumber) {
+        if (phoneNumber == null) {
+            throw new IllegalArgumentException("Phone number must not be null");
+        }
+        this.phoneNumber = phoneNumber;
+    }
+
+    public void updateStatus(UserStatus status) {
+        if (status == null) {
+            throw new IllegalArgumentException("Status must not be null");
+        }
+        if (this.status != status && !this.status.canTransitionTo(status)) {
+            throw new IllegalStateException("Cannot change user status from " + this.status + " to " + status);
+        }
+        this.status = status;
     }
 
     /**

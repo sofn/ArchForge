@@ -20,8 +20,13 @@ class RoleIdTest {
     }
 
     @Test
-    void shouldRejectNonPositiveValue() {
-        assertThrows(IllegalArgumentException.class, () -> new RoleId(0L));
+    void shouldAllowZeroForUnassignedRole() {
+        assertEquals(0L, new RoleId(0L).value());
+    }
+
+    @Test
+    void shouldRejectNegativeValue() {
+        assertThrows(IllegalArgumentException.class, () -> new RoleId(-1L));
     }
 
     @Test

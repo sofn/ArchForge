@@ -24,7 +24,7 @@ public class FlywayDependencyBeanFactoryPostProcessor implements BeanFactoryPost
         }
 
         String[] targetNames = {
-                "userDbConfig", "taskDbConfig"
+                "userDbConfig", "taskDbConfig", "blogDbConfig", "userDomainDbConfig"
         };
         for (String name : targetNames) {
             if (!beanFactory.containsBeanDefinition(name)) {

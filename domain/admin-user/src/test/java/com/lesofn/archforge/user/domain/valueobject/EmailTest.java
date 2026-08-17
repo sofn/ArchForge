@@ -2,6 +2,7 @@ package com.lesofn.archforge.user.domain.valueobject;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -25,7 +26,7 @@ class EmailTest {
 
     @ParameterizedTest
     @ValueSource(strings = {
-            "", "plainaddress", "@missing-local.com", "admin@", "admin@.com"
+            "plainaddress", "@missing-local.com", "admin@", "admin@.com"
     })
     void shouldRejectInvalidEmails(String value) {
         assertThrows(IllegalArgumentException.class, () -> new Email(value));
@@ -34,5 +35,12 @@ class EmailTest {
     @Test
     void shouldRejectNullEmail() {
         assertThrows(IllegalArgumentException.class, () -> new Email(null));
+    }
+
+    @Test
+    void shouldAllowBlankEmailForPersistenceRestore() {
+        Email email = Email.ofNullable("");
+        assertEquals("", email.value());
+        assertTrue(email.isBlank());
     }
 }

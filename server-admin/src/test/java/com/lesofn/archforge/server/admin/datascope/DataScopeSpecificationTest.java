@@ -75,7 +75,7 @@ class DataScopeSpecificationTest {
     void setUp() {
         dataScopeSpecification = new DataScopeSpecification(deptService);
         when(root.get("deptId")).thenReturn(deptPath);
-        when(root.get("userId")).thenReturn(userPath);
+        when(root.get("id")).thenReturn(userPath);
     }
 
     @Test

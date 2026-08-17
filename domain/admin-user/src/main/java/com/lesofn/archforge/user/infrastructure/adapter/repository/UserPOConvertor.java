@@ -31,13 +31,15 @@ public interface UserPOConvertor {
         User user = User.create(
                 new UserId(po.getId()),
                 new Username(po.getUsername()),
-                new Email(po.getEmail() == null ? "" : po.getEmail()),
-                new PhoneNumber(po.getPhoneNumber() == null ? "" : po.getPhoneNumber()),
+                Email.ofNullable(po.getEmail()),
+                PhoneNumber.ofNullable(po.getPhoneNumber()),
                 Password.ofEncrypted(po.getPassword()),
-                toUserStatus(po.getStatus()));
+                UserStatus.fromPersistenceValue(po.getStatus()));
 
-        RoleId roleId = po.getRoleId() == null ? new RoleId(0L) : new RoleId(po.getRoleId());
-        return new UserAggregate(user, roleId);
+        RoleId roleId = po.getRoleId() == null || po.getRoleId() <= 0L ? new RoleId(1L) : new RoleId(po.getRoleId());
+        return new UserAggregate(user, roleId, po.getDeptId(), po.getNickname(), po.getUserType(), po.getSex(), po
+                .getAvatar(), po.getLoginIp(), po.getLoginDate(), po.getIsAdmin(), po.getRemark(), Boolean.TRUE.equals(po
+                        .getDeleted()));
     }
 
     /**
@@ -49,45 +51,23 @@ public interface UserPOConvertor {
         }
         User user = aggregate.getUser();
         UserPO po = new UserPO();
-        po.setId(user.getId().value());
-        po.setRoleId(aggregate.getRoleId().value());
+        po.setId(user.getId() == null ? null : user.getId().value());
+        po.setRoleId(aggregate.getRoleId() == null ? null : aggregate.getRoleId().value());
+        po.setDeptId(aggregate.getDeptId());
         po.setUsername(user.getUsername().value());
+        po.setNickname(aggregate.getNickname());
+        po.setUserType(aggregate.getUserType());
         po.setEmail(user.getEmail().value());
         po.setPhoneNumber(user.getPhoneNumber().value());
+        po.setSex(aggregate.getSex());
+        po.setAvatar(aggregate.getAvatar());
         po.setPassword(user.getPassword().value());
-        po.setStatus(toStatusValue(user.getStatus()));
-
-        // 领域模型未包含的字段使用默认值，避免覆盖已有数据
-        po.setNickname("");
-        po.setUserType(0);
-        po.setSex(0);
-        po.setAvatar("");
-        po.setIsAdmin(Boolean.FALSE);
-        po.setRemark("");
+        po.setStatus(user.getStatus().toPersistenceValue());
+        po.setLoginIp(aggregate.getLoginIp());
+        po.setLoginDate(aggregate.getLoginDate());
+        po.setIsAdmin(aggregate.getIsAdmin());
+        po.setRemark(aggregate.getRemark());
+        po.setDeleted(aggregate.isDeleted());
         return po;
-    }
-
-    /**
-     * 将领域状态转换为数据库存储值。
-     */
-    default Integer toStatusValue(UserStatus status) {
-        if (status == null) {
-            return UserStatus.NORMAL.ordinal() + 1;
-        }
-        return status.ordinal() + 1;
-    }
-
-    /**
-     * 将数据库存储值转换为领域状态。
-     */
-    default UserStatus toUserStatus(Integer value) {
-        if (value == null) {
-            return UserStatus.NORMAL;
-        }
-        return switch (value) {
-            case 2 -> UserStatus.DISABLED;
-            case 3 -> UserStatus.FROZEN;
-            default -> UserStatus.NORMAL;
-        };
     }
 }

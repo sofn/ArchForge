@@ -56,7 +56,7 @@ public class DataScopeSpecification {
 
     private Predicate buildScopePredicate(Root<SysUser> root, CriteriaBuilder cb, DataScopeContext context) {
         String deptAlias = context.getDeptAlias() == null ? "deptId" : context.getDeptAlias();
-        String userAlias = context.getUserAlias() == null ? "userId" : context.getUserAlias();
+        String userAlias = context.getUserAlias() == null ? "id" : context.getUserAlias();
         Path<Long> deptPath = root.get(deptAlias);
         Path<Long> userPath = root.get(userAlias);
 

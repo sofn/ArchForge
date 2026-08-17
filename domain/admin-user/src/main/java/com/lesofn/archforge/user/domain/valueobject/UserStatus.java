@@ -24,4 +24,19 @@ public enum UserStatus {
             case FROZEN -> target == NORMAL;
         };
     }
+
+    public int toPersistenceValue() {
+        return ordinal() + 1;
+    }
+
+    public static UserStatus fromPersistenceValue(Integer value) {
+        if (value == null) {
+            return NORMAL;
+        }
+        return switch (value) {
+            case 2 -> DISABLED;
+            case 3 -> FROZEN;
+            default -> NORMAL;
+        };
+    }
 }

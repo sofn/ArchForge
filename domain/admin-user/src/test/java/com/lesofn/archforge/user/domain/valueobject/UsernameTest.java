@@ -17,7 +17,7 @@ class UsernameTest {
 
     @ParameterizedTest
     @ValueSource(strings = {
-            "user", "test", "a.b-c_123", "12345678901234567890123456789012"
+            "ag1", "user", "test", "a.b-c_123", "12345678901234567890123456789012"
     })
     void shouldAcceptValidUsernames(String value) {
         new Username(value);
@@ -25,7 +25,7 @@ class UsernameTest {
 
     @ParameterizedTest
     @ValueSource(strings = {
-            "", "ab", "abc", "123456789012345678901234567890123", "user name", "user@name"
+            "", "a", "12345678901234567890123456789012345678901234567890123456789012345", "user name", "user@name"
     })
     void shouldRejectInvalidUsernames(String value) {
         assertThrows(IllegalArgumentException.class, () -> new Username(value));

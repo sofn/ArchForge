@@ -1,13 +1,17 @@
 package com.lesofn.archforge.user.internal.service;
 
-import com.lesofn.archforge.user.api.dao.SysUserRepository;
 import com.lesofn.archforge.user.api.domain.SysUser;
 import com.lesofn.archforge.user.api.domain.query.SysUserQuery;
 import com.lesofn.archforge.user.api.service.SysUserService;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
-import java.util.ArrayList;
+import com.lesofn.archforge.user.domain.adapter.repository.UserRepository;
+import com.lesofn.archforge.user.domain.model.aggregate.UserAggregate;
+import com.lesofn.archforge.user.domain.model.query.UserQuery;
+import com.lesofn.archforge.user.domain.valueobject.Email;
+import com.lesofn.archforge.user.domain.valueobject.Password;
+import com.lesofn.archforge.user.domain.valueobject.PhoneNumber;
+import com.lesofn.archforge.user.domain.valueobject.UserId;
+import com.lesofn.archforge.user.domain.valueobject.Username;
+import com.lesofn.archforge.user.internal.convert.SysUserConvertor;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -22,79 +26,80 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class SysUserServiceImpl implements SysUserService {
 
-    private static final char LIKE_ESCAPE_CHAR = '!';
-
-    // TODO(ddd): replace SysUserRepository with UserRepository after SysUser migration
-    private final SysUserRepository userRepository;
+    private final UserRepository userRepository;
+    private final SysUserConvertor sysUserConvertor;
 
     public Optional<SysUser> findById(Long id) {
-        return userRepository.findById(id);
+        if (id == null || id <= 0L) {
+            return Optional.empty();
+        }
+        return userRepository.findById(new UserId(id)).map(sysUserConvertor::toSysUser);
     }
 
     public Optional<SysUser> findByUsername(String username) {
-        return Optional.ofNullable(userRepository.findByUsername(username));
+        if (username == null || username.isBlank()) {
+            return Optional.empty();
+        }
+        return userRepository.findByUsername(new Username(username)).map(sysUserConvertor::toSysUser);
     }
 
     public Optional<SysUser> findByEmail(String email) {
-        return Optional.ofNullable(userRepository.findByEmail(email));
+        if (email == null || email.isBlank()) {
+            return Optional.empty();
+        }
+        return userRepository.findByEmail(new Email(email)).map(sysUserConvertor::toSysUser);
     }
 
     public Optional<SysUser> findByPhoneNumber(String phoneNumber) {
-        return Optional.ofNullable(userRepository.findByPhoneNumber(phoneNumber));
+        if (phoneNumber == null || phoneNumber.isBlank()) {
+            return Optional.empty();
+        }
+        return userRepository.findByPhoneNumber(new PhoneNumber(phoneNumber)).map(sysUserConvertor::toSysUser);
     }
 
     public Page<SysUser> findAll(Pageable pageable) {
-        return userRepository.findAll(pageable);
+        return userRepository.findAll(pageable).map(sysUserConvertor::toSysUser);
     }
 
     public Page<SysUser> findAll(Specification<SysUser> spec, Pageable pageable) {
-        return userRepository.findAll(spec, pageable);
+        return userRepository.findAll(spec, pageable).map(sysUserConvertor::toSysUser);
     }
 
     public List<SysUser> findAll() {
-        return userRepository.findAll();
+        return userRepository.findAll().stream().map(sysUserConvertor::toSysUser).toList();
     }
 
     @Transactional
     public SysUser create(SysUser user) {
-        return userRepository.save(user);
+        return sysUserConvertor.toSysUser(userRepository.save(sysUserConvertor.toAggregate(user)));
     }
 
     @Transactional
     public SysUser update(SysUser user) {
-        return userRepository.save(user);
+        return sysUserConvertor.toSysUser(userRepository.save(sysUserConvertor.toAggregate(user)));
     }
 
     @Transactional
     public void deleteById(Long id) {
-        userRepository.deleteById(id);
-    }
-
-    private void updateIfPresent(Long id, Consumer<SysUser> updater) {
-        userRepository
-                .findById(id)
-                .ifPresent(
-                        user -> {
-                            updater.accept(user);
-                            userRepository.save(user);
-                        });
+        userRepository.deleteById(new UserId(id));
     }
 
     @Transactional
     public void softDeleteById(Long id) {
-        updateIfPresent(id, SysUser::markDeleted);
+        updateIfPresent(id, UserAggregate::markDeleted);
     }
 
     public boolean existsByUsername(String username) {
-        return userRepository.existsByUsername(username);
+        return username != null && !username.isBlank() && userRepository.existsByUsername(new Username(username));
     }
 
     public boolean existsByEmail(String email) {
-        return userRepository.existsByEmail(email);
+        return email != null && !email.isBlank() && userRepository.existsByEmail(new Email(email));
     }
 
     public boolean existsByPhoneNumber(String phoneNumber) {
-        return userRepository.existsByPhoneNumber(phoneNumber);
+        return phoneNumber != null && !phoneNumber.isBlank() && userRepository.existsByPhoneNumber(
+                new PhoneNumber(phoneNumber));
     }
 
     @Transactional
@@ -104,50 +109,18 @@ public class SysUserServiceImpl implements SysUserService {
 
     @Transactional
     public void resetPassword(Long userId, String newPassword) {
-        updateIfPresent(userId, user -> user.changePassword(newPassword));
+        updateIfPresent(userId, user -> user.changePassword(Password.ofEncrypted(newPassword)));
     }
 
     public Page<SysUser> searchUsers(SysUserQuery query, Pageable pageable) {
-        Specification<SysUser> spec = (root, criteriaQuery, cb) -> {
-            List<Predicate> predicates = new ArrayList<>();
-            if (query != null) {
-                if (isNotBlank(query.getUsername())) {
-                    predicates.add(like(cb, root, "username", query.getUsername()));
-                }
-                if (isNotBlank(query.getEmail())) {
-                    predicates.add(like(cb, root, "email", query.getEmail()));
-                }
-                if (isNotBlank(query.getPhoneNumber())) {
-                    predicates.add(like(cb, root, "phoneNumber", query.getPhoneNumber()));
-                }
-                if (query.getEnabled() != null) {
-                    if (Boolean.TRUE.equals(query.getEnabled())) {
-                        predicates.add(cb.equal(root.get("status"), 1));
-                    } else {
-                        predicates.add(cb.notEqual(root.get("status"), 1));
-                    }
-                }
-            }
-            predicates.add(cb.equal(root.get("deleted"), false));
-            return cb.and(predicates.toArray(new Predicate[0]));
-        };
-        return userRepository.findAll(spec, pageable);
-    }
-
-    private static Predicate like(CriteriaBuilder cb, Root<SysUser> root, String attribute, String value) {
-        String pattern = "%" + escapeLike(value) + "%";
-        return cb.like(root.get(attribute).as(String.class), pattern, LIKE_ESCAPE_CHAR);
-    }
-
-    private static String escapeLike(String value) {
-        String escape = String.valueOf(LIKE_ESCAPE_CHAR);
-        return value.replace(escape, escape + escape)
-                .replace("%", escape + "%")
-                .replace("_", escape + "_");
-    }
-
-    private static boolean isNotBlank(String value) {
-        return value != null && !value.isBlank();
+        UserQuery userQuery = new UserQuery();
+        if (query != null) {
+            userQuery.setUsername(query.getUsername());
+            userQuery.setEmail(query.getEmail());
+            userQuery.setPhoneNumber(query.getPhoneNumber());
+            userQuery.setEnabled(query.getEnabled());
+        }
+        return userRepository.search(userQuery, pageable).map(sysUserConvertor::toSysUser);
     }
 
     @Transactional
@@ -157,25 +130,28 @@ public class SysUserServiceImpl implements SysUserService {
 
     @Transactional
     public void updatePassword(Long userId, String newPassword) {
-        updateIfPresent(userId, user -> user.changePassword(newPassword));
+        updateIfPresent(userId, user -> user.changePassword(Password.ofEncrypted(newPassword)));
     }
 
     public List<SysUser> findActiveUsers() {
-        return userRepository.findAll((root, criteriaQuery, cb) -> cb.and(
-                cb.equal(root.get("status"), 1),
-                cb.equal(root.get("deleted"), false)));
+        return userRepository.findActiveUsers().stream().map(sysUserConvertor::toSysUser).toList();
     }
 
     public List<SysUser> findByDeptId(Long deptId) {
-        if (deptId == null) {
-            return List.of();
-        }
-        return userRepository.findAll((root, criteriaQuery, cb) -> cb.and(
-                cb.equal(root.get("deptId"), deptId),
-                cb.equal(root.get("deleted"), false)));
+        return userRepository.findByDeptId(deptId).stream().map(sysUserConvertor::toSysUser).toList();
     }
 
     public SysUser getUserByUserName(String username) {
-        return userRepository.findByUsername(username);
+        return findByUsername(username).orElse(null);
+    }
+
+    private void updateIfPresent(Long id, Consumer<UserAggregate> updater) {
+        if (id == null || id <= 0L) {
+            return;
+        }
+        userRepository.findById(new UserId(id)).ifPresent(user -> {
+            updater.accept(user);
+            userRepository.save(user);
+        });
     }
 }
