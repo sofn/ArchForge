@@ -19,7 +19,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.access.prepost.PreAuthorize;
+import cn.dev33.satoken.annotation.SaCheckRole;
+import com.lesofn.archforge.infrastructure.auth.stp.StpAdminUtil;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -28,7 +29,7 @@ import org.springframework.web.bind.annotation.*;
  * @author sofn
  */
 @Tag(name = "Quartz 调度", description = "Quartz 反射调度任务管理")
-@PreAuthorize("hasRole('ADMIN')")
+@SaCheckRole(value = "ADMIN", type = StpAdminUtil.TYPE)
 @RestController
 @RequestMapping("/quartz")
 @RequiredArgsConstructor

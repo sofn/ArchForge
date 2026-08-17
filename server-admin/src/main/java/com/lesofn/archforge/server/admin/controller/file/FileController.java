@@ -33,7 +33,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
+import cn.dev33.satoken.annotation.SaCheckLogin;
+import com.lesofn.archforge.infrastructure.auth.stp.StpAdminUtil;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -44,7 +45,7 @@ import org.springframework.web.multipart.MultipartFile;
  */
 @Slf4j
 @Tag(name = "文件管理", description = "文件上传、下载、删除接口")
-@PreAuthorize("isAuthenticated()")
+@SaCheckLogin(type = StpAdminUtil.TYPE)
 @RestController
 @CrossOrigin
 @RequiredArgsConstructor

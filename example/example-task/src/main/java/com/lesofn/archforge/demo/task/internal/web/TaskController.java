@@ -8,13 +8,14 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.access.prepost.PreAuthorize;
+import cn.dev33.satoken.annotation.SaCheckRole;
+import com.lesofn.archforge.infrastructure.auth.stp.StpAdminUtil;
 import org.springframework.web.bind.annotation.*;
 
 /** Task management REST API */
 @Slf4j
 @Tag(name = "任务管理")
-@PreAuthorize("hasRole('ADMIN')")
+@SaCheckRole(value = "ADMIN", type = StpAdminUtil.TYPE)
 @RestController
 @CrossOrigin
 @RequiredArgsConstructor

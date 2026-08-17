@@ -3,7 +3,7 @@ package com.lesofn.archforge.infrastructure.aspect;
 import com.google.common.hash.Hashing;
 import com.lesofn.archforge.infrastructure.annotation.Idempotent;
 import com.lesofn.archforge.infrastructure.annotation.IdempotentType;
-import com.lesofn.archforge.infrastructure.auth.AuthenticationUtils;
+import com.lesofn.archforge.infrastructure.auth.LoginContext;
 import com.lesofn.archforge.infrastructure.auth.model.SystemLoginUser;
 import com.lesofn.archforge.infrastructure.frame.context.RequestContext;
 import com.lesofn.archforge.infrastructure.frame.context.ScopedValueContext;
@@ -138,7 +138,7 @@ public class IdempotentAspect {
 
     private String resolveUserId() {
         try {
-            SystemLoginUser user = AuthenticationUtils.getSystemLoginUser();
+            SystemLoginUser user = LoginContext.findAdminUser().orElse(null);
             if (user != null) {
                 return String.valueOf(user.getUserId());
             }

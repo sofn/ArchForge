@@ -67,9 +67,6 @@ public final class LoginContext {
     }
 
     private static void grantIfAbsent(SystemLoginUser loginUser, String authority) {
-        boolean exists = loginUser.getAuthorities().stream().anyMatch(item -> authority.equals(item.getAuthority()));
-        if (!exists) {
-            loginUser.grantAppPermission(authority);
-        }
+        loginUser.grantAppPermission(authority);
     }
 }

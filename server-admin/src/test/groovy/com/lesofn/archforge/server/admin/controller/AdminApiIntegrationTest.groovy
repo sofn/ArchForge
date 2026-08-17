@@ -46,6 +46,9 @@ class AdminApiIntegrationTest extends Specification {
         int responseCode = conn.getResponseCode()
         InputStream inputStream = responseCode >= 400 ? conn.getErrorStream() : conn.getInputStream()
         String responseText = inputStream?.text ?: ""
+        if (responseText.isBlank()) {
+            throw new IllegalStateException("Empty response for ${method} ${path}, status=${responseCode}")
+        }
         return objectMapper.readValue(responseText, Map.class)
     }
 

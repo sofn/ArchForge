@@ -30,7 +30,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import org.springframework.core.env.Environment;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -78,7 +77,8 @@ public class LoginService {
             String decryptedPassword = decryptPassword(loginCommand.getPassword());
             SystemLoginUser loginUser = adminLoginUserFactory.load(loginCommand.getUsername());
             if (!passwordEncoder.matches(decryptedPassword, loginUser.getPassword())) {
-                throw new BadCredentialsException("bad credentials");
+                loginAttemptService.recordFailure(loginCommand.getUsername());
+                throw new AdminAuthException(USERNAME_PASSWORD_ERROR);
             }
             // 登录成功，清除失败计数
             loginAttemptService.clearAttempts(loginCommand.getUsername());
@@ -87,11 +87,6 @@ public class LoginService {
 
             recordLoginLog(loginUser, 1, "登录成功");
             return new LoginResult(token, loginUser);
-        } catch (BadCredentialsException e) {
-            log.info("用户[{}]登录失败，用户名或密码错误", loginCommand.getUsername());
-            loginAttemptService.recordFailure(loginCommand.getUsername());
-            recordLoginLog(loginCommand.getUsername(), 0, "登录失败");
-            throw new AdminAuthException(USERNAME_PASSWORD_ERROR);
         } catch (AdminAuthException e) {
             log.info("用户[{}]登录失败：{}", loginCommand.getUsername(), e.getMessage());
             recordLoginLog(loginCommand.getUsername(), 0, "登录失败");
@@ -263,7 +258,7 @@ public class LoginService {
         } catch (Exception e) {
             if (environment.matchesProfiles("prod")) {
                 log.warn("RSA密码解密失败，拒绝明文回退: {}", e.getMessage());
-                throw new BadCredentialsException("密码解密失败");
+                throw new AdminAuthException(DECODE_PASS_ERROR);
             }
             log.warn("RSA密码解密失败，尝试作为明文密码处理: {}", e.getMessage());
             return encryptedPassword;

@@ -1,6 +1,6 @@
 package com.lesofn.archforge.infrastructure.security.datascope;
 
-import com.lesofn.archforge.infrastructure.auth.AuthenticationUtils;
+import com.lesofn.archforge.infrastructure.auth.LoginContext;
 import com.lesofn.archforge.infrastructure.auth.model.SystemLoginUser;
 import com.lesofn.archforge.infrastructure.user.web.DataScopeEnum;
 import com.lesofn.archforge.infrastructure.user.web.RoleInfo;
@@ -43,7 +43,7 @@ public class DataScopeAspect {
     private DataScopeContext buildContext(DataPermission dataPermission) {
         SystemLoginUser user;
         try {
-            user = AuthenticationUtils.getSystemLoginUser();
+            user = LoginContext.getAdminUser();
         } catch (Exception e) {
             log.debug("No authenticated user, skip data scope: {}", e.getMessage());
             return null;

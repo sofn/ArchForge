@@ -101,20 +101,13 @@ dependencies {
     api("org.springframework.boot:spring-boot-starter-web") {
         exclude(group = "org.springframework.boot", module = "spring-boot-starter-logging")
     }
-    api("org.springframework.boot:spring-boot-starter-security") {
-        exclude(group = "org.springframework.boot", module = "spring-boot-starter-logging")
-    }
+    api("org.springframework.security:spring-security-crypto")
     
     // 添加log4j2依赖
     api("org.springframework.boot:spring-boot-starter-log4j2") {
         exclude(group = "org.apache.logging.log4j", module = "log4j-to-slf4j")
     }
     api("org.jolokia:jolokia-core")
-    
-    // JWT
-    api("io.jsonwebtoken:jjwt-api")
-    api("io.jsonwebtoken:jjwt-impl")
-    api("io.jsonwebtoken:jjwt-jackson")
     
     // Redis
     api("org.springframework.boot:spring-boot-starter-data-redis")

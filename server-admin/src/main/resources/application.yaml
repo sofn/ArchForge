@@ -19,6 +19,11 @@ management:
 spring:
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:dev}
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.security.autoconfigure.SecurityAutoConfiguration
+      - org.springframework.boot.security.autoconfigure.UserDetailsServiceAutoConfiguration
+      - org.springframework.boot.security.autoconfigure.servlet.ManagementWebSecurityAutoConfiguration
   application:
     name: ArchForge
     version: 1.0.0

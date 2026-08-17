@@ -1,7 +1,7 @@
 package com.lesofn.archforge.server.admin.controller.auth;
 
 import com.lesofn.archforge.infrastructure.annotation.RateLimit;
-import com.lesofn.archforge.infrastructure.auth.AuthenticationUtils;
+import com.lesofn.archforge.infrastructure.auth.LoginContext;
 import com.lesofn.archforge.infrastructure.auth.errors.AdminAuthErrorCode;
 import com.lesofn.archforge.infrastructure.auth.errors.AdminAuthException;
 import com.lesofn.archforge.infrastructure.auth.model.SystemLoginUser;
@@ -26,7 +26,8 @@ import java.util.List;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.access.prepost.PreAuthorize;
+import cn.dev33.satoken.annotation.SaCheckLogin;
+import com.lesofn.archforge.infrastructure.auth.stp.StpAdminUtil;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -129,10 +130,10 @@ public class LoginController {
      * @return 用户信息
      */
     @Operation(summary = "获取当前登录用户信息")
-    @PreAuthorize("isAuthenticated()")
+    @SaCheckLogin(type = StpAdminUtil.TYPE)
     @GetMapping("/getLoginUserInfo")
     public CurrentLoginUserResponse getLoginUserInfo() {
-        SystemLoginUser loginUser = AuthenticationUtils.getSystemLoginUser();
+        SystemLoginUser loginUser = LoginContext.getAdminUser();
         return userService.getLoginUserInfo(loginUser);
     }
 
@@ -142,10 +143,10 @@ public class LoginController {
      * @return 路由信息
      */
     @Operation(summary = "获取用户对应的菜单路由", description = "用于动态生成路由")
-    @PreAuthorize("isAuthenticated()")
+    @SaCheckLogin(type = StpAdminUtil.TYPE)
     @GetMapping("/getRouters")
     public List<RouterDTO> getRouters() {
-        SystemLoginUser loginUser = AuthenticationUtils.getSystemLoginUser();
+        SystemLoginUser loginUser = LoginContext.getAdminUser();
         return menuService.getRouterTree(loginUser);
     }
 
@@ -155,10 +156,10 @@ public class LoginController {
      * @return 路由信息
      */
     @Operation(summary = "获取异步路由", description = "兼容vue-pure-admin前端的路由获取接口")
-    @PreAuthorize("isAuthenticated()")
+    @SaCheckLogin(type = StpAdminUtil.TYPE)
     @GetMapping("/get-async-routes")
     public List<RouterDTO> getAsyncRoutes() {
-        SystemLoginUser loginUser = AuthenticationUtils.getSystemLoginUser();
+        SystemLoginUser loginUser = LoginContext.getAdminUser();
         return menuService.getRouterTree(loginUser);
     }
 

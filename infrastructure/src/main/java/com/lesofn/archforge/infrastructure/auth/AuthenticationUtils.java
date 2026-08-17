@@ -1,12 +1,9 @@
 package com.lesofn.archforge.infrastructure.auth;
 
 import static com.lesofn.archforge.infrastructure.auth.errors.AdminAuthErrorCode.USER_FAIL_TO_GET_USER_ID;
-import static com.lesofn.archforge.infrastructure.auth.errors.AdminAuthErrorCode.USER_FAIL_TO_GET_USER_INFO;
 
 import com.lesofn.archforge.infrastructure.auth.errors.AdminAuthException;
 import com.lesofn.archforge.infrastructure.auth.model.SystemLoginUser;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 /**
@@ -14,6 +11,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
  *
  * @author sofn
  */
+@Deprecated
 public class AuthenticationUtils {
 
     private AuthenticationUtils() {
@@ -29,20 +27,7 @@ public class AuthenticationUtils {
     }
 
     /** 获取系统用户 */
-    public static SystemLoginUser getSystemLoginUser() {
-        return LoginContext.findAdminUser().orElseGet(() -> {
-            try {
-                return (SystemLoginUser) getAuthentication().getPrincipal();
-            } catch (Exception e) {
-                throw new AdminAuthException(USER_FAIL_TO_GET_USER_INFO);
-            }
-        });
-    }
-
-    /** 获取Authentication */
-    public static Authentication getAuthentication() {
-        return SecurityContextHolder.getContext().getAuthentication();
-    }
+    public static SystemLoginUser getSystemLoginUser() { return LoginContext.getAdminUser(); }
 
     /**
      * 生成BCryptPasswordEncoder密码

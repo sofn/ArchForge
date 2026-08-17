@@ -41,7 +41,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.springframework.core.env.Environment;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -271,6 +270,6 @@ class LoginServiceTest {
     void decryptPassword_ProdInvalidInput_ThrowsBadCredentialsException() {
         when(environment.matchesProfiles("prod")).thenReturn(true);
 
-        assertThrows(BadCredentialsException.class, () -> loginService.decryptPassword("notEncrypted"));
+        assertThrows(AdminAuthException.class, () -> loginService.decryptPassword("notEncrypted"));
     }
 }

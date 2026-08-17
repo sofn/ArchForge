@@ -7,13 +7,9 @@ import com.lesofn.archforge.common.utils.ip.IpUtil;
 import eu.bitwalker.useragentutils.UserAgent;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
 /**
  * 登录用户身份权限
@@ -22,7 +18,7 @@ import org.springframework.security.core.userdetails.UserDetails;
  */
 @Data
 @NoArgsConstructor
-public class BaseLoginUser implements UserDetails {
+public class BaseLoginUser implements java.io.Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -35,7 +31,7 @@ public class BaseLoginUser implements UserDetails {
 
     protected String password;
 
-    protected List<GrantedAuthority> authorities = new ArrayList<>();
+    protected List<String> authorities = new ArrayList<>();
 
     /** 登录信息 */
     protected final LoginInfo loginInfo = new LoginInfo();
@@ -100,36 +96,11 @@ public class BaseLoginUser implements UserDetails {
     }
 
     public void grantAppPermission(String appName) {
-        authorities.add(new SimpleGrantedAuthority(appName));
+        if (appName != null && !appName.isBlank() && !authorities.contains(appName)) {
+            authorities.add(appName);
+        }
     }
 
-    @Override
-    public String getUsername() { return this.username; }
-
     @JsonIgnore
-    @Override
-    public String getPassword() { return this.password; }
-
-    /** 账户是否未过期,过期无法验证 未实现此功能 */
-    @JsonIgnore
-    @Override
-    public boolean isAccountNonExpired() { return true; }
-
-    /** 指定用户是否解锁,锁定的用户无法进行身份验证 未实现此功能 */
-    @JsonIgnore
-    @Override
-    public boolean isAccountNonLocked() { return true; }
-
-    /** 指示是否已过期的用户的凭据(密码),过期的凭据防止认证 未实现此功能 */
-    @JsonIgnore
-    @Override
-    public boolean isCredentialsNonExpired() { return true; }
-
-    /** 是否可用 ,禁用的用户不能身份验证 未实现此功能 */
-    @Override
-    public boolean isEnabled() { return true; }
-
-    @JsonIgnore
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() { return authorities; }
+    public List<String> getAuthorities() { return authorities; }
 }

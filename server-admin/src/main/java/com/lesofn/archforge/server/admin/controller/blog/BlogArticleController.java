@@ -5,7 +5,7 @@ import com.lesofn.archforge.blog.api.domain.BlogCategory;
 import com.lesofn.archforge.blog.api.enums.BlogArticleStatus;
 import com.lesofn.archforge.blog.api.service.BlogArticleService;
 import com.lesofn.archforge.blog.api.service.BlogCategoryService;
-import com.lesofn.archforge.infrastructure.auth.AuthenticationUtils;
+import com.lesofn.archforge.infrastructure.auth.LoginContext;
 import com.lesofn.archforge.infrastructure.auth.model.SystemLoginUser;
 import com.lesofn.archforge.server.admin.dto.AdminPageResponse;
 import com.lesofn.archforge.server.admin.dto.request.AdminBlogArticleCreateRequest;
@@ -22,7 +22,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.access.prepost.PreAuthorize;
+import cn.dev33.satoken.annotation.SaCheckRole;
+import com.lesofn.archforge.infrastructure.auth.stp.StpAdminUtil;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -32,7 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/blog/article")
-@PreAuthorize("hasRole('ADMIN')")
+@SaCheckRole(value = "ADMIN", type = StpAdminUtil.TYPE)
 @RequiredArgsConstructor
 public class BlogArticleController {
 
@@ -60,7 +61,7 @@ public class BlogArticleController {
 
     @PostMapping("/create")
     public Long create(@RequestBody @Valid AdminBlogArticleCreateRequest request) {
-        SystemLoginUser loginUser = AuthenticationUtils.getSystemLoginUser();
+        SystemLoginUser loginUser = LoginContext.getAdminUser();
         BlogArticle article = buildFromRequest(request)
                 .setAuthorId(loginUser != null ? loginUser.getUserId() : null);
         return articleService.create(article).getId();

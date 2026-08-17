@@ -17,10 +17,8 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
+import com.lesofn.archforge.infrastructure.auth.LoginContext;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 /**
@@ -72,17 +70,7 @@ public class LogAspect {
         }
     }
 
-    private String getCurrentUsername() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !authentication.isAuthenticated()) {
-            return "";
-        }
-        Object principal = authentication.getPrincipal();
-        if (principal instanceof UserDetails userDetails) {
-            return userDetails.getUsername();
-        }
-        return authentication.getName() == null ? "" : authentication.getName();
-    }
+    private String getCurrentUsername() { return LoginContext.findAdminUser().map(user -> user.getUsername()).orElse(""); }
 
     private String resolveModule(Log annotation, MethodSignature signature) {
         if (annotation != null && !annotation.module().isBlank()) {

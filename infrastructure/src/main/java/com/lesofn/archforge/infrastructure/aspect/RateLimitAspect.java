@@ -4,7 +4,7 @@ import com.lesofn.archforge.common.error.system.SystemException;
 import com.lesofn.archforge.common.error.SystemErrorCode;
 import com.lesofn.archforge.common.utils.ip.IpUtil;
 import com.lesofn.archforge.infrastructure.annotation.RateLimit;
-import com.lesofn.archforge.infrastructure.auth.AuthenticationUtils;
+import com.lesofn.archforge.infrastructure.auth.LoginContext;
 import com.lesofn.archforge.infrastructure.auth.model.SystemLoginUser;
 import com.lesofn.archforge.infrastructure.config.ArchForgeProperties;
 import com.lesofn.archforge.infrastructure.frame.context.RequestContext;
@@ -89,7 +89,7 @@ public class RateLimitAspect {
 
     private String getCurrentUserId() {
         try {
-            SystemLoginUser user = AuthenticationUtils.getSystemLoginUser();
+            SystemLoginUser user = LoginContext.findAdminUser().orElse(null);
             return user != null ? String.valueOf(user.getUserId()) : "anonymous";
         } catch (Exception e) {
             return "anonymous";

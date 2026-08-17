@@ -94,8 +94,8 @@ class AdminLoginUserFactoryTest {
 
         SystemLoginUser loginUser = factory.load("admin");
         assertEquals("admin", loginUser.getUsername());
-        assertTrue(loginUser.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_USER")));
-        assertTrue(loginUser.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("system:user:list")));
+        assertTrue(loginUser.getAuthorities().contains("ROLE_USER"));
+        assertTrue(loginUser.getAuthorities().contains("system:user:list"));
         assertEquals(2L, loginUser.getRoleId());
     }
 
@@ -118,8 +118,8 @@ class AdminLoginUserFactoryTest {
         when(menuService.findAllActiveMenus()).thenReturn(List.of(menu));
 
         SystemLoginUser loginUser = factory.load("super");
-        assertTrue(loginUser.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN")));
-        assertTrue(loginUser.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(RoleInfo.ALL_PERMISSIONS)));
+        assertTrue(loginUser.getAuthorities().contains("ROLE_ADMIN"));
+        assertTrue(loginUser.getAuthorities().contains(RoleInfo.ALL_PERMISSIONS));
     }
 
     @Test
