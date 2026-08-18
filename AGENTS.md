@@ -52,3 +52,6 @@ archforge/
 - Do not modify another repository unless explicitly required.
 - This repo exposes two applications: `server-admin` (port 8080) and
   `server-web` (port 8081).
+- **Contract sync rule**: whenever the backend API changes (paths, parameters,
+  request/response schemas, auth), update `../ArchForgeSpec/api/openapi.yaml`
+  in the same change. Never leave the API contract out of sync with the source.
