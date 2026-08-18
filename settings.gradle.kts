@@ -44,6 +44,7 @@ include("archforge-starters:archforge-redisson-starter")
 include("archforge-starters:archforge-cache-starter")
 include("archforge-starters:archforge-lock-starter")
 include("archforge-starters:archforge-trace-starter")
+include("archforge-cli")
 
 // Configure build file names for subprojects
 rootProject.children.forEach { project ->

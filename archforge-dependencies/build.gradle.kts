@@ -113,6 +113,10 @@ dependencies {
 
         // FreeMarker (template engine for code generation)
         api("org.freemarker:freemarker:2.3.33")
+
+        // CLI
+        api("info.picocli:picocli:4.7.6")
+        api("info.picocli:picocli-shell-jline3:4.7.6")
     }
 }
 

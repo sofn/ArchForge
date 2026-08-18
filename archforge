@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+JAR="${ROOT}/archforge-cli/build/libs/archforge-cli.jar"
+
+if [[ ! -f "${JAR}" ]]; then
+  echo "archforge-cli.jar not found, building..."
+  (cd "${ROOT}" && ./gradlew :archforge-cli:shadowJar -x test)
+fi
+
+exec java --enable-preview -jar "${JAR}" "$@"

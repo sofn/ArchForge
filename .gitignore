@@ -49,3 +49,7 @@ IFLOW.md
 # Runtime upload directory
 uploads/
 archforge-server-admin/uploads/
+
+# Generated secrets and DB backups
+.env
+backup/
