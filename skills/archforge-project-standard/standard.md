@@ -88,7 +88,7 @@ server-<name> → infrastructure → common/common-base
 - **`infrastructure/`**: Spring-aware cross-cutting concerns — authentication, authorization, filters, interceptors, file storage, database configuration, observability setup.
 - **`domain/<context>/`**: Business logic with DDD patterns. Depends on `common-base` and JPA. Contains entities with behavior, repository interfaces, domain services.
 - **`server-<name>/`**: Thin web layer — controllers, request/response DTOs, Spring Boot `@SpringBootApplication` entry point. Depends on `domain/*` and `infrastructure`.
-- **`dependencies/`**: `java-platform` module. All third-party versions defined here. Every other module applies `platform(project(":dependencies"))`.
+- **`dependencies/`**: `java-platform` module. All third-party versions defined here. Every other module applies `platform(project(":archforge-dependencies"))`.
 
 ### Adding a New Bounded Context
 
@@ -615,7 +615,7 @@ Every subproject imports both the Spring Boot BOM and the project BOM:
 ```kotlin
 dependencies {
     implementation(platform("org.springframework.boot:spring-boot-dependencies:4.0.5"))
-    implementation(platform(project(":dependencies")))
+    implementation(platform(project(":archforge-dependencies")))
 }
 ```
 

@@ -33,8 +33,8 @@ sonarqube {
 }
 
 subprojects {
-    // 为除了 dependencies 之外的所有子项目应用插件
-    if (name != "dependencies") {
+    // 为除了 archforge-dependencies 之外的所有子项目应用插件
+    if (name != "archforge-dependencies") {
         apply(plugin = "java-library")
         apply(plugin = "groovy")
         apply(plugin = "com.diffplug.spotless")
@@ -100,7 +100,7 @@ subprojects {
             // 引入 Spring Boot dependencies
             add("implementation", platform("org.springframework.boot:spring-boot-dependencies:4.1.0"))
             // 引入自定义 dependencies
-            add("implementation", platform(project(":dependencies")))
+            add("implementation", platform(project(":archforge-dependencies")))
 
             // compile - Lombok配置
             add("annotationProcessor", "org.projectlombok:lombok:1.18.46")

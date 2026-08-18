@@ -4,11 +4,11 @@
 
 ```bash
 ./gradlew build                    # Full build (compile + spotless + test)
-./gradlew server-admin:bootRun     # Start Spring Boot (dev profile)
+./gradlew :archforge-server-admin:bootRun     # Start Spring Boot (dev profile)
 ./gradlew spotlessApply            # Auto-fix code formatting
 ./gradlew spotlessCheck            # Check formatting only
 ./gradlew test                     # Run all tests
-./gradlew :server-admin:test       # Run specific module tests
+./gradlew :archforge-server-admin:test       # Run specific module tests
 ./gradlew clean build              # Clean + full build
 ```
 

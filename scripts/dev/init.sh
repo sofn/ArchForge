@@ -107,12 +107,12 @@ init_databases() {
 
 import_seed() {
     echo "Importing seed data into ${DB_NAME_USER}..."
-    for sql in "${REPO_ROOT}/domain/admin-user/src/main/resources/sql/data-admin-user.sql" \
-               "${REPO_ROOT}/domain/admin-user/src/main/resources/sql/data-admin-dept.sql" \
-               "${REPO_ROOT}/domain/admin-user/src/main/resources/sql/data-admin-config.sql" \
-               "${REPO_ROOT}/domain/admin-user/src/main/resources/sql/data-admin-quartz.sql" \
-               "${REPO_ROOT}/domain/admin-user/src/main/resources/sql/data-admin-blog.sql" \
-               "${REPO_ROOT}/domain/admin-user/src/main/resources/sql/reset-sequences.sql"; do
+    for sql in "${REPO_ROOT}/archforge-domain/archforge-admin-user/src/main/resources/sql/data-admin-user.sql" \
+               "${REPO_ROOT}/archforge-domain/archforge-admin-user/src/main/resources/sql/data-admin-dept.sql" \
+               "${REPO_ROOT}/archforge-domain/archforge-admin-user/src/main/resources/sql/data-admin-config.sql" \
+               "${REPO_ROOT}/archforge-domain/archforge-admin-user/src/main/resources/sql/data-admin-quartz.sql" \
+               "${REPO_ROOT}/archforge-domain/archforge-admin-user/src/main/resources/sql/data-admin-blog.sql" \
+               "${REPO_ROOT}/archforge-domain/archforge-admin-user/src/main/resources/sql/reset-sequences.sql"; do
         filename=$(basename "${sql}")
         docker cp "${sql}" "${POSTGRES_CONTAINER}:/tmp/${filename}"
         docker exec "${POSTGRES_CONTAINER}" psql -U "${DB_USERNAME}" -d "${DB_NAME_USER}" -v ON_ERROR_STOP=0 -f "/tmp/${filename}"
@@ -131,6 +131,6 @@ init_databases
 
 echo ""
 echo "Dev environment is ready."
-echo "Run: cd ${REPO_ROOT} && JAVA_HOME=/path/to/jdk25 ./gradlew server-admin:bootRun"
+echo "Run: cd ${REPO_ROOT} && JAVA_HOME=/path/to/jdk25 ./gradlew :archforge-server-admin:bootRun"
 echo "After the app has started (tables created by Hibernate), seed data with:"
 echo "  ${DIR}/seed.sh"

@@ -1,5 +1,5 @@
 # ---- Traditional JVM Deployment (Full JRE) ----
-# Pre-requisite: ./gradlew :server-admin:bootJar -x test
+# Pre-requisite: ./gradlew :archforge-server-admin:bootJar -x test
 # Build with: docker build -f docker/fulljre/Dockerfile -t archforge:fulljre .
 #
 # Simplest deployment mode — uses the complete Azul Zulu JRE.
@@ -11,7 +11,7 @@ RUN addgroup -g 1001 archforge && adduser -u 1001 -G archforge -D archforge \
     && mkdir -p /app/logs && chown archforge:archforge /app/logs
 USER archforge
 
-ARG JAR_FILE=server-admin/build/libs/server-admin.jar
+ARG JAR_FILE=archforge-server-admin/build/libs/archforge-server-admin.jar
 COPY ${JAR_FILE} app.jar
 
 EXPOSE 8080

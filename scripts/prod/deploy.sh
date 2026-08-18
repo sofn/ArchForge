@@ -16,7 +16,7 @@ fi
 cd "${REPO_ROOT}"
 
 echo "=== Building backend bootJar ==="
-./gradlew :server-admin:bootJar -x test -x spotlessCheck --no-daemon
+./gradlew :archforge-server-admin:bootJar -x test -x spotlessCheck --no-daemon
 
 echo "=== Building backend image: archforge:fulljre ==="
 docker build -f docker/fulljre/Dockerfile -t archforge:fulljre .
@@ -50,7 +50,7 @@ for i in $(seq 1 120); do
 done
 
 echo "=== Importing seed data ==="
-docker cp "${REPO_ROOT}/domain/admin-user/src/main/resources/sql" "$(docker compose -f docker-compose.prod.yml ps -q postgres):/tmp/seed"
+docker cp "${REPO_ROOT}/archforge-domain/archforge-admin-user/src/main/resources/sql" "$(docker compose -f docker-compose.prod.yml ps -q postgres):/tmp/seed"
 for sql in data-admin-user.sql data-admin-dept.sql data-admin-config.sql data-admin-quartz.sql; do
     docker compose -f docker-compose.prod.yml exec -T postgres \
         psql -v ON_ERROR_STOP=0 -U "${DB_USERNAME:-archforge}" -d archforge_user -f "/tmp/seed/sql/${sql}"

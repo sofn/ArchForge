@@ -22,33 +22,33 @@ pluginManagement {
 
 rootProject.name = "ArchForge"
 
-include("common:common-base")
-include("common:common-jpa")
-include("common:common-error")
-include("infrastructure")
-include("dependencies")
-include("server-admin")
-include("domain:blog")
-include("server-web")
+include("archforge-common:archforge-common-base")
+include("archforge-common:archforge-common-jpa")
+include("archforge-common:archforge-common-error")
+include("archforge-infrastructure")
+include("archforge-dependencies")
+include("archforge-server-admin")
+include("archforge-domain:archforge-blog")
+include("archforge-server-web")
 
-include("domain:admin-user")
-include("domain:meta-table")
+include("archforge-domain:archforge-admin-user")
+include("archforge-domain:archforge-meta-table")
 
-file("example").listFiles()?.filter {
+file("archforge-example").listFiles()?.filter {
     it.isDirectory && File(it, "build.gradle.kts").exists()
 }?.forEach { dir ->
-    include("example:${dir.name}")
+    include("archforge-example:${dir.name}")
 }
 
-include("starters:arch-forge-redisson-starter")
-include("starters:arch-forge-cache-starter")
-include("starters:arch-forge-lock-starter")
-include("starters:arch-forge-trace-starter")
+include("archforge-starters:archforge-redisson-starter")
+include("archforge-starters:archforge-cache-starter")
+include("archforge-starters:archforge-lock-starter")
+include("archforge-starters:archforge-trace-starter")
 
 // Configure build file names for subprojects
 rootProject.children.forEach { project ->
     // All subprojects now use build.gradle.kts
     project.buildFileName = "build.gradle.kts"
-    
+
     require(project.projectDir.isDirectory) { "Project directory must exist: ${project.projectDir}" }
 }

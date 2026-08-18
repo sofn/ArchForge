@@ -6,7 +6,7 @@ WORKDIR /workspace
 COPY . .
 # Limit Gradle/AOT JVM memory to leave headroom for native-image (needs ~6GB)
 ENV GRADLE_OPTS="-Xmx512m" JAVA_TOOL_OPTIONS="-Xmx1g"
-RUN ./gradlew :server-admin:nativeCompile -x test -x spotlessCheck --no-daemon -Dorg.gradle.jvmargs="-Xmx1g"
+RUN ./gradlew :archforge-server-admin:nativeCompile -x test -x spotlessCheck --no-daemon -Dorg.gradle.jvmargs="-Xmx1g"
 
 # ---- Runtime Stage ----
 FROM debian:trixie-slim
@@ -20,7 +20,7 @@ RUN groupadd -g 1001 archforge && useradd -u 1001 -g archforge -m archforge \
     && mkdir -p /app/logs && chown archforge:archforge /app/logs
 USER archforge
 
-COPY --from=build /workspace/server-admin/build/native/nativeCompile/server-admin app
+COPY --from=build /workspace/archforge-server-admin/build/native/nativeCompile/archforge-server-admin app
 
 EXPOSE 8080
 ENV SPRING_PROFILES_ACTIVE="prod"

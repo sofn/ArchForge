@@ -12,7 +12,7 @@ For every new requirement:
 2. **Wait for user review** — do NOT start implementation until approved
 3. **Track progress** — update plan file status after each step (pending / in_progress / done)
 4. **Verify each step** — run `./gradlew build` after each change
-5. **Verify before push** — run `./gradlew server-admin:bootRun` to confirm startup
+5. **Verify before push** — run `./gradlew :archforge-server-admin:bootRun` to confirm startup
 6. **Push codeplans repo** after completion
 
 ## Agent Loop Files
@@ -25,7 +25,7 @@ For every new requirement:
 Before claiming work is complete:
 
 - [ ] `./gradlew build` passes (includes spotlessCheck + all tests)
-- [ ] `./gradlew server-admin:bootRun` starts without errors
+- [ ] `./gradlew :archforge-server-admin:bootRun` starts without errors
 - [ ] No new deprecation warnings introduced
 - [ ] Plan file updated with final status
 

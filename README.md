@@ -27,7 +27,7 @@ ArchForge is a **production-ready, full-stack admin platform** that combines a S
 - **Team project standard**: Codified conventions (Spotless, JSpecify, Lombok), centralized dependency BOM, skill-based onboarding
 - **JDK 25 features in production**: ScopedValue, Structured Concurrency, Pattern Matching, Stream Gatherers, Virtual Threads
 - **Production-ready deployment**: Docker with jlink minimal JRE + Project Leyden CDS, Flyway migrations, multi-datasource, Micrometer observability
-- **Zero-config dev**: `scripts/dev/init.sh` starts PostgreSQL, Redis, RustFS Docker containers; `./gradlew server-admin:bootRun` connects to them
+- **Zero-config dev**: `scripts/dev/init.sh` starts PostgreSQL, Redis, RustFS Docker containers; `./gradlew :archforge-server-admin:bootRun` connects to them
 
 ## Features
 
@@ -82,7 +82,7 @@ git clone https://github.com/sofn/ArchForgeAdmin.git
 cd ArchForge/scripts/dev
 ./init.sh           # starts PostgreSQL, Redis, RustFS Docker containers
 cd ../..
-JAVA_HOME=/path/to/jdk25 ./gradlew server-admin:bootRun
+JAVA_HOME=/path/to/jdk25 ./gradlew :archforge-server-admin:bootRun
 ```
 
 > Dev profile uses the Docker containers started by `scripts/dev/init.sh`. Use `scripts/dev/down.sh` to stop them.

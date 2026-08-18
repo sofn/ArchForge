@@ -1,5 +1,5 @@
 # ---- JVM Build Stage (Project Leyden CDS + jlink minimal JRE) ----
-# Pre-requisite: ./gradlew :server-admin:bootJar -x test
+# Pre-requisite: ./gradlew :archforge-server-admin:bootJar -x test
 # Build with: docker build -f docker/jlink/Dockerfile -t archforge:jlink .
 FROM azul/zulu-openjdk:25 AS training
 WORKDIR /app
@@ -7,7 +7,7 @@ WORKDIR /app
 # binutils provides objcopy (needed by jlink --strip-debug)
 RUN apt-get update && apt-get install -y --no-install-recommends binutils && rm -rf /var/lib/apt/lists/*
 
-ARG JAR_FILE=server-admin/build/libs/server-admin.jar
+ARG JAR_FILE=archforge-server-admin/build/libs/archforge-server-admin.jar
 COPY ${JAR_FILE} app.jar
 
 # Generate CDS archive (Project Leyden AOT cache)

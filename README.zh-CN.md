@@ -27,7 +27,7 @@ ArchForge 是一个**开箱即用的全栈管理系统**，后端基于 Spring B
 - **团队标准**：规范化约定（Spotless、JSpecify、Lombok），统一依赖 BOM，Skill 化入门指引
 - **JDK 25 新能力**：ScopedValue、结构化并发、模式匹配、Stream Gatherers、虚拟线程
 - **生产就绪**：Docker（jlink 最小 JRE + Leyden CDS）、Flyway 迁移、多数据源、Micrometer 可观测性
-- **零配置开发**：`scripts/dev/init.sh` 启动 PostgreSQL、Redis、RustFS Docker 容器；`./gradlew server-admin:bootRun` 直接连接它们
+- **零配置开发**：`scripts/dev/init.sh` 启动 PostgreSQL、Redis、RustFS Docker 容器；`./gradlew :archforge-server-admin:bootRun` 直接连接它们
 
 ## 功能模块
 
@@ -81,7 +81,7 @@ git clone https://github.com/sofn/ArchForgeAdmin.git
 cd ArchForge/scripts/dev
 ./init.sh           # 启动 PostgreSQL、Redis、RustFS Docker 容器
 cd ../..
-JAVA_HOME=/path/to/jdk25 ./gradlew server-admin:bootRun
+JAVA_HOME=/path/to/jdk25 ./gradlew :archforge-server-admin:bootRun
 ```
 
 > 开发环境使用 `scripts/dev/init.sh` 启动的 Docker 容器。使用 `scripts/dev/down.sh` 停止它们。

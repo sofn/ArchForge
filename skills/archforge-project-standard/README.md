@@ -41,10 +41,10 @@ Once installed, Devin can reference this skill when:
 ./gradlew build
 
 # Run the admin server locally (dev profile, Testcontainers)
-./gradlew server-admin:bootRun
+./gradlew :archforge-server-admin:bootRun
 
 # Docker production build
-./gradlew :server-admin:bootJar -x test
+./gradlew :archforge-server-admin:bootJar -x test
 cd docker && ./start.sh jvm
 ```
 
