@@ -18,6 +18,10 @@ public class ProcessRunner {
     }
 
     public int run(List<String> command, Path workingDir, Map<String, String> extraEnv, boolean inheritIo) {
+        return run(command, workingDir, extraEnv, inheritIo, null);
+    }
+
+    public int run(List<String> command, Path workingDir, Map<String, String> extraEnv, boolean inheritIo, Path stdoutFile) {
         try {
             ProcessBuilder builder = new ProcessBuilder(new ArrayList<>(command));
             if (workingDir != null) {
@@ -26,11 +30,15 @@ public class ProcessRunner {
             builder.environment().putAll(extraEnv);
             if (inheritIo) {
                 builder.inheritIO();
+            } else if (stdoutFile != null) {
+                stdoutFile.toFile().getParentFile().mkdirs();
+                builder.redirectOutput(stdoutFile.toFile());
+                builder.redirectError(ProcessBuilder.Redirect.INHERIT);
             } else {
                 builder.redirectErrorStream(true);
             }
             Process process = builder.start();
-            if (!inheritIo) {
+            if (!inheritIo && stdoutFile == null) {
                 String output = new String(process.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
                 if (!output.isBlank()) {
                     System.out.print(output);

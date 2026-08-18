@@ -60,12 +60,9 @@ public final class SecretGenerator {
             Map<String, String> existing = readEnv(envFile);
             Map<String, String> generated = generate();
             Map<String, String> written = new LinkedHashMap<>();
-            List<String> lines = envFile.toFile().exists()
+            List<String> lines = Files.exists(envFile)
                     ? new ArrayList<>(Files.readAllLines(envFile, StandardCharsets.UTF_8))
                     : new ArrayList<>();
-            if (!lines.isEmpty() && !lines.get(lines.size() - 1).isBlank()) {
-                // keep a trailing newline by appending after existing content
-            }
             for (String key : KEYS) {
                 if (existing.containsKey(key) && !existing.get(key).isBlank()) {
                     continue;

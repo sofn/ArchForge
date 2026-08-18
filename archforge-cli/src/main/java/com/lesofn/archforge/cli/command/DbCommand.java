@@ -64,20 +64,11 @@ public class DbCommand {
             ComposeSupport compose = new ComposeSupport(new ProcessRunner(), root);
             int code = compose.exec(
                     "dev",
-                    List.of(
-                            "postgres",
-                            "sh",
-                            "-c",
-                            "pg_dump -U ${POSTGRES_USER:-archforge} postgres > /tmp/archforge.sql"));
+                    List.of("postgres", "pg_dump", "-U", "archforge", "-d", "archforge_user"),
+                    file);
             if (code != 0) {
-                System.err.println("pg_dump via compose failed; wrote placeholder marker at " + file);
-            }
-            try {
-                if (!Files.exists(file)) {
-                    Files.writeString(file, "-- archforge backup placeholder " + stamp + "\n");
-                }
-            } catch (Exception e) {
-                throw new IllegalStateException(e);
+                System.err.println("pg_dump via compose failed; no usable backup written.");
+                return code;
             }
             System.out.println("Backup written: " + file);
             return 0;

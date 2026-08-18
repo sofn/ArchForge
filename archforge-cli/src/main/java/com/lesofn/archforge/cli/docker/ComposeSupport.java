@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * All docker operations go through compose files under docker/.
@@ -51,11 +52,15 @@ public class ComposeSupport {
     }
 
     public int exec(String profile, List<String> execArgs) {
+        return exec(profile, execArgs, null);
+    }
+
+    public int exec(String profile, List<String> execArgs, Path stdoutFile) {
         List<String> command = base(profile);
         command.add("exec");
         command.add("-T");
         command.addAll(execArgs);
-        return processRunner.run(command, ProjectPaths.dockerDir(repoRoot));
+        return processRunner.run(command, ProjectPaths.dockerDir(repoRoot), Map.of(), false, stdoutFile);
     }
 
     public boolean fileExists(String profile) {

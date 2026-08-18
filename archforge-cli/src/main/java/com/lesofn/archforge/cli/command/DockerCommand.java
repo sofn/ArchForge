@@ -23,8 +23,8 @@ public class DockerCommand {
 
         @Override
         public Integer call() {
-            PathAwareCompose compose = new PathAwareCompose(profile);
-            int infra = compose.support.up(profile, List.of("postgres", "redis"));
+            ComposeSupport compose = new ComposeSupport(new ProcessRunner(), ProjectPaths.repoRoot());
+            int infra = compose.up(profile, List.of("postgres", "redis"));
             if (infra != 0) {
                 return infra;
             }
@@ -35,7 +35,7 @@ public class DockerCommand {
             if (migrate != 0) {
                 System.err.println("flywayMigrate returned " + migrate);
             }
-            return compose.support.up(profile, List.of());
+            return compose.up(profile, List.of());
         }
     }
 
@@ -47,14 +47,6 @@ public class DockerCommand {
         @Override
         public Integer call() {
             return new ComposeSupport(new ProcessRunner(), ProjectPaths.repoRoot()).down(profile);
-        }
-    }
-
-    private static final class PathAwareCompose {
-        private final ComposeSupport support;
-
-        private PathAwareCompose(String ignored) {
-            this.support = new ComposeSupport(new ProcessRunner(), ProjectPaths.repoRoot());
         }
     }
 }
