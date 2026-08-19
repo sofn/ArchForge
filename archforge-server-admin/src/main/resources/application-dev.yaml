@@ -93,7 +93,7 @@ arch-forge:
     db-init: false
     s3: false
   flyway:
-    enabled: false
+    enabled: true
   monitor:
     enabled: true
   web:
@@ -109,7 +109,7 @@ arch-forge:
       - http://localhost:8848
       - http://localhost:3000
   file-storage:
-    type: ${FILE_STORAGE_TYPE:s3}
+    type: ${FILE_STORAGE_TYPE:local}
     local-dir: uploads
     s3:
       endpoint: ${S3_ENDPOINT:http://localhost:9000}

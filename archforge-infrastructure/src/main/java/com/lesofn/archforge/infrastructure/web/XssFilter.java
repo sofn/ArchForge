@@ -10,6 +10,10 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+/**
+ * First-pass XSS defense for query/header values.
+ * JSON request bodies still need controller-level sanitization.
+ */
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE + 20)
 public class XssFilter extends OncePerRequestFilter {
