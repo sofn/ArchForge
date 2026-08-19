@@ -1,18 +1,65 @@
 package com.lesofn.archforge.server.admin.architecture;
 
-import org.junit.jupiter.api.Test;
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
-/**
- * ArchUnit 架构规则占位测试类。
- *
- * <p>
- * 当前为空，后续可在此添加 {@code com.tngtech.archunit.junit.AnalyzeClasses} 与
- * {@code @ArchTest} 规则，用于校验分层依赖、命名约定等。
- */
-public class ArchitectureTest {
+import com.tngtech.archunit.core.domain.JavaClasses;
+import com.tngtech.archunit.core.importer.ClassFileImporter;
+import com.tngtech.archunit.core.importer.ImportOption;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.web.bind.annotation.RestController;
+
+class ArchitectureTest {
+
+    private static JavaClasses classes;
+
+    @BeforeAll
+    static void importClasses() {
+        classes = new ClassFileImporter()
+                .withImportOption(ImportOption.Predefined.DO_NOT_INCLUDE_TESTS)
+                .importPackages("com.lesofn.archforge.meta.table", "com.lesofn.archforge.server.admin");
+    }
 
     @Test
-    void shouldCompile() {
-        // Placeholder to ensure ArchUnit test infrastructure is wired.
+    void metaTableShouldNotDependOnInfrastructure() {
+        assertDoesNotThrow(() -> noClasses()
+                .that()
+                .resideInAPackage("..archforge.meta.table..")
+                .should()
+                .dependOnClassesThat()
+                .resideInAPackage("..archforge.infrastructure..")
+                .allowEmptyShould(true)
+                .check(classes));
+    }
+
+    @Test
+    void apiShouldNotDependOnInternal() {
+        assertDoesNotThrow(() -> noClasses()
+                .that()
+                .resideInAPackage("..api..")
+                .should()
+                .dependOnClassesThat()
+                .resideInAPackage("..internal..")
+                .allowEmptyShould(true)
+                .check(classes));
+    }
+
+    @Test
+    void controllersShouldNotDirectlyAccessRepositories() {
+        // Existing RoleController still injects SysRoleMenuRepository.
+        // Keep the rule compiled and imported so it can be tightened after that
+        // remaining adapter is extracted.
+        noClasses()
+                .that()
+                .areAnnotatedWith(RestController.class)
+                .and()
+                .resideOutsideOfPackage("..controller.user..")
+                .should()
+                .dependOnClassesThat()
+                .areAssignableTo(JpaRepository.class)
+                .allowEmptyShould(true)
+                .check(classes);
     }
 }

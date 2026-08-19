@@ -80,7 +80,7 @@ public class LoginController {
      */
     @Operation(summary = "登录")
     @PostMapping("/login")
-    @RateLimit(key = "login", time = 60, maxCount = 10, limitType = RateLimit.LimitType.IP)
+    @RateLimit(key = "login", time = 60, maxCount = 5, limitType = RateLimit.LimitType.IP)
     public LoginResponse login(
             @Parameter(description = "登录信息", required = true) @RequestBody @Valid LoginRequest loginCommand) {
         // 生成令牌并获取用户信息

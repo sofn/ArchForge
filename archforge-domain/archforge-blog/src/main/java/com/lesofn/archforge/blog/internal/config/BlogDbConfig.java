@@ -1,6 +1,6 @@
 package com.lesofn.archforge.blog.internal.config;
 
-import com.lesofn.archforge.infrastructure.frame.database.GroupDataSourceProxy;
+import com.lesofn.archforge.common.persistence.GroupDataSourceProxy;
 import jakarta.annotation.Resource;
 import java.util.HashMap;
 import java.util.Map;

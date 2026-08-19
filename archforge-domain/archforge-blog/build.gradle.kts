@@ -1,6 +1,5 @@
 dependencies {
     api(project(":archforge-common:archforge-common-jpa"))
-    api(project(":archforge-infrastructure"))
 
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")

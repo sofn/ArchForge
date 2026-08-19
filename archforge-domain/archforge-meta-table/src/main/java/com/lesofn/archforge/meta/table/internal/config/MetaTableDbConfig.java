@@ -1,6 +1,6 @@
 package com.lesofn.archforge.meta.table.internal.config;
 
-import com.lesofn.archforge.infrastructure.frame.database.GroupDataSourceProxy;
+import com.lesofn.archforge.common.persistence.GroupDataSourceProxy;
 import java.util.HashMap;
 import java.util.Map;
 import javax.sql.DataSource;

@@ -40,6 +40,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 用户服务实现类
@@ -119,6 +120,7 @@ public class AdminUserServiceImpl implements AdminUserService {
     }
 
     @Override
+    @Transactional("userDomainTransactionManager")
     public Long createUser(UserCreateRequest request) {
         SysUser user = adminUserMapper.fromCreateRequest(request);
         if (user.getPhoneNumber() == null) {
@@ -136,6 +138,7 @@ public class AdminUserServiceImpl implements AdminUserService {
     }
 
     @Override
+    @Transactional("userDomainTransactionManager")
     public Boolean updateUser(UserUpdateRequest request) {
         if (sysUserService.findById(request.getId()).isEmpty()) {
             return false;

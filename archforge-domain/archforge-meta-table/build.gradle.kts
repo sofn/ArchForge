@@ -1,10 +1,10 @@
 dependencies {
     api(project(":archforge-common:archforge-common-base"))
     api(project(":archforge-common:archforge-common-jpa"))
-    api(project(":archforge-infrastructure"))
 
     implementation("org.freemarker:freemarker")
     implementation("org.apache.commons:commons-csv:1.10.0")
+    implementation("com.fasterxml.jackson.core:jackson-databind")
 
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
