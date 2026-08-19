@@ -60,10 +60,12 @@ archforge-infrastructure
 archforge-server-admin
 archforge-server-web
 archforge-cli
-archforge-example/archforge-example-task
+archforge-example/archforge-example-task   # still linked from server-admin (/task)
 archforge-starters/archforge-{cache,lock,redisson,trace}-starter
 archforge-dependencies
 ```
+
+`archforge-server-admin` still depends on `archforge-example-task` because the admin `/task` API uses it. AuthSpi stays — `DefaultAuthService` and `ProxyResource` still call it.
 
 Non-Gradle dirs stay unprefixed: `docker/`, `config/`, `scripts/`, `skills/`.
 
@@ -89,7 +91,7 @@ git clone <archforge> ArchForge
 cd ArchForge
 ./archforge init --write
 ./archforge infra up
-# source .env so DB_PASSWORD / JWT-related values are present
+# source .env so DB_PASSWORD and sa-token secrets are present
 set -a; source .env; set +a
 FILE_STORAGE_TYPE=local ./gradlew :archforge-server-admin:bootRun
 ```

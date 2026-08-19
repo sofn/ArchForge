@@ -41,6 +41,7 @@ public class QuartzJobController {
     private final QuartzJobService quartzJobService;
 
     @Operation(summary = "查询 Quartz 任务列表")
+    @SaCheckPermission(value = "monitor:job:list", type = StpAdminUtil.TYPE)
     @GetMapping
     public AdminPageResponse<QuartzJobResponse> list(QuartzJobListRequest query) {
         int currentPage = query.getCurrentPage() != null && query.getCurrentPage() > 0

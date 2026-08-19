@@ -96,6 +96,6 @@ All versions centrally managed in `archforge-dependencies/build.gradle.kts`:
 - Spring Boot 4.1.0, Gradle 9.5.1, PostgreSQL 42.7.11
 - OpenTelemetry 1.62.0, Flyway 12.4.0, sa-token 1.45.0
 - JSpecify 1.0.0, MapStruct 1.6.3, Lombok 1.18.46
-- Testcontainers 2.0.4, Spock 2.4, JUnit 6.0.3
+- Testcontainers 2.0.5, Spock 2.4, JUnit 6.0.3
 
 

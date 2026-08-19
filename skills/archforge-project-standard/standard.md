@@ -41,28 +41,20 @@
 
 ```
 ArchForge/
-├── dependencies/                  # Centralized java-platform BOM
+├── archforge-dependencies/        # Centralized java-platform BOM
 │   └── build.gradle.kts           # All third-party version constraints
-├── common/
-│   ├── common-base/               # Shared utilities, base entities, constants
-│   │   └── build.gradle.kts
-│   └── common-error/              # Error codes, exception hierarchy, response formats
-│       └── build.gradle.kts
-├── infrastructure/                # Cross-cutting concerns
-│   └── build.gradle.kts           # Auth, config, filters, file storage, logging, observability
-├── domain/
-│   └── <bounded-context>/         # e.g. admin-user, order, product
-│       └── build.gradle.kts       # DDD entities, repositories, domain services
-├── server-<name>/                 # e.g. server-admin
-│   ├── build.gradle.kts           # Spring Boot application plugin
-│   └── src/main/
-│       ├── java/.../Application.java
-│       └── resources/
-│           ├── application.yaml
-│           ├── application-dev.yaml
-│           └── log4j2-spring.xml
-├── example/                       # Example/demo modules (not deployed)
-│   └── example-task/
+├── archforge-common/
+│   ├── archforge-common-base/     # Shared utilities, base entities, constants
+│   ├── archforge-common-error/    # Error codes, exception hierarchy
+│   └── archforge-common-jpa/      # JPA base entities, GroupDataSourceProxy
+├── archforge-infrastructure/      # Auth (sa-token), filters, file storage
+├── archforge-domain/
+│   └── archforge-<bounded-context>/  # e.g. admin-user, blog, meta-table
+├── archforge-server-admin/        # Admin API :8080
+├── archforge-server-web/          # C-end API :8081
+├── archforge-cli/
+├── archforge-example/             # Example/demo modules
+│   └── archforge-example-task/
 ├── docker/
 │   ├── jvm/Dockerfile             # JVM mode (jlink + Leyden CDS)
 │   ├── native/Dockerfile          # GraalVM Native Image mode
@@ -78,17 +70,16 @@ ArchForge/
 ### Module Dependency Rules
 
 ```
-server-<name> → domain/* → common/common-base
-server-<name> → infrastructure → common/common-base
-                                 common/common-error
+archforge-server-* → archforge-domain/* → archforge-common/archforge-common-base
+archforge-server-* → archforge-infrastructure → archforge-common/{base,error,jpa}
 ```
 
-- **`common/common-base`**: No Spring dependencies. Pure Java utilities, base classes, constants.
-- **`common/common-error`**: Error code enums, exception base classes, standard API response wrappers.
-- **`infrastructure/`**: Spring-aware cross-cutting concerns — authentication, authorization, filters, interceptors, file storage, database configuration, observability setup.
-- **`domain/<context>/`**: Business logic with DDD patterns. Depends on `common-base` and JPA. Contains entities with behavior, repository interfaces, domain services.
-- **`server-<name>/`**: Thin web layer — controllers, request/response DTOs, Spring Boot `@SpringBootApplication` entry point. Depends on `domain/*` and `infrastructure`.
-- **`dependencies/`**: `java-platform` module. All third-party versions defined here. Every other module applies `platform(project(":archforge-dependencies"))`.
+- **`archforge-common-base`**: No Spring dependencies. Pure Java utilities, base classes, constants.
+- **`archforge-common-error`**: Error code enums, exception base classes, standard API response wrappers.
+- **`archforge-infrastructure/`**: Spring-aware cross-cutting concerns — sa-token, filters, file storage, observability.
+- **`archforge-domain/<context>/`**: Business logic with DDD patterns. Depends on common-base/jpa.
+- **`archforge-server-*`**: Thin web layer — controllers, DTOs, Spring Boot entry point.
+- **`archforge-dependencies/`**: `java-platform` BOM. Every other module applies `platform(project(":archforge-dependencies"))`.
 
 ### Adding a New Bounded Context
 
