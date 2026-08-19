@@ -2,7 +2,7 @@ package com.lesofn.archforge.server.web.controller;
 
 import com.lesofn.archforge.infrastructure.config.ArchForgeProperties;
 import com.lesofn.archforge.infrastructure.file.FileStorageService;
-import com.lesofn.archforge.server.web.context.WebUserContext;
+import com.lesofn.archforge.infrastructure.auth.LoginContext;
 import com.lesofn.archforge.server.web.dto.FileUploadResponse;
 import com.lesofn.archforge.user.api.domain.SysFile;
 import com.lesofn.archforge.user.api.service.SysFileService;

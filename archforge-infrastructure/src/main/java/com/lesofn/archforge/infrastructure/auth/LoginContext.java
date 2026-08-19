@@ -10,6 +10,9 @@ import java.util.Optional;
 
 public final class LoginContext {
 
+    private static final ThreadLocal<Long> OVERRIDE_WEB_USER_ID = new ThreadLocal<>();
+    private static final ThreadLocal<String> OVERRIDE_WEB_USERNAME = new ThreadLocal<>();
+
     private LoginContext() {
     }
 
@@ -38,14 +41,42 @@ public final class LoginContext {
 
     public static boolean isAdmin() { return findAdminUser().map(SystemLoginUser::isAdmin).orElse(false); }
 
-    public static Long getWebUserId() { return StpWebUtil.isLogin() ? StpWebUtil.getLoginIdAsLong() : null; }
+    public static void setWebUser(Long userId, String username) {
+        OVERRIDE_WEB_USER_ID.set(userId);
+        OVERRIDE_WEB_USERNAME.set(username);
+    }
 
-    public static String getWebUsername() {
-        if (!StpWebUtil.isLogin()) {
+    public static void clearWebUser() {
+        OVERRIDE_WEB_USER_ID.remove();
+        OVERRIDE_WEB_USERNAME.remove();
+    }
+
+    public static Long getWebUserId() {
+        Long override = OVERRIDE_WEB_USER_ID.get();
+        if (override != null) {
+            return override;
+        }
+        try {
+            return StpWebUtil.isLogin() ? StpWebUtil.getLoginIdAsLong() : null;
+        } catch (RuntimeException ignored) {
             return null;
         }
-        Object username = StpWebUtil.getSession().get(LoginSessionKeys.USERNAME);
-        return username instanceof String value ? value : null;
+    }
+
+    public static String getWebUsername() {
+        String override = OVERRIDE_WEB_USERNAME.get();
+        if (override != null) {
+            return override;
+        }
+        try {
+            if (!StpWebUtil.isLogin()) {
+                return null;
+            }
+            Object username = StpWebUtil.getSession().get(LoginSessionKeys.USERNAME);
+            return username instanceof String value ? value : null;
+        } catch (RuntimeException ignored) {
+            return null;
+        }
     }
 
     public static SystemLoginUser restoreAuthorities(SystemLoginUser loginUser) {

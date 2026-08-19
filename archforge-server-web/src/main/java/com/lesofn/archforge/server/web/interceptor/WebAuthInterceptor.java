@@ -2,7 +2,7 @@ package com.lesofn.archforge.server.web.interceptor;
 
 import com.lesofn.archforge.infrastructure.auth.stp.LoginSessionKeys;
 import com.lesofn.archforge.infrastructure.auth.stp.StpWebUtil;
-import com.lesofn.archforge.server.web.context.WebUserContext;
+import com.lesofn.archforge.infrastructure.auth.LoginContext;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Map;
@@ -20,7 +20,7 @@ public class WebAuthInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        if (isPublicRequest(request) || WebUserContext.getUserId() != null) {
+        if (isPublicRequest(request) || LoginContext.getWebUserId() != null) {
             return true;
         }
         if (!StpWebUtil.isLogin()) {
@@ -29,14 +29,14 @@ public class WebAuthInterceptor implements HandlerInterceptor {
         }
         Long userId = StpWebUtil.getLoginIdAsLong();
         Object username = StpWebUtil.getSession().get(LoginSessionKeys.USERNAME);
-        WebUserContext.set(userId, username instanceof String value ? value : null);
+        LoginContext.setWebUser(userId, username instanceof String value ? value : null);
         return true;
     }
 
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex)
             throws Exception {
-        WebUserContext.clear();
+        LoginContext.clearWebUser();
     }
 
     private boolean isPublicRequest(HttpServletRequest request) {

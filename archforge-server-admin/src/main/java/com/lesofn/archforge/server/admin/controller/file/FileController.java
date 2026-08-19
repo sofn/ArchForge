@@ -125,11 +125,10 @@ public class FileController {
     @Operation(summary = "下载文件")
     @GetMapping("/download/{fileId}")
     public ResponseEntity<Resource> downloadFile(@PathVariable Long fileId) {
-        Optional<SysFile> optFile = fileService.findById(fileId);
-        if (optFile.isEmpty()) {
+        SysFile sysFile = fileService.findById(fileId).orElse(null);
+        if (sysFile == null) {
             return ResponseEntity.notFound().build();
         }
-        SysFile sysFile = optFile.get();
         InputStream inputStream = fileStorageService.download(sysFile.getStoragePath());
 
         return ResponseEntity.ok()
@@ -145,11 +144,10 @@ public class FileController {
     @SaCheckPermission(value = "system:file:remove", type = StpAdminUtil.TYPE)
     @DeleteMapping("/{fileId}")
     public Boolean deleteFile(@PathVariable Long fileId) {
-        Optional<SysFile> optFile = fileService.findById(fileId);
-        if (optFile.isEmpty()) {
+        SysFile sysFile = fileService.findById(fileId).orElse(null);
+        if (sysFile == null) {
             return false;
         }
-        SysFile sysFile = optFile.get();
         fileStorageService.delete(sysFile.getStoragePath());
         fileService.deleteById(fileId);
         return true;

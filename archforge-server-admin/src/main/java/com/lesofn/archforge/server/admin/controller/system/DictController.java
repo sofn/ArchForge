@@ -92,11 +92,10 @@ public class DictController {
     @SaCheckPermission(value = "system:dict:edit", type = StpAdminUtil.TYPE)
     @PutMapping("/type/{id}")
     public Boolean updateType(@PathVariable Long id, @RequestBody @Valid DictTypeUpdateRequest request) {
-        Optional<SysDictType> opt = dictService.findTypeById(id);
-        if (opt.isEmpty()) {
+        SysDictType type = dictService.findTypeById(id).orElse(null);
+        if (type == null) {
             return false;
         }
-        SysDictType type = opt.get();
         type.setDictName(request.getDictName());
         type.setDescription(request.getDescription());
         type.setStatus(request.getStatus());

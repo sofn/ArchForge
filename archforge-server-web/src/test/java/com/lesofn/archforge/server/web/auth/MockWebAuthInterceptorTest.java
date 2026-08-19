@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.when;
 
-import com.lesofn.archforge.server.web.context.WebUserContext;
+import com.lesofn.archforge.infrastructure.auth.LoginContext;
 import com.lesofn.archforge.user.api.domain.SysUser;
 import com.lesofn.archforge.user.api.service.SysUserService;
 import java.util.Optional;
@@ -24,7 +24,7 @@ class MockWebAuthInterceptorTest {
 
     @AfterEach
     void tearDown() {
-        WebUserContext.clear();
+        LoginContext.clearWebUser();
     }
 
     @Test
@@ -39,8 +39,8 @@ class MockWebAuthInterceptorTest {
 
         interceptor.preHandle(request, new MockHttpServletResponse(), new Object());
 
-        assertEquals(7L, WebUserContext.getUserId());
-        assertEquals("alice", WebUserContext.getUsername());
+        assertEquals(7L, LoginContext.getWebUserId());
+        assertEquals("alice", LoginContext.getWebUsername());
     }
 
     @Test
@@ -52,8 +52,8 @@ class MockWebAuthInterceptorTest {
 
         interceptor.preHandle(request, new MockHttpServletResponse(), new Object());
 
-        assertEquals(9L, WebUserContext.getUserId());
-        assertEquals("mock-user-9", WebUserContext.getUsername());
+        assertEquals(9L, LoginContext.getWebUserId());
+        assertEquals("mock-user-9", LoginContext.getWebUsername());
     }
 
     @Test
@@ -64,6 +64,6 @@ class MockWebAuthInterceptorTest {
 
         interceptor.preHandle(request, new MockHttpServletResponse(), new Object());
 
-        assertNull(WebUserContext.getUserId());
+        assertNull(LoginContext.getWebUserId());
     }
 }

@@ -1,6 +1,6 @@
 package com.lesofn.archforge.server.web.auth;
 
-import com.lesofn.archforge.server.web.context.WebUserContext;
+import com.lesofn.archforge.infrastructure.auth.LoginContext;
 import com.lesofn.archforge.user.api.domain.SysUser;
 import com.lesofn.archforge.user.api.service.SysUserService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -35,7 +35,7 @@ public class MockWebAuthInterceptor implements HandlerInterceptor, Ordered {
             String username = sysUserService.findById(userId)
                     .map(SysUser::getUsername)
                     .orElse("mock-user-" + userId);
-            WebUserContext.set(userId, username);
+            LoginContext.setWebUser(userId, username);
         } catch (NumberFormatException ignored) {
             return true;
         }
@@ -44,7 +44,7 @@ public class MockWebAuthInterceptor implements HandlerInterceptor, Ordered {
 
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
-        WebUserContext.clear();
+        LoginContext.clearWebUser();
     }
 
     @Override

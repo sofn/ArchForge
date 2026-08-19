@@ -5,7 +5,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.lesofn.archforge.server.web.context.WebUserContext;
+import com.lesofn.archforge.infrastructure.auth.LoginContext;
 import com.lesofn.archforge.user.api.domain.SysUser;
 import com.lesofn.archforge.user.api.service.SysUserService;
 import com.lesofn.archforge.user.domain.adapter.port.PasswordEncoderPort;
@@ -34,12 +34,12 @@ class WebUserControllerTest {
     void setUp() {
         WebUserController controller = new WebUserController(sysUserService, passwordEncoderPort);
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
-        WebUserContext.set(7L, "alice");
+        LoginContext.setWebUser(7L, "alice");
     }
 
     @AfterEach
     void tearDown() {
-        WebUserContext.clear();
+        LoginContext.clearWebUser();
     }
 
     @Test

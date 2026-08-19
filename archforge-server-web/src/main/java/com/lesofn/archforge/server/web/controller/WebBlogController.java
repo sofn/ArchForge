@@ -5,7 +5,7 @@ import com.lesofn.archforge.blog.api.enums.BlogArticleStatus;
 import com.lesofn.archforge.blog.api.domain.BlogCategory;
 import com.lesofn.archforge.blog.api.service.BlogArticleService;
 import com.lesofn.archforge.blog.api.service.BlogCategoryService;
-import com.lesofn.archforge.server.web.context.WebUserContext;
+import com.lesofn.archforge.infrastructure.auth.LoginContext;
 import com.lesofn.archforge.server.web.dto.WebArticleCreateRequest;
 import com.lesofn.archforge.server.web.dto.WebArticleDetailResponse;
 import com.lesofn.archforge.server.web.dto.WebArticleSummaryResponse;
@@ -81,7 +81,7 @@ public class WebBlogController {
 
     @PostMapping("/articles")
     public Long createArticle(@RequestBody @Valid WebArticleCreateRequest request) {
-        Long authorId = WebUserContext.getUserId();
+        Long authorId = LoginContext.getWebUserId();
         String baseSlug = request.getTitle().trim()
                 .replaceAll("\\s+", "-")
                 .replaceAll("[^a-zA-Z0-9-]", "")
@@ -106,7 +106,7 @@ public class WebBlogController {
     public WebPageResponse<WebArticleSummaryResponse> myArticles(
             @RequestParam(required = false, defaultValue = "1") int currentPage,
             @RequestParam(required = false, defaultValue = "10") int pageSize) {
-        Long authorId = WebUserContext.getUserId();
+        Long authorId = LoginContext.getWebUserId();
         PageRequest pageRequest = PageRequest.of(
                 Math.max(currentPage - 1, 0),
                 Math.max(pageSize, 1),
