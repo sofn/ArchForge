@@ -101,6 +101,11 @@ arch-forge:
   jwt:
     secret: ${JWT_SECRET}
     expire-seconds: 604800
+  llm:
+    provider: ${LLM_PROVIDER:openai}
+    base-url: ${LLM_BASE_URL:https://api.openai.com/v1}
+    api-key: ${LLM_API_KEY:}
+    model: ${LLM_MODEL:gpt-4o-mini}
   captcha:
     enabled: true
   file-storage:

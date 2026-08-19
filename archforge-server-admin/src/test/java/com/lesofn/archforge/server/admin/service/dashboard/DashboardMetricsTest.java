@@ -29,9 +29,9 @@ class DashboardMetricsTest {
 
     @Test
     void metricsAggregatesExistingCounts() {
-        when(userRepository.count()).thenReturn(12L);
-        when(articleRepository.count()).thenReturn(4L);
-        when(metaTableRepository.count()).thenReturn(3L);
+        when(userRepository.countByDeletedFalse()).thenReturn(12L);
+        when(articleRepository.countByDeletedFalse()).thenReturn(4L);
+        when(metaTableRepository.countByDeletedFalse()).thenReturn(3L);
 
         DashboardMetricsResponse metrics = dashboardService.metrics();
 

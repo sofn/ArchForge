@@ -12,4 +12,6 @@ public interface MetaTableRepository extends JpaRepository<MetaTable, Long>, Jpa
     Optional<MetaTable> findByTableCodeAndDeletedFalse(String tableCode);
 
     boolean existsByTableCodeAndDeletedFalse(String tableCode);
+
+    long countByDeletedFalse();
 }

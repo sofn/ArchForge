@@ -1,7 +1,7 @@
 package com.lesofn.archforge.server.admin.service.chat;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.lesofn.archforge.common.utils.jackson.JsonUtil;
+import com.lesofn.archforge.infrastructure.auth.LoginContext;
 import com.lesofn.archforge.infrastructure.config.ArchForgeProperties;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -19,15 +19,17 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 @Service
 @RequiredArgsConstructor
 public class ChatAiService {
 
     private final ArchForgeProperties properties;
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = JsonUtil.getObjectMapper();
     private final HttpClient httpClient = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(10)).build();
-    private final ConcurrentHashMap<String, List<Map<String, String>>> sessions = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Long, ConcurrentHashMap<String, List<Map<String, String>>>> sessions = new ConcurrentHashMap<>();
 
     public Map<String, Object> configStatus() {
         ArchForgeProperties.Llm llm = properties.getLlm();
@@ -40,29 +42,42 @@ public class ChatAiService {
 
     public Map<String, Object> createSession() {
         String id = UUID.randomUUID().toString();
-        sessions.put(id, new ArrayList<>());
+        userSessions().put(id, new ArrayList<>());
         return Map.of("id", id, "messages", List.of());
     }
 
     public List<Map<String, Object>> listSessions() {
-        return sessions.keySet().stream().map(id -> Map.<String, Object> of("id", id)).toList();
+        return userSessions().keySet().stream().map(id -> Map.<String, Object> of("id", id)).toList();
     }
 
     public List<Map<String, String>> messages(String sessionId) {
-        return sessions.getOrDefault(sessionId, List.of());
+        List<Map<String, String>> history = userSessions().get(sessionId);
+        if (history == null) {
+            throw new ChatAiException(ChatAiErrorCode.CHAT_SESSION_NOT_FOUND);
+        }
+        return history;
     }
 
     public void deleteSession(String sessionId) {
-        sessions.remove(sessionId);
+        if (userSessions().remove(sessionId) == null) {
+            throw new ChatAiException(ChatAiErrorCode.CHAT_SESSION_NOT_FOUND);
+        }
     }
 
     public SseEmitter stream(String sessionId, String content) {
         ArchForgeProperties.Llm llm = LlmClientFactory.requireConfigured(properties.getLlm());
-        List<Map<String, String>> history = sessions.computeIfAbsent(sessionId, key -> new ArrayList<>());
+        List<Map<String, String>> history = userSessions().get(sessionId);
+        if (history == null) {
+            throw new ChatAiException(ChatAiErrorCode.CHAT_SESSION_NOT_FOUND);
+        }
         history.add(Map.of("role", "user", "content", content));
         SseEmitter emitter = new SseEmitter(120_000L);
         Thread.ofVirtual().start(() -> complete(emitter, llm, sessionId, history));
         return emitter;
+    }
+
+    private ConcurrentHashMap<String, List<Map<String, String>>> userSessions() {
+        return sessions.computeIfAbsent(LoginContext.getAdminUserId(), key -> new ConcurrentHashMap<>());
     }
 
     private void complete(
@@ -70,7 +85,7 @@ public class ChatAiService {
         try {
             String reply = callModel(llm, history);
             history.add(Map.of("role", "assistant", "content", reply));
-            sessions.put(sessionId, history);
+            userSessions().put(sessionId, history);
             emitter.send(SseEmitter.event().name("delta").data(reply, MediaType.TEXT_PLAIN));
             emitter.send(SseEmitter.event().name("done").data("[DONE]"));
             emitter.complete();
@@ -100,17 +115,16 @@ public class ChatAiService {
         }
         HttpResponse<String> response = httpClient.send(builder.build(), HttpResponse.BodyHandlers.ofString());
         if (response.statusCode() >= 400) {
-            throw new IllegalStateException("LLM request failed: " + response.statusCode() + " " + response.body());
+            throw new ChatAiException(ChatAiErrorCode.LLM_REQUEST_FAILED);
         }
         JsonNode root = objectMapper.readTree(response.body());
         if ("anthropic".equals(provider)) {
-            JsonNode text = root.path("content").path(0).path("text");
-            return text.asText("");
+            return root.path("content").path(0).path("text").asString("");
         }
-        return root.path("choices").path(0).path("message").path("content").asText("");
+        return root.path("choices").path(0).path("message").path("content").asString("");
     }
 
-    private String openAiBody(ArchForgeProperties.Llm llm, List<Map<String, String>> history) throws Exception {
+    private String openAiBody(ArchForgeProperties.Llm llm, List<Map<String, String>> history) {
         Map<String, Object> payload = new LinkedHashMap<>();
         payload.put("model", llm.getModel());
         payload.put("messages", history);
@@ -118,7 +132,7 @@ public class ChatAiService {
         return objectMapper.writeValueAsString(payload);
     }
 
-    private String anthropicBody(ArchForgeProperties.Llm llm, List<Map<String, String>> history) throws Exception {
+    private String anthropicBody(ArchForgeProperties.Llm llm, List<Map<String, String>> history) {
         Map<String, Object> payload = new LinkedHashMap<>();
         payload.put("model", llm.getModel());
         payload.put("max_tokens", 1024);

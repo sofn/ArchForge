@@ -2,7 +2,6 @@ package com.lesofn.archforge.server.admin.service.chat;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.lesofn.archforge.infrastructure.config.ArchForgeProperties;
 import org.junit.jupiter.api.Test;
@@ -30,7 +29,6 @@ class LlmClientFactoryTest {
         ArchForgeProperties.Llm llm = new ArchForgeProperties.Llm();
         llm.setProvider("openai");
         llm.setApiKey("");
-        IllegalStateException ex = assertThrows(IllegalStateException.class, () -> LlmClientFactory.requireConfigured(llm));
-        assertTrue(ex.getMessage().contains("arch-forge.llm.api-key"));
+        assertThrows(ChatAiException.class, () -> LlmClientFactory.requireConfigured(llm));
     }
 }

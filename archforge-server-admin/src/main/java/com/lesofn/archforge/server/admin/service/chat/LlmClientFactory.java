@@ -18,7 +18,7 @@ public final class LlmClientFactory {
 
     public static ArchForgeProperties.Llm requireConfigured(ArchForgeProperties.Llm llm) {
         if (llm == null || llm.getApiKey() == null || llm.getApiKey().isBlank()) {
-            throw new IllegalStateException("arch-forge.llm.api-key is required (set an OpenAI or Anthropic compatible key)");
+            throw new ChatAiException(ChatAiErrorCode.LLM_NOT_CONFIGURED);
         }
         return llm;
     }

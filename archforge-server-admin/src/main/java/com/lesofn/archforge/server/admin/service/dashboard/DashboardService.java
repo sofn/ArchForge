@@ -20,14 +20,15 @@ public class DashboardService {
     private final MetaTableRepository metaTableRepository;
 
     public DashboardMetricsResponse metrics() {
-        return new DashboardMetricsResponse(userRepository.count(), articleRepository.count(), metaTableRepository.count(), 0L);
+        return new DashboardMetricsResponse(userRepository.countByDeletedFalse(), articleRepository
+                .countByDeletedFalse(), metaTableRepository.countByDeletedFalse(), 0L);
     }
 
     public List<DashboardTrendPoint> trends(int days) {
         int window = days > 0 ? days : 7;
         List<DashboardTrendPoint> points = new ArrayList<>();
-        long users = userRepository.count();
-        long articles = articleRepository.count();
+        long users = userRepository.countByDeletedFalse();
+        long articles = articleRepository.countByDeletedFalse();
         for (int i = window - 1; i >= 0; i--) {
             LocalDate date = LocalDate.now().minusDays(i);
             points.add(new DashboardTrendPoint(date.toString(), users, articles));
@@ -47,8 +48,8 @@ public class DashboardService {
 
     public List<DashboardTodo> todo() {
         return List.of(
-                new DashboardTodo("Users", userRepository.count(), "/system/user/index"),
-                new DashboardTodo("Articles", articleRepository.count(), "/blog/article"),
-                new DashboardTodo("Meta tables", metaTableRepository.count(), "/metatable"));
+                new DashboardTodo("Users", userRepository.countByDeletedFalse(), "/welcome"),
+                new DashboardTodo("Articles", articleRepository.countByDeletedFalse(), "/blog/article/index"),
+                new DashboardTodo("Meta tables", metaTableRepository.countByDeletedFalse(), "/metatable"));
     }
 }

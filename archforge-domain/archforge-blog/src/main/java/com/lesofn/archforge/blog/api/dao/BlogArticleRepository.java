@@ -17,6 +17,8 @@ public interface BlogArticleRepository extends JpaRepository<BlogArticle, Long>,
 
     long countByCategoryIdAndStatusAndDeletedFalse(Long categoryId, BlogArticleStatus status);
 
+    long countByDeletedFalse();
+
     Page<BlogArticle> findByStatusAndDeletedFalse(BlogArticleStatus status, Pageable pageable);
 
     Page<BlogArticle> findByCategoryIdAndStatusAndDeletedFalse(

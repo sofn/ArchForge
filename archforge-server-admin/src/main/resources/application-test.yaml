@@ -56,6 +56,9 @@ arch-forge:
     expire-seconds: 604800
   captcha:
     enabled: false
+  llm:
+    provider: openai
+    api-key: ""
   security:
     sign:
       apps:

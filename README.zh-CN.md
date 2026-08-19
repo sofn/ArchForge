@@ -30,6 +30,12 @@
 
 管理端响应 `{code,message,data}`；C 端错误为 RFC 9457 ProblemDetail。
 
+附加接口：
+
+- 仪表盘 `GET /admin/dashboard/metrics|trends|recent-activities|todo`
+- 权限矩阵 `/admin/permission-matrix/**`
+- ChatAI `/admin/chat/**`，密钥由用户填写 `LLM_PROVIDER` / `LLM_BASE_URL` / `LLM_API_KEY` / `LLM_MODEL`（OpenAI 或 Anthropic 兼容），仓库不内置密钥
+
 ## 模块与 CLI
 
 所有 Java 模块带 `archforge-` 前缀。`archforge-server-admin` 仍依赖 `archforge-example-task`（`/task` API）。AuthSpi 因 `DefaultAuthService` / `ProxyResource` 仍在使用，未删除。
