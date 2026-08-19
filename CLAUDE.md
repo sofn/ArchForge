@@ -21,13 +21,19 @@ Multi-module Spring Boot 4 project with DDD + Clean Architecture:
 
 ```
 ArchForge/
-├── common/common-base        # Base utilities, enums, encryption, Jackson, validation
-├── common/common-error       # ErrorCode, exceptions, error manager
-├── common/common-jpa         # JPA base entities, converters, query helpers
-├── domain/admin-user/        # User/Role/Menu/Dept domain entities + services
-├── server-admin/             # Controllers, Spring Boot entry point, security
-├── example/example-task/     # Example bounded context
-└── dependencies/             # Centralized version management (java-platform)
+├── archforge-common/archforge-common-base   # Base utilities, enums, encryption, Jackson
+├── archforge-common/archforge-common-error  # ErrorCode, exceptions, error manager
+├── archforge-common/archforge-common-jpa    # JPA base entities, converters, query helpers
+├── archforge-domain/archforge-admin-user    # User/Role/Menu/Dept domain
+├── archforge-domain/archforge-blog          # Blog bounded context
+├── archforge-domain/archforge-meta-table    # Metadata table / codegen
+├── archforge-infrastructure                 # Auth (sa-token), file, tracing
+├── archforge-server-admin                   # Admin API :8080
+├── archforge-server-web                     # C-end API :8081
+├── archforge-cli                            # Developer CLI (picocli)
+├── archforge-example/archforge-example-task # Example bounded context
+├── archforge-starters/                      # cache / lock / redisson / trace
+└── archforge-dependencies                   # Centralized BOM (java-platform)
 ```
 
 ### Key Patterns
@@ -39,7 +45,7 @@ ArchForge/
 - **Pattern Matching**: switch expressions with type patterns throughout error handling and JSON utils
 - **MapStruct**: `@Mapper` interfaces for Entity→DTO conversion (under `server-admin/.../mapper/`)
 - **Multi-datasource**: `dynamic-datasource-spring-boot4-starter` with master/slave + `GroupDataSourceProxy` for JPA
-- **JWT auth**: `JwtTokenUtil` + `JwtAuthenticationFilter` + Spring Security `SecurityFilterChain`
+- **Auth**: sa-token 1.45.0 via `StpAdminUtil` (admin) and `StpWebUtil` (web); `@SaCheckLogin` / `@SaCheckPermission`
 - **File storage**: `FileStorageService` interface with Local and S3 implementations
 - **Problem Details**: RFC 9457 `ProblemDetail` for error responses
 - **Observation API**: Micrometer `Observation` in `RequestLogFilter` for metrics/tracing
@@ -65,7 +71,7 @@ ArchForge/
   - `application-staging.yaml`: external services, Flyway
   - `application-prod.yaml`: production hardened, Flyway
 - Logging: Log4j2 via `log4j2-spring.xml` with `<SpringProfile>` sections
-- Database: PostgreSQL via Flyway migrations (`server-admin/src/main/resources/db/migration/`) and `domain/admin-user/src/main/resources/sql/` seed data
+- Database: PostgreSQL via Flyway migrations (`archforge-server-admin/src/main/resources/db/migration/`) and `archforge-domain/archforge-admin-user/src/main/resources/sql/` seed data
 
 ## JDK 25 Features
 
@@ -86,10 +92,10 @@ ArchForge/
 
 ## Dependencies
 
-All versions centrally managed in `dependencies/build.gradle.kts`:
-- Spring Boot 4.0.5, Gradle 9.4.1, PostgreSQL 42.7.10
-- Micrometer 1.6.4 + OpenTelemetry 1.55.0, Flyway 11.14.1
-- JSpecify 1.0.0, MapStruct 1.6.3, Lombok 1.18.44
+All versions centrally managed in `archforge-dependencies/build.gradle.kts`:
+- Spring Boot 4.1.0, Gradle 9.5.1, PostgreSQL 42.7.11
+- OpenTelemetry 1.62.0, Flyway 12.4.0, sa-token 1.45.0
+- JSpecify 1.0.0, MapStruct 1.6.3, Lombok 1.18.46
 - Testcontainers 2.0.4, Spock 2.4, JUnit 6.0.3
 
 

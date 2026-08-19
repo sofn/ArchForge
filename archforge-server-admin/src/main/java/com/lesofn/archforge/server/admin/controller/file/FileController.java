@@ -61,6 +61,8 @@ public class FileController {
     @Log
     @Operation(summary = "上传文件")
     @SaCheckPermission(value = "system:file:add", type = StpAdminUtil.TYPE)
+    @com.lesofn.archforge.infrastructure.annotation.RateLimit(key = "file-upload", time = 60, maxCount = 20,
+            limitType = com.lesofn.archforge.infrastructure.annotation.RateLimit.LimitType.IP)
     @PostMapping("/upload")
     @RepeatSubmit
     public UploadFileResponse uploadFile(@RequestParam("file") MultipartFile file) {

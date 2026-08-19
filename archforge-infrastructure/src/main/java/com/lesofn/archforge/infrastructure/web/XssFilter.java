@@ -21,6 +21,20 @@ public class XssFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
+        if (shouldSkip(request)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
         filterChain.doFilter(new XssRequestWrapper(request), response);
+    }
+
+    static boolean shouldSkip(HttpServletRequest request) {
+        String contentType = request.getContentType();
+        if (contentType == null) {
+            return false;
+        }
+        String normalized = contentType.toLowerCase();
+        return normalized.startsWith("multipart/") || normalized.startsWith("application/octet-stream") || normalized
+                .startsWith("application/pdf") || normalized.startsWith("image/");
     }
 }

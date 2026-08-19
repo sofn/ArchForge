@@ -9,20 +9,20 @@
 | Category | Technology | Version | Notes |
 |----------|-----------|---------|-------|
 | **Language** | Java (Azul Zulu) | 25 | Preview features enabled (`--enable-preview`) |
-| **Framework** | Spring Boot | 4.x (currently 4.0.5) | Virtual threads enabled by default |
-| **Build** | Gradle (Kotlin DSL) | 9.x (currently 9.4.1) | Configuration cache supported |
+| **Framework** | Spring Boot | 4.x (currently 4.1.0) | Virtual threads enabled by default |
+| **Build** | Gradle (Kotlin DSL) | 9.x (currently 9.5.1) | Configuration cache supported |
 | **Database** | PostgreSQL | 17 | All environments; Testcontainers in dev |
 | **Cache** | Redis | 7 | Lettuce client via Spring Data Redis |
-| **Migrations** | Flyway | 11.x | `flyway-database-postgresql` dialect |
+| **Migrations** | Flyway | 12.x | `flyway-database-postgresql` dialect |
 | **ORM** | Spring Data JPA + Hibernate | (Boot-managed) | `CamelCaseToUnderscores` naming strategy |
 | **Multi-Datasource** | dynamic-datasource-spring-boot4-starter | 4.5.x | Master/slave groups, `@DS` annotation |
 | **DTO Mapping** | MapStruct | 1.6.x | Compile-time code generation |
 | **Null Safety** | JSpecify | 1.0.x | `@NullMarked` on every package |
 | **API Docs** | SpringDoc OpenAPI | 2.8.x | Swagger UI at `/swagger-ui/index.html` |
-| **Auth** | JWT (jjwt) | 0.12.x | Configurable expiration, auto-refresh |
+| **Auth** | sa-token | 1.45.0 | `StpAdminUtil` / `StpWebUtil`; `@SaCheckLogin` / `@SaCheckPermission` |
 | **Observability** | Micrometer + OpenTelemetry | (Boot-aligned) | OTLP export; 100% sampling dev, 10% prod |
 | **Logging** | Log4j2 | (Boot-managed) | `log4j2-spring.xml` with `<SpringProfile>` |
-| **Object Storage** | AWS S3 SDK | 2.31.x | `FileStorageService` abstraction (local/s3) |
+| **Object Storage** | AWS S3 SDK | 2.46.8 | `FileStorageService` abstraction (local/s3) |
 | **Code Style** | Spotless + Google Java Style (AOSP) | Plugin 8.4.x, GJF 1.35.x | 4-space indent, auto-enforced |
 | **Testing** | JUnit 6 + Spock 2.4 (Groovy 5.x) | See BOM | Testcontainers for integration |
 | **Containerization** | Docker (multi-stage) | — | jlink minimal JRE + Project Leyden CDS/AOT |
@@ -365,9 +365,9 @@ arch-forge:
   file-storage:
     type: local          # local | s3
     local-dir: uploads
-  jwt:
-    secret: ${JWT_SECRET}
-    expire-seconds: 604800
+  sa-token:
+    token-name: Authorization
+    timeout: 604800
 ```
 
 ### 4.2 Profile Strategy
@@ -395,7 +395,7 @@ server-<name>/src/main/resources/
 ### 4.3 Secrets Management
 
 - **Never** store secrets in source control.
-- Use environment variables for sensitive values: `${JWT_SECRET}`, `${DB_PASSWORD}`, etc.
+- Use environment variables for sensitive values: `${DB_PASSWORD}`, `${DRUID_PASSWORD}`, sa-token secrets, etc.
 - Dev profile may use hardcoded values for local convenience (Testcontainers auto-generates credentials).
 - Production uses environment injection from orchestrator (Docker Compose, Kubernetes, etc.).
 
@@ -603,7 +603,7 @@ javaPlatform { allowDependencies() }
 
 dependencies {
     constraints {
-        api("com.google.guava:guava:33.4.8-jre")
+        api("com.google.guava:guava:33.6.0-jre")
         api("org.mapstruct:mapstruct:1.6.3")
         // ... all versions here
     }
@@ -614,7 +614,7 @@ Every subproject imports both the Spring Boot BOM and the project BOM:
 
 ```kotlin
 dependencies {
-    implementation(platform("org.springframework.boot:spring-boot-dependencies:4.0.5"))
+    implementation(platform("org.springframework.boot:spring-boot-dependencies:4.1.0"))
     implementation(platform(project(":archforge-dependencies")))
 }
 ```

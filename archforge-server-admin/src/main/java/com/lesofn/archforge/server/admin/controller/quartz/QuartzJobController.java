@@ -61,6 +61,7 @@ public class QuartzJobController {
 
     @Log
     @Operation(summary = "新增 Quartz 任务")
+    @SaCheckPermission(value = "monitor:job:add", type = StpAdminUtil.TYPE)
     @PostMapping("/add")
     public Long add(@RequestBody QuartzJobUpsertRequest req) {
         return quartzJobService.add(toEntity(new SysQuartzJob(), req));
@@ -84,6 +85,7 @@ public class QuartzJobController {
 
     @Log
     @Operation(summary = "暂停 Quartz 任务")
+    @SaCheckPermission(value = "monitor:job:edit", type = StpAdminUtil.TYPE)
     @PostMapping("/pause/{id}")
     public void pause(@PathVariable Long id) {
         quartzJobService.pause(id);
@@ -91,6 +93,7 @@ public class QuartzJobController {
 
     @Log
     @Operation(summary = "恢复 Quartz 任务")
+    @SaCheckPermission(value = "monitor:job:edit", type = StpAdminUtil.TYPE)
     @PostMapping("/resume/{id}")
     public void resume(@PathVariable Long id) {
         quartzJobService.resume(id);
@@ -98,12 +101,14 @@ public class QuartzJobController {
 
     @Log
     @Operation(summary = "立即执行一次")
+    @SaCheckPermission(value = "monitor:job:edit", type = StpAdminUtil.TYPE)
     @PostMapping("/run/{id}")
     public void run(@PathVariable Long id) {
         quartzJobService.runOnce(id);
     }
 
     @Operation(summary = "查询任务执行日志")
+    @SaCheckPermission(value = "monitor:job:list", type = StpAdminUtil.TYPE)
     @GetMapping("/log")
     public AdminPageResponse<QuartzLogResponse> logList(QuartzLogListRequest body) {
         Long jobId = body.getJobId();
@@ -123,6 +128,7 @@ public class QuartzJobController {
     }
 
     @Operation(summary = "校验 cron 表达式")
+    @SaCheckPermission(value = "monitor:job:list", type = StpAdminUtil.TYPE)
     @PostMapping("/validate-cron")
     public boolean validateCron(@RequestBody CronValidateRequest body) {
         return quartzJobService.validateCron(body.getCron());

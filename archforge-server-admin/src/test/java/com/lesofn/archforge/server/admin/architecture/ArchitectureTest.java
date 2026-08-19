@@ -30,7 +30,6 @@ class ArchitectureTest {
                 .should()
                 .dependOnClassesThat()
                 .resideInAPackage("..archforge.infrastructure..")
-                .allowEmptyShould(true)
                 .check(classes));
     }
 
@@ -42,24 +41,17 @@ class ArchitectureTest {
                 .should()
                 .dependOnClassesThat()
                 .resideInAPackage("..internal..")
-                .allowEmptyShould(true)
                 .check(classes));
     }
 
     @Test
     void controllersShouldNotDirectlyAccessRepositories() {
-        // Existing RoleController still injects SysRoleMenuRepository.
-        // Keep the rule compiled and imported so it can be tightened after that
-        // remaining adapter is extracted.
         noClasses()
                 .that()
                 .areAnnotatedWith(RestController.class)
-                .and()
-                .resideOutsideOfPackage("..controller.user..")
                 .should()
                 .dependOnClassesThat()
                 .areAssignableTo(JpaRepository.class)
-                .allowEmptyShould(true)
                 .check(classes);
     }
 }

@@ -15,7 +15,6 @@ import com.lesofn.archforge.server.admin.dto.request.RoleStatusRequest;
 import com.lesofn.archforge.server.admin.dto.request.RoleUpdateRequest;
 import com.lesofn.archforge.server.admin.mapper.AdminRoleConvertor;
 import com.lesofn.archforge.server.admin.mapper.AdminRoleMenuConvertor;
-import com.lesofn.archforge.user.api.dao.SysRoleMenuRepository;
 import com.lesofn.archforge.user.api.domain.SysRole;
 import com.lesofn.archforge.user.api.domain.SysRoleMenu;
 import com.lesofn.archforge.user.api.menu.SysMenuService;
@@ -48,7 +47,6 @@ public class RoleController {
 
     private final SysRoleService roleService;
     private final SysRoleMenuService roleMenuService;
-    private final SysRoleMenuRepository roleMenuRepository;
     private final SysMenuService menuService;
     private final AdminRoleConvertor roleMapper;
     private final AdminRoleMenuConvertor roleMenuMapper;
@@ -95,7 +93,7 @@ public class RoleController {
         if (request.getId() == null) {
             return Collections.emptyList();
         }
-        List<SysRoleMenu> roleMenus = roleMenuRepository.findByRoleId(request.getId());
+        List<SysRoleMenu> roleMenus = roleMenuService.findByRoleId(request.getId());
         return roleMenus.stream().map(SysRoleMenu::getMenuId).collect(Collectors.toList());
     }
 

@@ -1,166 +1,127 @@
 <div align="center">
   <h1>ArchForge</h1>
-  <p><strong>Modern enterprise admin platform built with Spring Boot 4 + Vue 3</strong></p>
+  <p><strong>Backend for the ArchForge platform — Spring Boot 4 + JDK 25 + sa-token</strong></p>
   <p>
     <a href="https://archforge.lesofn.com">Documentation</a> ·
-    <a href="https://github.com/sofn/ArchForgeAdmin">Frontend Repo</a> ·
     <a href="./README.zh-CN.md">中文</a>
   </p>
   <p>
     <img src="https://img.shields.io/badge/Java-25-blue?logo=openjdk" alt="Java 25" />
-    <img src="https://img.shields.io/badge/Spring%20Boot-4.0.5-green?logo=springboot" alt="Spring Boot 4" />
-    <img src="https://img.shields.io/badge/Vue-3.5-brightgreen?logo=vuedotjs" alt="Vue 3" />
-    <img src="https://img.shields.io/badge/Vite-8-purple?logo=vite" alt="Vite 8" />
+    <img src="https://img.shields.io/badge/Spring%20Boot-4.1.0-green?logo=springboot" alt="Spring Boot 4.1" />
+    <img src="https://img.shields.io/badge/Gradle-9.5.1-02303A?logo=gradle" alt="Gradle 9.5.1" />
+    <img src="https://img.shields.io/badge/Auth-sa--token%201.45-red" alt="sa-token" />
     <img src="https://img.shields.io/badge/License-MIT-yellow" alt="MIT" />
   </p>
 </div>
 
 ---
 
-## What is ArchForge?
+## What is this repo?
 
-ArchForge is a **production-ready, full-stack admin platform** that combines a Spring Boot 4 backend with a Vue 3 frontend. It provides complete user/role/menu/department management, file management, Quartz scheduling, i18n, operation/login logs, server monitoring, JWT authentication, and more — all with clean architecture and modern tooling.
+This repository is the **backend** of the five-repo ArchForge project. It exposes two Spring Boot apps:
 
-### Why ArchForge?
+| App | Gradle module | Port | Audience |
+|-----|---------------|------|----------|
+| Admin API | `:archforge-server-admin` | 8080 | ArchForgeAdmin (Vue) |
+| C-end API | `:archforge-server-web` | 8081 | ArchForgeWeb (Next.js) |
 
-- **Modern architecture**: JDK 25 + Spring Boot 4 + DDD + Clean Architecture
-- **Team project standard**: Codified conventions (Spotless, JSpecify, Lombok), centralized dependency BOM, skill-based onboarding
-- **JDK 25 features in production**: ScopedValue, Structured Concurrency, Pattern Matching, Stream Gatherers, Virtual Threads
-- **Production-ready deployment**: Docker with jlink minimal JRE + Project Leyden CDS, Flyway migrations, multi-datasource, Micrometer observability
-- **Zero-config dev**: `scripts/dev/init.sh` starts PostgreSQL, Redis, RustFS Docker containers; `./gradlew :archforge-server-admin:bootRun` connects to them
+Sibling repositories (clone side by side, no submodules):
 
-## Features
+```
+archforge/
+├── ArchForge/          # this repo
+├── ArchForgeWeb/       # C-end Next.js client
+├── ArchForgeAdmin/     # admin Vue client
+├── ArchForgeDocs/      # VitePress docs
+└── ArchForgeSpec/      # contracts, enums, architecture
+```
 
-| Category | Details |
-|----------|---------|
-| **Auth** | JWT + refresh token, Spring Security, BCrypt password, configurable captcha, API request signing, idempotent token |
-| **RBAC** | Users, roles, menus, departments, button-level permissions, role-based data scopes |
-| **System** | Config management, notice/announcements, operation & login logs |
-| **File Management** | Upload, list, download, delete; local filesystem and S3 (RustFS) backends; extension/size/MIME allow-lists |
-| **Scheduler** | Quartz-based reflective cron jobs; pause/resume/run once; execution logs |
-| **i18n** | Backend and frontend locale sync; English / Simplified Chinese message bundles |
-| **Monitor** | Real-time CPU/memory/JVM/disk monitoring (Oshi), Prometheus + Grafana + Jaeger + Alertmanager observability stack |
-| **Database** | PostgreSQL, multi-datasource with read/write split, Flyway migration |
-| **Deploy** | Docker Compose (Leyden JVM + Native Image), Nginx reverse proxy |
-| **Frontend** | vue-pure-admin, Element Plus, TailwindCSS, Pinia, dynamic routing, i18n |
-| **Architecture** | Spring Modulith 2.0 module boundaries, typed DTO APIs, JSpecify @NullMarked, Spotless |
+Contracts live in `../ArchForgeSpec`. When an API changes, update `../ArchForgeSpec/api/openapi.yaml` in the same change.
 
-## Recent Highlights
+## Auth and security
 
-The latest merged feature branch added a number of production-ready capabilities:
+- **sa-token 1.45.0**, not Spring Security JWT filters.
+- Admin: `StpAdminUtil` + class-level `@SaCheckLogin` + write `@SaCheckPermission("resource:action")`.
+- Web: `StpWebUtil` + `WebAuthInterceptor`.
+- Login rate limit: 5 requests / minute / IP (`@RateLimit`).
+- XSS filter sanitizes query/header values and **skips multipart** uploads.
+- Production YAML has **no default** `DB_PASSWORD` / S3 keys.
 
-- **Idempotent Token** — `@Idempotent` supports PARAM, TOKEN, and HEADER modes; includes a `/idempotent/token` endpoint to issue one-time tokens that prevent duplicate form submissions.
-- **API Request Signing** — `@ApiSign` enforces HMAC-SHA256 request signatures with timestamp and nonce checks, preventing tampering and replay attacks.
-- **Data Permission** — Role-level data scopes (all, custom departments, single department, department tree, self-only) applied via `@DataPermission` and JPA Specifications.
-- **OpenTelemetry Observability** — Pre-configured Prometheus + Grafana + Jaeger + Alertmanager stack with dashboards, alerting rules, and distributed trace visualization.
-- **File Management** — A complete file lifecycle (upload, list, download, delete) with configurable local or S3/RustFS storage, extension allow-lists and size limits.
-- **Quartz Scheduling** — Reflective cron jobs managed from the admin UI, including pause/resume/run-once and execution logs.
-- **i18n** — Locale-aware message bundles on both backend and frontend, with English and Simplified Chinese out of the box.
-- **Druid Monitoring** — Druid SQL monitoring enabled in non-production environments and hidden in production.
-- **Spring Modulith 2.0** — Explicit module boundaries and dependency tests for the `admin-user`, `example-task`, and infrastructure layers.
-- **Security Hardening** — Management endpoints require admin/authenticated access, legacy endpoints removed, and sensitive data no longer logged.
-- **Typed API Contracts** — Controllers moved from raw `Map` payloads to explicit request/response DTOs with MapStruct mapping.
-- **Quality of Life** — `@RepeatSubmit` anti-replay, `LIKE` escape compatibility for Druid `mergeSql`, and JDK 25 native access enabled for all test/AOT tasks.
+Admin responses use `{code,message,data}`. Web errors use RFC 9457 `ProblemDetail`.
 
-## Quick Start
+## Gradle modules
 
-### Prerequisites
+Every Java module is prefixed with `archforge-`:
 
-- Java 25, Node.js 20+, pnpm 9+
-- **Docker** (required for dev mode — Testcontainers uses Docker to run PostgreSQL, Redis, RustFS)
+```
+archforge-common/archforge-common-{base,error,jpa}
+archforge-domain/archforge-{admin-user,blog,meta-table}
+archforge-infrastructure
+archforge-server-admin
+archforge-server-web
+archforge-cli
+archforge-example/archforge-example-task
+archforge-starters/archforge-{cache,lock,redisson,trace}-starter
+archforge-dependencies
+```
 
-### 1. Clone
+Non-Gradle dirs stay unprefixed: `docker/`, `config/`, `scripts/`, `skills/`.
+
+## Developer CLI
 
 ```bash
-git clone https://github.com/sofn/ArchForge.git
-git clone https://github.com/sofn/ArchForgeAdmin.git
+./archforge --help
+./archforge init --write          # idempotent .env secrets
+./archforge infra up              # postgres + redis via docker/docker-compose.infra.yml
+./archforge db backup
+./archforge skills install --tool claude
+./archforge --mcp                 # Phase-1 MCP stdio server
 ```
 
-### 2. Start Dev Environment
+If the fat jar is missing, `./archforge` builds `:archforge-cli:shadowJar` first.
+
+## Quick start
+
+Prerequisites: **Java 25**, Docker.
 
 ```bash
-cd ArchForge/scripts/dev
-./init.sh           # starts PostgreSQL, Redis, RustFS Docker containers
-cd ../..
-JAVA_HOME=/path/to/jdk25 ./gradlew :archforge-server-admin:bootRun
+git clone <archforge> ArchForge
+cd ArchForge
+./archforge init --write
+./archforge infra up
+# source .env so DB_PASSWORD / JWT-related values are present
+set -a; source .env; set +a
+FILE_STORAGE_TYPE=local ./gradlew :archforge-server-admin:bootRun
 ```
 
-> Dev profile uses the Docker containers started by `scripts/dev/init.sh`. Use `scripts/dev/down.sh` to stop them.
+Default admin login is `admin / admin123` (captcha is on in `dev`).
 
-### 3. Start Frontend
+Web API:
 
 ```bash
-cd ArchForgeAdmin
-pnpm install && pnpm dev
+./gradlew :archforge-server-web:bootRun
 ```
 
-### 4. Open Browser
-
-Visit `http://localhost:8848` and login with `admin / admin123`.
-
-### Staging / Production Deployment
+## Build and test
 
 ```bash
-cd ArchForge/scripts/staging  # or scripts/prod
-cp .env.example .env          # edit configuration
-./deploy.sh
+./gradlew build                                   # spotless + compile + all tests
+./gradlew :archforge-server-admin:test
+./gradlew :archforge-cli:test
 ```
 
-This builds both backend and frontend Docker images, starts PostgreSQL + Redis + backend + frontend via Docker Compose, and imports seed SQL.
+## Tech stack
 
-### Docker (Alternative)
+| Layer | Choice |
+|-------|--------|
+| Runtime | Java 25 (preview), Spring Boot **4.1.0**, Gradle **9.5.1** |
+| Auth | sa-token **1.45.0** (`StpAdminUtil` / `StpWebUtil`) |
+| Data | PostgreSQL 17, Flyway **12.4.0**, dynamic-datasource, Redis 7 |
+| Observability | Micrometer + OpenTelemetry **1.62.0** |
+| Storage | Local dir or AWS S3 SDK 2.46.x |
+| Style | Spotless + Google Java Style, JSpecify `@NullMarked` |
 
-```bash
-cd ArchForge/docker
-./start.sh          # JVM mode (default, Project Leyden CDS)
-./start.sh native   # Native Image mode (Liberica NIK 25)
-```
-
-## Project Structure
-
-```
-ArchForge (Backend)
-├── common/                   # Shared libraries
-│   ├── common-base/          # Core utilities, enums, Jackson, encryption, validation
-│   ├── common-error/         # Error codes and business exceptions
-│   └── common-jpa/           # JPA base entities, converters, and QueryHelp
-├── infrastructure/           # Auth, filters, file storage, i18n, response wrapper
-├── domain/admin-user/        # Domain entities & business logic
-│   ├── domain/               # SysUser, SysRole, SysMenu, SysDept, SysFile, SysQuartzJob, SysQuartzLog
-│   ├── service/              # Business services
-│   └── dao/                  # Spring Data JPA repositories
-├── server-admin/             # Web layer & Spring Boot app
-├── example/example-task/     # Task domain example
-├── dependencies/             # Centralized version management
-└── docker/                   # Docker & deployment configs
-    ├── jvm/                  # Leyden CDS optimized Dockerfile
-    └── native/               # Liberica NIK 25 native Dockerfile
-
-ArchForgeAdmin (Frontend)
-├── src/api/                  # API definitions
-├── src/views/system/         # System management pages
-├── src/views/system/quartz/  # Quartz job scheduling pages
-├── src/views/monitor/        # Monitoring pages (server, cache, logs)
-├── src/views/tool/           # File management page
-├── src/store/                # Pinia stores
-└── src/router/               # Dynamic routing
-```
-
-## Tech Stack
-
-| Layer | Technology |
-|-------|-----------|
-| Backend | Java 25, Spring Boot 4.0.5, Spring Security, Spring Data JPA, QueryDSL, Spring Modulith 2.0 |
-| Frontend | Vue 3.5, Vite 8, TypeScript 6, Element Plus, TailwindCSS 4 |
-| Database | PostgreSQL 17 (Testcontainers in dev), Redis, Flyway |
-| File Storage | Local filesystem, AWS S3 / RustFS (Testcontainers in dev) |
-| Monitoring | Oshi, SpringDoc OpenAPI, Micrometer + OpenTelemetry, Prometheus + Grafana + Jaeger + Alertmanager |
-| Build | Gradle 9.4.1, pnpm, Docker, Project Leyden, Liberica NIK 25 |
-| Testing | JUnit 6, Spock 2.4, RestClient, Testcontainers |
-
-## Documentation
-
-Full documentation: **[archforge.lesofn.com](https://archforge.lesofn.com)**
+Canonical conventions: `skills/archforge-project-standard/standard.md`.
 
 ## License
 

@@ -162,6 +162,8 @@ public class MetaTableController {
     @Log
     @Operation(summary = "生成元表格代码")
     @SaCheckPermission(value = "meta-table:edit", type = StpAdminUtil.TYPE)
+    @com.lesofn.archforge.infrastructure.annotation.RateLimit(key = "meta-table-generate", time = 60, maxCount = 5,
+            limitType = com.lesofn.archforge.infrastructure.annotation.RateLimit.LimitType.USER)
     @PostMapping("/{id}/generate")
     public MetaTableGenerateResponse generate(@PathVariable Long id, @RequestBody @Valid MetaTableGenerateRequest request) {
         MetaTable table = metaTableAdminService.findById(id);
