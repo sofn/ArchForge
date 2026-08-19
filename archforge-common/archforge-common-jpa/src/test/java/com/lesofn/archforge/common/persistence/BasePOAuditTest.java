@@ -13,7 +13,8 @@ class BasePOAuditTest {
 
     @Test
     void prePersistFillsCreateTimeAndDeleted() {
-        BasePO po = new BasePO() {};
+        BasePO po = new BasePO() {
+        };
         po.prePersist();
         assertNotNull(po.getCreateTime());
         assertFalse(po.getDeleted());
@@ -21,7 +22,8 @@ class BasePOAuditTest {
 
     @Test
     void preUpdateSetsUpdateTime() {
-        BasePO po = new BasePO() {};
+        BasePO po = new BasePO() {
+        };
         po.prePersist();
         po.preUpdate();
         assertNotNull(po.getUpdateTime());
@@ -30,7 +32,8 @@ class BasePOAuditTest {
 
     @Test
     void existingCreateTimeIsKept() {
-        BasePO po = new BasePO() {};
+        BasePO po = new BasePO() {
+        };
         LocalDateTime existing = LocalDateTime.of(2024, 1, 1, 0, 0);
         po.setCreateTime(existing);
         po.prePersist();

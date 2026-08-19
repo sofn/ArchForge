@@ -42,9 +42,7 @@ public class GroupDataSourceProxy implements DataSource {
     }
 
     @Override
-    public PrintWriter getLogWriter() throws SQLException {
-        return delegate.getLogWriter();
-    }
+    public PrintWriter getLogWriter() throws SQLException { return delegate.getLogWriter(); }
 
     @Override
     public void setLogWriter(PrintWriter out) throws SQLException {
@@ -57,14 +55,10 @@ public class GroupDataSourceProxy implements DataSource {
     }
 
     @Override
-    public int getLoginTimeout() throws SQLException {
-        return delegate.getLoginTimeout();
-    }
+    public int getLoginTimeout() throws SQLException { return delegate.getLoginTimeout(); }
 
     @Override
-    public Logger getParentLogger() throws SQLFeatureNotSupportedException {
-        return delegate.getParentLogger();
-    }
+    public Logger getParentLogger() throws SQLFeatureNotSupportedException { return delegate.getParentLogger(); }
 
     @Override
     public <T> T unwrap(Class<T> iface) throws SQLException {
