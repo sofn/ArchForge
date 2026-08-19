@@ -32,7 +32,9 @@
 
 ## 模块与 CLI
 
-所有 Java 模块带 `archforge-` 前缀。开发入口：
+所有 Java 模块带 `archforge-` 前缀。`archforge-server-admin` 仍依赖 `archforge-example-task`（`/task` API）。AuthSpi 因 `DefaultAuthService` / `ProxyResource` 仍在使用，未删除。
+
+开发入口：
 
 ```bash
 ./archforge --help
