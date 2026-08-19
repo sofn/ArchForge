@@ -48,25 +48,25 @@ spring:
           driver-class-name: org.postgresql.Driver
           url: ${DB_USER_MASTER_URL:jdbc:postgresql://postgres:5432/archforge_user}
           username: ${DB_USERNAME:archforge}
-          password: ${DB_PASSWORD:archforge}
+          password: ${DB_PASSWORD}
         user_slave:
           type: com.alibaba.druid.pool.DruidDataSource
           driver-class-name: org.postgresql.Driver
           url: ${DB_USER_SLAVE_URL:jdbc:postgresql://postgres:5432/archforge_user}
           username: ${DB_USERNAME:archforge}
-          password: ${DB_PASSWORD:archforge}
+          password: ${DB_PASSWORD}
         task_master:
           type: com.alibaba.druid.pool.DruidDataSource
           driver-class-name: org.postgresql.Driver
           url: ${DB_TASK_MASTER_URL:jdbc:postgresql://postgres:5432/archforge_task}
           username: ${DB_USERNAME:archforge}
-          password: ${DB_PASSWORD:archforge}
+          password: ${DB_PASSWORD}
         task_slave:
           type: com.alibaba.druid.pool.DruidDataSource
           driver-class-name: org.postgresql.Driver
           url: ${DB_TASK_SLAVE_URL:jdbc:postgresql://postgres:5432/archforge_task}
           username: ${DB_USERNAME:archforge}
-          password: ${DB_PASSWORD:archforge}
+          password: ${DB_PASSWORD}
 
 management:
   tracing:

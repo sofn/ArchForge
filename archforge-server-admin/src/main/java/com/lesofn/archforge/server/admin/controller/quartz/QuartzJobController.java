@@ -19,6 +19,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import cn.dev33.satoken.annotation.SaCheckLogin;
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.dev33.satoken.annotation.SaCheckRole;
 import com.lesofn.archforge.infrastructure.auth.stp.StpAdminUtil;
 import org.springframework.web.bind.annotation.*;
@@ -29,6 +31,7 @@ import org.springframework.web.bind.annotation.*;
  * @author sofn
  */
 @Tag(name = "Quartz 调度", description = "Quartz 反射调度任务管理")
+@SaCheckLogin(type = StpAdminUtil.TYPE)
 @SaCheckRole(value = "ADMIN", type = StpAdminUtil.TYPE)
 @RestController
 @RequestMapping("/quartz")
@@ -65,6 +68,7 @@ public class QuartzJobController {
 
     @Log
     @Operation(summary = "更新 Quartz 任务")
+    @SaCheckPermission(value = "monitor:job:edit", type = StpAdminUtil.TYPE)
     @PutMapping("/update/{id}")
     public void update(@PathVariable Long id, @RequestBody QuartzJobUpsertRequest req) {
         quartzJobService.update(id, toEntity(new SysQuartzJob(), req));
@@ -72,6 +76,7 @@ public class QuartzJobController {
 
     @Log
     @Operation(summary = "删除 Quartz 任务")
+    @SaCheckPermission(value = "monitor:job:remove", type = StpAdminUtil.TYPE)
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {
         quartzJobService.delete(id);

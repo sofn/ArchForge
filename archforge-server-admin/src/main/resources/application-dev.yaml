@@ -103,6 +103,11 @@ arch-forge:
     expire-seconds: 604800
   captcha:
     enabled: true
+  cors:
+    allowed-origins:
+      - http://localhost:5173
+      - http://localhost:8848
+      - http://localhost:3000
   file-storage:
     type: ${FILE_STORAGE_TYPE:s3}
     local-dir: uploads

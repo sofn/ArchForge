@@ -13,6 +13,8 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import cn.dev33.satoken.annotation.SaCheckLogin;
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.dev33.satoken.annotation.SaCheckRole;
 import com.lesofn.archforge.infrastructure.auth.stp.StpAdminUtil;
 import org.springframework.util.StringUtils;
@@ -24,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/blog/file")
+@SaCheckLogin(type = StpAdminUtil.TYPE)
 @SaCheckRole(value = "ADMIN", type = StpAdminUtil.TYPE)
 @RequiredArgsConstructor
 public class BlogFileController {
@@ -34,6 +37,7 @@ public class BlogFileController {
     @Value("${arch-forge.web.public-url:http://localhost:8081}")
     private String webPublicUrl;
 
+    @SaCheckPermission(value = "blog:file:add", type = StpAdminUtil.TYPE)
     @PostMapping("/upload")
     public ResponseEntity<Map<String, Object>> uploadMarkdownImage(
             @RequestParam("file[]") MultipartFile[] files) throws IOException {

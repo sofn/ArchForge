@@ -16,14 +16,16 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import cn.dev33.satoken.annotation.SaCheckLogin;
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.dev33.satoken.annotation.SaCheckRole;
 import com.lesofn.archforge.infrastructure.auth.stp.StpAdminUtil;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "菜单管理")
+@SaCheckLogin(type = StpAdminUtil.TYPE)
 @SaCheckRole(value = "ADMIN", type = StpAdminUtil.TYPE)
 @RestController
-@CrossOrigin
 @RequiredArgsConstructor
 @RequestMapping("/admin/menu")
 public class MenuController {
@@ -40,6 +42,7 @@ public class MenuController {
 
     @Log
     @Operation(summary = "创建菜单")
+    @SaCheckPermission(value = "system:menu:add", type = StpAdminUtil.TYPE)
     @PostMapping("/create")
     public Long createMenu(@RequestBody @Valid MenuCreateRequest request) {
         SysMenu menu = buildMenuFromCreateRequest(request);
@@ -49,6 +52,7 @@ public class MenuController {
 
     @Log
     @Operation(summary = "更新菜单")
+    @SaCheckPermission(value = "system:menu:edit", type = StpAdminUtil.TYPE)
     @PutMapping("/update")
     public Boolean updateMenu(@RequestBody @Valid MenuUpdateRequest request) {
         Optional<SysMenu> opt = menuService.findById(request.getId());
@@ -80,6 +84,7 @@ public class MenuController {
 
     @Log
     @Operation(summary = "删除菜单")
+    @SaCheckPermission(value = "system:menu:remove", type = StpAdminUtil.TYPE)
     @PostMapping("/delete")
     public Boolean deleteMenu(@RequestBody @Valid MenuDeleteRequest request) {
         menuService.softDeleteById(request.getId());

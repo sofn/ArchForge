@@ -20,14 +20,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import cn.dev33.satoken.annotation.SaCheckLogin;
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.dev33.satoken.annotation.SaCheckRole;
 import com.lesofn.archforge.infrastructure.auth.stp.StpAdminUtil;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "参数管理")
+@SaCheckLogin(type = StpAdminUtil.TYPE)
 @SaCheckRole(value = "ADMIN", type = StpAdminUtil.TYPE)
 @RestController
-@CrossOrigin
 @RequiredArgsConstructor
 @RequestMapping("/admin/config")
 public class ConfigController {
@@ -51,6 +53,7 @@ public class ConfigController {
 
     @Log
     @Operation(summary = "创建参数")
+    @SaCheckPermission(value = "system:config:add", type = StpAdminUtil.TYPE)
     @PostMapping("/create")
     public Long createConfig(@RequestBody @Valid ConfigCreateRequest request) {
         SysConfig config = new SysConfig();
@@ -65,6 +68,7 @@ public class ConfigController {
 
     @Log
     @Operation(summary = "更新参数")
+    @SaCheckPermission(value = "system:config:edit", type = StpAdminUtil.TYPE)
     @PutMapping("/update")
     public Boolean updateConfig(@RequestBody @Valid ConfigUpdateRequest request) {
         Optional<SysConfig> opt = configService.findById(request.getId());
@@ -88,6 +92,7 @@ public class ConfigController {
 
     @Log
     @Operation(summary = "删除参数")
+    @SaCheckPermission(value = "system:config:remove", type = StpAdminUtil.TYPE)
     @PostMapping("/delete")
     public Boolean deleteConfig(@RequestBody @Valid ConfigDeleteRequest request) {
         configService.deleteById(request.getId());

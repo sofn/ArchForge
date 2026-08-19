@@ -33,6 +33,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import cn.dev33.satoken.annotation.SaCheckLogin;
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.dev33.satoken.annotation.SaCheckRole;
 import com.lesofn.archforge.infrastructure.auth.stp.StpAdminUtil;
 import org.springframework.web.bind.annotation.*;
@@ -45,9 +47,9 @@ import org.springframework.web.multipart.MultipartFile;
  */
 @Slf4j
 @Tag(name = "文件管理", description = "文件上传、下载、删除接口")
+@SaCheckLogin(type = StpAdminUtil.TYPE)
 @SaCheckRole(value = "ADMIN", type = StpAdminUtil.TYPE)
 @RestController
-@CrossOrigin
 @RequiredArgsConstructor
 @RequestMapping("/file")
 public class FileController {
@@ -58,6 +60,7 @@ public class FileController {
 
     @Log
     @Operation(summary = "上传文件")
+    @SaCheckPermission(value = "system:file:add", type = StpAdminUtil.TYPE)
     @PostMapping("/upload")
     @RepeatSubmit
     public UploadFileResponse uploadFile(@RequestParam("file") MultipartFile file) {
@@ -90,6 +93,7 @@ public class FileController {
 
     @Log
     @Operation(summary = "上传图片（头像等）")
+    @SaCheckPermission(value = "system:file:add", type = StpAdminUtil.TYPE)
     @PostMapping("/upload-image")
     @RepeatSubmit
     public UploadFileResponse uploadImage(@RequestParam("file") MultipartFile file) {
@@ -138,6 +142,7 @@ public class FileController {
 
     @Log
     @Operation(summary = "删除文件")
+    @SaCheckPermission(value = "system:file:remove", type = StpAdminUtil.TYPE)
     @DeleteMapping("/{fileId}")
     public Boolean deleteFile(@PathVariable Long fileId) {
         Optional<SysFile> optFile = fileService.findById(fileId);

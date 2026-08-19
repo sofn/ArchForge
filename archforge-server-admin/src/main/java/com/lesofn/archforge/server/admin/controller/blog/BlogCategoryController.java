@@ -18,6 +18,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import cn.dev33.satoken.annotation.SaCheckLogin;
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.dev33.satoken.annotation.SaCheckRole;
 import com.lesofn.archforge.infrastructure.auth.stp.StpAdminUtil;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/blog/category")
+@SaCheckLogin(type = StpAdminUtil.TYPE)
 @SaCheckRole(value = "ADMIN", type = StpAdminUtil.TYPE)
 @RequiredArgsConstructor
 public class BlogCategoryController {
@@ -49,6 +52,7 @@ public class BlogCategoryController {
         return AdminPageResponse.of(list, page.getTotalElements(), page.getSize(), request.getCurrentPage());
     }
 
+    @SaCheckPermission(value = "blog:category:add", type = StpAdminUtil.TYPE)
     @PostMapping("/create")
     public Long create(@RequestBody @Valid AdminBlogCategoryCreateRequest request) {
         BlogCategory category = new BlogCategory()
@@ -59,6 +63,7 @@ public class BlogCategoryController {
         return categoryService.create(category).getId();
     }
 
+    @SaCheckPermission(value = "blog:category:edit", type = StpAdminUtil.TYPE)
     @PutMapping("/update")
     public Boolean update(@RequestBody @Valid AdminBlogCategoryUpdateRequest request) {
         BlogCategory category = new BlogCategory()

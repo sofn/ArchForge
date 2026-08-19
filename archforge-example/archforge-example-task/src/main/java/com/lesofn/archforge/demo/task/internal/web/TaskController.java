@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "任务管理")
 @SaCheckRole(value = "ADMIN", type = StpAdminUtil.TYPE)
 @RestController
-@CrossOrigin
 @RequiredArgsConstructor
 @RequestMapping("/task")
 public class TaskController {

@@ -41,9 +41,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import cn.dev33.satoken.annotation.SaCheckLogin;
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.dev33.satoken.annotation.SaCheckRole;
 import com.lesofn.archforge.infrastructure.auth.stp.StpAdminUtil;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -60,9 +61,9 @@ import org.springframework.web.multipart.MultipartFile;
  * 元表格管理接口
  */
 @Tag(name = "元表格管理")
+@SaCheckLogin(type = StpAdminUtil.TYPE)
 @SaCheckRole(value = "ADMIN", type = StpAdminUtil.TYPE)
 @RestController
-@CrossOrigin
 @RequiredArgsConstructor
 @RequestMapping("/meta-table")
 public class MetaTableController {
@@ -76,6 +77,7 @@ public class MetaTableController {
     private final SysUserService sysUserService;
 
     @Operation(summary = "获取元表格列表")
+    @SaCheckPermission(value = "meta-table:list", type = StpAdminUtil.TYPE)
     @PostMapping
     public AdminPageResponse<MetaTableResponse> list(@RequestBody MetaTableListRequest request) {
         int currentPage = request.getCurrentPage() != null && request.getCurrentPage() > 0
@@ -125,6 +127,7 @@ public class MetaTableController {
 
     @Log
     @Operation(summary = "创建元表格")
+    @SaCheckPermission(value = "meta-table:add", type = StpAdminUtil.TYPE)
     @PostMapping("/create")
     public Long create(RequestContext rc, @RequestBody @Valid MetaTableCreateRequest request) {
         MetaTable table = request.toTable();
@@ -138,6 +141,7 @@ public class MetaTableController {
 
     @Log
     @Operation(summary = "更新元表格")
+    @SaCheckPermission(value = "meta-table:edit", type = StpAdminUtil.TYPE)
     @PutMapping("/{id}")
     public Boolean update(RequestContext rc, @PathVariable Long id, @RequestBody @Valid MetaTableUpdateRequest request) {
         MetaTable table = request.toTable();
@@ -149,6 +153,7 @@ public class MetaTableController {
 
     @Log
     @Operation(summary = "复制元表格")
+    @SaCheckPermission(value = "meta-table:add", type = StpAdminUtil.TYPE)
     @PostMapping("/{id}/copy")
     public Long copy(@PathVariable Long id) {
         return metaTableAdminService.copy(id);
@@ -156,6 +161,7 @@ public class MetaTableController {
 
     @Log
     @Operation(summary = "生成元表格代码")
+    @SaCheckPermission(value = "meta-table:edit", type = StpAdminUtil.TYPE)
     @PostMapping("/{id}/generate")
     public MetaTableGenerateResponse generate(@PathVariable Long id, @RequestBody @Valid MetaTableGenerateRequest request) {
         MetaTable table = metaTableAdminService.findById(id);
@@ -197,6 +203,7 @@ public class MetaTableController {
 
     @Log
     @Operation(summary = "删除元表格")
+    @SaCheckPermission(value = "meta-table:remove", type = StpAdminUtil.TYPE)
     @DeleteMapping("/{id}")
     public Boolean delete(@PathVariable Long id, @RequestParam(defaultValue = "false") Boolean force) {
         metaTableAdminService.delete(id, Boolean.TRUE.equals(force));
@@ -220,6 +227,7 @@ public class MetaTableController {
     }
 
     @Operation(summary = "获取元表格数据")
+    @SaCheckPermission(value = "meta-table:list", type = StpAdminUtil.TYPE)
     @PostMapping("/{id}/data")
     public AdminPageResponse<Map<String, Object>> listData(
             @PathVariable Long id, @RequestBody MetaDataListRequest request) {
@@ -236,6 +244,7 @@ public class MetaTableController {
 
     @Log
     @Operation(summary = "新增元表格数据")
+    @SaCheckPermission(value = "meta-table:add", type = StpAdminUtil.TYPE)
     @PostMapping("/{id}/data/create")
     public Long createData(RequestContext rc, @PathVariable Long id, @RequestBody Map<String, Object> row) {
         return metaTableCrudService.insert(id, row, rc.getCurrentUid());
@@ -243,6 +252,7 @@ public class MetaTableController {
 
     @Log
     @Operation(summary = "修改元表格数据")
+    @SaCheckPermission(value = "meta-table:edit", type = StpAdminUtil.TYPE)
     @PutMapping("/{id}/data/{dataId}")
     public Boolean updateData(
             RequestContext rc,
@@ -254,6 +264,7 @@ public class MetaTableController {
 
     @Log
     @Operation(summary = "删除元表格数据")
+    @SaCheckPermission(value = "meta-table:remove", type = StpAdminUtil.TYPE)
     @PostMapping("/{id}/data/{dataId}/delete")
     public Boolean deleteData(RequestContext rc, @PathVariable Long id, @PathVariable Long dataId) {
         return metaTableCrudService.softDelete(id, dataId, rc.getCurrentUid());
@@ -284,6 +295,7 @@ public class MetaTableController {
 
     @Log
     @Operation(summary = "导入元表格数据")
+    @SaCheckPermission(value = "meta-table:add", type = StpAdminUtil.TYPE)
     @PostMapping("/{id}/import")
     public ImportResponse importData(
             RequestContext rc,

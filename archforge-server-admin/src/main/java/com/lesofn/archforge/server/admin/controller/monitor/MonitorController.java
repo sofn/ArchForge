@@ -20,6 +20,8 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import cn.dev33.satoken.annotation.SaCheckLogin;
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.dev33.satoken.annotation.SaCheckRole;
 import com.lesofn.archforge.infrastructure.auth.stp.StpAdminUtil;
 import org.springframework.web.bind.annotation.*;
@@ -28,6 +30,7 @@ import org.springframework.web.bind.annotation.*;
  * 系统监控接口：在线用户、缓存信息。
  */
 @Tag(name = "系统监控")
+@SaCheckLogin(type = StpAdminUtil.TYPE)
 @SaCheckRole(value = "ADMIN", type = StpAdminUtil.TYPE)
 @RequiredArgsConstructor
 @RestController
@@ -38,6 +41,7 @@ public class MonitorController {
     private final StringRedisTemplate stringRedisTemplate;
 
     @Operation(summary = "在线用户列表")
+    @SaCheckPermission(value = "monitor:online:list", type = StpAdminUtil.TYPE)
     @PostMapping("/online-logs")
     public AdminPageResponse<OnlineUserResponse> getOnlineLogsList(@RequestBody OnlineLogListRequest request) {
         int currentPage = request.getCurrentPage() != null ? request.getCurrentPage() : 1;
@@ -79,6 +83,7 @@ public class MonitorController {
     }
 
     @Operation(summary = "缓存监控信息")
+    @SaCheckPermission(value = "monitor:cache:list", type = StpAdminUtil.TYPE)
     @GetMapping("/cache-info")
     public CacheInfoResponse getCacheInfo() {
         Properties info = stringRedisTemplate.execute(

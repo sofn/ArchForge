@@ -15,14 +15,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import cn.dev33.satoken.annotation.SaCheckLogin;
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.dev33.satoken.annotation.SaCheckRole;
 import com.lesofn.archforge.infrastructure.auth.stp.StpAdminUtil;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "操作日志")
+@SaCheckLogin(type = StpAdminUtil.TYPE)
 @SaCheckRole(value = "ADMIN", type = StpAdminUtil.TYPE)
 @RestController
-@CrossOrigin
 @RequiredArgsConstructor
 @RequestMapping("/admin/operation-log")
 public class OperationLogController {
@@ -30,6 +32,7 @@ public class OperationLogController {
     private final SysOperLogService operLogService;
 
     @Operation(summary = "获取操作日志列表")
+    @SaCheckPermission(value = "monitor:operlog:list", type = StpAdminUtil.TYPE)
     @PostMapping
     public AdminPageResponse<OperationLogResponse> getOperationLogsList(@RequestBody BasePageRequest request) {
         int currentPage = request.getCurrentPage() != null ? request.getCurrentPage() : 1;
@@ -46,6 +49,7 @@ public class OperationLogController {
     }
 
     @Operation(summary = "删除操作日志")
+    @SaCheckPermission(value = "monitor:operlog:remove", type = StpAdminUtil.TYPE)
     @PostMapping("/delete")
     public Boolean deleteOperLog(@RequestBody DeleteRequest data) {
         operLogService.deleteById(data.getId());
@@ -53,6 +57,7 @@ public class OperationLogController {
     }
 
     @Operation(summary = "清空操作日志")
+    @SaCheckPermission(value = "monitor:operlog:list", type = StpAdminUtil.TYPE)
     @PostMapping("/clear")
     public Boolean clearOperLogs() {
         operLogService.clearAll();

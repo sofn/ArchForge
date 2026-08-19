@@ -32,14 +32,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import cn.dev33.satoken.annotation.SaCheckLogin;
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.dev33.satoken.annotation.SaCheckRole;
 import com.lesofn.archforge.infrastructure.auth.stp.StpAdminUtil;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "角色管理")
+@SaCheckLogin(type = StpAdminUtil.TYPE)
 @SaCheckRole(value = "ADMIN", type = StpAdminUtil.TYPE)
 @RestController
-@CrossOrigin
 @RequiredArgsConstructor
 @RequestMapping("/admin/role")
 public class RoleController {
@@ -52,6 +54,7 @@ public class RoleController {
     private final AdminRoleMenuConvertor roleMenuMapper;
 
     @Operation(summary = "获取全量角色列表")
+    @SaCheckPermission(value = "system:role:query", type = StpAdminUtil.TYPE)
     @GetMapping("/all")
     public List<AdminRoleSimpleDTO> listAllRoles() {
         List<SysRole> roles = roleService.findAll();
@@ -78,6 +81,7 @@ public class RoleController {
     }
 
     @Operation(summary = "获取角色权限菜单树")
+    @SaCheckPermission(value = "system:role:query", type = StpAdminUtil.TYPE)
     @PostMapping("/menu")
     public List<AdminRoleMenuDTO> getRoleMenuTree() {
         List<com.lesofn.archforge.user.api.domain.SysMenu> allMenus = menuService.findAllActiveMenus();
@@ -85,6 +89,7 @@ public class RoleController {
     }
 
     @Operation(summary = "获取角色菜单ID列表")
+    @SaCheckPermission(value = "system:role:query", type = StpAdminUtil.TYPE)
     @PostMapping("/menu-ids")
     public List<Long> getRoleMenuIds(@RequestBody AdminRoleIdRequest request) {
         if (request.getId() == null) {
@@ -96,6 +101,7 @@ public class RoleController {
 
     @Log
     @Operation(summary = "创建角色")
+    @SaCheckPermission(value = "system:role:add", type = StpAdminUtil.TYPE)
     @PostMapping("/create")
     public Long createRole(@RequestBody @Valid RoleCreateRequest request) {
         SysRole role = new SysRole();
@@ -110,6 +116,7 @@ public class RoleController {
 
     @Log
     @Operation(summary = "更新角色")
+    @SaCheckPermission(value = "system:role:edit", type = StpAdminUtil.TYPE)
     @PutMapping("/update")
     public Boolean updateRole(@RequestBody @Valid RoleUpdateRequest request) {
         Optional<SysRole> opt = roleService.findById(request.getId());
@@ -129,6 +136,7 @@ public class RoleController {
 
     @Log
     @Operation(summary = "删除角色")
+    @SaCheckPermission(value = "system:role:remove", type = StpAdminUtil.TYPE)
     @PostMapping("/delete")
     public Boolean deleteRole(@RequestBody @Valid RoleDeleteRequest request) {
         roleService.softDeleteById(request.getId());
@@ -137,6 +145,7 @@ public class RoleController {
 
     @Log
     @Operation(summary = "更新角色状态")
+    @SaCheckPermission(value = "system:role:edit", type = StpAdminUtil.TYPE)
     @PostMapping("/status")
     public Boolean updateRoleStatus(@RequestBody @Valid RoleStatusRequest request) {
         Optional<SysRole> opt = roleService.findById(request.getId());
@@ -150,6 +159,7 @@ public class RoleController {
 
     @Log
     @Operation(summary = "保存角色菜单权限")
+    @SaCheckPermission(value = "system:role:edit", type = StpAdminUtil.TYPE)
     @PostMapping("/save-menu")
     public Boolean saveRoleMenu(@RequestBody @Valid RoleMenuRequest request) {
         List<Long> menuIdList = request.getMenuIds() != null ? request.getMenuIds() : Collections.emptyList();
@@ -159,6 +169,7 @@ public class RoleController {
 
     @Log
     @Operation(summary = "更新角色数据权限")
+    @SaCheckPermission(value = "system:role:edit", type = StpAdminUtil.TYPE)
     @PostMapping("/data-scope")
     public Boolean updateRoleDataScope(@RequestBody @Valid RoleDataScopeRequest request) {
         Optional<SysRole> opt = roleService.findById(request.getId());

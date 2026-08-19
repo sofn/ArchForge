@@ -15,14 +15,16 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import cn.dev33.satoken.annotation.SaCheckLogin;
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.dev33.satoken.annotation.SaCheckRole;
 import com.lesofn.archforge.infrastructure.auth.stp.StpAdminUtil;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "部门管理")
+@SaCheckLogin(type = StpAdminUtil.TYPE)
 @SaCheckRole(value = "ADMIN", type = StpAdminUtil.TYPE)
 @RestController
-@CrossOrigin
 @RequiredArgsConstructor
 @RequestMapping("/admin/dept")
 public class DeptController {
@@ -39,6 +41,7 @@ public class DeptController {
 
     @Log
     @Operation(summary = "创建部门")
+    @SaCheckPermission(value = "system:dept:add", type = StpAdminUtil.TYPE)
     @PostMapping("/create")
     public Long createDept(@RequestBody @Valid DeptCreateRequest request) {
         SysDept dept = new SysDept();
@@ -56,6 +59,7 @@ public class DeptController {
 
     @Log
     @Operation(summary = "更新部门")
+    @SaCheckPermission(value = "system:dept:edit", type = StpAdminUtil.TYPE)
     @PutMapping("/update")
     public Boolean updateDept(@RequestBody @Valid DeptUpdateRequest request) {
         Optional<SysDept> opt = deptService.findById(request.getId());
@@ -85,6 +89,7 @@ public class DeptController {
 
     @Log
     @Operation(summary = "删除部门")
+    @SaCheckPermission(value = "system:dept:remove", type = StpAdminUtil.TYPE)
     @PostMapping("/delete")
     public Boolean deleteDept(@RequestBody @Valid DeptDeleteRequest request) {
         deptService.deleteById(request.getId());

@@ -16,14 +16,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import cn.dev33.satoken.annotation.SaCheckLogin;
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.dev33.satoken.annotation.SaCheckRole;
 import com.lesofn.archforge.infrastructure.auth.stp.StpAdminUtil;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "字典配置")
+@SaCheckLogin(type = StpAdminUtil.TYPE)
 @SaCheckRole(value = "ADMIN", type = StpAdminUtil.TYPE)
 @RestController
-@CrossOrigin
 @RequiredArgsConstructor
 @RequestMapping("/system/dict")
 public class DictController {
@@ -31,6 +33,7 @@ public class DictController {
     private final SysDictService dictService;
 
     @Operation(summary = "字典类型分页列表")
+    @SaCheckPermission(value = "system:dict:list", type = StpAdminUtil.TYPE)
     @PostMapping("/type")
     public AdminPageResponse<DictTypeResponse> listTypes(@RequestBody DictTypeQueryRequest request) {
         int currentPage = request.getCurrentPage() != null && request.getCurrentPage() > 0
@@ -49,6 +52,7 @@ public class DictController {
     }
 
     @Operation(summary = "根据字典编码查询详情及全部项")
+    @SaCheckPermission(value = "system:dict:query", type = StpAdminUtil.TYPE)
     @GetMapping("/type/{dictCode}")
     public DictTypeResponse getTypeByCode(@PathVariable String dictCode) {
         Optional<SysDictType> type = dictService.findTypeByCode(dictCode);
@@ -66,6 +70,7 @@ public class DictController {
 
     @Log(module = "字典配置", summary = "创建字典类型")
     @Operation(summary = "创建字典类型")
+    @SaCheckPermission(value = "system:dict:add", type = StpAdminUtil.TYPE)
     @PostMapping("/type/create")
     public Long createType(@RequestBody @Valid DictTypeCreateRequest request) {
         SysDictType type = new SysDictType()
@@ -84,6 +89,7 @@ public class DictController {
 
     @Log(module = "字典配置", summary = "更新字典类型")
     @Operation(summary = "更新字典类型")
+    @SaCheckPermission(value = "system:dict:edit", type = StpAdminUtil.TYPE)
     @PutMapping("/type/{id}")
     public Boolean updateType(@PathVariable Long id, @RequestBody @Valid DictTypeUpdateRequest request) {
         Optional<SysDictType> opt = dictService.findTypeById(id);
@@ -101,6 +107,7 @@ public class DictController {
 
     @Log(module = "字典配置", summary = "删除字典类型")
     @Operation(summary = "删除字典类型")
+    @SaCheckPermission(value = "system:dict:remove", type = StpAdminUtil.TYPE)
     @DeleteMapping("/type/{id}")
     public Boolean deleteType(@PathVariable Long id) {
         dictService.deleteType(id);
@@ -109,6 +116,7 @@ public class DictController {
 
     @Log(module = "字典配置", summary = "创建字典项")
     @Operation(summary = "创建字典项")
+    @SaCheckPermission(value = "system:dict:add", type = StpAdminUtil.TYPE)
     @PostMapping("/type/{typeId}/item")
     public Long createItem(@PathVariable Long typeId, @RequestBody @Valid DictItemRequest request) {
         SysDictItem item = toItemDomain(request);
