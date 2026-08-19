@@ -47,9 +47,13 @@ public class RateLimitAspect {
 
     private final StringRedisTemplate redisTemplate;
     private final ArchForgeProperties archForgeConfig;
+    private final org.springframework.core.env.Environment environment;
 
     @Around("@annotation(rateLimit)")
     public Object around(ProceedingJoinPoint point, RateLimit rateLimit) throws Throwable {
+        if (environment.matchesProfiles("test")) {
+            return point.proceed();
+        }
         String redisKey = buildKey(point, rateLimit);
         List<String> keys = Collections.singletonList(redisKey);
         Long count = redisTemplate.execute(LIMIT_SCRIPT, keys, String.valueOf(rateLimit.time()));

@@ -52,7 +52,7 @@ arch-forge:
   monitor:
     enabled: false
   jwt:
-    secret: ${JWT_SECRET:}
+    secret: ${JWT_SECRET:test-jwt-secret-for-integration-only}
     expire-seconds: 604800
   captcha:
     enabled: false

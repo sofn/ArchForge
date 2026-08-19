@@ -67,6 +67,11 @@ public class DbCommand {
                     List.of("postgres", "pg_dump", "-U", "archforge", "-d", "archforge_user"),
                     file);
             if (code != 0) {
+                try {
+                    Files.deleteIfExists(file);
+                } catch (Exception ignored) {
+                    // best-effort cleanup of empty failed dumps
+                }
                 System.err.println("pg_dump via compose failed; no usable backup written.");
                 return code;
             }

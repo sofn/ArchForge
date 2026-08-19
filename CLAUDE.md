@@ -91,3 +91,5 @@ All versions centrally managed in `dependencies/build.gradle.kts`:
 - Micrometer 1.6.4 + OpenTelemetry 1.55.0, Flyway 11.14.1
 - JSpecify 1.0.0, MapStruct 1.6.3, Lombok 1.18.44
 - Testcontainers 2.0.4, Spock 2.4, JUnit 6.0.3
+
+
