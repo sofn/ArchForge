@@ -49,6 +49,12 @@ Contracts live in `../ArchForgeSpec`. When an API changes, update `../ArchForgeS
 
 Admin responses use `{code,message,data}`. Web errors use RFC 9457 `ProblemDetail`.
 
+Admin extras:
+
+- Dashboard: `GET /admin/dashboard/metrics|trends|recent-activities|todo`
+- Permission matrix: `/admin/permission-matrix/**`
+- ChatAI: `/admin/chat/**` with user-supplied `LLM_PROVIDER` / `LLM_BASE_URL` / `LLM_API_KEY` / `LLM_MODEL` (OpenAI or Anthropic compatible). No default key.
+
 ## Gradle modules
 
 Every Java module is prefixed with `archforge-`:

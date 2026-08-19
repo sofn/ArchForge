@@ -80,6 +80,9 @@ public class ArchForgeProperties {
     /** 字典配置 */
     private Dictionary dictionary = new Dictionary();
 
+    /** Admin ChatAI LLM (OpenAI / Anthropic compatible) */
+    private Llm llm = new Llm();
+
     @Setter
     @Getter
     public static class Token {
@@ -281,5 +284,23 @@ public class ArchForgeProperties {
 
         /** 扫描根包，支持子包递归 */
         private List<String> enumBasePackages = List.of("com.lesofn.archforge");
+    }
+
+    @Setter
+    @Getter
+    public static class Llm {
+        /** openai | anthropic */
+        private String provider = "openai";
+
+        /** API base, e.g. https://api.openai.com/v1 or https://api.anthropic.com */
+        private String baseUrl = "https://api.openai.com/v1";
+
+        /** User-supplied key; never ship a default secret */
+        private String apiKey = "";
+
+        private String model = "gpt-4o-mini";
+
+        /** Optional Anthropic version header */
+        private String anthropicVersion = "2023-06-01";
     }
 }
