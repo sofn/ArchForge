@@ -1,7 +1,6 @@
 package com.lesofn.archforge.server.admin.service.dashboard;
 
 import com.lesofn.archforge.blog.api.dao.BlogArticleRepository;
-import com.lesofn.archforge.demo.task.internal.repository.TaskDao;
 import com.lesofn.archforge.meta.table.api.dao.MetaTableRepository;
 import com.lesofn.archforge.user.api.dao.SysUserRepository;
 import java.time.LocalDate;
@@ -19,11 +18,9 @@ public class DashboardService {
     private final SysUserRepository userRepository;
     private final BlogArticleRepository articleRepository;
     private final MetaTableRepository metaTableRepository;
-    private final TaskDao taskRepository;
 
     public DashboardMetricsResponse metrics() {
-        return new DashboardMetricsResponse(userRepository.count(), articleRepository.count(), metaTableRepository
-                .count(), taskRepository.count());
+        return new DashboardMetricsResponse(userRepository.count(), articleRepository.count(), metaTableRepository.count(), 0L);
     }
 
     public List<DashboardTrendPoint> trends(int days) {
@@ -52,7 +49,6 @@ public class DashboardService {
         return List.of(
                 new DashboardTodo("Users", userRepository.count(), "/system/user/index"),
                 new DashboardTodo("Articles", articleRepository.count(), "/blog/article"),
-                new DashboardTodo("Meta tables", metaTableRepository.count(), "/metatable"),
-                new DashboardTodo("Tasks", taskRepository.count(), "/task"));
+                new DashboardTodo("Meta tables", metaTableRepository.count(), "/metatable"));
     }
 }

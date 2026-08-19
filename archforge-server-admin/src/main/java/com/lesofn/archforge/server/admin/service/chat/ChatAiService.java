@@ -25,7 +25,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 public class ChatAiService {
 
     private final ArchForgeProperties properties;
-    private final ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper = new ObjectMapper();
     private final HttpClient httpClient = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(10)).build();
     private final ConcurrentHashMap<String, List<Map<String, String>>> sessions = new ConcurrentHashMap<>();
 
