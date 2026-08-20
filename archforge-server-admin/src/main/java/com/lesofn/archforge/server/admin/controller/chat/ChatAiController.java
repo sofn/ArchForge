@@ -1,6 +1,7 @@
 package com.lesofn.archforge.server.admin.controller.chat;
 
 import cn.dev33.satoken.annotation.SaCheckLogin;
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import com.lesofn.archforge.infrastructure.annotation.RateLimit;
 import com.lesofn.archforge.infrastructure.auth.stp.StpAdminUtil;
 import com.lesofn.archforge.server.admin.service.chat.ChatAiService;
@@ -44,6 +45,7 @@ public class ChatAiController {
     }
 
     @Operation(summary = "新建会话")
+    @SaCheckPermission(value = "chatai:use", type = StpAdminUtil.TYPE)
     @PostMapping("/sessions")
     public Map<String, Object> createSession() {
         return chatAiService.createSession();
@@ -56,12 +58,14 @@ public class ChatAiController {
     }
 
     @Operation(summary = "删除会话")
+    @SaCheckPermission(value = "chatai:use", type = StpAdminUtil.TYPE)
     @DeleteMapping("/sessions/{id}")
     public void delete(@PathVariable String id) {
         chatAiService.deleteSession(id);
     }
 
     @Operation(summary = "发送消息（SSE：delta / done / error）")
+    @SaCheckPermission(value = "chatai:use", type = StpAdminUtil.TYPE)
     @RateLimit(key = "admin-chat", time = 60, maxCount = 20, limitType = RateLimit.LimitType.USER)
     @PostMapping(value = "/sessions/{id}/messages", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter send(@PathVariable String id, @RequestBody @Valid ChatMessageRequest request) {

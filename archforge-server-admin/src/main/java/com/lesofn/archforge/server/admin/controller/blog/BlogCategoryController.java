@@ -76,6 +76,7 @@ public class BlogCategoryController {
         return true;
     }
 
+    @SaCheckPermission(value = "blog:category:remove", type = StpAdminUtil.TYPE)
     @PostMapping("/delete")
     public Boolean delete(@RequestBody @Valid IdRequest request) {
         categoryService.delete(request.getId());

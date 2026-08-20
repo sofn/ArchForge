@@ -9,11 +9,6 @@ public final class XssSanitizer {
         if (value == null || value.isEmpty()) {
             return value;
         }
-        return value.replace("<", "&lt;")
-                .replace(">", "&gt;")
-                .replace("\"", "&quot;")
-                .replace("'", "&#x27;")
-                .replace("(", "&#40;")
-                .replace(")", "&#41;");
+        return value.replace("<", "&lt;").replace(">", "&gt;");
     }
 }

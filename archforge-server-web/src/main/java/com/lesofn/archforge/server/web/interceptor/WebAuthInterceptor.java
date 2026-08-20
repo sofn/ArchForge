@@ -24,7 +24,7 @@ public class WebAuthInterceptor implements HandlerInterceptor {
             return true;
         }
         if (!StpWebUtil.isLogin()) {
-            writeUnauthorized(response);
+            writeUnauthorized(request, response);
             return false;
         }
         Long userId = StpWebUtil.getLoginIdAsLong();
@@ -67,10 +67,18 @@ public class WebAuthInterceptor implements HandlerInterceptor {
         return !uri.equals("/web/articles/me") && !uri.startsWith("/web/articles/me/");
     }
 
-    private void writeUnauthorized(HttpServletResponse response) throws Exception {
+    private void writeUnauthorized(HttpServletRequest request, HttpServletResponse response) throws Exception {
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("UTF-8");
-        objectMapper.writeValue(response.getWriter(), Map.of("code", 401, "message", "未登录或 token 无效"));
+        objectMapper.writeValue(
+                response.getWriter(),
+                Map.of(
+                        "type", "about:blank",
+                        "title", "Unauthorized",
+                        "status", 401,
+                        "detail", "未登录或 token 无效",
+                        "instance", request.getRequestURI(),
+                        "code", 401));
     }
 }

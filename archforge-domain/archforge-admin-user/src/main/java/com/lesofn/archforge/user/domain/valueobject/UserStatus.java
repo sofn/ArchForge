@@ -26,7 +26,11 @@ public enum UserStatus {
     }
 
     public int toPersistenceValue() {
-        return ordinal() + 1;
+        return switch (this) {
+            case NORMAL -> 1;
+            case DISABLED -> 2;
+            case FROZEN -> 3;
+        };
     }
 
     public static UserStatus fromPersistenceValue(Integer value) {

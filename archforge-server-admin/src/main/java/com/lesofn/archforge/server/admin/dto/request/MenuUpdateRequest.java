@@ -28,6 +28,9 @@ public class MenuUpdateRequest {
     private Integer menuType;
 
     @Nullable
+    private Boolean isButton;
+
+    @Nullable
     private String name;
 
     @Nullable

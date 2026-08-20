@@ -186,7 +186,7 @@ public class ArchForgeProperties {
 
         /** 允许的文件扩展名白名单（不带点号） */
         private List<String> allowedExtensions = List.of(
-                "jpg", "jpeg", "png", "gif", "webp", "bmp", "svg", "pdf", "doc", "docx",
+                "jpg", "jpeg", "png", "gif", "webp", "bmp", "pdf", "doc", "docx",
                 "xls", "xlsx", "ppt", "pptx", "txt", "csv", "zip", "rar", "7z", "mp3",
                 "mp4", "avi", "mov", "json", "xml");
 

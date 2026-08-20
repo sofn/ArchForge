@@ -148,7 +148,6 @@ arch-forge:
       - gif
       - webp
       - bmp
-      - svg
       - pdf
       - doc
       - docx

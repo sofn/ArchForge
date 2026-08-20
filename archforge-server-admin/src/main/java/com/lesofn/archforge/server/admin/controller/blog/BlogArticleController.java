@@ -79,18 +79,21 @@ public class BlogArticleController {
         return true;
     }
 
+    @SaCheckPermission(value = "blog:article:remove", type = StpAdminUtil.TYPE)
     @PostMapping("/delete")
     public Boolean delete(@RequestBody @Valid IdRequest request) {
         articleService.delete(request.getId());
         return true;
     }
 
+    @SaCheckPermission(value = "blog:article:publish", type = StpAdminUtil.TYPE)
     @PostMapping("/{id}/publish")
     public Boolean publish(@PathVariable Long id) {
         articleService.publish(id);
         return true;
     }
 
+    @SaCheckPermission(value = "blog:article:offline", type = StpAdminUtil.TYPE)
     @PostMapping("/{id}/offline")
     public Boolean offline(@PathVariable Long id) {
         articleService.offline(id);

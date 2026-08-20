@@ -26,13 +26,10 @@ public class MenuDTO {
             this.isButton = entity.getIsButton();
             this.statusStr = BasicEnumUtil.getDescriptionByValue(StatusEnum.class, entity.getStatus());
 
-            if (!entity.getIsButton()) {
-                this.menuType = entity.getMenuType();
-                this.menuTypeStr = BasicEnumUtil.getDescriptionByValue(
-                        MenuTypeEnum.class, entity.getMenuType());
-            } else {
-                this.menuType = 0;
-            }
+            this.menuType = entity.getMenuType();
+            this.menuTypeStr = Boolean.TRUE.equals(entity.getIsButton())
+                    ? "按钮"
+                    : BasicEnumUtil.getDescriptionByValue(MenuTypeEnum.class, entity.getMenuType());
 
             if (entity.getMetaInfo() != null) {
                 MetaDTO meta = entity.getMetaInfo();

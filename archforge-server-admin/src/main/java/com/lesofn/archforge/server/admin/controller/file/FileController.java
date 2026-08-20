@@ -1,11 +1,12 @@
 package com.lesofn.archforge.server.admin.controller.file;
 
-import com.lesofn.archforge.common.error.SystemErrorCode;
 import com.lesofn.archforge.common.error.system.SystemException;
 import com.lesofn.archforge.infrastructure.annotation.Log;
 import com.lesofn.archforge.infrastructure.annotation.RepeatSubmit;
 import com.lesofn.archforge.infrastructure.config.ArchForgeProperties;
 import com.lesofn.archforge.infrastructure.file.FileStorageService;
+import com.lesofn.archforge.infrastructure.file.FileUploadValidator;
+import java.nio.charset.StandardCharsets;
 import com.lesofn.archforge.server.admin.controller.ControllerHelper;
 import com.lesofn.archforge.server.admin.dto.AdminPageResponse;
 import com.lesofn.archforge.server.admin.dto.request.FileListRequest;
@@ -66,9 +67,26 @@ public class FileController {
     @PostMapping("/upload")
     @RepeatSubmit
     public UploadFileResponse uploadFile(@RequestParam("file") MultipartFile file) {
-        validateUploadFile(file);
+        return store(file, false);
+    }
+
+    @Log
+    @Operation(summary = "上传图片（头像等）")
+    @SaCheckPermission(value = "system:file:add", type = StpAdminUtil.TYPE)
+    @PostMapping("/upload-image")
+    @RepeatSubmit
+    public UploadFileResponse uploadImage(@RequestParam("file") MultipartFile file) {
+        return store(file, true);
+    }
+
+    private UploadFileResponse store(MultipartFile file, boolean imageOnly) {
+        if (imageOnly) {
+            FileUploadValidator.validateImage(file, appForgeConfig.getFileStorage());
+        } else {
+            FileUploadValidator.validate(file, appForgeConfig.getFileStorage());
+        }
         String originalName = file.getOriginalFilename();
-        String extension = getExtension(originalName);
+        String extension = FileUploadValidator.extension(originalName);
         String storageName = UUID.randomUUID().toString().replace("-", "") + "." + extension;
         String datePath = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd"));
         String storagePath = datePath + "/" + storageName;
@@ -77,7 +95,7 @@ public class FileController {
             fileStorageService.upload(
                     storagePath, inputStream, file.getContentType(), file.getSize());
         } catch (Exception e) {
-            throw new RuntimeException("文件上传失败: " + e.getMessage(), e);
+            throw new SystemException("文件上传失败", e);
         }
 
         SysFile sysFile = new SysFile();
@@ -91,15 +109,6 @@ public class FileController {
         SysFile saved = fileService.create(sysFile);
 
         return new UploadFileResponse(saved.getFileId(), originalName, "/file/download/" + saved.getFileId(), file.getSize());
-    }
-
-    @Log
-    @Operation(summary = "上传图片（头像等）")
-    @SaCheckPermission(value = "system:file:add", type = StpAdminUtil.TYPE)
-    @PostMapping("/upload-image")
-    @RepeatSubmit
-    public UploadFileResponse uploadImage(@RequestParam("file") MultipartFile file) {
-        return uploadFile(file);
     }
 
     @Operation(summary = "获取文件列表")
@@ -137,7 +146,10 @@ public class FileController {
                 .contentType(MediaType.parseMediaType(sysFile.getContentType()))
                 .header(
                         HttpHeaders.CONTENT_DISPOSITION,
-                        "attachment; filename=\"" + sysFile.getOriginalName() + "\"")
+                        org.springframework.http.ContentDisposition.attachment()
+                                .filename(sysFile.getOriginalName(), StandardCharsets.UTF_8)
+                                .build()
+                                .toString())
                 .body(new InputStreamResource(inputStream));
     }
 
@@ -155,40 +167,4 @@ public class FileController {
         return true;
     }
 
-    private String getExtension(String filename) {
-        if (filename == null || filename.isBlank()) {
-            return "";
-        }
-        int dot = filename.lastIndexOf('.');
-        return dot >= 0 && dot < filename.length() - 1
-                ? filename.substring(dot + 1).toLowerCase()
-                : "";
-    }
-
-    private void validateUploadFile(MultipartFile file) {
-        ArchForgeProperties.FileStorage fileStorage = appForgeConfig.getFileStorage();
-
-        long maxFileSize = fileStorage.getMaxFileSize();
-        if (file.getSize() > maxFileSize) {
-            throw new SystemException(SystemErrorCode.E_FILE_SIZE_EXCEEDED);
-        }
-
-        String extension = getExtension(file.getOriginalFilename());
-        List<String> allowedExtensions = fileStorage.getAllowedExtensions();
-        if (allowedExtensions != null && !allowedExtensions.isEmpty()) {
-            boolean allowed = allowedExtensions.stream().anyMatch(ext -> ext.equalsIgnoreCase(extension));
-            if (!allowed) {
-                throw new SystemException(SystemErrorCode.E_FILE_TYPE_NOT_ALLOWED);
-            }
-        }
-
-        String contentType = file.getContentType();
-        List<String> blockedMimeTypes = fileStorage.getBlockedMimeTypes();
-        if (contentType != null && blockedMimeTypes != null) {
-            boolean blocked = blockedMimeTypes.stream().anyMatch(mime -> mime.equalsIgnoreCase(contentType));
-            if (blocked) {
-                throw new SystemException(SystemErrorCode.E_FILE_TYPE_NOT_ALLOWED);
-            }
-        }
-    }
 }

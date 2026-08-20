@@ -16,8 +16,11 @@ public class AdminMenuDTO {
     /** 菜单ID */
     private Long id;
 
-    /** 菜单类型（0=目录，1=菜单，2=按钮） */
+    /** 菜单类型：1=页面 2=目录 3=iframe 4=外链；按钮看 isButton */
     private Integer menuType;
+
+    /** 是否按钮（独立于 menuType） */
+    private Boolean isButton;
 
     /** 菜单标题 */
     private String title;

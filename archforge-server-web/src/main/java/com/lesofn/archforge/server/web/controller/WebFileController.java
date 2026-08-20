@@ -1,13 +1,15 @@
 package com.lesofn.archforge.server.web.controller;
 
+import com.lesofn.archforge.infrastructure.annotation.RateLimit;
 import com.lesofn.archforge.infrastructure.config.ArchForgeProperties;
 import com.lesofn.archforge.infrastructure.file.FileStorageService;
-import com.lesofn.archforge.infrastructure.auth.LoginContext;
+import com.lesofn.archforge.infrastructure.file.FileUploadValidator;
 import com.lesofn.archforge.server.web.dto.FileUploadResponse;
 import com.lesofn.archforge.user.api.domain.SysFile;
 import com.lesofn.archforge.user.api.service.SysFileService;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
@@ -15,6 +17,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -50,16 +53,23 @@ public class WebFileController {
         MediaType mediaType = sysFile.getContentType() != null
                 ? MediaType.parseMediaType(sysFile.getContentType())
                 : MediaType.APPLICATION_OCTET_STREAM;
+        boolean inlineImage = mediaType.getType().equals("image") && !"svg+xml".equalsIgnoreCase(mediaType.getSubtype());
+        ContentDisposition disposition = inlineImage
+                ? ContentDisposition.inline().filename(sysFile.getOriginalName(), StandardCharsets.UTF_8).build()
+                : ContentDisposition.attachment().filename(sysFile.getOriginalName(), StandardCharsets.UTF_8).build();
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + sysFile.getOriginalName() + "\"")
+                .header(HttpHeaders.CONTENT_DISPOSITION, disposition.toString())
+                .header("Content-Security-Policy", "sandbox")
                 .contentType(mediaType)
                 .body(resource);
     }
 
+    @RateLimit(key = "web-file-upload", time = 60, maxCount = 10, limitType = RateLimit.LimitType.USER)
     @PostMapping("/upload")
     public FileUploadResponse upload(@RequestParam("file") MultipartFile file) throws IOException {
+        FileUploadValidator.validateImage(file, appForgeConfig.getFileStorage());
         String originalName = file.getOriginalFilename();
-        String extension = getExtension(originalName);
+        String extension = FileUploadValidator.extension(originalName);
         String baseName = UUID.randomUUID().toString().replace("-", "");
         String storageName = extension.isEmpty() ? baseName : baseName + "." + extension;
         String datePath = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd"));
@@ -83,12 +93,5 @@ public class WebFileController {
                 .url(url)
                 .name(originalName)
                 .build();
-    }
-
-    private String getExtension(String filename) {
-        if (filename == null || !filename.contains(".")) {
-            return "";
-        }
-        return filename.substring(filename.lastIndexOf(".") + 1);
     }
 }

@@ -8,8 +8,13 @@ import org.junit.jupiter.api.Test;
 class XssSanitizerTest {
 
     @Test
-    void escapesScriptTags() {
-        assertEquals("&lt;script&gt;alert&#40;1&#41;&lt;/script&gt;", XssSanitizer.sanitize("<script>alert(1)</script>"));
+    void escapesScriptTagsWithoutTouchingParentheses() {
+        assertEquals("&lt;script&gt;alert(1)&lt;/script&gt;", XssSanitizer.sanitize("<script>alert(1)</script>"));
+    }
+
+    @Test
+    void keepsApostrophesAndParenthesesInNormalText() {
+        assertEquals("don't (call)", XssSanitizer.sanitize("don't (call)"));
     }
 
     @Test

@@ -64,6 +64,7 @@ public class MenuController {
                 menu,
                 request.getParentId(),
                 request.getMenuType(),
+                request.getIsButton(),
                 request.getName(),
                 request.getPath(),
                 request.getAuths(),
@@ -97,6 +98,7 @@ public class MenuController {
                 menu,
                 request.getParentId(),
                 request.getMenuType(),
+                request.getIsButton(),
                 request.getName(),
                 request.getPath(),
                 request.getAuths(),
@@ -118,6 +120,7 @@ public class MenuController {
             SysMenu menu,
             Long parentId,
             Integer menuType,
+            Boolean isButton,
             String name,
             String path,
             String auths,
@@ -133,8 +136,12 @@ public class MenuController {
             Boolean hiddenTag) {
         if (parentId != null)
             menu.setParentId(parentId);
-        if (menuType != null)
+        if (menuType != null) {
             menu.setMenuType(menuType);
+        }
+        if (isButton != null) {
+            menu.setIsButton(isButton);
+        }
         if (name != null)
             menu.setRouterName(name);
         if (path != null)

@@ -24,6 +24,9 @@ public class MenuCreateRequest {
     private Integer menuType;
 
     @Nullable
+    private Boolean isButton;
+
+    @Nullable
     private String name;
 
     @Nullable

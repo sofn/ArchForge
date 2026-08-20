@@ -1,5 +1,6 @@
 package com.lesofn.archforge.user.domain.valueobject;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -35,5 +36,15 @@ class UserStatusTest {
     @Test
     void cannotTransitionToNull() {
         assertFalse(UserStatus.NORMAL.canTransitionTo(null));
+    }
+
+    @Test
+    void persistenceValuesAreExplicitNotOrdinal() {
+        assertEquals(1, UserStatus.NORMAL.toPersistenceValue());
+        assertEquals(2, UserStatus.DISABLED.toPersistenceValue());
+        assertEquals(3, UserStatus.FROZEN.toPersistenceValue());
+        assertEquals(UserStatus.DISABLED, UserStatus.fromPersistenceValue(2));
+        assertEquals(UserStatus.FROZEN, UserStatus.fromPersistenceValue(3));
+        assertEquals(UserStatus.NORMAL, UserStatus.fromPersistenceValue(1));
     }
 }
