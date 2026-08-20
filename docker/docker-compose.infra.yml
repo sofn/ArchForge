@@ -5,7 +5,7 @@ services:
     image: postgres:17-alpine
     environment:
       POSTGRES_USER: ${DB_USERNAME:-archforge}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-archforge}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD}
     ports:
       - "5432:5432"
     volumes:

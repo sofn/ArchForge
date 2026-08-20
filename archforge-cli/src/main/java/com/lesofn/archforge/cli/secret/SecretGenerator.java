@@ -25,6 +25,7 @@ public final class SecretGenerator {
             "DRUID_PASSWORD",
             "RSA_PUBLIC_KEY",
             "RSA_PRIVATE_KEY",
+            "ARCH_FORGE_RSA_PRIVATE_KEY",
             "AES_KEY"
     };
 
@@ -43,6 +44,7 @@ public final class SecretGenerator {
             Map<String, String> rsa = RsaEncrypter.generateKeyPair();
             secrets.put("RSA_PUBLIC_KEY", rsa.get("publicKey"));
             secrets.put("RSA_PRIVATE_KEY", rsa.get("privateKey"));
+            secrets.put("ARCH_FORGE_RSA_PRIVATE_KEY", rsa.get("privateKey"));
         } catch (Exception e) {
             throw new IllegalStateException("Failed to generate RSA key pair", e);
         }

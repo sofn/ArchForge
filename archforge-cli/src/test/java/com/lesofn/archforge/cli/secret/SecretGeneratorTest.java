@@ -24,6 +24,8 @@ class SecretGeneratorTest {
         assertTrue(secrets.containsKey("DRUID_PASSWORD"));
         assertTrue(secrets.containsKey("RSA_PUBLIC_KEY"));
         assertTrue(secrets.containsKey("RSA_PRIVATE_KEY"));
+        assertTrue(secrets.containsKey("ARCH_FORGE_RSA_PRIVATE_KEY"));
+        assertEquals(secrets.get("RSA_PRIVATE_KEY"), secrets.get("ARCH_FORGE_RSA_PRIVATE_KEY"));
         assertTrue(secrets.containsKey("AES_KEY"));
         assertTrue(secrets.get("JWT_SECRET").length() >= 32);
         assertTrue(secrets.get("DB_PASSWORD").length() >= 16);

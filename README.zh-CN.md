@@ -45,7 +45,7 @@ archforge/
 - C 端：`StpWebUtil` + `WebAuthInterceptor`。
 - 登录限流：5 次/分钟/IP（`@RateLimit`）。
 - XSS 过滤 query/header，**跳过 multipart**。C 端上传走共享 `FileUploadValidator`，拒绝 SVG/HTML。
-- 生产 YAML **没有默认** `DB_PASSWORD` / S3 密钥。
+- 生产必须注入 `DB_PASSWORD`、`ARCH_FORGE_RSA_PRIVATE_KEY` 与存储密钥；`prod` 缺 RSA 会启动失败。
 
 管理端成功响应 `{code,message,data}`。C 端错误为 RFC 9457 `ProblemDetail`。
 

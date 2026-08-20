@@ -46,7 +46,7 @@ Contracts live in `../ArchForgeSpec`. When an API changes, update `../ArchForgeS
 - Web: `StpWebUtil` + `WebAuthInterceptor`.
 - Login rate limit: 5 requests / minute / IP (`@RateLimit`).
 - XSS filter sanitizes query/header values and **skips multipart** uploads.
-- Production YAML has **no default** `DB_PASSWORD` / S3 keys.
+- Production must inject `DB_PASSWORD`, `ARCH_FORGE_RSA_PRIVATE_KEY`, and storage keys; missing RSA in `prod` fails fast.
 
 Admin responses use `{code,message,data}`. Web errors use RFC 9457 `ProblemDetail`.
 
