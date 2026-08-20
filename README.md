@@ -9,8 +9,9 @@
     <img src="https://img.shields.io/badge/Java-25-blue?logo=openjdk" alt="Java 25" />
     <img src="https://img.shields.io/badge/Spring%20Boot-4.1.0-green?logo=springboot" alt="Spring Boot 4.1" />
     <img src="https://img.shields.io/badge/Gradle-9.5.1-02303A?logo=gradle" alt="Gradle 9.5.1" />
+    <img src="https://github.com/sofn/ArchForge/actions/workflows/ci.yml/badge.svg" alt="CI" />
     <img src="https://img.shields.io/badge/Auth-sa--token%201.45-red" alt="sa-token" />
-    <img src="https://img.shields.io/badge/License-MIT-yellow" alt="MIT" />
+    <img src="https://img.shields.io/badge/License-Apache%202.0-blue" alt="Apache 2.0" />
   </p>
 </div>
 
@@ -133,4 +134,4 @@ Canonical conventions: `skills/archforge-project-standard/standard.md`.
 
 ## License
 
-[MIT](./LICENSE)
+[Apache-2.0](./LICENSE)
