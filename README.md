@@ -170,6 +170,8 @@ What CI enforces on every PR ([ci.yml](.github/workflows/ci.yml)):
 
 If the fat jar is missing, `./archforge` builds `:archforge-cli:shadowJar` first.
 
+Windows: run `archforge.bat` instead — same commands (`archforge --help`, `archforge init --write`, …). It builds the jar via `gradlew.bat` on first run and needs `java` on `PATH`.
+
 ## 📚 Tech stack
 
 | Layer | Choice |

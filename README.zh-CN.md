@@ -179,6 +179,8 @@ FILE_STORAGE_TYPE=local ./gradlew :archforge-server-admin:bootRun
 
 缺少 fat jar 时，`./archforge` 会先构建 `:archforge-cli:shadowJar`。
 
+Windows：使用 `archforge.bat`，命令相同（`archforge --help`、`archforge init --write`……）。首次运行会通过 `gradlew.bat` 构建 jar，需要 `java` 在 `PATH` 中。
+
 ## 📚 技术栈
 
 | 层 | 选型 |
