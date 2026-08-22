@@ -13,10 +13,23 @@ jobs:
   build-and-test:
     name: Build & Test
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ArchForge
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          path: ArchForge
+          fetch-depth: 0
+
+      # Contract source + sibling layout expected by scripts and tests.
+      - name: Checkout ArchForgeSpec
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository_owner }}/ArchForgeSpec
+          path: ArchForgeSpec
 
       - name: Set up JDK 25
         uses: actions/setup-java@v4
@@ -29,6 +42,53 @@ jobs:
 
       - name: Build
         run: ./gradlew build --no-daemon
+
+      - name: Aggregate JaCoCo report
+        if: always()
+        run: ./gradlew jacocoAggregateReport --no-daemon -x test
+
+      - name: Diff coverage report (PR comment)
+        if: github.event_name == 'pull_request'
+        uses: madrapps/jacoco-report@v1.7.2
+        with:
+          paths: ${{ github.workspace }}/ArchForge/build/reports/jacoco/jacocoAggregateReport.xml
+          token: ${{ secrets.GITHUB_TOKEN }}
+          min-coverage-overall: 0
+          min-coverage-changed-files: 60
+          title: ":chart_with_upwards_trend: Diff Coverage"
+          update-comment: true
+
+      - name: Diff coverage gate (new code < 60% fails)
+        if: github.event_name == 'pull_request'
+        run: |
+          pipx install diff-cover
+          git fetch origin "${{ github.base_ref }}" --depth=1
+          diff-cover build/reports/jacoco/jacocoAggregateReport.xml \
+            --compare-branch "origin/${{ github.base_ref }}" \
+            --fail-under 60
+
+      - name: Error-code registration check (contract sync)
+        run: python3 scripts/check-error-codes.py ../ArchForgeSpec/specs/error-codes.md
+
+      - name: Export live OpenAPI document
+        run: ./gradlew :archforge-server-admin:test --tests '*OpenApiSnapshotTest*' --no-daemon
+
+      - name: Install oasdiff
+        run: curl -sSf https://raw.githubusercontent.com/oasdiff/oasdiff/main/install.sh | sh
+
+      - name: Contract diff (breaking changes fail)
+        run: |
+          oasdiff breaking ../ArchForgeSpec/api/openapi.yaml \
+            archforge-server-admin/build/openapi/live-openapi.json \
+            --format text
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-aggregate-report
+          path: ArchForge/build/reports/jacoco/
+          retention-days: 7
 
       - name: Upload test reports
         if: failure()
