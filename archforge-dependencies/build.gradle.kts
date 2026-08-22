@@ -109,7 +109,7 @@ dependencies {
         api("org.redisson:redisson:3.52.0")
 
         // ArchUnit (architecture testing)
-        api("com.tngtech.archunit:archunit:1.3.0")
+        api("com.tngtech.archunit:archunit:1.4.2")
 
         // FreeMarker (template engine for code generation)
         api("org.freemarker:freemarker:2.3.33")

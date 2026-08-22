@@ -22,7 +22,7 @@ public final class YamlConfigPatcher {
                 patchFile(repoRoot.resolve("archforge-server-admin/src/main/resources/application-dev.yaml"), true));
         result.put(
                 "application-test.yaml",
-                patchFile(repoRoot.resolve("archforge-server-admin/src/main/resources/application-test.yaml"), false));
+                patchFile(repoRoot.resolve("archforge-server-admin/src/test/resources/application-test.yaml"), false));
         return result;
     }
 

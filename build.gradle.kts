@@ -1,8 +1,12 @@
 plugins {
     id("org.sonarqube") version "7.3.0.8198"
     id("com.diffplug.spotless") version "6.13.0" apply false
+    jacoco
     idea
 }
+
+// JaCoCo 0.8.15+: 官方支持 Java 25/26 class 文件
+val jacocoToolVersion = "0.8.15"
 
 group = "com.lesofn.archforge"
 version = "0.1.0-SNAPSHOT"
@@ -29,6 +33,10 @@ allprojects {
 sonarqube {
     properties {
         property("sonar.projectKey", "ArchForge")
+        property(
+            "sonar.coverage.jacoco.xmlReportPaths",
+            layout.buildDirectory.file("reports/jacoco/jacocoAggregateReport.xml").get().asFile.absolutePath
+        )
     }
 }
 
@@ -38,7 +46,21 @@ subprojects {
         apply(plugin = "java-library")
         apply(plugin = "groovy")
         apply(plugin = "com.diffplug.spotless")
+        apply(plugin = "jacoco")
         apply(plugin = "idea")
+
+        configure<JacocoPluginExtension> {
+            toolVersion = jacocoToolVersion
+        }
+
+        tasks.withType<JacocoReport> {
+            dependsOn(tasks.named("test"))
+            reports {
+                xml.required.set(true)
+                html.required.set(true)
+                csv.required.set(false)
+            }
+        }
 
         // 让 IDEA 自动识别 annotation processor 生成的源码目录 (Hibernate Metamodel 等)
         configure<org.gradle.plugins.ide.idea.model.IdeaModel> {
@@ -71,8 +93,20 @@ subprojects {
         
         // 配置测试任务使用JUnit Platform
         tasks.withType<Test> {
-            useJUnitPlatform()
             jvmArgs("--enable-preview", "--enable-native-access=ALL-UNNAMED")
+            // JUnit @Tag 体系 (P0/P1/contract/slow):
+            //   ./gradlew test -Ptags=P0,contract          只跑指定 tag
+            //   ./gradlew build -PexcludeTags=slow         跳过慢速集成测试
+            useJUnitPlatform {
+                (rootProject.findProperty("tags") as String?)?.let { value ->
+                    includeTags(*value.split(',').map { it.trim() }.filter { it.isNotEmpty() }
+                        .toTypedArray())
+                }
+                (rootProject.findProperty("excludeTags") as String?)?.let { value ->
+                    excludeTags(*value.split(',').map { it.trim() }.filter { it.isNotEmpty() }
+                        .toTypedArray())
+                }
+            }
         }
 
         // 全局排除冲突的日志依赖
@@ -119,5 +153,37 @@ subprojects {
             add("testImplementation", "org.apache.groovy:groovy")
             add("testImplementation", "org.junit.platform:junit-platform-launcher")
         }
+    }
+}
+
+// 聚合覆盖率报告: ./gradlew jacocoAggregateReport (先报告不门禁, 门禁在 CI diff coverage 阶段)
+val coverageModules = subprojects.filter { it.name != "archforge-dependencies" }
+
+tasks.register<JacocoReport>("jacocoAggregateReport") {
+    group = "verification"
+    description = "Aggregated JaCoCo coverage report across all modules"
+    dependsOn(coverageModules.map { it.tasks.named("test") })
+    // 源码目录同时被 spotless 任务写入, 需显式声明依赖避免隐式依赖告警
+    coverageModules.forEach { module ->
+        dependsOn(module.tasks.matching { it.name.startsWith("spotless") })
+    }
+    executionData.setFrom(
+        rootProject.fileTree(rootDir) {
+            include("**/build/jacoco/*.exec")
+            exclude("build/**", ".worktrees/**")
+        }
+    )
+    val mainSourceSets = coverageModules.mapNotNull { module ->
+        module.extensions.findByType(JavaPluginExtension::class.java)?.sourceSets?.findByName("main")
+    }
+    additionalSourceDirs.setFrom(mainSourceSets.flatMap { it.allJava.srcDirs })
+    sourceDirectories.setFrom(mainSourceSets.flatMap { it.allSource.srcDirs })
+    classDirectories.setFrom(mainSourceSets.flatMap { it.output.classesDirs })
+    reports {
+        xml.required.set(true)
+        xml.outputLocation.set(layout.buildDirectory.file("reports/jacoco/jacocoAggregateReport.xml"))
+        html.required.set(true)
+        html.outputLocation.set(layout.buildDirectory.dir("reports/jacoco/html"))
+        csv.required.set(false)
     }
 }
