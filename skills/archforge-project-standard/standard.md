@@ -378,9 +378,13 @@ server-<name>/src/main/resources/
 ├── application-test.yaml.example     # Template for test environment
 ├── application-prod.yaml.example     # Template for production
 └── log4j2-spring.xml                 # Single file with <SpringProfile> sections
+
+server-<name>/src/test/resources/
+└── application-test.yaml             # Committed test profile (Testcontainers + Flyway), never ships in the prod jar
 ```
 
-- `application-test.yaml` and `application-prod.yaml` are **gitignored** — never commit real credentials.
+- `application-test.yaml` lives in `src/test/resources` (committed, test classpath only).
+- `application-prod.yaml` is **gitignored** — never commit real credentials.
 - Set active profile via `SPRING_PROFILES_ACTIVE` env var or `-Dspring.profiles.active=...`.
 
 ### 4.3 Secrets Management
@@ -454,6 +458,44 @@ src/test/
 
 - JUnit: `<Class>Test.java` (e.g., `UserServiceTest.java`)
 - Spock: `<Class>Spec.groovy` (e.g., `UserServiceSpec.groovy`)
+
+### 5.4 Test Data Builders
+
+Cross-module test data builders live in `src/testFixtures/java/<module>.testing/` and are
+consumed via `testImplementation(testFixtures(project(...)))`:
+
+| Builder | Module | Entity |
+|---------|--------|--------|
+| `UserTestBuilder` / `RoleTestBuilder` | archforge-admin-user | `SysUser` / `SysRole` |
+| `ArticleTestBuilder` | archforge-blog | `BlogArticle` |
+| `MetaTableTestBuilder` | archforge-meta-table | `MetaTable` + `MetaColumn` |
+| `ChatSessionTestBuilder` | archforge-server-admin (test) | chat session message maps |
+
+Rules:
+
+- Builders produce **valid-by-default** entities; tests only configure fields they assert on.
+- Unique columns (username, slug, tableCode...) get an auto-increment suffix by default.
+- Never encode passwords inside builders — pass already-encoded values via
+  `withEncodedPassword(...)`.
+- New core entities get a builder before their first service test.
+
+### 5.5 Test Tags (@Tag)
+
+| Tag | Meaning | Examples |
+|-----|---------|----------|
+| `P0` | Security-critical / money-path unit tests | login, permission checks |
+| `P1` | Regular business logic tests | CRUD services |
+| `contract` | Contract/architecture enforcement | enum contract, permission coverage, ArchUnit |
+| `slow` | Container-backed integration tests | @SpringBootTest + Testcontainers |
+
+Filtering from the CLI:
+
+```bash
+./gradlew test -Ptags=P0,contract     # only these tags
+./gradlew build -PexcludeTags=slow    # skip slow integration tests
+```
+
+Every `@SpringBootTest` must be tagged `slow`. New contract tests must be tagged `contract`.
 - Integration: `<Class>IntegrationTest.java` or `<Class>IT.java`
 
 ### 5.4 Testcontainers Usage

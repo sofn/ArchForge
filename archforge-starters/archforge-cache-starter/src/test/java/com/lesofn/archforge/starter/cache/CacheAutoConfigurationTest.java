@@ -2,6 +2,7 @@ package com.lesofn.archforge.starter.cache;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.redisson.api.RedissonClient;
@@ -16,6 +17,7 @@ import org.springframework.context.annotation.Import;
  */
 @SpringBootTest(classes = TestApplication.class)
 @Import(RedisTestConfiguration.class)
+@Tag("slow")
 public class CacheAutoConfigurationTest {
 
     private final CacheManager cacheManager;

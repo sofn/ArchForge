@@ -149,6 +149,11 @@ dependencies {
 
     // ArchUnit architecture tests
     testImplementation("com.tngtech.archunit:archunit")
+
+    // Cross-module test data builders (G2)
+    testImplementation(testFixtures(project(":archforge-domain:archforge-admin-user")))
+    testImplementation(testFixtures(project(":archforge-domain:archforge-blog")))
+    testImplementation(testFixtures(project(":archforge-domain:archforge-meta-table")))
 }
 
 // jlink: 生成最小化 JRE (Spring Boot Web + Actuator + JPA 所需模块)

@@ -6,6 +6,7 @@ import tools.jackson.databind.ObjectMapper;
 import com.lesofn.archforge.server.admin.Application;
 import java.util.List;
 import java.util.Map;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -29,6 +30,7 @@ import org.springframework.web.client.RestClient;
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@Tag("slow")
 class RestClientIntegrationTest {
 
     @LocalServerPort

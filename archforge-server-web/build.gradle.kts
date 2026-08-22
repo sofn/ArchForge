@@ -108,4 +108,7 @@ dependencies {
     annotationProcessor("org.mapstruct:mapstruct-processor")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+
+    // ArchUnit architecture tests (G7)
+    testImplementation("com.tngtech.archunit:archunit")
 }
