@@ -1,6 +1,7 @@
 package com.lesofn.archforge.server.web.controller;
 
 import com.lesofn.archforge.infrastructure.annotation.RateLimit;
+import com.lesofn.archforge.infrastructure.auth.LoginContext;
 import com.lesofn.archforge.infrastructure.config.ArchForgeProperties;
 import com.lesofn.archforge.infrastructure.file.FileStorageService;
 import com.lesofn.archforge.infrastructure.file.FileUploadValidator;
@@ -44,7 +45,7 @@ public class WebFileController {
     @GetMapping("/{fileId}")
     public ResponseEntity<InputStreamResource> download(@PathVariable Long fileId) throws IOException {
         Optional<SysFile> fileOpt = sysFileService.findById(fileId);
-        if (fileOpt.isEmpty()) {
+        if (fileOpt.isEmpty() || !canDownload(fileOpt.get())) {
             return ResponseEntity.notFound().build();
         }
         SysFile sysFile = fileOpt.get();
@@ -62,6 +63,15 @@ public class WebFileController {
                 .header("Content-Security-Policy", "sandbox")
                 .contentType(mediaType)
                 .body(resource);
+    }
+
+    /** 公开文件匿名可读；非公开文件要求登录且为上传者本人，统一返回 404 防止枚举探测。 */
+    private boolean canDownload(SysFile sysFile) {
+        if (Boolean.TRUE.equals(sysFile.getPublicVisible())) {
+            return true;
+        }
+        Long userId = LoginContext.getWebUserId();
+        return userId != null && userId.equals(sysFile.getCreatorId());
     }
 
     @RateLimit(key = "web-file-upload", time = 60, maxCount = 10, limitType = RateLimit.LimitType.USER)
@@ -85,6 +95,8 @@ public class WebFileController {
         sysFile.setContentType(file.getContentType());
         sysFile.setExtension(extension);
         sysFile.setStorageType(appForgeConfig.getFileStorage().getType());
+        sysFile.setCreatorId(LoginContext.getWebUserId());
+        sysFile.setPublicVisible(true);
         SysFile saved = sysFileService.create(sysFile);
 
         String url = webPublicUrl + "/web/file/" + saved.getFileId();

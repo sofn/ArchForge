@@ -128,6 +128,10 @@ arch-forge:
   sensitive:
     enabled: true
   rsa-private-key: ${ARCH_FORGE_RSA_PRIVATE_KEY:}
+  quartz:
+    allowed-job-beans: demoQuartzJob
+  codegen:
+    workspace-root: ${ARCH_FORGE_CODEGEN_WORKSPACE_ROOT:${user.home}/.archforge/codegen}
   token:
     header: Authorization
     auto-refresh-time: 20

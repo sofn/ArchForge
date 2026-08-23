@@ -1,12 +1,19 @@
 package com.lesofn.archforge.server.admin.service.quartz;
 
+import com.lesofn.archforge.common.error.system.SystemException;
+import com.lesofn.archforge.common.utils.jackson.JsonUtil;
 import com.lesofn.archforge.common.utils.query.QueryHelp;
 import com.lesofn.archforge.server.admin.dto.quartz.SysQuartzJobQueryRequest;
 import com.lesofn.archforge.user.api.dao.SysQuartzJobRepository;
 import com.lesofn.archforge.user.api.dao.SysQuartzLogRepository;
 import com.lesofn.archforge.user.api.domain.SysQuartzJob;
 import com.lesofn.archforge.user.api.domain.SysQuartzLog;
-import lombok.RequiredArgsConstructor;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.CronExpression;
 import org.quartz.CronScheduleBuilder;
@@ -19,6 +26,8 @@ import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.TriggerBuilder;
 import org.quartz.TriggerKey;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -32,12 +41,29 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class QuartzJobService {
 
     private final SysQuartzJobRepository jobRepository;
     private final SysQuartzLogRepository logRepository;
     private final Scheduler scheduler;
+    private final ApplicationContext applicationContext;
+    private final Set<String> allowedJobBeans;
+
+    public QuartzJobService(
+            SysQuartzJobRepository jobRepository,
+            SysQuartzLogRepository logRepository,
+            Scheduler scheduler,
+            ApplicationContext applicationContext,
+            @Value("${arch-forge.quartz.allowed-job-beans:}") String allowedJobBeans) {
+        this.jobRepository = jobRepository;
+        this.logRepository = logRepository;
+        this.scheduler = scheduler;
+        this.applicationContext = applicationContext;
+        this.allowedJobBeans = Arrays.stream(allowedJobBeans.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .collect(Collectors.toUnmodifiableSet());
+    }
 
     @Transactional(readOnly = true)
     public Page<SysQuartzJob> page(SysQuartzJobQueryRequest criteria, Pageable pageable) {
@@ -239,5 +265,42 @@ public class QuartzJobService {
         if (!validateCron(input.getCron())) {
             throw new IllegalArgumentException("invalid cron expression: " + input.getCron());
         }
+        validateReflectionTarget(input);
+    }
+
+    /** Reflective dispatch is only permitted for allowlisted beans with a public declared method. */
+    private void validateReflectionTarget(SysQuartzJob input) {
+        String beanName = input.getBeanName();
+        if (!allowedJobBeans.contains(beanName)) {
+            throw new SystemException("Quartz job bean is not allowed: " + beanName);
+        }
+        if (!applicationContext.containsBean(beanName)) {
+            throw new SystemException("Quartz job bean does not exist: " + beanName);
+        }
+        Object bean = applicationContext.getBean(beanName);
+        int arity = parseArity(input.getMethodParams());
+        if (findPublicDeclaredMethod(bean.getClass(), input.getMethodName(), arity) == null) {
+            throw new SystemException("Quartz job method is not invocable: " + beanName + "#" + input.getMethodName());
+        }
+    }
+
+    private static int parseArity(String methodParams) {
+        if (methodParams == null || methodParams.isBlank()) {
+            return 0;
+        }
+        List<Object> parsed = JsonUtil.fromList(methodParams, Object.class);
+        return parsed == null ? 0 : parsed.size();
+    }
+
+    private static Method findPublicDeclaredMethod(Class<?> type, String name, int arity) {
+        for (Method m : type.getMethods()) {
+            boolean matches = m.getName().equals(name) && m.getParameterCount() == arity && Modifier.isPublic(m
+                    .getModifiers()) && !m.isSynthetic() && m.getDeclaringClass() != Object.class && m.getDeclaringClass()
+                            .isAssignableFrom(type);
+            if (matches) {
+                return m;
+            }
+        }
+        return null;
     }
 }

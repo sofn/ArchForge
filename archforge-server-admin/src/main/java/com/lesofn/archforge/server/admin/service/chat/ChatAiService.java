@@ -9,27 +9,39 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ChatAiService {
 
+    private static final int MAX_SESSION_USERS = 1000;
+
     private final ArchForgeProperties properties;
     private final ObjectMapper objectMapper = JsonUtil.getObjectMapper();
     private final HttpClient httpClient = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(10)).build();
-    private final ConcurrentHashMap<Long, ConcurrentHashMap<String, List<Map<String, String>>>> sessions = new ConcurrentHashMap<>();
+    private final Map<Long, Map<String, List<Map<String, String>>>> sessions = Collections.synchronizedMap(
+            new LinkedHashMap<>(16, 0.75f, true) {
+                @Override
+                protected boolean removeEldestEntry(
+                        Map.Entry<Long, Map<String, List<Map<String, String>>>> eldest) {
+                    return size() > MAX_SESSION_USERS;
+                }
+            });
 
     public Map<String, Object> configStatus() {
         ArchForgeProperties.Llm llm = properties.getLlm();
@@ -42,16 +54,19 @@ public class ChatAiService {
 
     public Map<String, Object> createSession() {
         String id = UUID.randomUUID().toString();
-        userSessions().put(id, new ArrayList<>());
+        currentUserSessions().put(id, new CopyOnWriteArrayList<>());
         return Map.of("id", id, "messages", List.of());
     }
 
     public List<Map<String, Object>> listSessions() {
-        return userSessions().keySet().stream().map(id -> Map.<String, Object> of("id", id)).toList();
+        Map<String, List<Map<String, String>>> userSessions = currentUserSessions();
+        synchronized (userSessions) {
+            return userSessions.keySet().stream().map(id -> Map.<String, Object> of("id", id)).toList();
+        }
     }
 
     public List<Map<String, String>> messages(String sessionId) {
-        List<Map<String, String>> history = userSessions().get(sessionId);
+        List<Map<String, String>> history = currentUserSessions().get(sessionId);
         if (history == null) {
             throw new ChatAiException(ChatAiErrorCode.CHAT_SESSION_NOT_FOUND);
         }
@@ -59,39 +74,44 @@ public class ChatAiService {
     }
 
     public void deleteSession(String sessionId) {
-        if (userSessions().remove(sessionId) == null) {
+        if (currentUserSessions().remove(sessionId) == null) {
             throw new ChatAiException(ChatAiErrorCode.CHAT_SESSION_NOT_FOUND);
         }
     }
 
     public SseEmitter stream(String sessionId, String content) {
         ArchForgeProperties.Llm llm = LlmClientFactory.requireConfigured(properties.getLlm());
-        List<Map<String, String>> history = userSessions().get(sessionId);
+        List<Map<String, String>> history = currentUserSessions().get(sessionId);
         if (history == null) {
             throw new ChatAiException(ChatAiErrorCode.CHAT_SESSION_NOT_FOUND);
         }
         history.add(Map.of("role", "user", "content", content));
         SseEmitter emitter = new SseEmitter(120_000L);
-        Thread.ofVirtual().start(() -> complete(emitter, llm, sessionId, history));
+        Thread.ofVirtual().start(() -> complete(emitter, llm, history));
         return emitter;
     }
 
-    private ConcurrentHashMap<String, List<Map<String, String>>> userSessions() {
-        return sessions.computeIfAbsent(LoginContext.getAdminUserId(), key -> new ConcurrentHashMap<>());
+    private Map<String, List<Map<String, String>>> currentUserSessions() {
+        return userSessions(LoginContext.getAdminUserId());
     }
 
-    private void complete(
-            SseEmitter emitter, ArchForgeProperties.Llm llm, String sessionId, List<Map<String, String>> history) {
+    private Map<String, List<Map<String, String>>> userSessions(Long userId) {
+        return sessions.computeIfAbsent(userId, key -> new ConcurrentHashMap<>());
+    }
+
+    private void complete(SseEmitter emitter, ArchForgeProperties.Llm llm, List<Map<String, String>> history) {
         try {
             String reply = callModel(llm, history);
             history.add(Map.of("role", "assistant", "content", reply));
-            userSessions().put(sessionId, history);
             emitter.send(SseEmitter.event().name("delta").data(reply, MediaType.TEXT_PLAIN));
             emitter.send(SseEmitter.event().name("done").data("[DONE]"));
             emitter.complete();
         } catch (Exception e) {
+            log.error("[ChatAI] streaming failed", e);
             try {
-                emitter.send(SseEmitter.event().name("error").data(e.getMessage()));
+                emitter.send(SseEmitter.event()
+                        .name("error")
+                        .data(ChatAiErrorCode.LLM_REQUEST_FAILED.getMsg(), MediaType.TEXT_PLAIN));
             } catch (Exception ignored) {
                 // already closing
             }

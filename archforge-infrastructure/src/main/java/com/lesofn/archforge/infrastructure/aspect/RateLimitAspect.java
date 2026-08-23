@@ -94,9 +94,16 @@ public class RateLimitAspect {
     private String getCurrentUserId() {
         try {
             SystemLoginUser user = LoginContext.findAdminUser().orElse(null);
-            return user != null ? String.valueOf(user.getUserId()) : "anonymous";
+            if (user != null) {
+                return String.valueOf(user.getUserId());
+            }
+            Long webUserId = LoginContext.getWebUserId();
+            if (webUserId != null) {
+                return String.valueOf(webUserId);
+            }
         } catch (Exception e) {
-            return "anonymous";
+            // fall through to anonymous IP bucket
         }
+        return "ip:" + getClientIp();
     }
 }

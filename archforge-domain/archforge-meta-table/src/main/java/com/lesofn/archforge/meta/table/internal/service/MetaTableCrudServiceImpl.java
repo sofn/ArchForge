@@ -262,7 +262,7 @@ public class MetaTableCrudServiceImpl implements MetaTableCrudService {
         String quoted = mainAlias + "." + SqlIdentifier.quote(column.getColumnCode());
         String[] parts = jsonPath.split("\\.");
         if (parts.length == 1) {
-            return quoted + " ->> '" + parts[0] + "' LIKE :" + paramName;
+            return quoted + " ->> '" + parts[0].replace("'", "''") + "' LIKE :" + paramName;
         }
         return quoted + " #>> ARRAY[" + java.util.Arrays.stream(parts)
                 .map(p -> "'" + p.replace("'", "''") + "'")

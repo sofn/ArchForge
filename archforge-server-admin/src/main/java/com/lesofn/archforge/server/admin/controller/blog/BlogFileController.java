@@ -68,7 +68,8 @@ public class BlogFileController {
                         .setFileSize(file.getSize())
                         .setContentType(file.getContentType())
                         .setExtension(extension)
-                        .setStorageType("local");
+                        .setStorageType("local")
+                        .setPublicVisible(true);
                 SysFile saved = sysFileService.create(sysFile);
                 succMap.put(originalName, webPublicUrl + "/web/file/" + saved.getFileId());
             }

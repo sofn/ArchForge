@@ -47,6 +47,9 @@ public class SysFile extends BaseEntity<SysFile> {
     /** 存储类型: local / s3 */
     private String storageType;
 
+    /** 是否公开可见（允许匿名下载） */
+    private Boolean publicVisible;
+
     /** 备注 */
     private String remark;
 }

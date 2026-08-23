@@ -83,6 +83,9 @@ public class ArchForgeProperties {
     /** Admin ChatAI LLM (OpenAI / Anthropic compatible) */
     private Llm llm = new Llm();
 
+    /** 代码生成工作区配置 */
+    private CodeGen codeGen = new CodeGen();
+
     @Setter
     @Getter
     public static class Token {
@@ -302,5 +305,12 @@ public class ArchForgeProperties {
 
         /** Optional Anthropic version header */
         private String anthropicVersion = "2023-06-01";
+    }
+
+    @Setter
+    @Getter
+    public static class CodeGen {
+        /** 代码生成工作区根目录，所有生成输出必须位于该目录内 */
+        private String workspaceRoot = System.getProperty("user.home") + "/.archforge/codegen";
     }
 }

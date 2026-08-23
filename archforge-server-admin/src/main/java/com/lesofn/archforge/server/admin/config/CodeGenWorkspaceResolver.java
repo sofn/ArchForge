@@ -1,6 +1,10 @@
 package com.lesofn.archforge.server.admin.config;
 
+import com.lesofn.archforge.common.error.system.SystemException;
+import com.lesofn.archforge.infrastructure.config.ArchForgeProperties;
 import jakarta.annotation.Nullable;
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -10,10 +14,9 @@ import org.springframework.stereotype.Component;
  * Resolves the workspace root for meta-table code generation.
  *
  * <p>
- * The workspace is expected to contain both the backend project ({@code ArchForge})
- * and the frontend project ({@code ArchForgeAdmin}). If the current working directory
- * is inside either project (or one of their subdirectories), walking up the tree will
- * find the workspace root.
+ * The workspace root comes from the {@code arch-forge.codegen.workspace-root} property and acts as
+ * a security boundary: every request-supplied output directory is normalized, absolutized and
+ * required to stay inside it.
  */
 @Component
 public class CodeGenWorkspaceResolver {
@@ -21,24 +24,22 @@ public class CodeGenWorkspaceResolver {
     private static final String BACKEND_DIR = "ArchForge";
     private static final String FRONTEND_DIR = "ArchForgeAdmin";
 
-    /**
-     * Returns the workspace root, or the current working directory if no workspace root
-     * can be determined.
-     */
-    public Path resolve() {
-        Path start = Paths.get(System.getProperty("user.dir")).toAbsolutePath().normalize();
-        Path current = start;
-        while (current != null) {
-            if (isWorkspaceRoot(current)) {
-                return current;
-            }
-            current = current.getParent();
-        }
-        return start;
+    private final Path workspaceRoot;
+
+    public CodeGenWorkspaceResolver(ArchForgeProperties properties) {
+        this.workspaceRoot = Paths.get(properties.getCodeGen().getWorkspaceRoot()).toAbsolutePath().normalize();
     }
 
-    private boolean isWorkspaceRoot(Path dir) {
-        return Files.isDirectory(dir.resolve(BACKEND_DIR)) && Files.isDirectory(dir.resolve(FRONTEND_DIR));
+    /**
+     * Returns the configured workspace root, creating it on demand.
+     */
+    public Path resolve() {
+        try {
+            Files.createDirectories(workspaceRoot);
+        } catch (IOException e) {
+            throw new UncheckedIOException("无法创建代码生成工作区目录: " + workspaceRoot, e);
+        }
+        return workspaceRoot;
     }
 
     /** Default backend output directory relative to the workspace root. */
@@ -56,7 +57,7 @@ public class CodeGenWorkspaceResolver {
         if (backendDir == null || backendDir.isBlank()) {
             return defaultBackendDir(tableCode);
         }
-        return Paths.get(backendDir);
+        return confine(backendDir);
     }
 
     /** Resolve a raw frontend dir string; {@code null}/blank returns the default. */
@@ -64,6 +65,14 @@ public class CodeGenWorkspaceResolver {
         if (frontendDir == null || frontendDir.isBlank()) {
             return defaultFrontendDir(tableCode);
         }
-        return Paths.get(frontendDir);
+        return confine(frontendDir);
+    }
+
+    private Path confine(String rawDir) {
+        Path target = Paths.get(rawDir).toAbsolutePath().normalize();
+        if (!target.startsWith(workspaceRoot)) {
+            throw new SystemException("代码生成目录必须位于工作区根目录内: " + target);
+        }
+        return target;
     }
 }

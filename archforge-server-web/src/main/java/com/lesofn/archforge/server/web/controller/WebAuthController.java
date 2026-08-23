@@ -1,5 +1,6 @@
 package com.lesofn.archforge.server.web.controller;
 
+import com.lesofn.archforge.infrastructure.annotation.RateLimit;
 import com.lesofn.archforge.infrastructure.auth.stp.LoginSessionKeys;
 import com.lesofn.archforge.infrastructure.auth.stp.StpWebUtil;
 import com.lesofn.archforge.infrastructure.config.ArchForgeProperties;
@@ -37,6 +38,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class WebAuthController {
 
     private static final DateTimeFormatter EXPIRES_FORMATTER = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+    private static final String GENERIC_LOGIN_FAILURE = "用户名或密码错误";
     private static final Pattern PASSWORD_PATTERN = Pattern.compile("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$");
     private static final int USERNAME_MAX_LENGTH = 64;
     private static final int NICKNAME_MAX_LENGTH = 32;
@@ -50,15 +52,16 @@ public class WebAuthController {
     private final ArchForgeProperties archForgeConfig;
 
     @PostMapping("/login")
+    @RateLimit(key = "web-login", time = 60, maxCount = 5, limitType = RateLimit.LimitType.IP)
     public WebLoginResponse login(@RequestBody @Valid WebLoginRequest request) {
         SysUser user = sysUserService.findByUsername(request.getUsername())
                 .or(() -> sysUserService.findByEmail(request.getUsername()))
-                .orElseThrow(() -> new AdminUserException("用户名或密码错误"));
+                .orElseThrow(() -> new AdminUserException(GENERIC_LOGIN_FAILURE));
         if (!user.canLogin()) {
-            throw new AdminUserException("用户已被停用");
+            throw new AdminUserException(GENERIC_LOGIN_FAILURE);
         }
         if (!passwordEncoderPort.matches(request.getPassword(), user.getPassword())) {
-            throw new AdminUserException("用户名或密码错误");
+            throw new AdminUserException(GENERIC_LOGIN_FAILURE);
         }
 
         writeLoginSession(user);
@@ -75,9 +78,9 @@ public class WebAuthController {
     public WebLoginResponse refreshToken(@RequestBody @Valid WebRefreshTokenRequest request) {
         Long userId = webRefreshTokenService.validateRefreshToken(request.getRefreshToken());
         SysUser user = sysUserService.findById(userId)
-                .orElseThrow(() -> new AdminUserException("用户不存在"));
+                .orElseThrow(() -> new AdminUserException(GENERIC_LOGIN_FAILURE));
         if (!user.canLogin()) {
-            throw new AdminUserException("用户已被停用");
+            throw new AdminUserException(GENERIC_LOGIN_FAILURE);
         }
 
         writeLoginSession(user);
