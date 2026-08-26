@@ -2,6 +2,8 @@ package com.lesofn.archforge.meta.table.internal.validator;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.lesofn.archforge.meta.table.api.dao.MetaColumnRepository;
+import com.lesofn.archforge.meta.table.api.dao.MetaTableRepository;
 import com.lesofn.archforge.meta.table.api.domain.MetaColumn;
 import com.lesofn.archforge.meta.table.api.domain.MetaColumnType;
 import com.lesofn.archforge.meta.table.api.domain.MetaTable;
@@ -41,6 +43,8 @@ public class MetaTableValidator {
 
     private DictionaryProvider dictionaryProvider;
     private NamedParameterJdbcTemplate jdbcTemplate;
+    private MetaTableRepository metaTableRepository;
+    private MetaColumnRepository metaColumnRepository;
 
     @Autowired(required = false)
     public void setDictionaryProvider(DictionaryProvider dictionaryProvider) { this.dictionaryProvider = dictionaryProvider; }
@@ -48,6 +52,16 @@ public class MetaTableValidator {
     @Autowired(required = false)
     public void setJdbcTemplate(@Qualifier("metaTableJdbcTemplate") NamedParameterJdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
+    }
+
+    @Autowired(required = false)
+    public void setMetaTableRepository(MetaTableRepository metaTableRepository) {
+        this.metaTableRepository = metaTableRepository;
+    }
+
+    @Autowired(required = false)
+    public void setMetaColumnRepository(MetaColumnRepository metaColumnRepository) {
+        this.metaColumnRepository = metaColumnRepository;
     }
 
     private static final String DATE_PATTERN = "yyyy-MM-dd";
@@ -83,13 +97,15 @@ public class MetaTableValidator {
             validateColumnConfig(column);
             validateIndexGroup(column, columns, groupNames);
         }
+        validateReferenceTargets(table, columns);
     }
 
     /** 校验数据行值。 */
     public void validateValues(Map<String, Object> row, List<MetaColumn> columns, boolean insert) {
         for (MetaColumn column : columns) {
             Object value = row.get(column.getColumnCode());
-            if (insert && Boolean.TRUE.equals(column.getRequired()) && isEmpty(value)) {
+            boolean provided = row.containsKey(column.getColumnCode());
+            if (Boolean.TRUE.equals(column.getRequired()) && (insert || provided) && isEmpty(value)) {
                 throw new MetaTableException(MetaTableErrorCode.META_COLUMN_VALUE_INVALID, column.getColumnName() + " 不能为空");
             }
             if (value == null) {
@@ -163,6 +179,44 @@ public class MetaTableValidator {
         }
         if (upper.matches(".*\\(\\s*(SELECT|WITH)\\b.*")) {
             throw new MetaTableException(MetaTableErrorCode.META_COLUMN_TYPE_INVALID, "显示表达式不允许包含子查询");
+        }
+    }
+
+    private void validateReferenceTargets(MetaTable table, List<MetaColumn> columns) {
+        if (metaTableRepository == null || metaColumnRepository == null) {
+            return;
+        }
+        for (MetaColumn column : columns) {
+            if (column.getDataType() != MetaColumnType.REFERENCE) {
+                continue;
+            }
+            String refTable = column.getReferenceTable();
+            String refColumn = column.getReferenceColumn() == null ? "id" : column.getReferenceColumn();
+            boolean selfReference = table != null && refTable != null && refTable.equals(table.physicalTableName());
+            MetaColumn target = null;
+            if (selfReference) {
+                target = columns.stream()
+                        .filter(c -> c.getColumnCode().equals(refColumn))
+                        .findFirst()
+                        .orElse(null);
+            } else if (refTable != null) {
+                target = metaTableRepository.findAllByDeletedFalse().stream()
+                        .filter(t -> refTable.equals(t.physicalTableName()))
+                        .findFirst()
+                        .flatMap(t -> metaColumnRepository.findByTableIdAndDeletedFalseOrderBySortAsc(t.getId()).stream()
+                                .filter(c -> c.getColumnCode().equals(refColumn))
+                                .findFirst())
+                        .orElse(null);
+            }
+            boolean primaryKeyRef = "id".equals(refColumn);
+            if (target == null && !primaryKeyRef) {
+                throw new MetaTableException(MetaTableErrorCode.META_COLUMN_TYPE_INVALID, "关联字段不存在于被关联表元数据中: " + refTable +
+                        "." + refColumn);
+            }
+            if (target != null && !Boolean.TRUE.equals(target.getUnique())) {
+                throw new MetaTableException(MetaTableErrorCode.META_COLUMN_TYPE_INVALID, "关联字段必须唯一，否则关联查询会产生重复行: " + refTable +
+                        "." + refColumn);
+            }
         }
     }
 

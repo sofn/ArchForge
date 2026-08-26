@@ -6,6 +6,7 @@ import com.lesofn.archforge.meta.table.internal.schema.SchemaChange;
 import com.lesofn.archforge.meta.table.internal.schema.SchemaChangeType;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -26,6 +27,50 @@ public class AlterTableDdlGenerator {
             result.addAll(generateForChange(table, change));
         }
         return result;
+    }
+
+    /** 执行该变更前需要先确认的数据预检查询（违规行计数）；空表示无需预检。 */
+    public Optional<String> buildViolationCountSql(MetaTable table, SchemaChange change) {
+        return switch (change.getType()) {
+            case ALTER_TYPE -> Optional.of(buildTypeLossCountSql(table, change));
+            case ALTER_NULL -> Boolean.TRUE.equals(change.getNewRequired())
+                    ? Optional.of(buildNullCountSql(table, change))
+                    : Optional.<String> empty();
+            default -> Optional.<String> empty();
+        };
+    }
+
+    /** SET NOT NULL 需要先执行的默认值回填 UPDATE；仅当目标列配置了默认值时非空。 */
+    public Optional<String> buildBackfillUpdateSql(MetaTable table, SchemaChange change) {
+        if (change.getType() != SchemaChangeType.ALTER_NULL || !Boolean.TRUE.equals(change.getNewRequired())) {
+            return Optional.empty();
+        }
+        MetaColumn column = change.getNewColumn();
+        if (column.getDefaultValue() == null || column.getDefaultValue().isEmpty()) {
+            return Optional.empty();
+        }
+        String physicalName = SqlIdentifier.quote(table.physicalTableName());
+        String quoted = SqlIdentifier.quote(column.getColumnCode());
+        return Optional.of("UPDATE " + physicalName + " SET " + quoted + " = " + columnTypeResolver.formatDefaultValue(column) +
+                " WHERE " + quoted + " IS NULL");
+    }
+
+    private String buildNullCountSql(MetaTable table, SchemaChange change) {
+        String physicalName = SqlIdentifier.quote(table.physicalTableName());
+        String quoted = SqlIdentifier.quote(change.getNewColumn().getColumnCode());
+        return "SELECT COUNT(*) FROM " + physicalName + " WHERE " + quoted + " IS NULL";
+    }
+
+    private String buildTypeLossCountSql(MetaTable table, SchemaChange change) {
+        String physicalName = SqlIdentifier.quote(table.physicalTableName());
+        String columnCode = change.getNewColumn().getColumnCode();
+        String quoted = SqlIdentifier.quote(columnCode);
+        String forward = buildUsingExpression(columnCode, change.getOldType(), change.getNewType());
+        String roundTrip = needsTextRelay(change.getOldType())
+                ? "(" + forward + ")::text::" + change.getOldType()
+                : "CAST(" + forward + " AS " + change.getOldType() + ")";
+        return "SELECT COUNT(*) FROM " + physicalName + " WHERE " + quoted + " IS NOT NULL AND " + roundTrip +
+                " IS DISTINCT FROM " + quoted;
     }
 
     private List<SchemaDdl> generateForChange(MetaTable table, SchemaChange change) {
@@ -157,6 +202,9 @@ public class AlterTableDdlGenerator {
             sb.append(" USING ").append(pgType);
         }
         sb.append(" (").append(columnsPart).append(")");
+        if (Boolean.TRUE.equals(unique)) {
+            sb.append(" WHERE deleted = 0");
+        }
         return sb.toString();
     }
 
@@ -176,9 +224,13 @@ public class AlterTableDdlGenerator {
 
     private String buildUsingExpression(String columnCode, String oldType, String newType) {
         String quoted = SqlIdentifier.quote(columnCode);
-        if (oldType != null && (oldType.toUpperCase().startsWith("JSONB") || oldType.toUpperCase().endsWith("[]"))) {
+        if (needsTextRelay(oldType)) {
             return quoted + "::text::" + newType;
         }
         return quoted + "::" + newType;
+    }
+
+    private static boolean needsTextRelay(String type) {
+        return type != null && (type.toUpperCase().startsWith("JSONB") || type.toUpperCase().endsWith("[]"));
     }
 }

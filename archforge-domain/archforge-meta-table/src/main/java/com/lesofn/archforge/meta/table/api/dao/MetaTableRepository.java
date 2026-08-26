@@ -1,6 +1,7 @@
 package com.lesofn.archforge.meta.table.api.dao;
 
 import com.lesofn.archforge.meta.table.api.domain.MetaTable;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -14,4 +15,6 @@ public interface MetaTableRepository extends JpaRepository<MetaTable, Long>, Jpa
     boolean existsByTableCodeAndDeletedFalse(String tableCode);
 
     long countByDeletedFalse();
+
+    List<MetaTable> findAllByDeletedFalse();
 }

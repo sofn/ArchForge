@@ -1,11 +1,13 @@
 package com.lesofn.archforge.meta.table.internal.service;
 
+import static com.lesofn.archforge.meta.table.api.errors.MetaTableErrorCode.META_QUERY_PARAM_INVALID;
 import static com.lesofn.archforge.meta.table.api.errors.MetaTableErrorCode.META_TABLE_DATA_NOT_EXISTS;
 
 import com.lesofn.archforge.meta.table.api.domain.MetaColumn;
 import com.lesofn.archforge.meta.table.api.errors.MetaTableErrorCode;
 import com.lesofn.archforge.meta.table.api.domain.MetaTable;
 import com.lesofn.archforge.meta.table.api.dto.ImportResponse;
+import com.lesofn.archforge.meta.table.api.dto.MetaDataQuery;
 import com.lesofn.archforge.meta.table.api.dto.MetaPageResponse;
 import com.lesofn.archforge.meta.table.api.enums.MetaDataFormat;
 import com.lesofn.archforge.meta.table.api.service.MetaTableAdminService;
@@ -24,8 +26,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.postgresql.util.PGobject;
@@ -107,8 +111,7 @@ public class MetaTableCrudServiceImpl implements MetaTableCrudService {
     }
 
     @Override
-    public MetaPageResponse<Map<String, Object>> list(
-            Long tableId, Map<String, Object> filters, int currentPage, int pageSize) {
+    public MetaPageResponse<Map<String, Object>> list(Long tableId, MetaDataQuery query) {
         MetaTable table = metaTableAdminService.findById(tableId);
         List<MetaColumn> columns = metaTableAdminService.findColumns(tableId);
 
@@ -118,24 +121,59 @@ public class MetaTableCrudServiceImpl implements MetaTableCrudService {
         List<String> joins = ReferenceDisplayBuilder.buildJoins(columns, mainAlias);
 
         MapSqlParameterSource params = new MapSqlParameterSource();
-        String whereClause = buildWhereClause(columns, filters, params, mainAlias);
+        String whereClause = buildWhereClause(columns, query.filters(), params, mainAlias);
 
         String fromClause = " FROM " + physicalName + " " + mainAlias + " " + String.join(" ", joins);
-        String countSql = "SELECT COUNT(*)" + fromClause + " WHERE " + mainAlias + ".deleted = 0" + whereClause;
-        Long total = jdbcTemplate.queryForObject(countSql, params, Long.class);
-        long finalTotal = total == null ? 0L : total;
+        long total = -1L;
+        if (!query.skipCount()) {
+            String countSql = "SELECT COUNT(*)" + fromClause + " WHERE " + mainAlias + ".deleted = 0" + whereClause;
+            Long count = jdbcTemplate.queryForObject(countSql, params, Long.class);
+            total = count == null ? 0L : count;
+        }
 
+        int currentPage = Math.max(query.currentPage(), 1);
+        int pageSize = Math.max(query.pageSize(), 1);
         int offset = (currentPage - 1) * pageSize;
         params.addValue("limit", pageSize);
         params.addValue("offset", offset);
 
+        String orderClause = buildOrderClause(columns, mainAlias, query.orderBy(), query.orderDir());
         String querySql = "SELECT " + String.join(", ", selectColumns) + fromClause + " WHERE " + mainAlias +
-                ".deleted = 0" + whereClause + " ORDER BY " + mainAlias + ".id DESC LIMIT :limit OFFSET :offset";
+                ".deleted = 0" + whereClause + " ORDER BY " + orderClause + " LIMIT :limit OFFSET :offset";
 
         List<Map<String, Object>> rows = jdbcTemplate.queryForList(querySql, params);
         List<Map<String, Object>> converted = rows.stream().map(this::convertRow).toList();
 
-        return MetaPageResponse.of(converted, finalTotal, pageSize, currentPage);
+        return MetaPageResponse.of(converted, total, pageSize, currentPage);
+    }
+
+    private static final Set<String> AUDIT_ORDER_COLUMNS = Set.of("id", "creator_id", "create_time", "updater_id",
+            "update_time");
+
+    private String buildOrderClause(List<MetaColumn> columns, String mainAlias, String orderBy, String orderDir) {
+        String direction = resolveOrderDirection(orderDir);
+        String column = orderBy == null || orderBy.isBlank() ? "id" : orderBy;
+        Set<String> allowed = new HashSet<>(AUDIT_ORDER_COLUMNS);
+        for (MetaColumn metaColumn : columns) {
+            allowed.add(metaColumn.getColumnCode());
+        }
+        if (!allowed.contains(column)) {
+            throw new MetaTableException(META_QUERY_PARAM_INVALID, "排序字段不允许: " + orderBy);
+        }
+        return mainAlias + "." + SqlIdentifier.quote(column) + " " + direction;
+    }
+
+    private String resolveOrderDirection(String orderDir) {
+        if (orderDir == null || orderDir.isBlank()) {
+            return "DESC";
+        }
+        if ("ASC".equalsIgnoreCase(orderDir.trim())) {
+            return "ASC";
+        }
+        if ("DESC".equalsIgnoreCase(orderDir.trim())) {
+            return "DESC";
+        }
+        throw new MetaTableException(META_QUERY_PARAM_INVALID, "排序方向必须是 ASC 或 DESC: " + orderDir);
     }
 
     @Override

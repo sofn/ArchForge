@@ -4,6 +4,7 @@ import com.lesofn.archforge.common.persistence.BasePO;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -43,6 +44,10 @@ public class MetaTable extends BasePO {
 
     @Column(name = "schema_version")
     private Integer schemaVersion = 1;
+
+    @Version
+    @Column(name = "version")
+    private Integer version;
 
     public String physicalTableName() {
         String prefix = tablePrefix == null ? "meta_" : tablePrefix;

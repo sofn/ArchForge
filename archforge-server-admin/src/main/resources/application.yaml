@@ -130,6 +130,8 @@ arch-forge:
   rsa-private-key: ${ARCH_FORGE_RSA_PRIVATE_KEY:}
   quartz:
     allowed-job-beans: demoQuartzJob
+  meta-table:
+    max-page-size: 200
   codegen:
     workspace-root: ${ARCH_FORGE_CODEGEN_WORKSPACE_ROOT:${user.home}/.archforge/codegen}
   token:

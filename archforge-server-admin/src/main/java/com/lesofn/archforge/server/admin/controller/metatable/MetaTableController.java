@@ -1,11 +1,13 @@
 package com.lesofn.archforge.server.admin.controller.metatable;
 
 import com.lesofn.archforge.infrastructure.annotation.Log;
+import com.lesofn.archforge.infrastructure.config.ArchForgeProperties;
 import com.lesofn.archforge.infrastructure.frame.context.RequestContext;
 import com.lesofn.archforge.meta.table.api.domain.MetaColumn;
 import com.lesofn.archforge.meta.table.api.domain.MetaTable;
 import com.lesofn.archforge.meta.table.api.domain.MetaTableMigration;
 import com.lesofn.archforge.meta.table.api.dto.ImportResponse;
+import com.lesofn.archforge.meta.table.api.dto.MetaDataQuery;
 import com.lesofn.archforge.meta.table.api.dto.MetaPageResponse;
 import com.lesofn.archforge.meta.table.api.enums.MetaDataFormat;
 import com.lesofn.archforge.meta.table.api.service.MetaTableAdminService;
@@ -75,6 +77,7 @@ public class MetaTableController {
     private final MetaTableMigrationService metaTableMigrationService;
     private final MetaTableMigrationExporter metaTableMigrationExporter;
     private final SysUserService sysUserService;
+    private final ArchForgeProperties archForgeProperties;
 
     @Operation(summary = "获取元表格列表")
     @SaCheckPermission(value = "meta-table:list", type = StpAdminUtil.TYPE)
@@ -239,8 +242,11 @@ public class MetaTableController {
         int pageSize = request.getPageSize() != null && request.getPageSize() > 0
                 ? request.getPageSize()
                 : 10;
-        MetaPageResponse<Map<String, Object>> result = metaTableCrudService.list(
-                id, request.getFilters(), currentPage, pageSize);
+        pageSize = Math.min(pageSize, Math.max(archForgeProperties.getMetaTable().getMaxPageSize(), 1));
+        boolean skipCount = Boolean.TRUE.equals(request.getSkipCount());
+        MetaDataQuery query = new MetaDataQuery(request.getFilters(), currentPage, pageSize, request.getOrderBy(), request
+                .getOrderDir(), skipCount);
+        MetaPageResponse<Map<String, Object>> result = metaTableCrudService.list(id, query);
         return AdminPageResponse.of(result.getList(), result.getTotal(), result.getPageSize(), result.getCurrentPage());
     }
 

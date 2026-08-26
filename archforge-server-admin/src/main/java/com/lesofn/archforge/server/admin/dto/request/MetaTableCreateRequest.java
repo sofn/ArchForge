@@ -113,7 +113,7 @@ public class MetaTableCreateRequest {
             column.setId(id);
             column.setColumnCode(columnCode);
             column.setColumnName(columnName);
-            column.setDataType(com.lesofn.archforge.meta.table.api.domain.MetaColumnType.valueOf(dataType));
+            column.setDataType(com.lesofn.archforge.meta.table.api.domain.MetaColumnType.of(dataType));
             column.setLength(length);
             column.setPrecision(precision);
             column.setScale(scale);

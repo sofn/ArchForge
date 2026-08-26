@@ -145,6 +145,9 @@ public class MetaTableDdlGenerator {
             sb.append(" USING ").append(pgType);
         }
         sb.append(" (").append(columnsPart).append(")");
+        if (unique) {
+            sb.append(" WHERE deleted = 0");
+        }
         return sb.toString();
     }
 

@@ -1,6 +1,7 @@
 package com.lesofn.archforge.meta.table.api.service;
 
 import com.lesofn.archforge.meta.table.api.dto.ImportResponse;
+import com.lesofn.archforge.meta.table.api.dto.MetaDataQuery;
 import com.lesofn.archforge.meta.table.api.dto.MetaPageResponse;
 import com.lesofn.archforge.meta.table.api.enums.MetaDataFormat;
 import java.io.InputStream;
@@ -18,7 +19,7 @@ public interface MetaTableCrudService {
 
     Boolean softDelete(Long tableId, Long dataId, Long currentUid);
 
-    MetaPageResponse<Map<String, Object>> list(Long tableId, Map<String, Object> filters, int currentPage, int pageSize);
+    MetaPageResponse<Map<String, Object>> list(Long tableId, MetaDataQuery query);
 
     void export(Long tableId, MetaDataFormat format, OutputStream out);
 

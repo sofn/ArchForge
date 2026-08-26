@@ -1,6 +1,8 @@
 package com.lesofn.archforge.meta.table.internal.service;
 
 import static com.lesofn.archforge.meta.table.api.errors.MetaTableErrorCode.META_TABLE_CODE_EXISTS;
+import static com.lesofn.archforge.meta.table.api.errors.MetaTableErrorCode.META_TABLE_CONCURRENT_MODIFY;
+import static com.lesofn.archforge.meta.table.api.errors.MetaTableErrorCode.META_TABLE_EVOLUTION_INVALID;
 import static com.lesofn.archforge.meta.table.api.errors.MetaTableErrorCode.META_TABLE_HAS_DATA;
 import static com.lesofn.archforge.meta.table.api.errors.MetaTableErrorCode.META_TABLE_NOT_EXISTS;
 
@@ -24,8 +26,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -94,7 +99,7 @@ public class MetaTableAdminServiceImpl implements MetaTableAdminService {
             if (table.getStatus() != null) {
                 existing.setStatus(table.getStatus());
             }
-            metaTableRepository.save(existing);
+            saveGuarded(existing);
             return;
         }
 
@@ -108,7 +113,7 @@ public class MetaTableAdminServiceImpl implements MetaTableAdminService {
             if (table.getStatus() != null) {
                 existing.setStatus(table.getStatus());
             }
-            metaTableRepository.save(existing);
+            saveGuarded(existing);
             return;
         }
 
@@ -121,9 +126,7 @@ public class MetaTableAdminServiceImpl implements MetaTableAdminService {
                 operatorId);
 
         for (SchemaDdl ddl : ddlStatements) {
-            for (String sql : ddl.sqls()) {
-                jdbcTemplate.getJdbcOperations().execute(sql);
-            }
+            executeWithPreflight(existing, ddl);
         }
 
         existing.setSchemaVersion(nextVersion);
@@ -132,7 +135,7 @@ public class MetaTableAdminServiceImpl implements MetaTableAdminService {
         if (table.getStatus() != null) {
             existing.setStatus(table.getStatus());
         }
-        metaTableRepository.save(existing);
+        saveGuarded(existing);
 
         // 软删除被 DROP 的字段
         for (MetaColumn old : oldColumns) {
@@ -226,7 +229,57 @@ public class MetaTableAdminServiceImpl implements MetaTableAdminService {
         jdbcTemplate.getJdbcOperations().execute(ddlGenerator.generateDropTable(table.physicalTableName()));
 
         metaColumnRepository.deleteByTableId(id);
-        metaTableRepository.deleteById(id);
+        deleteGuarded(id);
+    }
+
+    private void saveGuarded(MetaTable table) {
+        try {
+            metaTableRepository.saveAndFlush(table);
+        } catch (OptimisticLockingFailureException e) {
+            throw new MetaTableException(META_TABLE_CONCURRENT_MODIFY);
+        }
+    }
+
+    private void deleteGuarded(Long id) {
+        try {
+            metaTableRepository.deleteById(id);
+            metaTableRepository.flush();
+        } catch (OptimisticLockingFailureException e) {
+            throw new MetaTableException(META_TABLE_CONCURRENT_MODIFY);
+        }
+    }
+
+    private void executeWithPreflight(MetaTable table, SchemaDdl ddl) {
+        Optional<String> violationSql = alterTableDdlGenerator.buildViolationCountSql(table, ddl.change());
+        long violations = violationSql.map(this::countViolations).orElse(0L);
+        if (violations > 0) {
+            Optional<String> backfillSql = alterTableDdlGenerator.buildBackfillUpdateSql(table, ddl.change());
+            if (backfillSql.isPresent()) {
+                jdbcTemplate.getJdbcOperations().execute(backfillSql.get());
+            } else {
+                throw new MetaTableException(META_TABLE_EVOLUTION_INVALID, describeEvolutionBlocker(table, ddl.change(),
+                        violations));
+            }
+        }
+        for (String sql : ddl.sqls()) {
+            jdbcTemplate.getJdbcOperations().execute(sql);
+        }
+    }
+
+    private long countViolations(String sql) {
+        try {
+            Long count = jdbcTemplate.getJdbcOperations().queryForObject(sql, Long.class);
+            return count == null ? 0L : count;
+        } catch (DataAccessException e) {
+            throw new MetaTableException(META_TABLE_EVOLUTION_INVALID, "存在无法转换的存量数据: " + e.getMostSpecificCause().getMessage());
+        }
+    }
+
+    private String describeEvolutionBlocker(MetaTable table, SchemaChange change, long violations) {
+        String columnCode = change.getNewColumn() != null
+                ? change.getNewColumn().getColumnCode()
+                : change.getOldColumn().getColumnCode();
+        return "表 " + table.physicalTableName() + " 字段 " + columnCode + " 有 " + violations + " 行数据不满足变更要求";
     }
 
     private String generateCopyCode(String originalCode) {

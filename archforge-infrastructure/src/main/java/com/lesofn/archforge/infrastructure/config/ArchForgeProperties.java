@@ -86,6 +86,9 @@ public class ArchForgeProperties {
     /** 代码生成工作区配置 */
     private CodeGen codeGen = new CodeGen();
 
+    /** 元表格模块配置 */
+    private MetaTable metaTable = new MetaTable();
+
     @Setter
     @Getter
     public static class Token {
@@ -312,5 +315,12 @@ public class ArchForgeProperties {
     public static class CodeGen {
         /** 代码生成工作区根目录，所有生成输出必须位于该目录内 */
         private String workspaceRoot = System.getProperty("user.home") + "/.archforge/codegen";
+    }
+
+    @Setter
+    @Getter
+    public static class MetaTable {
+        /** 数据列表单页大小硬上限（超过将被截断） */
+        private int maxPageSize = 200;
     }
 }

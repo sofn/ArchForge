@@ -17,7 +17,10 @@ public enum MetaTableErrorCode implements ErrorCode {
     META_TABLE_HAS_DATA(5, "元表格中仍存在{0}条数据"),
     META_TABLE_DATA_NOT_EXISTS(6, "数据不存在"),
     META_COLUMN_TYPE_INVALID(7, "字段类型非法"),
-    META_COLUMN_VALUE_INVALID(8, "字段值校验失败：{0}");
+    META_COLUMN_VALUE_INVALID(8, "字段值校验失败：{0}"),
+    META_TABLE_CONCURRENT_MODIFY(9, "表定义已被他人修改，请刷新后重试"),
+    META_TABLE_EVOLUTION_INVALID(10, "Schema 演进预检失败：{0}"),
+    META_QUERY_PARAM_INVALID(11, "查询参数非法：{0}");
 
     private final int nodeNum;
     private final String msg;
