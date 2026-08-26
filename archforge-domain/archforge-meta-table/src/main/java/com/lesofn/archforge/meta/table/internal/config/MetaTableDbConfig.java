@@ -24,7 +24,8 @@ import org.springframework.transaction.PlatformTransactionManager;
  *
  * <p>
  * 注意：本配置不注册任何 {@link DataSource} Bean，仅使用注入的 primary {@code dataSource} 构造
- * {@link GroupDataSourceProxy} 实例，避免与 dynamic-datasource 形成循环依赖。
+ * {@link GroupDataSourceProxy} 实例，避免与 dynamic-datasource 形成循环依赖。事务管理器、EntityManagerFactory
+ * 与 JdbcTemplate 必须共享同一个实例，否则 Spring 无法按 DataSource 身份绑定事务连接。
  */
 @Configuration
 @RequiredArgsConstructor
@@ -39,8 +40,13 @@ public class MetaTableDbConfig {
 
     private final DataSource dataSource;
 
-    private DataSource metaDataSource() {
-        return new GroupDataSourceProxy(dataSource, "user");
+    private DataSource metaDataSource;
+
+    private synchronized DataSource metaDataSource() {
+        if (metaDataSource == null) {
+            metaDataSource = new GroupDataSourceProxy(dataSource, "user");
+        }
+        return metaDataSource;
     }
 
     @Bean
