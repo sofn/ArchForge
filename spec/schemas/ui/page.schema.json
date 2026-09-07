@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://archforge.dev/schemas/ui/page.schema.json",
+  "title": "UI Page",
+  "description": "ArchForge UI DSL: declarative page definition consumed by ArchForgeWeb / ArchForgeAdmin renderers.",
+  "type": "object",
+  "required": ["pageId", "components"],
+  "properties": {
+    "pageId": {
+      "type": "string",
+      "description": "Unique page identifier."
+    },
+    "title": {
+      "type": "string"
+    },
+    "layout": {
+      "type": "string",
+      "enum": ["single", "two-column", "sidebar"],
+      "default": "single"
+    },
+    "components": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/component"
+      }
+    }
+  },
+  "$defs": {
+    "component": {
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "description": "Component type, e.g. table, form, chart."
+        },
+        "props": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      }
+    }
+  }
+}

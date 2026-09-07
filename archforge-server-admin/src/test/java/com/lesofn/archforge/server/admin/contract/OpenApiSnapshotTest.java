@@ -14,7 +14,7 @@ import org.springframework.web.client.RestClient;
 
 /**
  * Exports the live springdoc OpenAPI document so CI can diff it against the canonical contract
- * in ArchForgeSpec (M3.1). Output: build/openapi/live-openapi.json.
+ * in spec/openapi.yaml (M3.1). Output: build/openapi/live-openapi.json.
  */
 @Tag("contract")
 @Tag("slow")

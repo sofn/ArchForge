@@ -1,0 +1,156 @@
+# Cross-repo enumerations. Backend is the producer; this file is the contract;
+# frontends consume it. See specs/enum-sync.md.
+#
+# Change flow: Java enum → this file → Admin / Web TypeScript constants.
+# Never invent a frontend-only numeric mapping.
+
+enums:
+  StatusEnum:
+    source: archforge-common-base
+    class: com.lesofn.archforge.common.enums.common.StatusEnum
+    dictionary: common.status
+    field: status
+    values:
+      - name: DISABLE
+        value: 0
+        label: 停用
+      - name: ENABLE
+        value: 1
+        label: 正常
+
+  UserStatus:
+    source: archforge-common-base
+    class: com.lesofn.archforge.common.enums.common.UserStatusEnum
+    dictionary: sysUser.status
+    field: sys_user.status
+    values:
+      - name: NORMAL
+        value: 1
+        label: 正常
+      - name: DISABLED
+        value: 2
+        label: 禁用
+      - name: FROZEN
+        value: 3
+        label: 冻结
+
+  MenuTypeEnum:
+    source: archforge-domain/archforge-admin-user
+    class: com.lesofn.archforge.user.api.enums.MenuTypeEnum
+    dictionary: sysMenu.menuType
+    field: sys_menu.menu_type
+    # Canonical backend values. Buttons are NOT a menuType; they use is_button.
+    values:
+      - name: MENU
+        value: 1
+        label: 页面
+      - name: CATALOG
+        value: 2
+        label: 目录
+      - name: IFRAME
+        value: 3
+        label: 内嵌Iframe
+      - name: OUTSIDE_LINK_REDIRECT
+        value: 4
+        label: 外链跳转
+    frontend:
+      repo: ArchForgeAdmin
+      file: src/views/system/menu/utils/enums.ts
+      rule: menuTypeOptions values must equal 1 / 2 / 3 / 4; buttons use isButton
+
+  BlogArticleStatus:
+    source: archforge-domain/archforge-blog
+    class: com.lesofn.archforge.blog.api.enums.BlogArticleStatus
+    field: blog_article.status
+    values:
+      - name: DRAFT
+        value: 0
+        label: 草稿
+      - name: PUBLISHED
+        value: 1
+        label: 已发布
+      - name: OFFLINE
+        value: 2
+        label: 已下线
+
+  NoticeTypeEnum:
+    source: archforge-common-base
+    class: com.lesofn.archforge.common.enums.common.NoticeTypeEnum
+    dictionary: sysNotice.noticeType
+    values:
+      - name: NOTIFICATION
+        value: 1
+        label: 通知
+      - name: ANNOUNCEMENT
+        value: 2
+        label: 公告
+
+  NoticeStatusEnum:
+    source: archforge-common-base
+    class: com.lesofn.archforge.common.enums.common.NoticeStatusEnum
+    dictionary: sysNotice.status
+    values:
+      - name: CLOSE
+        value: 0
+        label: 关闭
+      - name: OPEN
+        value: 1
+        label: 正常
+
+  GenderEnum:
+    source: archforge-common-base
+    class: com.lesofn.archforge.common.enums.common.GenderEnum
+    dictionary: sysUser.sex
+    values:
+      - name: MALE
+        value: 0
+        label: 男
+      - name: FEMALE
+        value: 1
+        label: 女
+      - name: UNKNOWN
+        value: 2
+        label: 未知
+
+  OperationStatusEnum:
+    source: archforge-common-base
+    class: com.lesofn.archforge.common.enums.common.OperationStatusEnum
+    dictionary: sysOperationLog.status
+    values:
+      - name: FAIL
+        value: 0
+        label: 失败
+      - name: SUCCESS
+        value: 1
+        label: 成功
+
+  LoginStatusEnum:
+    source: archforge-common-base
+    class: com.lesofn.archforge.common.enums.common.LoginStatusEnum
+    dictionary: sysLoginLog.status
+    values:
+      - name: LOGIN_FAIL
+        value: 0
+        label: 登录失败
+      - name: LOGIN_SUCCESS
+        value: 1
+        label: 登录成功
+      - name: LOGOUT
+        value: 2
+        label: 退出成功
+      - name: REGISTER
+        value: 3
+        label: 注册
+  VisibleStatusEnum:
+    source: archforge-common-base
+    class: com.lesofn.archforge.common.enums.common.VisibleStatusEnum
+    dictionary: sysMenu.isVisible
+    field: visible
+    values:
+      - name: HIDE
+        value: 0
+        label: 隐藏
+      - name: SHOW
+        value: 1
+        label: 显示
+

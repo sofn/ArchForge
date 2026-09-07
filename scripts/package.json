@@ -1,0 +1,12 @@
+{
+  "name": "archforge-spec-scripts",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "gen-enums": "node gen-enums.mjs",
+    "check-enums": "node gen-enums.mjs --check"
+  },
+  "devDependencies": {
+    "yaml": "^2.9.0"
+  }
+}

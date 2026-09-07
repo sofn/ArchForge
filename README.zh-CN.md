@@ -23,7 +23,7 @@
 ## ✨ 特性
 
 - **一套代码、两个应用** — `server-admin`（B 端，`{code,message,data}` envelope）与 `server-web`（C 端，RFC 9457 ProblemDetail），各自独立的 sa-token 认证域
-- **契约先行** — [ArchForgeSpec](https://github.com/sofn/ArchForgeSpec) 统一持有 OpenAPI 3.1 与枚举；CI 将 live spec 与契约做 diff，破坏性变更直接拦截
+- **契约先行** — `spec/openapi.yaml` 在本仓库内统一持有 OpenAPI 3.1 与枚举；CI 将 live spec 与契约做 diff，破坏性变更直接拦截
 - **Java 25 + 虚拟线程**，可选 GraalVM Native Image（约 100ms 启动）
 - **DDD 模块化** — Spring Modulith 边界校验 + ArchUnit 规则（空匹配即失败）
 - **元表格引擎** — 低代码建表、schema 演进、代码生成、REFERENCE 关联字段
@@ -44,10 +44,10 @@ flowchart LR
   subgraph backend["本仓库 —— 两个 Spring Boot 应用"]
     SA["server-admin :8080<br/>B 端 API"]
     SW["server-web :8081<br/>C 端 API"]
+    SPEC["spec/<br/>OpenAPI · enums · rules"]
   end
   PG[("PostgreSQL 17")]
   RD[("Redis 7")]
-  SPEC["ArchForgeSpec<br/>OpenAPI · enums · rules"]
 
   A -->|"REST /api"| SA
   W -->|"REST + SSE"| SW
@@ -159,8 +159,8 @@ FILE_STORAGE_TYPE=local ./gradlew :archforge-server-admin:bootRun
 | 门禁 | 机制 |
 |------|------|
 | 变更行覆盖率 ≥ 60% | 聚合 JaCoCo 报告 + `diff-cover` |
-| API 无破坏性变更 | `oasdiff` 对比 live spec 与 `ArchForgeSpec/api/openapi.yaml` |
-| 错误码已登记 | `scripts/check-error-codes.py` 对比 `specs/error-codes.md` |
+| API 无破坏性变更 | `oasdiff` 对比 live spec 与 `spec/openapi.yaml`（目标分支上的契约） |
+| 错误码已登记 | `scripts/check-error-codes.py` 对比 `docs/specs/error-codes.md` |
 | 前端 SDK 同步 | 重新生成 `schema.d.ts` 后 `git diff --exit-code`（Web/Admin 仓库） |
 | 架构规则 | ArchUnit，`failOnEmptyShould=true` |
 

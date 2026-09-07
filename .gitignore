@@ -54,3 +54,6 @@ archforge-server-admin/uploads/
 .env
 backup/
 .workbuddy/
+
+# Node deps for scripts/gen-enums.mjs (lock file is committed)
+scripts/node_modules/

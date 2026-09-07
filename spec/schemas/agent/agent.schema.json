@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://archforge.dev/schemas/agent/agent.schema.json",
+  "title": "Agent Definition",
+  "description": "ArchForge agent definition: declarative description of an AI agent registered on the platform.",
+  "type": "object",
+  "required": ["agentId", "capabilities"],
+  "properties": {
+    "agentId": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "model": {
+      "type": "string",
+      "description": "Underlying model identifier."
+    },
+    "capabilities": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Capability tags, e.g. 'sql-query', 'doc-summary'."
+    },
+    "tools": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Tool names the agent may invoke."
+    },
+    "limits": {
+      "type": "object",
+      "properties": {
+        "maxTokens": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "timeoutSeconds": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    }
+  }
+}

@@ -24,7 +24,7 @@ This repository is the **backend** of the five-repo ArchForge project. It builds
 ## ✨ Features
 
 - **Two apps, one codebase** — `server-admin` (B-end, `{code,message,data}` envelope) and `server-web` (C-end, RFC 9457 ProblemDetail), each with its own sa-token realm
-- **Contract-first** — [ArchForgeSpec](https://github.com/sofn/ArchForgeSpec) owns OpenAPI 3.1 + enums; CI diffs the live spec against it and blocks breaking changes
+- **Contract-first** — `spec/openapi.yaml` owns OpenAPI 3.1 + enums in this repo; CI diffs the live spec against it and blocks breaking changes
 - **Java 25 + virtual threads**, optional GraalVM native image (~100 ms start)
 - **DDD modules** guarded by Spring Modulith verification and fail-fast ArchUnit rules
 - **Meta-table engine** — low-code tables with schema evolution, code generation, and REFERENCE fields
@@ -45,10 +45,10 @@ flowchart LR
   subgraph backend["this repo — two Spring Boot apps"]
     SA["server-admin :8080<br/>B-end API"]
     SW["server-web :8081<br/>C-end API"]
+    SPEC["spec/<br/>OpenAPI · enums · rules"]
   end
   PG[("PostgreSQL 17")]
   RD[("Redis 7")]
-  SPEC["ArchForgeSpec<br/>OpenAPI · enums · rules"]
 
   A -->|"REST /api"| SA
   W -->|"REST + SSE"| SW
@@ -152,8 +152,8 @@ What CI enforces on every PR ([ci.yml](.github/workflows/ci.yml)):
 | Gate | Mechanism |
 |------|-----------|
 | Diff coverage ≥ 60% | `diff-cover` on the aggregated JaCoCo report |
-| No breaking API changes | `oasdiff` live spec vs `ArchForgeSpec/api/openapi.yaml` |
-| Error codes documented | `scripts/check-error-codes.py` vs `specs/error-codes.md` |
+| No breaking API changes | `oasdiff` live spec vs `spec/openapi.yaml` (on the target branch) |
+| Error codes documented | `scripts/check-error-codes.py` vs `docs/specs/error-codes.md` |
 | Frontend SDK in sync | `git diff --exit-code` after regenerating `schema.d.ts` (in Web/Admin repos) |
 | Architecture rules | ArchUnit with `failOnEmptyShould=true` |
 

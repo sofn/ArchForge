@@ -1,0 +1,99 @@
+# Machine-readable ArchForge project map.
+# Sibling clones, no Git submodules. Read this file first from any repo.
+#
+# ArchForgeSpec was merged into this repository (spec/, docs/specs/, skills/).
+# The contract now lives in spec/openapi.yaml — see AGENTS.md.
+
+project: ArchForge
+layout: sibling-repos
+submodules: false
+
+repos:
+  - name: ArchForge
+    path: .
+    role: backend
+    can_modify: [backend, spec, contract]
+    description: Spring Boot services. Owns and implements the API contract.
+    apps:
+      - name: archforge-server-admin
+        port: 8080
+        consumers: [ArchForgeAdmin]
+      - name: archforge-server-web
+        port: 8081
+        consumers: [ArchForgeWeb]
+    modules:
+      - archforge-common/archforge-common-base
+      - archforge-common/archforge-common-error
+      - archforge-common/archforge-common-jpa
+      - archforge-domain/archforge-admin-user
+      - archforge-domain/archforge-blog
+      - archforge-domain/archforge-meta-table
+      - archforge-infrastructure
+      - archforge-server-admin
+      - archforge-server-web
+      - archforge-cli
+      - archforge-example/archforge-example-task
+      - archforge-starters/archforge-cache-starter
+      - archforge-starters/archforge-lock-starter
+      - archforge-starters/archforge-redisson-starter
+      - archforge-starters/archforge-trace-starter
+      - archforge-dependencies
+    owns:
+      - spec/openapi.yaml
+      - spec/enums.yaml
+      - spec/schemas/
+      - docs/specs/
+      - docs/architecture.md
+      - skills/
+      - repos.yaml
+    notes:
+      - Canonical backend standard: skills/archforge-project-standard/standard.md
+      - Auth: sa-token (StpAdminUtil / StpWebUtil), not Spring Security JWT
+      - Contract sync: API changes must update spec/openapi.yaml in the same change
+
+  - name: ArchForgeAdmin
+    path: ../ArchForgeAdmin
+    role: admin-ui
+    can_modify: [admin-ui]
+    description: ArchForge admin console. Consumes server-admin only.
+    stack: Vue 3 + Vite + Element Plus + Pinia (vue-pure-admin based)
+    app:
+      port: 8848
+      api_base: /api   # Vite proxy → http://localhost:8080
+      backend: ArchForge/archforge-server-admin
+      auth: sa-token
+      response: "{code,message,data}"
+
+  - name: ArchForgeWeb
+    path: ../ArchForgeWeb
+    role: web-ui
+    can_modify: [web-ui]
+    description: C-end Next.js client. Consumes server-web only.
+    stack: Next.js 16.x + React 19 + Tailwind + shadcn/ui
+    app:
+      port: 3000
+      api_base_env: NEXT_PUBLIC_API_BASE_URL
+      api_base_default: http://localhost:8081
+      backend: ArchForge/archforge-server-web
+      auth: sa-token cookies (token, tokenName, refreshToken)
+      errors: RFC 9457 ProblemDetail
+
+# ArchForgeSpec and ArchForgeDocs are retired: ArchForgeSpec's contents moved
+# into spec/ + docs/specs/ + skills/ here; ArchForgeDocs never existed.
+
+ports:
+  server-admin: 8080
+  server-web: 8081
+  admin-ui: 8848
+  web-ui: 3000
+
+contract:
+  openapi: spec/openapi.yaml
+  openapi_version: "3.1.0"
+  enums: spec/enums.yaml
+  live_export: archforge-server-admin/build/openapi/live-openapi.json
+  deleted_paths:
+    - /system/menu
+    - /system/role
+  migration_backlog:
+    - /system/dict

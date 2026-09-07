@@ -11,7 +11,7 @@ public final class SkillInstaller {
     static final String END = "<!-- ARCHFORGE-SKILLS:END -->";
     static final String BLOCK = BEGIN + "\n" + "ArchForge CLI skills installed.\n" +
             "- Use `./archforge --help` for command tree.\n" + "- Backend modules are prefixed with `archforge-`.\n" +
-            "- Contracts live in sibling ArchForgeSpec.\n" + END + "\n";
+            "- Contracts live in spec/openapi.yaml.\n" + END + "\n";
 
     private SkillInstaller() {
     }

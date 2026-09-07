@@ -1,0 +1,19 @@
+# Governance boundary for the merged contract.
+#
+# ArchForgeSpec was retired and merged here, so the contract no longer has a
+# repository boundary to protect it. These rules keep the review requirement
+# that the separate repository used to provide: contract and spec changes need
+# an owner's review. When the team grows, replace @sofn with a team such as
+# @archforge/api-owners — the coverage stays equivalent.
+
+# API contract: OpenAPI document, shared enums, JSON Schemas
+/spec/            @sofn
+
+# Written standards: API paths, response format, naming, error codes, security
+/docs/specs/      @sofn
+
+# Agent skills and the canonical backend standard
+/skills/          @sofn
+
+# Machine-readable project map (repo layout, ports, contract pointers)
+/repos.yaml       @sofn

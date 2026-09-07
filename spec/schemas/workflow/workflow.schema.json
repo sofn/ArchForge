@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://archforge.dev/schemas/workflow/workflow.schema.json",
+  "title": "Workflow",
+  "description": "ArchForge Workflow DSL: AI/agent workflow definition executed by the ArchForge backend.",
+  "type": "object",
+  "required": ["workflowId", "steps"],
+  "properties": {
+    "workflowId": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "steps": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/step"
+      }
+    }
+  },
+  "$defs": {
+    "step": {
+      "type": "object",
+      "required": ["stepId", "type"],
+      "properties": {
+        "stepId": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["task", "decision", "parallel", "agent-call"],
+          "description": "Step type."
+        },
+        "next": {
+          "type": "string",
+          "description": "Id of the next step (simple sequential wiring)."
+        },
+        "config": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      }
+    }
+  }
+}

@@ -31,27 +31,33 @@ Before claiming work is complete:
 
 ## Project Context
 
-This repository is part of the **ArchForge multi-repository project** (five
+This repository is part of the **ArchForge multi-repository project** (three
 independent Git repositories, cloned side by side, no submodules). For the
-machine-readable project map, read `../ArchForgeSpec/repos.yaml` first.
+machine-readable project map, read `repos.yaml` first.
 
 ```
 archforge/
-├── ArchForge/          # backend (this repo): server-admin :8080 + server-web :8081
+├── ArchForge/          # backend + contracts (this repo)
+│   ├── spec/           # openapi.yaml, enums.yaml, schemas/
+│   ├── docs/specs/     # API / naming / error-code / security standards
+│   ├── docs/architecture.md
+│   └── skills/         # agent skills + backend standard
 ├── ArchForgeWeb/       # C-end web client (Next.js)  — consumes server-web :8081
-├── ArchForgeAdmin/     # admin client (vue-pure-admin) — consumes server-admin :8080
-├── ArchForgeDocs/      # documentation site (VitePress)
-└── ArchForgeSpec/      # contracts / architecture / AI context
+└── ArchForgeAdmin/     # admin client (vue-pure-admin) — consumes server-admin :8080
 ```
 
-- Contracts are owned by `../ArchForgeSpec` (`api/openapi.yaml` OpenAPI 3.1,
-  `schemas/` JSON Schema 2020-12). This repo implements them.
-- Cross-repository behavior: read `../ArchForgeSpec/repos.yaml`, then
-  `../ArchForgeSpec/architecture.md` before changing anything that affects the
-  Web / Admin clients or the contract.
+- **This repo owns the contract**: `spec/openapi.yaml` (OpenAPI 3.1) and
+  `spec/enums.yaml`. `spec/schemas/` holds JSON Schema 2020-12 definitions.
+  The old `ArchForgeSpec` repository is retired — its contents live here now.
+- Canonical backend standard: `skills/archforge-project-standard/standard.md`
+  (pointer: `docs/specs/backend-standard.md`).
+- Cross-repository behavior: read `repos.yaml`, then `docs/architecture.md`
+  before changing anything that affects the Web / Admin clients or the contract.
 - Do not modify another repository unless explicitly required.
 - This repo exposes two applications: `server-admin` (port 8080) and
   `server-web` (port 8081).
+- **Do not invent deleted APIs**: `/system/menu` and `/system/role` no longer
+  exist (see `repos.yaml` → `contract.deleted_paths`).
 - **Contract sync rule**: whenever the backend API changes (paths, parameters,
-  request/response schemas, auth), update `../ArchForgeSpec/api/openapi.yaml`
-  in the same change. Never leave the API contract out of sync with the source.
+  request/response schemas, auth), update `spec/openapi.yaml` in the same
+  change. CI diffs the live export against it and blocks breaking changes.

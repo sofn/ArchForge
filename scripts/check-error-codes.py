@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Contract check: every ArchForgeProjectModule used by an ErrorCode enum must be
-documented in ../ArchForgeSpec/specs/error-codes.md (M3.2).
+documented in docs/specs/error-codes.md (M3.2).
 
-Run from the ArchForge repo root with the Spec repo checked out as a sibling:
-    python3 scripts/check-error-codes.py ../ArchForgeSpec/specs/error-codes.md
+Run from the ArchForge repo root:
+    python3 scripts/check-error-codes.py docs/specs/error-codes.md
 """
 
 import re

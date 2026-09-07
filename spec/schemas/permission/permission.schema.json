@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://archforge.dev/schemas/permission/permission.schema.json",
+  "title": "Permission Model",
+  "description": "ArchForge permission model: role-based access control shared by backend and clients.",
+  "type": "object",
+  "required": ["roles"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "description": "Model version (SemVer)."
+    },
+    "roles": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/role"
+      }
+    }
+  },
+  "$defs": {
+    "role": {
+      "type": "object",
+      "required": ["roleId"],
+      "properties": {
+        "roleId": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "permissions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/permission"
+          }
+        }
+      }
+    },
+    "permission": {
+      "type": "object",
+      "required": ["resource", "action"],
+      "properties": {
+        "resource": {
+          "type": "string",
+          "description": "Resource identifier, e.g. 'workflow', 'user'."
+        },
+        "action": {
+          "type": "string",
+          "enum": ["create", "read", "update", "delete", "execute"],
+          "description": "Allowed action on the resource."
+        }
+      }
+    }
+  }
+}

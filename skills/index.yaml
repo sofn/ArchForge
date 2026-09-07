@@ -1,0 +1,43 @@
+# Progressive-disclosure index for agent skills.
+# Load only the skill that matches the task.
+#
+# ArchForgeSpec's skills were merged here when that repository was retired.
+# Contract-related skills now live next to the code they describe.
+
+skills:
+  - id: backend-api-design
+    file: backend-api-design.md
+    when:
+      - adding or changing a REST endpoint
+      - changing request/response shapes
+      - touching OpenAPI
+    repos: [ArchForge]
+
+  - id: frontend-page-dev
+    file: frontend-page-dev.md
+    when:
+      - adding an Admin or Web page
+      - wiring a new API on a client
+    repos: [ArchForgeAdmin, ArchForgeWeb]
+
+  - id: cross-module-change
+    file: cross-module-change.md
+    when:
+      - a change spans the contract and its implementation
+      - a change spans more than one repository
+      - contract, enum, or path prefix changes
+    repos: [ArchForge, ArchForgeAdmin, ArchForgeWeb]
+
+  - id: backend-standard
+    file: ../docs/specs/backend-standard.md
+    when:
+      - writing or reviewing ArchForge Java code
+      - applying backend conventions
+    repos: [ArchForge]
+
+  - id: archforge-project-standard
+    file: archforge-project-standard/SKILL.md
+    when:
+      - applying the canonical backend standard
+      - reviewing module structure or layering
+    repos: [ArchForge]

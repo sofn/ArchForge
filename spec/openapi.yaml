@@ -1,0 +1,1593 @@
+openapi: 3.1.0
+info:
+  title: ArchForge API
+  version: 0.1.0
+  summary: Stub contract for ArchForge admin and C-end APIs.
+  description: |
+    Two servers, two clients:
+
+    - **Admin** (`server-admin`, port 8080) — consumed by ArchForgeAdmin.
+      Success envelope `{code, message, data}`. See `specs/api-response.md`.
+    - **Web** (`server-web`, port 8081) — consumed by ArchForgeWeb.
+      Errors use RFC 9457 ProblemDetail.
+
+    This file is a **stub**. Paths listed here are the live surface we are
+    willing to document. Do **not** reintroduce deleted `/system/menu` or
+    `/system/role`. Leftover `/system/dict` is a migration backlog item
+    (see `specs/api-path.md`), not a target prefix.
+
+    When an endpoint changes, update this file in the same change.
+
+servers:
+  - url: http://localhost:8080
+    description: server-admin (ArchForgeAdmin)
+  - url: http://localhost:8081
+    description: server-web (ArchForgeWeb)
+
+tags:
+  - name: admin-auth
+    description: Admin sa-token login on server-admin
+  - name: admin
+    description: Admin resources under /admin/*
+  - name: admin-legacy
+    description: Admin paths still missing the /admin prefix
+  - name: web
+    description: C-end resources under /web/* on server-web
+
+security:
+  - saToken: []
+
+paths:
+  /auth/login:
+    post:
+      tags: [admin-auth]
+      summary: Admin login
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminLoginRequest"
+      responses:
+        "200":
+          description: Wrapped login payload
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminEnvelope"
+
+  /auth/logout:
+    post:
+      tags: [admin-auth]
+      summary: Admin logout
+      responses:
+        "200":
+          description: Wrapped boolean
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminEnvelope"
+
+  /auth/refresh-token:
+    post:
+      tags: [admin-auth]
+      summary: Refresh admin token
+      security: []
+      responses:
+        "200":
+          description: Wrapped token pair
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminEnvelope"
+
+  /auth/getConfig:
+    get:
+      tags: [admin-auth]
+      summary: Public admin login config
+      security: []
+      responses:
+        "200":
+          description: Wrapped config
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminEnvelope"
+
+  /auth/captchaImage:
+    get:
+      tags: [admin-auth]
+      summary: Captcha image payload
+      security: []
+      responses:
+        "200":
+          description: Wrapped captcha
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminEnvelope"
+
+  /auth/getLoginUserInfo:
+    get:
+      tags: [admin-auth]
+      summary: Current admin user
+      responses:
+        "200":
+          description: Wrapped user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminEnvelope"
+
+  /auth/getRouters:
+    get:
+      tags: [admin-auth]
+      summary: Dynamic admin routes
+      responses:
+        "200":
+          description: Wrapped router tree
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminEnvelope"
+
+  /admin/user:
+    post:
+      tags: [admin]
+      summary: Admin user page
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+  /admin/user/create:
+    post:
+      tags: [admin]
+      summary: Create admin user
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+  /admin/user/update:
+    put:
+      tags: [admin]
+      summary: Update admin user
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+  /admin/user/delete:
+    post:
+      tags: [admin]
+      summary: Delete admin user
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+  /admin/user/status:
+    post:
+      tags: [admin]
+      summary: Update admin user status
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+  /admin/user/reset-password:
+    post:
+      tags: [admin]
+      summary: Reset admin user password
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+  /admin/user/assign-role:
+    post:
+      tags: [admin]
+      summary: Assign roles to user
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+  /admin/user/list-role-ids:
+    post:
+      tags: [admin]
+      summary: List role ids for a user
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+
+  /admin/role:
+    post:
+      tags: [admin]
+      summary: Admin role page
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+  /admin/role/all:
+    get:
+      tags: [admin]
+      summary: All roles
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+  /admin/role/create:
+    post:
+      tags: [admin]
+      summary: Create role
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+  /admin/role/update:
+    put:
+      tags: [admin]
+      summary: Update role
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+  /admin/role/delete:
+    post:
+      tags: [admin]
+      summary: Delete role
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+  /admin/role/status:
+    post:
+      tags: [admin]
+      summary: Update role status
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+  /admin/role/save-menu:
+    post:
+      tags: [admin]
+      summary: Save role menus
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+  /admin/role/data-scope:
+    post:
+      tags: [admin]
+      summary: Update role data scope
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+  /admin/role/menu:
+    post:
+      tags: [admin]
+      summary: Role menu tree
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+  /admin/role/menu-ids:
+    post:
+      tags: [admin]
+      summary: Role menu ids
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+
+  /admin/menu:
+    post:
+      tags: [admin]
+      summary: Admin menu list
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+  /admin/menu/create:
+    post:
+      tags: [admin]
+      summary: Create menu
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+  /admin/menu/update:
+    put:
+      tags: [admin]
+      summary: Update menu
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+  /admin/menu/delete:
+    post:
+      tags: [admin]
+      summary: Delete menu
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+
+  /admin/dept:
+    post:
+      tags: [admin]
+      summary: Admin dept tree
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+  /admin/dept/create:
+    post:
+      tags: [admin]
+      summary: Create dept
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+  /admin/dept/update:
+    put:
+      tags: [admin]
+      summary: Update dept
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+  /admin/dept/delete:
+    post:
+      tags: [admin]
+      summary: Delete dept
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+
+  /admin/config:
+    post:
+      tags: [admin]
+      summary: System config page
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+  /admin/config/create:
+    post:
+      tags: [admin]
+      summary: Create config
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+  /admin/config/update:
+    put:
+      tags: [admin]
+      summary: Update config
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+  /admin/config/delete:
+    post:
+      tags: [admin]
+      summary: Delete config
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+
+  /admin/notice:
+    post:
+      tags: [admin]
+      summary: Notice page
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+  /admin/notice/create:
+    post:
+      tags: [admin]
+      summary: Create notice
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+  /admin/notice/update:
+    put:
+      tags: [admin]
+      summary: Update notice
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+  /admin/notice/delete:
+    post:
+      tags: [admin]
+      summary: Delete notice
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+
+  /admin/operation-log:
+    post:
+      tags: [admin]
+      summary: Operation log page
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+
+  /admin/login-log:
+    post:
+      tags: [admin]
+      summary: Login log page
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+
+  /admin/server:
+    get:
+      tags: [admin]
+      summary: Server metrics
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+
+  /admin/dashboard/metrics:
+    get:
+      tags: [admin]
+      summary: Dashboard counts
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+  /admin/dashboard/trends:
+    get:
+      tags: [admin]
+      summary: Dashboard trends
+      parameters:
+        - in: query
+          name: days
+          schema: { type: integer, default: 7 }
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+  /admin/dashboard/recent-activities:
+    get:
+      tags: [admin]
+      summary: Recent article activity
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+  /admin/dashboard/todo:
+    get:
+      tags: [admin]
+      summary: Dashboard todo aggregates
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+  /admin/permission-matrix/menus/tree:
+    get:
+      tags: [admin]
+      summary: Permission menu tree
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+  /admin/permission-matrix/roles/{roleId}/permissions:
+    get:
+      tags: [admin]
+      summary: Role permission ids
+      parameters:
+        - in: path
+          name: roleId
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+    put:
+      tags: [admin]
+      summary: Replace role permissions
+      parameters:
+        - in: path
+          name: roleId
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+  /admin/chat/config:
+    get:
+      tags: [admin]
+      summary: LLM config status without the API key
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+  /admin/chat/sessions:
+    get:
+      tags: [admin]
+      summary: In-memory chat sessions
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+    post:
+      tags: [admin]
+      summary: Create chat session
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+  /admin/chat/sessions/{id}/messages:
+    post:
+      tags: [admin]
+      summary: Send chat message
+      description: SSE events named `delta`, `done`, `error`.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: text/event-stream
+  /system/dict:
+    description: |
+      Leftover prefix. Migration backlog — move under `/admin/dict`.
+      Not a template for new APIs. `/system/menu` and `/system/role` are gone
+      and must not be re-added.
+    post:
+      tags: [admin-legacy]
+      summary: Dictionary type page (legacy prefix)
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+
+  /blog/article:
+    post:
+      tags: [admin-legacy]
+      summary: Blog article admin (prefix should become /admin/blog)
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+  /blog/article/create:
+    post:
+      tags: [admin-legacy]
+      summary: Create blog article
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+  /blog/article/update:
+    put:
+      tags: [admin-legacy]
+      summary: Update blog article
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+  /blog/article/delete:
+    post:
+      tags: [admin-legacy]
+      summary: Delete blog article
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+  /blog/article/{id}/publish:
+    post:
+      tags: [admin-legacy]
+      summary: Publish blog article
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer, format: int64 }
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+  /blog/article/{id}/offline:
+    post:
+      tags: [admin-legacy]
+      summary: Offline blog article
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer, format: int64 }
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+
+  /blog/category:
+    post:
+      tags: [admin-legacy]
+      summary: Blog category admin
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+  /blog/category/create:
+    post:
+      tags: [admin-legacy]
+      summary: Create blog category
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+  /blog/category/update:
+    put:
+      tags: [admin-legacy]
+      summary: Update blog category
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+  /blog/category/delete:
+    post:
+      tags: [admin-legacy]
+      summary: Delete blog category
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+
+  /blog/file/upload:
+    post:
+      tags: [admin-legacy]
+      summary: Upload blog file
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+
+  /meta-table:
+    post:
+      tags: [admin-legacy]
+      summary: Meta table admin
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+  /meta-table/create:
+    post:
+      tags: [admin-legacy]
+      summary: Create meta table
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+  /meta-table/{id}:
+    get:
+      tags: [admin-legacy]
+      summary: Meta table detail
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer, format: int64 }
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+
+  /file:
+    get:
+      tags: [admin-legacy]
+      summary: Admin file list
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+  /file/upload:
+    post:
+      tags: [admin-legacy]
+      summary: Upload admin file
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+  /file/upload-image:
+    post:
+      tags: [admin-legacy]
+      summary: Upload admin image
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+  /file/download/{fileId}:
+    get:
+      tags: [admin-legacy]
+      summary: Download admin file
+      parameters:
+        - in: path
+          name: fileId
+          required: true
+          schema: { type: integer, format: int64 }
+      responses:
+        "200":
+          description: Binary
+  /file/{fileId}:
+    delete:
+      tags: [admin-legacy]
+      summary: Delete admin file
+      parameters:
+        - in: path
+          name: fileId
+          required: true
+          schema: { type: integer, format: int64 }
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+
+  /monitor:
+    get:
+      tags: [admin-legacy]
+      summary: Monitor API
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+
+  /quartz:
+    get:
+      tags: [admin-legacy]
+      summary: Scheduled job list (db-scheduler)
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+  /quartz/add:
+    post:
+      tags: [admin-legacy]
+      summary: Add scheduled job
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+  /quartz/update/{id}:
+    put:
+      tags: [admin-legacy]
+      summary: Update scheduled job
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer, format: int64 }
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+  /quartz/{id}:
+    delete:
+      tags: [admin-legacy]
+      summary: Delete scheduled job
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer, format: int64 }
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+  /quartz/pause/{id}:
+    post:
+      tags: [admin-legacy]
+      summary: Pause scheduled job
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer, format: int64 }
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+  /quartz/resume/{id}:
+    post:
+      tags: [admin-legacy]
+      summary: Resume scheduled job
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer, format: int64 }
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+  /quartz/run/{id}:
+    post:
+      tags: [admin-legacy]
+      summary: Run scheduled job once
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer, format: int64 }
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+  /quartz/log:
+    get:
+      tags: [admin-legacy]
+      summary: Scheduled job logs
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+
+  /web/login:
+    post:
+      tags: [web]
+      summary: C-end login
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WebLoginRequest"
+      responses:
+        "200":
+          description: Wrapped login payload
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WebEnvelopeLogin"
+        "401":
+          $ref: "#/components/responses/WebProblem"
+
+  /web/logout:
+    post:
+      tags: [web]
+      summary: C-end logout
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WebLogoutRequest"
+      responses:
+        "200":
+          description: Wrapped boolean
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WebEnvelopeBoolean"
+
+  /web/refresh-token:
+    post:
+      tags: [web]
+      summary: Refresh C-end token
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WebRefreshTokenRequest"
+      responses:
+        "200":
+          description: Wrapped login payload
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WebEnvelopeLogin"
+        "401":
+          $ref: "#/components/responses/WebProblem"
+
+  /web/register:
+    post:
+      tags: [web]
+      summary: Register by email
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WebRegisterRequest"
+      responses:
+        "200":
+          description: Wrapped login payload
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WebEnvelopeLogin"
+
+  /web/forgot-password:
+    post:
+      tags: [web]
+      summary: Send reset-password code
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WebForgotPasswordRequest"
+      responses:
+        "200":
+          description: Wrapped boolean
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WebEnvelopeBoolean"
+
+  /web/reset-password:
+    post:
+      tags: [web]
+      summary: Reset password by email code
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WebResetPasswordRequest"
+      responses:
+        "200":
+          description: Wrapped boolean
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WebEnvelopeBoolean"
+
+  /web/verification-code/send:
+    post:
+      tags: [web]
+      summary: Send email verification code
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WebSendVerificationCodeRequest"
+      responses:
+        "200":
+          description: Wrapped boolean
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WebEnvelopeBoolean"
+
+  /web/user/profile:
+    get:
+      tags: [web]
+      summary: Current C-end profile
+      responses:
+        "200":
+          description: Wrapped profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WebEnvelopeProfile"
+        "401":
+          $ref: "#/components/responses/WebProblem"
+
+  /web/user/change-password:
+    post:
+      tags: [web]
+      summary: Change password while logged in
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WebChangePasswordRequest"
+      responses:
+        "200":
+          description: Wrapped boolean
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WebEnvelopeBoolean"
+        "401":
+          $ref: "#/components/responses/WebProblem"
+
+  /web/dashboard/metrics:
+    get:
+      tags: [web]
+      summary: C-end dashboard metrics
+      responses:
+        "200":
+          description: Wrapped metrics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WebEnvelopeMetrics"
+
+  /web/notices:
+    get:
+      tags: [web]
+      summary: Latest notices
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Wrapped notice list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WebEnvelopeNoticeList"
+
+  /web/operation-logs:
+    get:
+      tags: [web]
+      summary: Recent operation logs
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Wrapped log list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WebEnvelopeOperationLogList"
+
+  /web/categories:
+    get:
+      tags: [web]
+      summary: Visible article categories
+      security: []
+      responses:
+        "200":
+          description: Wrapped category list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WebEnvelopeCategoryList"
+
+  /web/articles:
+    get:
+      tags: [web]
+      summary: Published articles
+      security: []
+      parameters:
+        - name: categoryId
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int64
+        - name: currentPage
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: pageSize
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: keyword
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Wrapped page
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WebEnvelopeArticlePage"
+    post:
+      tags: [web]
+      summary: Create article
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WebArticleCreateRequest"
+      responses:
+        "200":
+          description: Wrapped article id
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WebEnvelopeLong"
+        "401":
+          $ref: "#/components/responses/WebProblem"
+
+  /web/user/articles:
+    get:
+      tags: [web]
+      summary: Current user's articles
+      parameters:
+        - name: currentPage
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: pageSize
+          in: query
+          required: false
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Wrapped page
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WebEnvelopeArticlePage"
+        "401":
+          $ref: "#/components/responses/WebProblem"
+
+  /web/articles/{slug}:
+    get:
+      tags: [web]
+      summary: Published article by slug
+      security: []
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Wrapped article
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WebEnvelopeArticleDetail"
+
+  /web/file/upload:
+    post:
+      tags: [web]
+      summary: Upload C-end file
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        "200":
+          description: Wrapped file payload
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WebEnvelopeFileUpload"
+        "401":
+          $ref: "#/components/responses/WebProblem"
+
+  /web/file/{fileId}:
+    get:
+      tags: [web]
+      summary: Download C-end file
+      security: []
+      parameters:
+        - name: fileId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Binary
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+
+components:
+  securitySchemes:
+    saToken:
+      type: http
+      scheme: bearer
+      description: "sa-token value. Header Authorization: Bearer <token>."
+
+  responses:
+    AdminOk:
+      description: Admin envelope
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/AdminEnvelope"
+    WebProblem:
+      description: RFC 9457 Problem Detail (C-end errors)
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/ProblemDetail"
+
+  schemas:
+    AdminEnvelope:
+      type: object
+      required: [code, message]
+      properties:
+        code:
+          type: integer
+          description: 0 means success
+        message:
+          type: string
+        data: {}
+
+    AdminLoginRequest:
+      type: object
+      required: [username, password]
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+        captchaCode:
+          type: string
+        captchaKey:
+          type: string
+
+    WebLoginRequest:
+      type: object
+      required: [username, password]
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+
+    ProblemDetail:
+      type: object
+      properties:
+        type:
+          type: string
+          format: uri
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
+        instance:
+          type: string
+          format: uri
+        code:
+          type: integer
+          description: Optional ArchForge error code property
+    WebLoginResponse:
+      type: object
+      required: [userId, username, tokenName, accessToken]
+      properties:
+        userId:
+          type: integer
+          format: int64
+        username:
+          type: string
+        nickname:
+          type: string
+        avatar:
+          type: string
+        tokenName:
+          type: string
+        accessToken:
+          type: string
+        refreshToken:
+          type: string
+        expires:
+          type: string
+
+    WebLogoutRequest:
+      type: object
+      properties:
+        refreshToken:
+          type: string
+
+    WebRefreshTokenRequest:
+      type: object
+      required: [refreshToken]
+      properties:
+        refreshToken:
+          type: string
+
+    WebUserProfileResponse:
+      type: object
+      required: [userId, username]
+      properties:
+        userId:
+          type: integer
+          format: int64
+        username:
+          type: string
+        nickname:
+          type: string
+        avatar:
+          type: string
+
+    WebChangePasswordRequest:
+      type: object
+      required: [oldPassword, newPassword, confirmPassword]
+      properties:
+        oldPassword:
+          type: string
+        newPassword:
+          type: string
+        confirmPassword:
+          type: string
+
+    WebSendVerificationCodeRequest:
+      type: object
+      required: [email, purpose]
+      properties:
+        email:
+          type: string
+        purpose:
+          type: string
+          enum: [REGISTER, RESET_PASSWORD]
+
+    WebRegisterRequest:
+      type: object
+      required: [email, password, confirmPassword, code]
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+        confirmPassword:
+          type: string
+        code:
+          type: string
+
+    WebResetPasswordRequest:
+      type: object
+      required: [email, code, newPassword, confirmPassword]
+      properties:
+        email:
+          type: string
+        code:
+          type: string
+        newPassword:
+          type: string
+        confirmPassword:
+          type: string
+
+    WebForgotPasswordRequest:
+      type: object
+      required: [email, purpose]
+      properties:
+        email:
+          type: string
+        purpose:
+          type: string
+          enum: [RESET_PASSWORD]
+
+    WebDashboardMetricsResponse:
+      type: object
+      required: [userTotal, onlineNow, todayLogin, todayOperation]
+      properties:
+        userTotal:
+          type: integer
+          format: int64
+        onlineNow:
+          type: integer
+          format: int64
+        todayLogin:
+          type: integer
+          format: int64
+        todayOperation:
+          type: integer
+          format: int64
+
+    WebNoticeResponse:
+      type: object
+      required: [id, title, createTime]
+      properties:
+        id:
+          type: integer
+          format: int64
+        title:
+          type: string
+        content:
+          type: string
+        noticeType:
+          type: integer
+        createTime:
+          type: string
+
+    WebOperationLogResponse:
+      type: object
+      required: [id, username, operatingTime]
+      properties:
+        id:
+          type: integer
+          format: int64
+        username:
+          type: string
+        module:
+          type: string
+        summary:
+          type: string
+        operatingTime:
+          type: string
+
+    WebCategoryResponse:
+      type: object
+      required: [id, name, slug, sortOrder, articleCount]
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        slug:
+          type: string
+        sortOrder:
+          type: integer
+        articleCount:
+          type: integer
+          format: int64
+
+    WebArticleSummaryResponse:
+      type: object
+      required: [id, title, slug, summary, coverImageUrl, categoryName, publishTime]
+      properties:
+        id:
+          type: integer
+          format: int64
+        title:
+          type: string
+        slug:
+          type: string
+        summary:
+          type: string
+        coverImageFileId:
+          type:
+            - integer
+            - "null"
+          format: int64
+        coverImageUrl:
+          type: string
+        categoryName:
+          type: string
+        publishTime:
+          type: string
+
+    WebArticleDetailResponse:
+      type: object
+      required:
+        - id
+        - title
+        - slug
+        - summary
+        - content
+        - coverImageUrl
+        - categoryId
+        - categoryName
+        - categorySlug
+        - publishTime
+        - createTime
+      properties:
+        id:
+          type: integer
+          format: int64
+        title:
+          type: string
+        slug:
+          type: string
+        summary:
+          type: string
+        content:
+          type: string
+        coverImageFileId:
+          type:
+            - integer
+            - "null"
+          format: int64
+        coverImageUrl:
+          type: string
+        categoryId:
+          type: integer
+          format: int64
+        categoryName:
+          type: string
+        categorySlug:
+          type: string
+        publishTime:
+          type: string
+        createTime:
+          type: string
+
+    WebArticleCreateRequest:
+      type: object
+      required: [categoryId, title, content]
+      properties:
+        categoryId:
+          type: integer
+          format: int64
+        title:
+          type: string
+        summary:
+          type: string
+        content:
+          type: string
+        coverImageFileId:
+          type:
+            - integer
+            - "null"
+          format: int64
+
+    WebFileUploadResponse:
+      type: object
+      required: [fileId, url, name]
+      properties:
+        fileId:
+          type: integer
+          format: int64
+        url:
+          type: string
+        name:
+          type: string
+
+    WebArticlePage:
+      type: object
+      required: [list, total, pageSize, currentPage]
+      properties:
+        list:
+          type: array
+          items:
+            $ref: "#/components/schemas/WebArticleSummaryResponse"
+        total:
+          type: integer
+          format: int64
+        pageSize:
+          type: integer
+        currentPage:
+          type: integer
+
+    WebEnvelopeBoolean:
+      allOf:
+        - $ref: "#/components/schemas/AdminEnvelope"
+        - type: object
+          properties:
+            data:
+              type: boolean
+
+    WebEnvelopeLong:
+      allOf:
+        - $ref: "#/components/schemas/AdminEnvelope"
+        - type: object
+          properties:
+            data:
+              type: integer
+              format: int64
+
+    WebEnvelopeLogin:
+      allOf:
+        - $ref: "#/components/schemas/AdminEnvelope"
+        - type: object
+          properties:
+            data:
+              $ref: "#/components/schemas/WebLoginResponse"
+
+    WebEnvelopeProfile:
+      allOf:
+        - $ref: "#/components/schemas/AdminEnvelope"
+        - type: object
+          properties:
+            data:
+              $ref: "#/components/schemas/WebUserProfileResponse"
+
+    WebEnvelopeMetrics:
+      allOf:
+        - $ref: "#/components/schemas/AdminEnvelope"
+        - type: object
+          properties:
+            data:
+              $ref: "#/components/schemas/WebDashboardMetricsResponse"
+
+    WebEnvelopeNoticeList:
+      allOf:
+        - $ref: "#/components/schemas/AdminEnvelope"
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: "#/components/schemas/WebNoticeResponse"
+
+    WebEnvelopeOperationLogList:
+      allOf:
+        - $ref: "#/components/schemas/AdminEnvelope"
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: "#/components/schemas/WebOperationLogResponse"
+
+    WebEnvelopeCategoryList:
+      allOf:
+        - $ref: "#/components/schemas/AdminEnvelope"
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: "#/components/schemas/WebCategoryResponse"
+
+    WebEnvelopeArticlePage:
+      allOf:
+        - $ref: "#/components/schemas/AdminEnvelope"
+        - type: object
+          properties:
+            data:
+              $ref: "#/components/schemas/WebArticlePage"
+
+    WebEnvelopeArticleDetail:
+      allOf:
+        - $ref: "#/components/schemas/AdminEnvelope"
+        - type: object
+          properties:
+            data:
+              $ref: "#/components/schemas/WebArticleDetailResponse"
+
+    WebEnvelopeFileUpload:
+      allOf:
+        - $ref: "#/components/schemas/AdminEnvelope"
+        - type: object
+          properties:
+            data:
+              $ref: "#/components/schemas/WebFileUploadResponse"
+
