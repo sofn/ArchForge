@@ -51,7 +51,7 @@ done
 
 echo "=== Importing seed data ==="
 docker cp "${REPO_ROOT}/archforge-domain/archforge-admin-user/src/main/resources/sql" "$(docker compose -f docker-compose.staging.yml ps -q postgres):/tmp/seed"
-for sql in data-admin-user.sql data-admin-dept.sql data-admin-config.sql data-admin-quartz.sql; do
+for sql in data-admin-user.sql data-admin-dept.sql data-admin-config.sql data-admin-scheduler.sql; do
     docker compose -f docker-compose.staging.yml exec -T postgres \
         psql -v ON_ERROR_STOP=0 -U "${DB_USERNAME:-archforge}" -d archforge_user -f "/tmp/seed/sql/${sql}"
 done

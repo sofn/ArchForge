@@ -1,4 +1,4 @@
-package com.lesofn.archforge.server.admin.dto.quartz;
+package com.lesofn.archforge.server.admin.dto.scheduler;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

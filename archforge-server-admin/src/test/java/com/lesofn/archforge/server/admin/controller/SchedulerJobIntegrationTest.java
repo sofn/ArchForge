@@ -29,7 +29,7 @@ import org.springframework.web.client.RestClient;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @Tag("slow")
-class QuartzJobIntegrationTest {
+class SchedulerJobIntegrationTest {
 
     @LocalServerPort
     int port;
@@ -145,10 +145,10 @@ class QuartzJobIntegrationTest {
                         "jobName", "it-demo-hello",
                         "jobGroup", "DEFAULT",
                         "description", "integration test demo job",
-                        "beanName", "demoQuartzJob",
+                        "beanName", "demoSchedulerJob",
                         "methodName", "echo",
                         "methodParams", "[\"hello-from-it\"]",
-                        "cron", "0 0 1 1 1 ? 2099",
+                        "cron", "0 0 1 1 1 *",
                         "misfirePolicy", 1,
                         "concurrent", false));
         assertEquals(0, resp.get("code"), "add failed: " + resp);
@@ -210,10 +210,10 @@ class QuartzJobIntegrationTest {
                         "jobName", "it-demo-hello",
                         "jobGroup", "DEFAULT",
                         "description", "updated description",
-                        "beanName", "demoQuartzJob",
+                        "beanName", "demoSchedulerJob",
                         "methodName", "echo",
                         "methodParams", "[\"updated\"]",
-                        "cron", "0 0 2 1 1 ? 2099",
+                        "cron", "0 0 2 1 1 *",
                         "misfirePolicy", 1,
                         "concurrent", false));
         assertEquals(0, resp.get("code"));

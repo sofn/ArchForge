@@ -96,8 +96,8 @@ dependencies {
         api("org.dhatim:fastexcel:0.20.2")
         api("org.dhatim:fastexcel-reader:0.20.2")
 
-        // Quartz (调度 — Spring Boot 4.1.0 BOM 已托管 quartz 版本，但显式声明 starter 便于追踪)
-        api("org.springframework.boot:spring-boot-starter-quartz:4.1.0")
+        // db-scheduler (调度 — 单表 JDBC 存储，集群安全，支持动态持久化 schedule)
+        api("com.github.kagkarlsson:db-scheduler:16.12.0")
 
         // Spring Modulith
         api("org.springframework.modulith:spring-modulith-api:2.1.0")

@@ -1,17 +1,21 @@
-package com.lesofn.archforge.server.admin.controller.quartz;
+package com.lesofn.archforge.server.admin.controller.scheduler;
 
+import cn.dev33.satoken.annotation.SaCheckLogin;
+import cn.dev33.satoken.annotation.SaCheckPermission;
+import cn.dev33.satoken.annotation.SaCheckRole;
+import com.lesofn.archforge.infrastructure.auth.stp.StpAdminUtil;
 import com.lesofn.archforge.infrastructure.annotation.Log;
 import com.lesofn.archforge.server.admin.dto.AdminPageResponse;
-import com.lesofn.archforge.server.admin.dto.quartz.CronValidateRequest;
-import com.lesofn.archforge.server.admin.dto.quartz.QuartzJobListRequest;
-import com.lesofn.archforge.server.admin.dto.quartz.QuartzJobResponse;
-import com.lesofn.archforge.server.admin.dto.quartz.QuartzJobUpsertRequest;
-import com.lesofn.archforge.server.admin.dto.quartz.QuartzLogListRequest;
-import com.lesofn.archforge.server.admin.dto.quartz.QuartzLogResponse;
-import com.lesofn.archforge.server.admin.dto.quartz.SysQuartzJobQueryRequest;
-import com.lesofn.archforge.server.admin.service.quartz.QuartzJobService;
-import com.lesofn.archforge.user.api.domain.SysQuartzJob;
-import com.lesofn.archforge.user.api.domain.SysQuartzLog;
+import com.lesofn.archforge.server.admin.dto.scheduler.CronValidateRequest;
+import com.lesofn.archforge.server.admin.dto.scheduler.SchedulerJobListRequest;
+import com.lesofn.archforge.server.admin.dto.scheduler.SchedulerJobQueryRequest;
+import com.lesofn.archforge.server.admin.dto.scheduler.SchedulerJobResponse;
+import com.lesofn.archforge.server.admin.dto.scheduler.SchedulerJobUpsertRequest;
+import com.lesofn.archforge.server.admin.dto.scheduler.SchedulerLogListRequest;
+import com.lesofn.archforge.server.admin.dto.scheduler.SchedulerLogResponse;
+import com.lesofn.archforge.server.admin.service.scheduler.ScheduledJobService;
+import com.lesofn.archforge.user.api.domain.SysJobLog;
+import com.lesofn.archforge.user.api.domain.SysScheduledJob;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -19,85 +23,96 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import cn.dev33.satoken.annotation.SaCheckLogin;
-import cn.dev33.satoken.annotation.SaCheckPermission;
-import cn.dev33.satoken.annotation.SaCheckRole;
-import com.lesofn.archforge.infrastructure.auth.stp.StpAdminUtil;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Admin REST surface for Quartz reflective jobs.
+ * Admin API for the db-scheduler-backed job platform (URL space {@code /quartz} and permission
+ * codes {@code monitor:job:*} are contract-stable with the former Quartz API — the admin frontend
+ * and ArchForgeSpec depend on them).
+ *
+ * <p>
+ * Execution is reflective: a job row names a Spring bean and method (optionally a JSON array of
+ * primitive arguments), invoked by {@code ReflectionJobHandler} on a db-scheduler worker thread
+ * with a per-run audit log in {@code sys_job_log}.
  *
  * @author sofn
  */
-@Tag(name = "Quartz 调度", description = "Quartz 反射调度任务管理")
+@Tag(name = "定时任务管理", description = "db-scheduler 反射调度任务管理")
 @SaCheckLogin(type = StpAdminUtil.TYPE)
 @SaCheckRole(value = "ADMIN", type = StpAdminUtil.TYPE)
 @RestController
 @RequestMapping("/quartz")
 @RequiredArgsConstructor
-public class QuartzJobController {
+public class SchedulerJobController {
 
-    private final QuartzJobService quartzJobService;
+    private final ScheduledJobService jobService;
 
-    @Operation(summary = "查询 Quartz 任务列表")
+    @Operation(summary = "查询定时任务列表")
     @SaCheckPermission(value = "monitor:job:list", type = StpAdminUtil.TYPE)
     @GetMapping
-    public AdminPageResponse<QuartzJobResponse> list(QuartzJobListRequest query) {
+    public AdminPageResponse<SchedulerJobResponse> list(SchedulerJobListRequest query) {
         int currentPage = query.getCurrentPage() != null && query.getCurrentPage() > 0
                 ? query.getCurrentPage()
                 : 1;
         int pageSize = query.getPageSize() != null && query.getPageSize() > 0 ? query.getPageSize() : 10;
         Pageable pageable = PageRequest.of(currentPage - 1, pageSize, Sort.by(Sort.Direction.DESC, "id"));
-        SysQuartzJobQueryRequest criteria = new SysQuartzJobQueryRequest();
+        SchedulerJobQueryRequest criteria = new SchedulerJobQueryRequest();
         criteria.setJobName(query.getJobName());
+        criteria.setJobGroup(query.getJobGroup());
         criteria.setStatus(query.getStatus());
-        Page<SysQuartzJob> page = quartzJobService.page(criteria, pageable);
+        Page<SysScheduledJob> page = jobService.page(criteria, pageable);
         return AdminPageResponse.of(
-                page.getContent().stream().map(QuartzJobResponse::from).toList(),
+                page.getContent().stream().map(SchedulerJobResponse::from).toList(),
                 page.getTotalElements(),
                 pageSize,
                 currentPage);
     }
 
     @Log
-    @Operation(summary = "新增 Quartz 任务")
+    @Operation(summary = "新增定时任务")
     @SaCheckPermission(value = "monitor:job:add", type = StpAdminUtil.TYPE)
     @PostMapping("/add")
-    public Long add(@RequestBody QuartzJobUpsertRequest req) {
-        return quartzJobService.add(toEntity(new SysQuartzJob(), req));
+    public Long add(@RequestBody SchedulerJobUpsertRequest req) {
+        return jobService.add(toEntity(new SysScheduledJob(), req));
     }
 
     @Log
-    @Operation(summary = "更新 Quartz 任务")
+    @Operation(summary = "更新定时任务")
     @SaCheckPermission(value = "monitor:job:edit", type = StpAdminUtil.TYPE)
     @PutMapping("/update/{id}")
-    public void update(@PathVariable Long id, @RequestBody QuartzJobUpsertRequest req) {
-        quartzJobService.update(id, toEntity(new SysQuartzJob(), req));
+    public void update(@PathVariable Long id, @RequestBody SchedulerJobUpsertRequest req) {
+        jobService.update(id, toEntity(new SysScheduledJob(), req));
     }
 
     @Log
-    @Operation(summary = "删除 Quartz 任务")
+    @Operation(summary = "删除定时任务")
     @SaCheckPermission(value = "monitor:job:remove", type = StpAdminUtil.TYPE)
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {
-        quartzJobService.delete(id);
+        jobService.delete(id);
     }
 
     @Log
-    @Operation(summary = "暂停 Quartz 任务")
+    @Operation(summary = "暂停定时任务")
     @SaCheckPermission(value = "monitor:job:edit", type = StpAdminUtil.TYPE)
     @PostMapping("/pause/{id}")
     public void pause(@PathVariable Long id) {
-        quartzJobService.pause(id);
+        jobService.pause(id);
     }
 
     @Log
-    @Operation(summary = "恢复 Quartz 任务")
+    @Operation(summary = "恢复定时任务")
     @SaCheckPermission(value = "monitor:job:edit", type = StpAdminUtil.TYPE)
     @PostMapping("/resume/{id}")
     public void resume(@PathVariable Long id) {
-        quartzJobService.resume(id);
+        jobService.resume(id);
     }
 
     @Log
@@ -105,13 +120,13 @@ public class QuartzJobController {
     @SaCheckPermission(value = "monitor:job:edit", type = StpAdminUtil.TYPE)
     @PostMapping("/run/{id}")
     public void run(@PathVariable Long id) {
-        quartzJobService.runOnce(id);
+        jobService.runOnce(id);
     }
 
     @Operation(summary = "查询任务执行日志")
     @SaCheckPermission(value = "monitor:job:list", type = StpAdminUtil.TYPE)
     @GetMapping("/log")
-    public AdminPageResponse<QuartzLogResponse> logList(QuartzLogListRequest body) {
+    public AdminPageResponse<SchedulerLogResponse> logList(SchedulerLogListRequest body) {
         Long jobId = body.getJobId();
         int currentPage = body.getCurrentPage() != null && body.getCurrentPage() > 0
                 ? body.getCurrentPage()
@@ -120,9 +135,9 @@ public class QuartzJobController {
                 ? body.getPageSize()
                 : 20;
         Pageable pageable = PageRequest.of(currentPage - 1, pageSize);
-        Page<SysQuartzLog> page = quartzJobService.logPage(jobId, pageable);
+        Page<SysJobLog> page = jobService.logPage(jobId, pageable);
         return AdminPageResponse.of(
-                page.getContent().stream().map(QuartzLogResponse::from).toList(),
+                page.getContent().stream().map(SchedulerLogResponse::from).toList(),
                 page.getTotalElements(),
                 pageSize,
                 currentPage);
@@ -132,10 +147,10 @@ public class QuartzJobController {
     @SaCheckPermission(value = "monitor:job:list", type = StpAdminUtil.TYPE)
     @PostMapping("/validate-cron")
     public boolean validateCron(@RequestBody CronValidateRequest body) {
-        return quartzJobService.validateCron(body.getCron());
+        return jobService.validateCron(body.getCron());
     }
 
-    private static SysQuartzJob toEntity(SysQuartzJob target, QuartzJobUpsertRequest req) {
+    private static SysScheduledJob toEntity(SysScheduledJob target, SchedulerJobUpsertRequest req) {
         target.setJobName(req.getJobName());
         target.setJobGroup(req.getJobGroup());
         target.setDescription(req.getDescription());

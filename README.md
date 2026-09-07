@@ -29,7 +29,7 @@ This repository is the **backend** of the five-repo ArchForge project. It builds
 - **DDD modules** guarded by Spring Modulith verification and fail-fast ArchUnit rules
 - **Meta-table engine** — low-code tables with schema evolution, code generation, and REFERENCE fields
 - **ChatAI module** — bring your own LLM (OpenAI/Anthropic compatible), streamed over SSE
-- **Permission matrix, data scope, Quartz clustering, operation/login logs** out of the box
+- **Permission matrix, data scope, db-scheduler clustering, operation/login logs** out of the box
 - **Developer CLI** — `./archforge` bootstraps env secrets, docker infra, DB backups, AI skills, MCP
 
 ## 🏛 Architecture

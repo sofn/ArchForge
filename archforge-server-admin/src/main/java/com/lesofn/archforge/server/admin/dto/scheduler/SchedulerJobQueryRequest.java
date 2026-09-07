@@ -1,4 +1,4 @@
-package com.lesofn.archforge.server.admin.dto.quartz;
+package com.lesofn.archforge.server.admin.dto.scheduler;
 
 import com.lesofn.archforge.common.annotation.Query;
 import lombok.Data;
@@ -10,7 +10,7 @@ import lombok.Data;
  * @author sofn
  */
 @Data
-public class SysQuartzJobQueryRequest {
+public class SchedulerJobQueryRequest {
 
     @Query(type = Query.Type.INNER_LIKE)
     private String jobName;

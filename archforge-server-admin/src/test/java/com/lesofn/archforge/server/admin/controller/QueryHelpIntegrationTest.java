@@ -187,7 +187,7 @@ class QueryHelpIntegrationTest {
     @Order(5)
     @SuppressWarnings("unchecked")
     void quartzListFiltersByJobNameInnerLike() {
-        // seeded demo-hello from data-admin-quartz.sql
+        // seeded demo-hello from data-admin-scheduler.sql
         Map<String, Object> resp = get("/quartz", Map.of("jobName", "demo", "currentPage", 1, "pageSize", 10));
         assertEquals(0, resp.get("code"));
 

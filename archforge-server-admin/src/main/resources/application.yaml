@@ -33,28 +33,6 @@ spring:
   threads:
     virtual:
       enabled: true
-  quartz:
-    job-store-type: jdbc
-    scheduler-name: ArchForgeScheduler
-    overwrite-existing-jobs: true
-    jdbc:
-      initialize-schema: never
-    properties:
-      org:
-        quartz:
-          scheduler:
-            instanceId: AUTO
-          jobStore:
-            class: org.springframework.scheduling.quartz.LocalDataSourceJobStore
-            driverDelegateClass: org.quartz.impl.jdbcjobstore.PostgreSQLDelegate
-            tablePrefix: QRTZ_
-            isClustered: true
-            clusterCheckinInterval: 15000
-            useProperties: false
-          threadPool:
-            class: org.quartz.simpl.SimpleThreadPool
-            threadCount: 10
-            threadPriority: 5
   jpa:
     hibernate:
       naming:
@@ -128,8 +106,10 @@ arch-forge:
   sensitive:
     enabled: true
   rsa-private-key: ${ARCH_FORGE_RSA_PRIVATE_KEY:}
-  quartz:
-    allowed-job-beans: demoQuartzJob
+  scheduler:
+    # db-scheduler runtime（调度状态存 scheduled_tasks 表，反射调用仅允许此名单内的 bean）
+    allowed-job-beans: demoSchedulerJob
+    threads: 5
   meta-table:
     max-page-size: 200
   codegen:

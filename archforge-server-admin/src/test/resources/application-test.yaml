@@ -8,9 +8,6 @@ spring:
       enabled: false
     livereload:
       enabled: false
-  quartz:
-    jdbc:
-      initialize-schema: never
   flyway:
     enabled: true
     baseline-on-migrate: true

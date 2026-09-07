@@ -7,8 +7,8 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 /**
- * Per-execution audit log of a SysQuartzJob. Persisted by the reflective job runner with status,
- * duration, and any error message.
+ * Per-execution audit log of a {@link SysScheduledJob}. Persisted by the reflective job runner
+ * with status, duration, and any error message.
  *
  * @author sofn
  */
@@ -17,12 +17,12 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 @Entity
 @Table(
-        name = "sys_quartz_log",
+        name = "sys_job_log",
         indexes = {
-                @Index(name = "idx_sys_quartz_log_job_id", columnList = "job_id"),
-                @Index(name = "idx_sys_quartz_log_started_at", columnList = "started_at")
+                @Index(name = "idx_sys_job_log_job_id", columnList = "job_id"),
+                @Index(name = "idx_sys_job_log_started_at", columnList = "started_at")
         })
-public class SysQuartzLog {
+public class SysJobLog {
 
     /** Status: execution succeeded. */
     public static final short STATUS_SUCCESS = 0;
@@ -47,6 +47,7 @@ public class SysQuartzLog {
     @Column(columnDefinition = "TEXT")
     private String methodParams;
 
+    /** 0 = success, 1 = failure. */
     private Short status;
 
     @Column(columnDefinition = "TEXT")
@@ -58,14 +59,9 @@ public class SysQuartzLog {
 
     private LocalDateTime finishedAt;
 
-    /** Builds a success log row for a completed run. */
-    public static SysQuartzLog success(
-            SysQuartzJob job,
-            String methodParams,
-            long durationMs,
-            LocalDateTime startedAt,
-            LocalDateTime finishedAt) {
-        return new SysQuartzLog()
+    public static SysJobLog success(SysScheduledJob job, String methodParams, long durationMs,
+            LocalDateTime startedAt, LocalDateTime finishedAt) {
+        return new SysJobLog()
                 .setJobId(job.getId())
                 .setJobName(job.getJobName())
                 .setJobGroup(job.getJobGroup())
@@ -78,15 +74,9 @@ public class SysQuartzLog {
                 .setFinishedAt(finishedAt);
     }
 
-    /** Builds a failure log row capturing the error message. */
-    public static SysQuartzLog failure(
-            SysQuartzJob job,
-            String methodParams,
-            String errorMessage,
-            long durationMs,
-            LocalDateTime startedAt,
-            LocalDateTime finishedAt) {
-        return new SysQuartzLog()
+    public static SysJobLog failure(SysScheduledJob job, String methodParams, String errorMessage,
+            long durationMs, LocalDateTime startedAt, LocalDateTime finishedAt) {
+        return new SysJobLog()
                 .setJobId(job.getId())
                 .setJobName(job.getJobName())
                 .setJobGroup(job.getJobGroup())

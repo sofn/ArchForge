@@ -129,8 +129,8 @@ dependencies {
     // AWS S3 SDK
     api("software.amazon.awssdk:s3")
 
-    // Quartz scheduler (JDBC store, clustered)
-    api("org.springframework.boot:spring-boot-starter-quartz")
+    // db-scheduler (JDBC store, clustered, single 'scheduled_tasks' table)
+    api("com.github.kagkarlsson:db-scheduler")
     
     // Spring Boot DevTools - 开发环境自动重启和热部署
     developmentOnly("org.springframework.boot:spring-boot-devtools:4.1.0")

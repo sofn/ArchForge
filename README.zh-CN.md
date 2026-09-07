@@ -28,7 +28,7 @@
 - **DDD 模块化** — Spring Modulith 边界校验 + ArchUnit 规则（空匹配即失败）
 - **元表格引擎** — 低代码建表、schema 演进、代码生成、REFERENCE 关联字段
 - **ChatAI 模块** — 自带密钥接入 LLM（OpenAI / Anthropic 兼容），SSE 流式输出
-- **权限矩阵、数据权限、Quartz 集群调度、操作/登录日志** 开箱即用
+- **权限矩阵、数据权限、db-scheduler 集群调度、操作/登录日志** 开箱即用
 - **开发 CLI** — `./archforge` 一键初始化密钥、拉起 docker 基础设施、备份数据库、安装 AI 技能、MCP
 
 ## 🏛 架构

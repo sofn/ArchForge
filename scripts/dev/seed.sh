@@ -17,7 +17,7 @@ echo "Importing seed data into ${DB_NAME_USER}..."
 for sql in "${REPO_ROOT}/archforge-domain/archforge-admin-user/src/main/resources/sql/data-admin-user.sql" \
            "${REPO_ROOT}/archforge-domain/archforge-admin-user/src/main/resources/sql/data-admin-dept.sql" \
            "${REPO_ROOT}/archforge-domain/archforge-admin-user/src/main/resources/sql/data-admin-config.sql" \
-           "${REPO_ROOT}/archforge-domain/archforge-admin-user/src/main/resources/sql/data-admin-quartz.sql" \
+           "${REPO_ROOT}/archforge-domain/archforge-admin-user/src/main/resources/sql/data-admin-scheduler.sql" \
            "${REPO_ROOT}/archforge-domain/archforge-admin-user/src/main/resources/sql/data-admin-blog.sql" \
            "${REPO_ROOT}/archforge-domain/archforge-admin-user/src/main/resources/sql/reset-sequences.sql"; do
     filename=$(basename "${sql}")

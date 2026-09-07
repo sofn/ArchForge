@@ -1,12 +1,12 @@
-package com.lesofn.archforge.server.admin.dto.quartz;
+package com.lesofn.archforge.server.admin.dto.scheduler;
 
-import com.lesofn.archforge.user.api.domain.SysQuartzJob;
+import com.lesofn.archforge.user.api.domain.SysScheduledJob;
 import java.time.LocalDateTime;
 import lombok.Data;
 
-/** Response DTO mirroring {@link SysQuartzJob} for the admin list view. */
+/** Response DTO mirroring {@link SysScheduledJob} for the admin list view. */
 @Data
-public class QuartzJobResponse {
+public class SchedulerJobResponse {
     private Long id;
     private String jobName;
     private String jobGroup;
@@ -21,8 +21,8 @@ public class QuartzJobResponse {
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
 
-    public static QuartzJobResponse from(SysQuartzJob j) {
-        QuartzJobResponse r = new QuartzJobResponse();
+    public static SchedulerJobResponse from(SysScheduledJob j) {
+        SchedulerJobResponse r = new SchedulerJobResponse();
         r.setId(j.getId());
         r.setJobName(j.getJobName());
         r.setJobGroup(j.getJobGroup());

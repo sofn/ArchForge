@@ -9,8 +9,13 @@ import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
 /**
- * Quartz reflective job metadata. The {@code QuartzReflectionJob} reads {@link #beanName}, {@link
- * #methodName}, {@link #methodParams} from this row to invoke the target method.
+ * Admin-managed scheduled job metadata for the db-scheduler runtime. The {@code
+ * ReflectionJobHandler} reads {@link #beanName}, {@link #methodName}, {@link #methodParams} from
+ * this row to invoke the target method; the runtime schedule lives in db-scheduler's {@code
+ * scheduled_tasks} table keyed by {@code admin-job-<id>}.
+ *
+ * <p>Historical note: this table (and its API surface) previously fronted Quartz; it was migrated
+ * to db-scheduler keeping job metadata, while Quartz's eleven QRTZ_* tables were dropped.
  *
  * @author sofn
  */
@@ -19,21 +24,21 @@ import org.hibernate.annotations.DynamicUpdate;
 @Accessors(chain = true)
 @Entity
 @Table(
-        name = "sys_quartz_job",
+        name = "sys_scheduled_job",
         uniqueConstraints = @UniqueConstraint(
-                name = "uk_sys_quartz_job_name_group",
+                name = "uk_sys_scheduled_job_name_group",
                 columnNames = {
                         "job_name", "job_group"
                 }))
 @DynamicInsert
 @DynamicUpdate
-public class SysQuartzJob extends BaseEntity<SysQuartzJob> {
+public class SysScheduledJob extends BaseEntity<SysScheduledJob> {
 
-    /** Status: paused (no trigger fires). */
+    /** Status: paused (schedule persisted as a disabled schedule). */
     public static final short STATUS_PAUSED = 1;
 
-    /** Status: running (trigger active). */
-    public static final short STATUS_RUNNING = 2;
+    /** Status: running. */
+    public static final short STATUS_RUNNING = 0;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -64,12 +69,12 @@ public class SysQuartzJob extends BaseEntity<SysQuartzJob> {
 
     public boolean isRunning() { return status != null && status == STATUS_RUNNING; }
 
-    public SysQuartzJob pause() {
+    public SysScheduledJob pause() {
         this.status = STATUS_PAUSED;
         return this;
     }
 
-    public SysQuartzJob resume() {
+    public SysScheduledJob resume() {
         this.status = STATUS_RUNNING;
         return this;
     }

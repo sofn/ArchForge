@@ -1,10 +1,10 @@
-package com.lesofn.archforge.server.admin.dto.quartz;
+package com.lesofn.archforge.server.admin.dto.scheduler;
 
 import lombok.Data;
 
-/** Create/update payload for Quartz jobs. */
+/** Create/update payload for a scheduled job. */
 @Data
-public class QuartzJobUpsertRequest {
+public class SchedulerJobUpsertRequest {
     private String jobName;
     private String jobGroup;
     private String description;
@@ -14,4 +14,5 @@ public class QuartzJobUpsertRequest {
     private String cron;
     private Short misfirePolicy;
     private Boolean concurrent;
+    private Short status;
 }

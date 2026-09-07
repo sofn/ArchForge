@@ -8,12 +8,12 @@ spring:
       enabled: false
     livereload:
       enabled: false
-  quartz:
-    jdbc:
-      initialize-schema: never
   flyway:
     enabled: true
     baseline-on-migrate: true
+    # V4.1/V5 (Quartz) were removed from the repository; legacy databases that already
+    # applied them report them as missing — tolerated, and V23 prunes the stale history rows.
+    ignore-migration-patterns: "*:missing"
     locations: classpath:db/migration
     default-schema: public
   jpa:

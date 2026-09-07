@@ -15,9 +15,6 @@ spring:
       enabled: true
       port: 35729
   # Dev: local Docker containers started by scripts/dev/init.sh
-  quartz:
-    jdbc:
-      initialize-schema: always
   flyway:
     enabled: false
   jpa:
