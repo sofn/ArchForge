@@ -5,7 +5,6 @@ import com.lesofn.archforge.meta.table.api.domain.MetaColumn;
 import com.lesofn.archforge.meta.table.api.domain.MetaTable;
 import com.lesofn.archforge.meta.table.api.domain.MetaTableMigration;
 import com.lesofn.archforge.meta.table.internal.ddl.SchemaDdl;
-import com.lesofn.archforge.meta.table.internal.schema.SchemaChange;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;

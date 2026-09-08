@@ -12,7 +12,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.lesofn.archforge.infrastructure.config.ArchForgeProperties;
-import com.lesofn.archforge.server.web.errors.WebAuthErrorCode;
 import com.lesofn.archforge.server.web.errors.WebAuthException;
 import com.lesofn.archforge.server.web.mail.MailSender;
 import java.time.Duration;

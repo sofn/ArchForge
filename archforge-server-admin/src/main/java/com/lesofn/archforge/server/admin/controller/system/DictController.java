@@ -2,7 +2,12 @@ package com.lesofn.archforge.server.admin.controller.system;
 
 import com.lesofn.archforge.infrastructure.annotation.Log;
 import com.lesofn.archforge.server.admin.dto.AdminPageResponse;
-import com.lesofn.archforge.server.admin.dto.dict.*;
+import com.lesofn.archforge.server.admin.dto.dict.DictItemRequest;
+import com.lesofn.archforge.server.admin.dto.dict.DictItemResponse;
+import com.lesofn.archforge.server.admin.dto.dict.DictTypeCreateRequest;
+import com.lesofn.archforge.server.admin.dto.dict.DictTypeQueryRequest;
+import com.lesofn.archforge.server.admin.dto.dict.DictTypeResponse;
+import com.lesofn.archforge.server.admin.dto.dict.DictTypeUpdateRequest;
 import com.lesofn.archforge.user.api.domain.dict.SysDictItem;
 import com.lesofn.archforge.user.api.domain.dict.SysDictType;
 import com.lesofn.archforge.user.api.service.dict.SysDictService;
@@ -11,7 +16,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,7 +24,14 @@ import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.dev33.satoken.annotation.SaCheckRole;
 import com.lesofn.archforge.infrastructure.auth.stp.StpAdminUtil;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "字典配置")
 @SaCheckLogin(type = StpAdminUtil.TYPE)

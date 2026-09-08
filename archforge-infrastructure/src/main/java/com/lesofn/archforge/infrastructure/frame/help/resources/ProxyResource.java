@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RequestMapping("/proxy")
 public class ProxyResource {
 
-    private static final Logger logger = LoggerFactory.getLogger(ProxyResource.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProxyResource.class);
 
     @BaseInfo(desc = "代理url，种cookie", needAuth = AuthType.REQUIRED)
     @RequestMapping(value = "", method = RequestMethod.GET)
@@ -31,7 +31,7 @@ public class ProxyResource {
         Cookie cookie = new Cookie(CookieAuthSpi.COOKIE_NAME, CookieAuthSpi.generateCookie(rc.getCurrentUid()));
         cookie.setMaxAge((int) CookieAuthSpi.COOKIE_EXPIRES_TIME);
         response.addCookie(cookie);
-        logger.info("proxy: " + url);
+        LOGGER.info("proxy: " + url);
         return "redirect:" + url;
     }
 }

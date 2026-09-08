@@ -20,13 +20,54 @@ For every new requirement:
 - Do NOT create or keep `.agent-loop/` inside this repository.
 - Place all agent-loop related files in `../codeplans/ArchForge/.agent-loop/`.
 
+## Static Analysis Layer (auto-enforced)
+
+Three layers run automatically — you never invoke them separately:
+
+- **Error Prone** (2.50.0) hooks into javac: every `compileJava` /
+  `compileTestJava` is analyzed for bug patterns. ERROR-severity findings
+  fail the compile. See the wiring in the root `build.gradle.kts`
+  (`net.ltgt.errorprone` 5.1.1); severity downgrades live there and must
+  carry a reason.
+- **Checkstyle** (10.26.1) gates style on the semantic side (import
+  hygiene, naming, control-flow traps — formatting stays with Spotless).
+  `checkstyleMain`/`checkstyleTest` run **before `test`** and as part of
+  `check`/`build`. Config: `config/checkstyle/checkstyle.xml`,
+  suppressions: `config/checkstyle/checkstyle-suppressions.xml`
+  (tests keep snake_case method names by convention).
+- **Spotless** rewrites formatting via `spotlessApply`; `spotlessCheck`
+  fails the build on unformatted code.
+
+## Per-Edit Verification Protocol (MANDATORY for AI agents)
+
+Every code edit must be verified BEFORE moving on — "configured" is not
+"working", and a compile alone is not a pass:
+
+1. **After editing main code in module M** (e.g. M = archforge-server-admin):
+   `./gradlew :M:compileJava :M:checkstyleMain`
+   (compileJava includes Error Prone; checkstyleMain is the style gate)
+2. **After editing tests in module M**:
+   `./gradlew :M:compileTestJava :M:checkstyleTest`
+3. **After behavioral changes**: run the affected tests —
+   `./gradlew :M:test --tests '*FooTest*'` (checkstyle gates test automatically).
+4. **Before claiming the task complete**:
+   `./gradlew spotlessApply compileJava compileTestJava checkstyleMain checkstyleTest`
+   then the targeted tests. For the full gate including all tests:
+   `./gradlew build`.
+5. **Never batch unverified edits** — fix loop violations immediately while
+   the context is small; do not park them for a "final pass".
+
+Known sandbox caveat: `build`/`test` require Docker (Testcontainers). In
+Docker-less environments the protocol above (compile + checkstyle + unit
+tests without @Tag("slow")/@Tag("contract")) is the verification floor.
+
 ## Verification Checklist
 
 Before claiming work is complete:
 
-- [ ] `./gradlew build` passes (includes spotlessCheck + all tests)
+- [ ] `./gradlew build` passes (includes spotless + checkstyle + all tests)
 - [ ] `./gradlew :archforge-server-admin:bootRun` starts without errors
-- [ ] No new deprecation warnings introduced
+- [ ] No new Error Prone warnings introduced beyond the pre-existing baseline
 - [ ] Plan file updated with final status
 
 ## Project Context

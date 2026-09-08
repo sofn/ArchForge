@@ -1,6 +1,10 @@
 package com.lesofn.archforge.common.sensitive;
 
-import java.lang.annotation.*;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * 数据脱敏注解，标注在需要脱敏的字段上

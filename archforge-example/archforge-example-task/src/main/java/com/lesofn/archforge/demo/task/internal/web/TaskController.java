@@ -1,6 +1,12 @@
 package com.lesofn.archforge.demo.task.internal.web;
 
-import com.lesofn.archforge.demo.task.api.dto.*;
+import com.lesofn.archforge.demo.task.api.dto.TaskActionRequest;
+import com.lesofn.archforge.demo.task.api.dto.TaskCreateRequest;
+import com.lesofn.archforge.demo.task.api.dto.TaskDTO;
+import com.lesofn.archforge.demo.task.api.dto.TaskDeleteRequest;
+import com.lesofn.archforge.demo.task.api.dto.TaskListRequest;
+import com.lesofn.archforge.demo.task.api.dto.TaskPageResponse;
+import com.lesofn.archforge.demo.task.api.dto.TaskUpdateRequest;
 import com.lesofn.archforge.demo.task.internal.service.TaskService;
 import com.lesofn.archforge.infrastructure.frame.context.RequestContext;
 import io.swagger.v3.oas.annotations.Operation;
@@ -10,7 +16,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import cn.dev33.satoken.annotation.SaCheckRole;
 import com.lesofn.archforge.infrastructure.auth.stp.StpAdminUtil;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /** Task management REST API */
 @Slf4j

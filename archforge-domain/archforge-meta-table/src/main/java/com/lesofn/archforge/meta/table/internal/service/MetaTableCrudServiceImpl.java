@@ -1,7 +1,6 @@
 package com.lesofn.archforge.meta.table.internal.service;
 
 import static com.lesofn.archforge.meta.table.api.errors.MetaTableErrorCode.META_QUERY_PARAM_INVALID;
-import static com.lesofn.archforge.meta.table.api.errors.MetaTableErrorCode.META_TABLE_DATA_NOT_EXISTS;
 
 import com.lesofn.archforge.meta.table.api.domain.MetaColumn;
 import com.lesofn.archforge.meta.table.api.errors.MetaTableErrorCode;

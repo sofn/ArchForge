@@ -10,7 +10,11 @@ import com.lesofn.archforge.infrastructure.frame.utils.RequestLogRecord;
 import com.lesofn.archforge.infrastructure.frame.utils.ResponseWrapper;
 import io.micrometer.observation.Observation;
 import io.micrometer.observation.ObservationRegistry;
-import jakarta.servlet.*;
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.FilterConfig;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -19,12 +23,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.Strings;
 import org.slf4j.MDC;
+import jakarta.servlet.ServletException;
 
 @Slf4j
 @RequiredArgsConstructor
 public class RequestLogFilter implements Filter {
 
-    private static final RequestIDGenerator requestIdGenerator = RequestIDGenerator.getInstance();
+    private static final RequestIDGenerator REQUEST_ID_GENERATOR = RequestIDGenerator.getInstance();
     private final ObservationRegistry observationRegistry;
 
     @Override
@@ -36,7 +41,7 @@ public class RequestLogFilter implements Filter {
         String path = request.getRequestURI();
 
         // Always bind RequestContext so downstream filters/loggers can access requestId.
-        RequestContext context = new RequestContext(requestIdGenerator.nextId());
+        RequestContext context = new RequestContext(REQUEST_ID_GENERATOR.nextId());
         context.setOriginRequest(request);
         context.setIp(IpUtil.getRealIpAddr(request));
         MDC.put("requestId", context.getRequestId());
@@ -141,7 +146,7 @@ public class RequestLogFilter implements Filter {
     private static boolean isStaticOrSwagger(String path) {
         return Strings.CS.startsWithAny(path, "/webjars", "/static", "/js", "/css", "/libs", "/WEB-INF") || Strings.CS
                 .startsWithAny(path, "/swagger-", "/v3/api-docs") || Strings.CS.startsWithAny(path,
-                        GlobalConstants.staticResourceArray);
+                        GlobalConstants.STATIC_RESOURCE_ARRAY);
     }
 
     private static boolean isBinaryResponsePath(String path) {

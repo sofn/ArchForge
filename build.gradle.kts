@@ -1,9 +1,17 @@
 plugins {
     id("org.sonarqube") version "7.3.0.8198"
     id("com.diffplug.spotless") version "6.13.0" apply false
+    id("net.ltgt.errorprone") version "5.1.1" apply false
     jacoco
     idea
 }
+
+// ---- Static analysis toolchain ----
+// Error Prone: bug detection inside javac — runs on EVERY compile automatically.
+val errorproneToolVersion = "2.50.0"
+// Checkstyle: semantic style gate — runs before `test` and as part of `check`/`build`
+// (division of labor: formatting stays with Spotless, see config/checkstyle/checkstyle.xml)
+val checkstyleToolVersion = "10.26.1"
 
 // JaCoCo 0.8.15+: 官方支持 Java 25/26 class 文件
 val jacocoToolVersion = "0.8.15"
@@ -48,6 +56,8 @@ subprojects {
         apply(plugin = "com.diffplug.spotless")
         apply(plugin = "jacoco")
         apply(plugin = "idea")
+        apply(plugin = "checkstyle")
+        apply(plugin = "net.ltgt.errorprone")
 
         configure<JacocoPluginExtension> {
             toolVersion = jacocoToolVersion
@@ -78,6 +88,50 @@ subprojects {
                 trimTrailingWhitespace()
                 endWithNewline()
             }
+        }
+
+        // ---- Checkstyle（语义风格门禁）----
+        // 规则与 Spotless 分工：格式归 Spotless，Checkstyle 管 import/命名/控制流等语义规则。
+        // 违规阻断 test/check/build（见下方 tasks.test 的 dependsOn 挂接）。
+        configure<CheckstyleExtension> {
+            toolVersion = checkstyleToolVersion
+            // configDirectory sets config_loc (Gradle 9 rejects a manual configProperties entry)
+            configDirectory = rootProject.file("config/checkstyle")
+            configFile = rootProject.file("config/checkstyle/checkstyle.xml")
+            isShowViolations = true
+        }
+
+        // ---- Error Prone（编译期 bug 检测，随 javac 自动执行）----
+        dependencies {
+            "errorprone"("com.google.errorprone:error_prone_core:$errorproneToolVersion")
+        }
+        // 5.x DSL: the options extension lives on CompileOptions (options.errorprone { … })
+        tasks.withType<JavaCompile>().configureEach {
+            (options as org.gradle.api.plugins.ExtensionAware).extensions
+                .configure<net.ltgt.gradle.errorprone.ErrorProneOptions>("errorprone") {
+                    // Baseline severity strategy: default (ERROR) blocks compile for genuine bug
+                    // patterns. Project-specific downgrades live here and must carry a reason.
+
+                    // UnusedVariable crashes Error Prone 2.50.0 itself (overlapping SuggestedFix
+                    // ranges, upstream bug — see TokenService.java) — OFF until an upgrade fixes it.
+                    check("UnusedVariable", net.ltgt.gradle.errorprone.CheckSeverity.OFF)
+                }
+        }
+
+        // Hand-written annotation stubs are an accepted test idiom; the equals/hashCode
+        // contract they technically violate is irrelevant for read-only stubs.
+        tasks.named<JavaCompile>("compileTestJava") {
+            (options as org.gradle.api.plugins.ExtensionAware).extensions
+                .configure<net.ltgt.gradle.errorprone.ErrorProneOptions>("errorprone") {
+                    check("BadAnnotationImplementation", net.ltgt.gradle.errorprone.CheckSeverity.WARN)
+                }
+        }
+
+        // ---- 静态分析执行时机 ----
+        // 编译：Error Prone 内嵌于 javac，任何 compileJava/compileTestJava 即执行。
+        // 测试：跑 test 前必须先过 Checkstyle（风格失败不进入测试阶段）。
+        tasks.named("test") {
+            dependsOn(tasks.named("checkstyleMain"), tasks.named("checkstyleTest"))
         }
 
         // 配置 Java 25

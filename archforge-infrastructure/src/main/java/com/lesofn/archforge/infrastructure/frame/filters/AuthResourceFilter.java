@@ -44,7 +44,7 @@ public class AuthResourceFilter extends RequestMappingHandlerAdapter {
                 "/swagger-resources") || Strings.CS.startsWith(request.getRequestURI(), "/v3/api-docs") || Strings.CS
                         .startsWith(request.getRequestURI(), "/swagger-ui") || Strings.CS.equals(request.getRequestURI(),
                                 "/swagger-ui.html") || Strings.CS.endsWithAny(
-                                        request.getRequestURI(), GlobalConstants.staticResourceArray) || !Strings.CS.equals(
+                                        request.getRequestURI(), GlobalConstants.STATIC_RESOURCE_ARRAY) || !Strings.CS.equals(
                                                 profile, "prod")) {
             return super.handleInternal(request, response, handlerMethod);
         }

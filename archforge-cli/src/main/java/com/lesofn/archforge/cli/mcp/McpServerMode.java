@@ -23,8 +23,9 @@ public final class McpServerMode {
             if (line.contains("\"method\":\"tools/list\"") || line.contains("tools/list")) {
                 System.out.println(toolsListResponse());
             } else if (line.contains("initialize")) {
-                System.out.println(
-                        "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"protocolVersion\":\"2024-11-05\",\"capabilities\":{\"tools\":{}},\"serverInfo\":{\"name\":\"archforge-cli\",\"version\":\"0.1.0\"}}}");
+                System.out.println("{\"jsonrpc\":\"2.0\",\"id\":1," + "\"result\":{\"protocolVersion\":\"2024-11-05\"," +
+                        "\"capabilities\":{\"tools\":{}}," + "\"serverInfo\":{" +
+                        "\"name\":\"archforge-cli\",\"version\":\"0.1.0\"}}}");
             } else {
                 System.out.println(
                         "{\"jsonrpc\":\"2.0\",\"error\":{\"code\":-32601,\"message\":\"Method not implemented in Phase 1\"}}");

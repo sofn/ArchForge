@@ -93,7 +93,7 @@ public class DefaultProfileLoader {
 
                 List<String> profiles = CollectionUtils.strListSplitter(active);
                 for (String profile : profiles) {
-                    if (Env.valueOf(profile) != null) {
+                    if (Env.fromName(profile) != null) {
                         return Optional.of(profile);
                     }
                 }

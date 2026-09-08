@@ -1,6 +1,5 @@
 package com.lesofn.archforge.server.admin.dto.request;
 
-import com.lesofn.archforge.meta.table.api.domain.MetaColumn;
 import com.lesofn.archforge.meta.table.api.domain.MetaTable;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;

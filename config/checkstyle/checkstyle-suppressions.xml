@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!DOCTYPE suppressions PUBLIC
+        "-//Checkstyle//DTD SuppressionFilter Configuration 1.2//EN"
+        "https://checkstyle.org/dtds/suppressions_1_2.dtd">
+
+<!-- ArchForge checkstyle suppressions. Add entries ONLY with a reason. -->
+<suppressions>
+    <!-- Test methods use the snake_case given/when/then naming convention on purpose. -->
+    <suppress checks="MethodName" files="[\\/]src[\\/]test[\\/].*\.java"/>
+
+    <!-- Test classes may keep lowercase static constants (mocks, mappers). -->
+    <suppress checks="ConstantName" files="[\\/]src[\\/]test[\\/].*\.java"/>
+</suppressions>

@@ -1,6 +1,9 @@
 package com.lesofn.archforge.user.api.domain;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.IdClass;
 import java.io.Serializable;
 import lombok.Data;
 import lombok.experimental.Accessors;

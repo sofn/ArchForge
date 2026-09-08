@@ -45,8 +45,8 @@ public class MAuthSpi extends AbstractAuthSpi {
             }
             return true;
         }
-        String param_auth = request.getParameter(AUTH_PARAM);
-        if (StringUtils.isNotBlank(param_auth) && Strings.CI.startsWith(param_auth, SPI_NAME + "") && param_auth
+        String paramAuth = request.getParameter(AUTH_PARAM);
+        if (StringUtils.isNotBlank(paramAuth) && Strings.CI.startsWith(paramAuth, SPI_NAME + "") && paramAuth
                 .length() == 70) {
             if (ApiLogger.isDebugEnabled()) {
                 ApiLogger.debug("find mauth parameter in param:" + authHeader);

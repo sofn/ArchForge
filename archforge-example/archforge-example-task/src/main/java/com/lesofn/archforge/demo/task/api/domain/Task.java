@@ -3,8 +3,19 @@ package com.lesofn.archforge.demo.task.api.domain;
 import com.lesofn.archforge.common.repository.BaseEntity;
 import com.lesofn.archforge.demo.task.api.errors.TaskErrorCode;
 import com.lesofn.archforge.demo.task.api.errors.TaskException;
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 /** Authors: sofn Version: 1.0 Created at 2015-10-12 00:12. */
 @Setter

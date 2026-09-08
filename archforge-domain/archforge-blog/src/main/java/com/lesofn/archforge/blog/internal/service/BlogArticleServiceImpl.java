@@ -132,8 +132,11 @@ public class BlogArticleServiceImpl implements BlogArticleService {
     }
 
     private void validateCategory(Long categoryId) {
-        categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new BlogException(BlogErrorCode.CATEGORY_NOT_FOUND));
+        // existence check — discarding orElseThrow's value would silently disable the
+        // validation (found by Error Prone's ReturnValueIgnored)
+        if (categoryRepository.findById(categoryId).isEmpty()) {
+            throw new BlogException(BlogErrorCode.CATEGORY_NOT_FOUND);
+        }
     }
 
     private void checkSlugUnique(String slug, Long excludeId) {

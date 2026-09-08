@@ -19,8 +19,9 @@ public class SpringProfileLoader {
         if (envVar == null) {
             String[] profiles = env.getActiveProfiles();
             for (String profile : profiles) {
-                if (Env.valueOf(profile) != null) {
-                    envVar = Env.valueOf(profile);
+                Env parsed = Env.fromName(profile);
+                if (parsed != null) {
+                    envVar = parsed;
                 }
             }
             if (envVar == null) {
