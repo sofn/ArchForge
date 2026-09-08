@@ -7,8 +7,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface SysScheduledJobRepository
-        extends JpaRepository<SysScheduledJob, Long>, JpaSpecificationExecutor<SysScheduledJob> {
+public interface SysScheduledJobRepository extends JpaRepository<SysScheduledJob, Long>, JpaSpecificationExecutor<SysScheduledJob> {
 
     Optional<SysScheduledJob> findByJobNameAndJobGroup(String jobName, String jobGroup);
 

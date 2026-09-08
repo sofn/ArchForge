@@ -5,4 +5,7 @@
  * JSON field names are contract-stable with the former Quartz DTOs — the admin frontend and
  * the spec/openapi.yaml contract depend on them.
  */
+@NullMarked
 package com.lesofn.archforge.server.admin.dto.scheduler;
+
+import org.jspecify.annotations.NullMarked;

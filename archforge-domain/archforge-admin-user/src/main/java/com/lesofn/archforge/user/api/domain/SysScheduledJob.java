@@ -14,7 +14,8 @@ import org.hibernate.annotations.DynamicUpdate;
  * this row to invoke the target method; the runtime schedule lives in db-scheduler's {@code
  * scheduled_tasks} table keyed by {@code admin-job-<id>}.
  *
- * <p>Historical note: this table (and its API surface) previously fronted Quartz; it was migrated
+ * <p>
+ * Historical note: this table (and its API surface) previously fronted Quartz; it was migrated
  * to db-scheduler keeping job metadata, while Quartz's eleven QRTZ_* tables were dropped.
  *
  * @author sofn
