@@ -57,3 +57,5 @@ backup/
 
 # Node deps for scripts/gen-enums.mjs (lock file is committed)
 scripts/node_modules/
+# ip2region xdb runtime cache (downloaded on demand, see arch-forge.ip-region)
+/data/

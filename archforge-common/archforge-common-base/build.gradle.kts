@@ -1,4 +1,18 @@
 
+// ip2region xdb DATA version (GitHub tag of lionsoul2014/ip2region).
+// Deliberately decoupled from the library version: the org.lionsoul artifact on
+// Maven Central stops at 3.3.7 (which already supports the v4/v6 dual API), while
+// the xdb data files follow upstream releases. This constant is injected into
+// ip2region-xdb.properties and replaces the {version} placeholder in the
+// configured CDN url templates.
+val ip2regionXdbVersion = "3.18.0"
+
+tasks.named<ProcessResources>("processResources") {
+    filesMatching("ip2region-xdb.properties") {
+        expand("ip2regionXdbVersion" to ip2regionXdbVersion)
+    }
+}
+
 dependencies {
     // 项目内依赖
     api(project(":archforge-common:archforge-common-error"))

@@ -48,7 +48,10 @@ dependencies {
         
         // 其他
         api("com.google.code.findbugs:annotations:3.0.1")
-        api("org.lionsoul:ip2region:2.7.0")
+        // ip2region: the Maven Central library (org.lionsoul) tops out at 3.3.7 which already
+// carries the v4/v6 dual-version API; xdb DATA files track the upstream GitHub tags
+// (see archforge-common-base: ip2region-xdb-version injected as a resource).
+api("org.lionsoul:ip2region:3.3.7")
         api("eu.bitwalker:UserAgentUtils:1.21")
         api("org.jspecify:jspecify:1.0.0")
         

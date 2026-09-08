@@ -110,6 +110,17 @@ arch-forge:
     # db-scheduler runtime（调度状态存 scheduled_tasks 表，反射调用仅允许此名单内的 bean）
     allowed-job-beans: demoSchedulerJob
     threads: 5
+  ip-region:
+    # xdb 数据文件运行时下载并缓存到 ./data（已 gitignore）；{version} 由构建时注入的
+    # ip2region-xdb.properties（gradle 的 ip2regionXdbVersion 常量）自动填充。
+    # 注意：cdn.jsdelivr.net 单文件上限 20MB，v6 库（约 37MB）默认走 raw.githubusercontent.com；
+    # 国内部署建议将 v6 地址替换为镜像前缀，例如
+    # https://gh-proxy.com/https://raw.githubusercontent.com/lionsoul2014/ip2region/{version}/data/ip2region_v6.xdb
+    v4-xdb-url: https://cdn.jsdelivr.net/gh/lionsoul2014/ip2region@{version}/data/ip2region_v4.xdb
+    v6-xdb-url: https://raw.githubusercontent.com/lionsoul2014/ip2region/{version}/data/ip2region_v6.xdb
+    cache-dir: ./data
+    # 集成测试等无外网/追求启动速度的环境可关闭离线库（在线兜底仍可用）
+    offline-enabled: true
   meta-table:
     max-page-size: 200
   codegen:

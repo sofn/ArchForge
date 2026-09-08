@@ -39,6 +39,9 @@ management:
         url: http://localhost:4318/v1/metrics
 
 arch-forge:
+  ip-region:
+    # keep integration tests off the 48 MB xdb downloads; the offline path degrades to null
+    offline-enabled: false
   embedded:
     # 依赖服务（PostgreSQL / Redis）由 AbstractIntegrationTest 通过 Testcontainers 提供，
     # 无需在此声明。db-init 控制测试种子数据是否灌入。
