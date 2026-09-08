@@ -3,6 +3,7 @@ package com.lesofn.archforge.server.admin.controller;
 import static org.junit.jupiter.api.Assertions.*;
 
 import tools.jackson.databind.ObjectMapper;
+import com.lesofn.archforge.server.admin.AbstractIntegrationTest;
 import com.lesofn.archforge.server.admin.Application;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +40,7 @@ import org.springframework.web.client.RestClient;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @Tag("slow")
-class QueryHelpIntegrationTest {
+class QueryHelpIntegrationTest extends AbstractIntegrationTest {
 
     @LocalServerPort
     int port;

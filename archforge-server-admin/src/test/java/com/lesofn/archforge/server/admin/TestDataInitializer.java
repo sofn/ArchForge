@@ -1,4 +1,4 @@
-package com.lesofn.archforge.server.admin.config;
+package com.lesofn.archforge.server.admin;
 
 import com.lesofn.archforge.common.persistence.GroupDataSourceProxy;
 import jakarta.annotation.PostConstruct;
@@ -14,15 +14,19 @@ import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.stereotype.Component;
 
 /**
+ * 测试种子数据：在 Flyway 迁移之后灌入基础数据并把 PostgreSQL 序列推到最大 ID 之后。
+ *
+ * <p>
+ * 该类位于 {@code src/test}，只在测试 classpath 中生效，不会进入生产包。 依赖服务（PostgreSQL / Redis）由 {@link AbstractIntegrationTest} 提供。
+ *
  * @author sofn
- * @version 1.0 Created at: 2025-08-25 23:33
  */
 @Slf4j
 @Component
 @Profile("test")
 @ConditionalOnProperty(name = "arch-forge.embedded.db-init", havingValue = "true", matchIfMissing = true)
 @RequiredArgsConstructor
-public class InitDbMockServer {
+public class TestDataInitializer {
 
     private final DataSource dataSource;
 
@@ -85,17 +89,8 @@ public class InitDbMockServer {
                 "blog_article"
         };
         String[] idCols = {
-                "user_id",
-                "menu_id",
-                "role_id",
-                "dept_id",
-                "config_id",
-                "notice_id",
-                "oper_id",
-                "info_id",
-                "file_id",
-                "id",
-                "id"
+                "user_id", "menu_id", "role_id", "dept_id", "config_id", "notice_id", "oper_id", "info_id", "file_id",
+                "id", "id"
         };
         for (int i = 0; i < sequences.length; i++) {
             try {
@@ -112,8 +107,7 @@ public class InitDbMockServer {
     private void resetTaskSequences(DataSource ds) {
         JdbcTemplate jdbc = new JdbcTemplate(ds);
         try {
-            jdbc.execute(
-                    "SELECT setval('task_id_seq', COALESCE((SELECT MAX(id) FROM task), 1))");
+            jdbc.execute("SELECT setval('task_id_seq', COALESCE((SELECT MAX(id) FROM task), 1))");
         } catch (Exception e) {
             log.warn("重置 task 序列失败: {}", e.getMessage());
         }

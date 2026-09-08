@@ -13,7 +13,10 @@
 ```
 
 - Requires **Java 25** — `JAVA_HOME` must point to JDK 25 (e.g. Azul Zulu)
-- Dev mode requires **Docker** — Testcontainers auto-starts PostgreSQL, Redis, RustFS
+- Dev mode requires **Docker** — start the dependencies first with
+  `docker compose -f docker/docker-compose.infra.yml up -d` (PostgreSQL + Redis).
+  The app never starts containers itself; it just connects to `localhost`.
+- Integration tests need Docker too, but manage their own containers via Testcontainers (see Testing).
 
 ## Architecture
 
@@ -87,8 +90,10 @@ ArchForge/
 - **Spock 2.4** (Groovy 5.x) for BDD tests — `src/test/groovy/`
 - **JUnit 6** (Jupiter) for unit tests — `src/test/java/`
 - **RestClient integration tests** — `RestClientIntegrationTest.java` (15 API tests)
-- **Testcontainers** in test: PostgreSQL 17, Redis 7, RustFS (auto-started)
-- Test data: Flyway migrations + `InitDbMockServer` SQL seed data
+- **Testcontainers** — `AbstractIntegrationTest` (`src/test`) starts PostgreSQL 17 + Redis 7 once per JVM;
+  integration tests extend it. RustFS (S3) is **opt-in** via `-Darch-forge.embedded.s3=true`
+- Object storage falls back to local files (`arch-forge.file-storage.type=local`), so no S3 container is needed
+- Test data: Flyway migrations + `TestDataInitializer` SQL seed data (`src/test`)
 
 ## Dependencies
 

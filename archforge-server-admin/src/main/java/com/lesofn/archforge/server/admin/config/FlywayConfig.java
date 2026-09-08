@@ -21,8 +21,8 @@ import org.springframework.context.annotation.Configuration;
  * 配置方式：
  *
  * <ul>
- * <li>dev 环境：Flyway 禁用，使用 Hibernate DDL auto + InitDbMockServer
- * <li>test/prod 环境：Flyway 启用，自动执行 db/migration 下的 SQL
+ * <li>dev 环境：Flyway 禁用，使用 Hibernate DDL auto
+ * <li>test/prod 环境：Flyway 启用，自动执行 db/migration 下的 SQL；test 下再由 TestDataInitializer 灌入种子数据
  * </ul>
  *
  * @author sofn

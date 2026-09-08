@@ -31,11 +31,6 @@ management:
 arch-forge:
   mock-auth:
     enabled: true
-  embedded:
-    redis: true
-    postgresql: true
-    db-init: true
-    s3: true
   file-storage:
     type: local
     local-dir: ../uploads

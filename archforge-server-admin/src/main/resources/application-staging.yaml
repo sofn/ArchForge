@@ -73,11 +73,6 @@ management:
       endpoint: ${OTEL_EXPORTER_OTLP_ENDPOINT:http://localhost:4318/v1/traces}
 
 arch-forge:
-  embedded:
-    redis: false
-    postgresql: false
-    db-init: false
-    s3: false
   flyway:
     enabled: true
   monitor:

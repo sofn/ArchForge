@@ -500,35 +500,32 @@ Every `@SpringBootTest` must be tagged `slow`. New contract tests must be tagged
 
 ### 5.4 Testcontainers Usage
 
-Dev profile auto-starts Testcontainers for PostgreSQL, Redis, and RustFS via embedded configuration flags:
+**Containers belong to the test classpath only.** Production code must never start one.
+`org.testcontainers` is declared as `testImplementation` — never `api`, which would ship it
+in the production jar and leak it to downstream modules. Starting a container from
+`src/main` is a review rejection.
 
-```yaml
-arch-forge:
-  embedded:
-    redis: true
-    postgresql: true
-    db-init: true
-    s3: true
-```
+Outside tests, services are **provisioned before the JVM starts**: `dev` and `prod` connect
+to externally provided PostgreSQL / Redis (`docker/docker-compose.infra.yml`, or whatever the
+environment provides). `application-dev.yaml` points at `localhost:5432` / `localhost:6379`.
 
-For integration tests, use `@Testcontainers` annotation with shared containers:
+For integration tests, extend `AbstractIntegrationTest` (`src/test`). It starts one
+PostgreSQL and one Redis container **once per JVM** and publishes them via
+`@DynamicPropertySource`, so every test class shares them:
 
 ```java
-@SpringBootTest
-@Testcontainers
-class UserRepositoryIntegrationTest {
-
-    @Container
-    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:17");
-
-    @DynamicPropertySource
-    static void configureProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.dynamic.datasource.user_master.url", postgres::getJdbcUrl);
-        registry.add("spring.datasource.dynamic.datasource.user_master.username", postgres::getUsername);
-        registry.add("spring.datasource.dynamic.datasource.user_master.password", postgres::getPassword);
-    }
+@SpringBootTest(classes = Application.class, webEnvironment = RANDOM_PORT)
+class UserRepositoryIntegrationTest extends AbstractIntegrationTest {
+    // archforge_user + archforge_task on PostgreSQL, and Redis, are already wired up
 }
 ```
+
+Do **not** annotate test classes with `@Testcontainers` / `@Container` yourself — that starts
+a container per class and multiplies suite time.
+
+Object storage needs no container: `arch-forge.file-storage.type` defaults to `local`, so
+tests write to a local directory. To exercise the real S3 path, run with
+`-Darch-forge.embedded.s3=true` and `AbstractIntegrationTest` starts RustFS instead.
 
 ### 5.5 Gate Rule
 

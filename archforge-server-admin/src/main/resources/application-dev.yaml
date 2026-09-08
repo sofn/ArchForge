@@ -84,11 +84,6 @@ arch-forge:
   druid:
     login-username: admin
     login-password: ${DRUID_PASSWORD:}
-  embedded:
-    redis: false
-    postgresql: false
-    db-init: false
-    s3: false
   flyway:
     enabled: true
   monitor:

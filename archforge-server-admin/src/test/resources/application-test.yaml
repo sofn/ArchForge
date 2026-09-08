@@ -40,10 +40,14 @@ management:
 
 arch-forge:
   embedded:
-    redis: true
-    postgresql: true
+    # 依赖服务（PostgreSQL / Redis）由 AbstractIntegrationTest 通过 Testcontainers 提供，
+    # 无需在此声明。db-init 控制测试种子数据是否灌入。
     db-init: true
-    s3: true
+  # 对象存储默认走本地文件，无需 S3 容器；需要覆盖真实 S3 路径时用
+  # -Darch-forge.embedded.s3=true 启动 RustFS（见 AbstractIntegrationTest）。
+  file-storage:
+    type: local
+    local-dir: build/test-uploads
   flyway:
     enabled: true
   monitor:

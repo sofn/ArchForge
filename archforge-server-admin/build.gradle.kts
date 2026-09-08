@@ -122,9 +122,10 @@ dependencies {
     // Druid monitoring
     api("com.alibaba:druid")
 
-    // Testcontainers PostgreSQL for Dev environment
-    api("org.testcontainers:testcontainers")
-    api("org.testcontainers:testcontainers-postgresql")
+    // Testcontainers — 仅供集成测试使用（AbstractIntegrationTest）。
+    // 必须是 testImplementation：放 api 会把 testcontainers 打进生产包并泄漏给下游模块。
+    testImplementation("org.testcontainers:testcontainers")
+    testImplementation("org.testcontainers:testcontainers-postgresql")
     
     // AWS S3 SDK
     api("software.amazon.awssdk:s3")
@@ -154,6 +155,9 @@ dependencies {
     testImplementation(testFixtures(project(":archforge-domain:archforge-admin-user")))
     testImplementation(testFixtures(project(":archforge-domain:archforge-blog")))
     testImplementation(testFixtures(project(":archforge-domain:archforge-meta-table")))
+
+    // Lombok 注解在测试源码中同样可用（testAnnotationProcessor 已由根工程统一配置）
+    testCompileOnly("org.projectlombok:lombok")
 }
 
 // jlink: 生成最小化 JRE (Spring Boot Web + Actuator + JPA 所需模块)

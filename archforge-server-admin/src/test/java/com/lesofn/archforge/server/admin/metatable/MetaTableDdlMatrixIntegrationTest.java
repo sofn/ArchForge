@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.lesofn.archforge.server.admin.AbstractIntegrationTest;
 import com.lesofn.archforge.meta.table.api.domain.MetaColumn;
 import com.lesofn.archforge.meta.table.api.domain.MetaColumnType;
 import com.lesofn.archforge.meta.table.api.domain.MetaTable;
@@ -51,7 +52,7 @@ import org.postgresql.util.PGobject;
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Tag("slow")
-class MetaTableDdlMatrixIntegrationTest {
+class MetaTableDdlMatrixIntegrationTest extends AbstractIntegrationTest {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
     private static final AtomicLong SEQ = new AtomicLong(System.currentTimeMillis() % 100_000);

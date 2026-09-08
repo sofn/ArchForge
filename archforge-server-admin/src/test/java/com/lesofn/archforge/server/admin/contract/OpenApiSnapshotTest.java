@@ -3,6 +3,7 @@ package com.lesofn.archforge.server.admin.contract;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.lesofn.archforge.server.admin.AbstractIntegrationTest;
 import com.lesofn.archforge.server.admin.Application;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -21,7 +22,7 @@ import org.springframework.web.client.RestClient;
 @SpringBootTest(
         classes = Application.class,
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class OpenApiSnapshotTest {
+class OpenApiSnapshotTest extends AbstractIntegrationTest {
 
     @LocalServerPort
     int port;

@@ -2,6 +2,7 @@ package com.lesofn.archforge.server.admin.metatable;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.lesofn.archforge.server.admin.AbstractIntegrationTest;
 import com.lesofn.archforge.meta.table.api.dao.MetaTableRepository;
 import com.lesofn.archforge.meta.table.api.domain.MetaTable;
 import com.lesofn.archforge.server.admin.Application;
@@ -37,7 +38,7 @@ import org.springframework.transaction.annotation.Transactional;
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Tag("slow")
-class MetaTableTransactionIntegrationTest {
+class MetaTableTransactionIntegrationTest extends AbstractIntegrationTest {
 
     private static final String PROBE_TABLE = "meta_tx_it_probe";
     private static final String PROBE_CODE = "tx_it_probe";

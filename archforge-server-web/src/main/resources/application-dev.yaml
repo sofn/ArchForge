@@ -43,11 +43,6 @@ spring:
           max-wait: -1ms
 
 arch-forge:
-  embedded:
-    redis: false
-    postgresql: false
-    db-init: false
-    s3: false
   file-storage:
     type: ${FILE_STORAGE_TYPE:local}
     local-dir: ${FILE_STORAGE_LOCAL_DIR:../uploads}

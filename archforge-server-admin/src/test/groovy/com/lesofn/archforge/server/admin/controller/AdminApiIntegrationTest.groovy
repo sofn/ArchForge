@@ -1,20 +1,31 @@
 package com.lesofn.archforge.server.admin.controller
 
 import tools.jackson.databind.ObjectMapper
+import com.lesofn.archforge.server.admin.AbstractIntegrationTest
 import com.lesofn.archforge.server.admin.Application
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.server.LocalServerPort
+import org.springframework.test.context.DynamicPropertyRegistry
+import org.springframework.test.context.DynamicPropertySource
 import spock.lang.Specification
 import spock.lang.Stepwise
 
 /**
  * 完整的管理端 API 增删改查集成测试
  *
+ * <p>依赖的 PostgreSQL / Redis 由 Testcontainers 提供。Spock 的 {@code Specification} 占用了父类位，
+ * 无法继承 {@link AbstractIntegrationTest}，因此在这里声明自己的 {@code @DynamicPropertySource} 并委托过去。
+ *
  * @author sofn
  */
 @SpringBootTest(classes = Application.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Stepwise
 class AdminApiIntegrationTest extends Specification {
+
+    @DynamicPropertySource
+    static void registerInfrastructure(DynamicPropertyRegistry registry) {
+        AbstractIntegrationTest.registerInfrastructureProperties(registry)
+    }
 
     @LocalServerPort
     int port

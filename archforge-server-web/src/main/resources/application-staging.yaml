@@ -49,11 +49,6 @@ management:
         include: health,info
 
 arch-forge:
-  embedded:
-    redis: false
-    postgresql: false
-    db-init: false
-    s3: false
   file-storage:
     type: ${FILE_STORAGE_TYPE:s3}
     local-dir: ${FILE_STORAGE_LOCAL_DIR:../uploads}

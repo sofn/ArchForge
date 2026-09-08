@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.lesofn.archforge.server.admin.AbstractIntegrationTest;
 import com.lesofn.archforge.meta.table.api.dao.MetaColumnRepository;
 import com.lesofn.archforge.meta.table.api.dao.MetaTableRepository;
 import com.lesofn.archforge.meta.table.api.domain.MetaColumn;
@@ -44,7 +45,7 @@ import org.springframework.transaction.annotation.Transactional;
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Tag("slow")
-class MetaTableSchemaEvolutionIntegrationTest {
+class MetaTableSchemaEvolutionIntegrationTest extends AbstractIntegrationTest {
 
     private static final List<String> CODES = List.of(
             "p1itnotnull", "p1itbackfill", "p1itlossy", "p1itwiden", "p1ituq", "p1itreadd", "p1itlock");
