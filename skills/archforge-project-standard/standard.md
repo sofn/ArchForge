@@ -250,26 +250,27 @@ public void export(HttpServletResponse response) throws IOException {
 }
 ```
 
-### 3.8 Scheduling (Quartz)
+### 3.8 Scheduling (db-scheduler)
 
-- **Library**: `org.springframework.boot:spring-boot-starter-quartz` (Quartz 2.5.x).
-- **JobStore**: JDBC (`LocalDataSourceJobStore`) over the existing PostgreSQL master DataSource, **clustered** (`org.quartz.jobStore.isClustered=true`). Schema is the upstream `tables_postgres.sql` plus ArchForge metadata tables `sys_quartz_job` and `sys_quartz_log` (created by `V4__quartz_schema.sql`).
-- **Reflective dispatch pattern**: a single Quartz `Job` class — `QuartzReflectionJob` — reads `beanName`/`methodName`/`methodParams` from the trigger `JobDataMap`, resolves the Spring bean via `ApplicationContext`, invokes the method by reflection (arity-matched), and persists a `SysQuartzLog` row capturing duration and any error. New scheduled tasks therefore require only a metadata row and a Spring bean — **no new `Job` class per task**.
+- **Library**: `com.github.kagkarlsson:db-scheduler` via `SchedulerConfig` in `server-admin`. Not Quartz — the Quartz JDBC store (`qrtz_*`, `sys_quartz_job`, `V4__quartz_schema.sql`, `QuartzReflectionJob`) was removed in `V23__replace_quartz_with_db_scheduler.sql`.
+- **Tables**: `scheduled_tasks` (db-scheduler runtime, optimistic-lock clustering) + ArchForge metadata `sys_scheduled_job` / audit `sys_job_log`. All three live on the primary (`user_master`) PostgreSQL database so one transaction can touch metadata and runtime rows.
+- **Reflective dispatch pattern**: a single handler — `ReflectionJobHandler` — reads `beanName` / `methodName` / `methodParams` from `JobInvocationData`, resolves the Spring bean via `ApplicationContext`, invokes the method by reflection (arity-matched), and persists a `SysJobLog` row capturing duration and any error. New scheduled tasks therefore require only a metadata row and an allow-listed Spring bean — **no new Job class per task**. Bean names must appear in `arch-forge.scheduler.allowed-job-beans`.
 - **Method params**: stored as a JSON array of primitives (`["foo", 42, true]`) for transparency.
-- **REST surface** (`server-admin`):
-  - `POST /quartz/list` paged query · `POST /quartz/add` · `PUT /quartz/update/{id}` · `DELETE /quartz/delete/{id}`
-  - `POST /quartz/pause/{id}` · `POST /quartz/resume/{id}` · `POST /quartz/run/{id}` (one-shot trigger)
-  - `POST /quartz/log/list` · `POST /quartz/validate-cron`
-- **UI**: `AppForgeAdmin` → System → 定时任务 (`/system/quartz/index`).
+- **REST surface** (`server-admin`, **legacy path kept for the Admin client**):
+  - `GET /quartz` paged query · `POST /quartz/add` · `PUT /quartz/update/{id}` · `DELETE /quartz/{id}`
+  - `POST /quartz/pause/{id}` · `POST /quartz/resume/{id}` · `POST /quartz/run/{id}` (one-shot)
+  - `GET /quartz/log` · `POST /quartz/validate-cron`
+  - Rename plan (not done until ArchForgeAdmin moves with it): `/quartz` → `/admin/scheduler-job`.
+- **UI**: ArchForgeAdmin → System → 定时任务 (`/system/quartz/index`, `src/api/quartz.ts`).
 
 ```java
-@Component("demoQuartzJob")
+@Component("demoSchedulerJob")
 @Slf4j
-public class DemoQuartzJobBean {
+public class DemoSchedulerJobBean {
     public void helloWorld() { log.info("hello @ {}", Instant.now()); }
 }
-// Persist a SysQuartzJob row { beanName: "demoQuartzJob", methodName: "helloWorld", cron: "0/30 * * * * ?" }
-// → QuartzReflectionJob fires it on schedule, no extra Java class needed.
+// Persist a SysScheduledJob row { beanName: "demoSchedulerJob", methodName: "helloWorld", cron: "0/30 * * * * ?" }
+// → ReflectionJobHandler fires it on a db-scheduler worker thread, no extra Java class needed.
 ```
 
 ### 3.9 Query Pattern (Declarative JPA Filters)

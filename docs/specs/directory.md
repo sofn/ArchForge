@@ -25,8 +25,15 @@ ArchForge/
 │   ├── archforge-redisson-starter/
 │   └── archforge-trace-starter/
 ├── archforge-dependencies/
-├── docker/                 # not prefixed
-├── skills/                 # backend standard lives here
+├── spec/                   # OpenAPI + enums + JSON Schema — the HTTP contract
+├── docs/
+│   ├── architecture.md     # three-repo runtime map
+│   └── specs/              # CI-gated standards (paths, naming, security, …)
+├── skills/                 # tutorial-style backend standard (AI-consumed)
+├── config/                 # checkstyle / spotbugs / forbiddenapis / OWASP
+├── docker/                 # compose infra (Postgres, Redis, …) — not prefixed
+├── Makefile                # convenience wrappers around gradle / compose
+├── repos.yaml              # machine-readable multi-repo map
 └── scripts/
 ```
 
