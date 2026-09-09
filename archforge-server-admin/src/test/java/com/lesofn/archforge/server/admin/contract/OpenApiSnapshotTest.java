@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.web.client.RestClient;
 
 /**
  * Exports the live springdoc OpenAPI document so CI can diff it against the canonical contract
@@ -29,11 +28,11 @@ class OpenApiSnapshotTest extends AbstractIntegrationTest {
 
     @Test
     void exportLiveOpenApiDocument() throws Exception {
-        String body = RestClient.create()
-                .get()
+        org.springframework.web.client.RestClient rest = org.springframework.web.client.RestClient.create();
+        String body = rest.get()
                 .uri("http://localhost:" + port + "/v3/api-docs")
                 .retrieve()
-                .body(String.class);
+                .body(java.lang.String.class);
 
         assertNotNull(body);
         assertTrue(body.contains("\"openapi\""), "response must be an OpenAPI document");

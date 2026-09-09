@@ -23,41 +23,43 @@ public class DefaultProfileLoader {
 
     public static final String APP_ENV_VAR = "profile";
 
-    public static DefaultProfileLoader loader = new DefaultProfileLoader();
+    private static final DefaultProfileLoader LOADER = new DefaultProfileLoader();
 
-    private Env envVar;
+    private volatile Env envVar;
 
-    public static DefaultProfileLoader getInstance() { return loader; }
+    public static DefaultProfileLoader getInstance() { return LOADER; }
+
+    private final Object envLock = new Object();
 
     public Env getEnv() {
+        Env snapshot = envVar;
+        if (snapshot != null) {
+            return snapshot;
+        }
+        synchronized (envLock) {
+            return loadEnvLocked();
+        }
+    }
+
+    private Env loadEnvLocked() {
         if (envVar != null) {
             return envVar;
         }
-        synchronized (this) {
-            if (envVar == null) {
-                // 先通过环境变量判断
-                String env = System.getenv(APP_ENV_VAR);
-                if (env == null) {
-                    // 先从Yaml文件中读取
-                    Optional<String> envOptional = readFromYaml();
-                    if (!envOptional.isPresent()) {
-                        envOptional = readFromProperties();
-                    }
-                    // 再从再从Properties文件中读取
-                    if (envOptional.isPresent()) {
-                        env = envOptional.get();
-                    }
-                }
-                if (env == null) {
-                    envVar = DEFAULT_DEV;
-                } else {
-                    envVar = Env.valueOf(env);
-                }
-                System.setProperty(APP_ENV_VAR, envVar.name());
-
-                log.info("AppEnv {}", envVar);
+        // 先通过环境变量判断，再从 Yaml/Properties 文件中读取
+        String env = System.getenv(APP_ENV_VAR);
+        if (env == null) {
+            Optional<String> envOptional = readFromYaml();
+            if (!envOptional.isPresent()) {
+                envOptional = readFromProperties();
+            }
+            if (envOptional.isPresent()) {
+                env = envOptional.get();
             }
         }
+        Env parsed = Env.fromName(env);
+        envVar = parsed != null ? parsed : DEFAULT_DEV;
+        System.setProperty(APP_ENV_VAR, envVar.name());
+        log.info("AppEnv {}", envVar);
         return envVar;
     }
 
@@ -104,13 +106,13 @@ public class DefaultProfileLoader {
         return Optional.empty();
     }
 
-    public static boolean isDev() { return loader.getEnv() == Env.dev; }
+    public static boolean isDev() { return LOADER.getEnv() == Env.dev; }
 
-    public static boolean isTest() { return loader.getEnv() == Env.test; }
+    public static boolean isTest() { return LOADER.getEnv() == Env.test; }
 
-    public static boolean isProd() { return loader.getEnv() == Env.prod; }
+    public static boolean isProd() { return LOADER.getEnv() == Env.prod; }
 
     public static boolean accept(Env env) {
-        return loader.getEnv() == env;
+        return LOADER.getEnv() == env;
     }
 }

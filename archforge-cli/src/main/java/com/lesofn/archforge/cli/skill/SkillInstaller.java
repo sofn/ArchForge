@@ -19,7 +19,7 @@ public final class SkillInstaller {
     public static void install(Path repoRoot, String tool) {
         Path target = targetFile(repoRoot, tool);
         try {
-            Files.createDirectories(target.getParent() == null ? repoRoot : target.getParent());
+            Files.createDirectories(java.util.Objects.requireNonNullElse(target.toAbsolutePath().getParent(), repoRoot));
             String existing = Files.exists(target) ? Files.readString(target, StandardCharsets.UTF_8) : "";
             String without = strip(existing).stripTrailing();
             String updated = (without.isBlank() ? "" : without + "\n\n") + BLOCK;

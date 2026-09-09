@@ -41,10 +41,18 @@ public final class ProjectPaths {
     }
 
     public static Path adminRepo(Path root) {
-        return root.getParent().resolve("ArchForgeAdmin");
+        return siblingRepo(root, "ArchForgeAdmin");
     }
 
     public static Path webRepo(Path root) {
-        return root.getParent().resolve("ArchForgeWeb");
+        return siblingRepo(root, "ArchForgeWeb");
+    }
+
+    private static Path siblingRepo(Path root, String name) {
+        Path parent = root.getParent();
+        if (parent == null) {
+            throw new IllegalArgumentException("root must have a parent directory: " + root);
+        }
+        return parent.resolve(name);
     }
 }

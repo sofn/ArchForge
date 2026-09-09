@@ -98,8 +98,8 @@ public class EnumOptionsMigrationRunner implements ApplicationRunner {
                 """;
         for (OptionItem item : items) {
             MapSqlParameterSource itemParams = new MapSqlParameterSource()
-                    .addValue("dictTypeId", dictTypeId.longValue())
-                    .addValue("itemCode", item.getValue() == null ? "" : item.getValue().toString())
+                    .addValue("dictTypeId", dictTypeId)
+                    .addValue("itemCode", String.valueOf(item.getValue()))
                     .addValue("itemLabel", item.getLabel())
                     .addValue("sort", 0)
                     .addValue("status", 1)

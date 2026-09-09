@@ -4,10 +4,8 @@ import com.lesofn.archforge.cli.config.ProjectPaths;
 import com.lesofn.archforge.cli.docker.ComposeSupport;
 import com.lesofn.archforge.cli.proc.ProcessRunner;
 import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -59,7 +57,8 @@ public class DbCommand {
             } catch (Exception e) {
                 throw new IllegalStateException("Cannot create backup dir", e);
             }
-            String stamp = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss").format(LocalDateTime.now());
+            String stamp = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss", java.util.Locale.ROOT)
+                    .format(java.time.LocalDateTime.now(java.time.ZoneId.systemDefault()));
             Path file = backupDir.resolve("archforge_" + stamp + ".sql");
             ComposeSupport compose = new ComposeSupport(new ProcessRunner(), root);
             int code = compose.exec(
@@ -96,7 +95,8 @@ public class DbCommand {
             }
             if (!yes) {
                 System.out.print("This will overwrite current tables. Type YES to continue: ");
-                String answer = new BufferedReader(new InputStreamReader(System.in)).readLine();
+                String answer = new BufferedReader(new java.io.InputStreamReader(System.in, java.nio.charset.StandardCharsets.UTF_8))
+                        .readLine();
                 if (!"YES".equals(answer)) {
                     System.out.println("Aborted.");
                     return 1;

@@ -36,7 +36,8 @@ public interface UserPOConvertor {
                 Password.ofEncrypted(po.getPassword()),
                 UserStatus.fromPersistenceValue(po.getStatus()));
 
-        RoleId roleId = new RoleId(po.getRoleId() == null || po.getRoleId() < 0L ? 0L : po.getRoleId());
+        Long poRoleId = po.getRoleId();
+        RoleId roleId = new RoleId(poRoleId != null && poRoleId >= 0L ? poRoleId : Long.valueOf(0L));
         UserAggregate aggregate = new UserAggregate(user, roleId, po.getDeptId(), po.getNickname(), po.getUserType(), po
                 .getSex(), po.getAvatar(), po.getLoginIp(), po.getLoginDate(), po.getIsAdmin(), po.getRemark(), Boolean.TRUE
                         .equals(po.getDeleted()));
@@ -53,8 +54,10 @@ public interface UserPOConvertor {
         }
         User user = aggregate.getUser();
         UserPO po = new UserPO();
-        po.setId(user.getId() == null ? null : user.getId().value());
-        po.setRoleId(aggregate.getRoleId() == null ? null : aggregate.getRoleId().value());
+        UserId userId = user.getId();
+        po.setId(userId == null ? null : userId.value());
+        RoleId aggRoleId = aggregate.getRoleId();
+        po.setRoleId(aggRoleId == null ? null : aggRoleId.value());
         po.setDeptId(aggregate.getDeptId());
         po.setUsername(user.getUsername().value());
         po.setNickname(aggregate.getNickname());

@@ -22,10 +22,12 @@ public class SysUserConvertor {
         }
         User user = aggregate.getUser();
         SysUser sysUser = new SysUser();
-        if (user.getId() != null) {
-            sysUser.setUserId(user.getId().value());
+        UserId userId = user.getId();
+        if (userId != null) {
+            sysUser.setUserId(userId.value());
         }
-        sysUser.setRoleId(aggregate.getRoleId() == null ? null : zeroToNull(aggregate.getRoleId().value()));
+        RoleId aggRoleId = aggregate.getRoleId();
+        sysUser.setRoleId(aggRoleId == null ? null : zeroToNull(aggRoleId.value()));
         sysUser.setDeptId(aggregate.getDeptId());
         sysUser.setUsername(user.getUsername().value());
         sysUser.setNickname(aggregate.getNickname());
@@ -60,7 +62,8 @@ public class SysUserConvertor {
                 PhoneNumber.ofNullable(sysUser.getPhoneNumber()),
                 Password.ofEncrypted(sysUser.getPassword()),
                 UserStatus.fromPersistenceValue(sysUser.getStatus()));
-        RoleId roleId = new RoleId(sysUser.getRoleId() == null || sysUser.getRoleId() < 0L ? 0L : sysUser.getRoleId());
+        Long sysRoleId = sysUser.getRoleId();
+        RoleId roleId = new RoleId(sysRoleId != null && sysRoleId >= 0L ? sysRoleId : Long.valueOf(0L));
         UserAggregate aggregate = new UserAggregate(user, roleId, sysUser.getDeptId(), sysUser.getNickname(), sysUser
                 .getUserType(), sysUser.getSex() == null ? null : sysUser.getSex().getValue(), sysUser.getAvatar(), sysUser
                         .getLoginIp(), sysUser.getLoginDate(), sysUser.getIsAdmin(), sysUser.getRemark(), Boolean.TRUE.equals(

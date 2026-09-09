@@ -96,7 +96,7 @@ public class MonitorController {
                 (RedisCallback<Long>) connection -> connection.serverCommands().dbSize());
 
         CacheInfoResponse result = new CacheInfoResponse();
-        result.setDbSize(dbSize == null ? 0 : dbSize);
+        result.setDbSize(java.util.Objects.requireNonNullElse(dbSize, 0L));
         if (info != null) {
             result.setUsedMemory(info.getProperty("used_memory"));
             result.setUsedMemoryHuman(info.getProperty("used_memory_human"));

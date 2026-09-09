@@ -4,7 +4,6 @@ import com.lesofn.archforge.common.context.ClientVersion;
 import com.lesofn.archforge.common.utils.jackson.JsonUtil;
 import tools.jackson.databind.node.ObjectNode;
 import java.util.Collections;
-import java.util.Date;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
@@ -18,7 +17,7 @@ public class RequestLogRecord {
 
     private String requestId;
 
-    private final Date date = new Date();
+    private final transient java.time.Instant date = java.time.Instant.now();
 
     private String api;
 
@@ -150,7 +149,7 @@ public class RequestLogRecord {
         buf.append(this.responseStatus);
         buf.append(SPLIT);
         if (this.useTime <= 0) {
-            this.useTime = System.currentTimeMillis() - this.date.getTime();
+            this.useTime = java.time.temporal.ChronoUnit.MILLIS.between(this.date, java.time.Instant.now());
         }
         buf.append(this.useTime);
         buf.append(SPLIT);

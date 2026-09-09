@@ -150,8 +150,12 @@ class XdbManagerTest {
     void downloadFailureReturnsNullAndKeepsTmpClean() throws Exception {
         XdbManager.configure(url("/missing.xdb"), null, tempDir.toString(), true);
         assertNull(XdbManager.ensureXdb(false));
-        assertEquals(0, Files.list(tempDir).filter(p -> p.getFileName().toString().endsWith(".tmp")).count(),
-                "no tmp leftovers on failed download");
+        try (var listing = Files.list(tempDir)) {
+            assertEquals(0, listing.filter(p -> {
+                java.nio.file.Path fn = p.getFileName();
+                return fn != null && fn.toString().endsWith(".tmp");
+            }).count(), "no tmp leftovers on failed download");
+        }
     }
 
     private String url(String path) {

@@ -22,7 +22,7 @@ For every new requirement:
 
 ## Static Analysis Layer (auto-enforced)
 
-Three layers run automatically — you never invoke them separately:
+Five layers run automatically — you never invoke them separately:
 
 - **Error Prone** (2.50.0) hooks into javac: every `compileJava` /
   `compileTestJava` is analyzed for bug patterns. ERROR-severity findings
@@ -35,6 +35,22 @@ Three layers run automatically — you never invoke them separately:
   `check`/`build`. Config: `config/checkstyle/checkstyle.xml`,
   suppressions: `config/checkstyle/checkstyle-suppressions.xml`
   (tests keep snake_case method names by convention).
+- **SpotBugs** (4.10.4) scans bytecode after compilation: NP (null deref),
+  RV (ignored return values), DL (String locks), resource leaks and more fail
+  `spotbugsMain`/`spotbugsTest` (part of `check`). Exclusions live in
+  `config/spotbugs/spotbugs-exclude.xml` (main) and `spotbugs-exclude-test.xml`
+  (test — mirrors the main ruleset plus test allowances); every entry needs a
+  reason. **NullAway** (0.14.1) extends Error Prone with null-safety analysis
+  over the jspecify `@NullMarked` base — currently WARN severity while the
+  baseline is driven to zero.
+- **Forbidden APIs** (3.10) bans by signature: `System.out/err` (cli and test
+  sources exempt — MCP stdio / debug prints), `Runtime.exec`, `Thread.sleep`,
+  `java.util.Date/Calendar/SimpleDateFormat`, internal JDK APIs. Rules:
+  `config/forbiddenapis/forbidden-signatures.txt` (+ test variant).
+- **OWASP Dependency Check** (13.0.0) scans the runtime classpath for CVEs
+  (transitives included) via `./gradlew dependencyCheckAnalyze` — a dedicated
+  CI job keyed by the `OWASP_NVD_API_KEY` secret, with OSS Index as the
+  anonymous secondary source. Not wired into `check` (NVD sync is heavy).
 - **Spotless** rewrites formatting via `spotlessApply`; `spotlessCheck`
   fails the build on unformatted code.
 
@@ -50,8 +66,12 @@ Every code edit must be verified BEFORE moving on — "configured" is not
    `./gradlew :M:compileTestJava :M:checkstyleTest`
 3. **After behavioral changes**: run the affected tests —
    `./gradlew :M:test --tests '*FooTest*'` (checkstyle gates test automatically).
-4. **Before claiming the task complete**:
-   `./gradlew spotlessApply compileJava compileTestJava checkstyleMain checkstyleTest`
+4. **After bytecode-level edits** (or any doubt): add `spotbugsMain` for the
+   module to the targeted command above.
+5. **Dependency changes**: `./gradlew dependencyCheckAnalyze` locally (needs
+   network; NVD data sync requires the API key in CI) — or rely on the CI job.
+6. **Before claiming the task complete**:
+   `./gradlew spotlessApply compileJava compileTestJava checkstyleMain checkstyleTest forbiddenApisMain spotbugsMain`
    then the targeted tests. For the full gate including all tests:
    `./gradlew build`.
 5. **Never batch unverified edits** — fix loop violations immediately while

@@ -1,0 +1,5 @@
+# Test-source signature set — intentionally empty.
+# Rationale: tests legitimately use Thread.sleep (waiting for schedulers),
+# System.out (debug output) and java.util.Date (fixtures). Production bans
+# stay in forbidden-signatures.txt; bundled deprecated/internal signatures
+# still apply here.

@@ -33,8 +33,8 @@ public class MultipartConfig {
         // Set upload temp directory
         String tempDir = System.getProperty("java.io.tmpdir");
         File uploadDirectory = new File(tempDir);
-        if (!uploadDirectory.exists()) {
-            uploadDirectory.mkdirs();
+        if (!uploadDirectory.exists() && !uploadDirectory.mkdirs()) {
+            throw new IllegalStateException("Cannot create temp upload dir: " + tempDir);
         }
         factory.setLocation(tempDir);
 

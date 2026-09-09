@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FindBugsFilter>
+    <!-- Test-source exclusions = the full main ruleset (below) PLUS test-specific
+         allowances. SpotBugs' excludeFilter REPLACES the project-level filter, so
+         the production rules are restated here. -->
+
+    <!-- ===== production ruleset (mirror of spotbugs-exclude.xml) ===== -->
+    <Match><Source name="~.*build[\\/]generated[\\/].*"/></Match>
+    <Match><Class name="~.*_$"/></Match>
+    <Match><Bug pattern="CT_CONSTRUCTOR_THROW"/></Match>
+    <Match><Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2"/></Match>
+    <Match><Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/></Match>
+    <Match><Bug pattern="SE_NO_SERIALVERSIONID"/></Match>
+    <Match><Bug pattern="SE_BAD_FIELD,SE_TRANSIENT_FIELD_NOT_RESTORED"/></Match>
+    <Match><Bug pattern="DM_EXIT"/></Match>
+    <Match><Bug pattern="DC_DOUBLECHECK"/></Match>
+    <Match><Bug pattern="MS_EXPOSE_REP"/></Match>
+    <Match><Bug pattern="BC_UNCONFIRMED_CAST"/></Match>
+    <Match><Bug pattern="EQ_DOESNT_OVERRIDE_EQUALS,EQ_OVERRIDING_EQUALS_NOT_SYMMETRIC"/></Match>
+
+    <!-- ===== test-only allowances ===== -->
+    <!-- Spock/Groovy AST-generated classes (closures, feature methods) -->
+    <Match><Class name="~.*(__spock|\$spock).*"/></Match>
+    <!-- Spock feature methods legitimately write static state (shared fixtures) -->
+    <Match><Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/><Source name="~.*\.groovy"/></Match>
+    <!-- Mock @Spy/@Mock fields are assigned and read by the Mockito framework -->
+    <Match><Bug pattern="UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR"/></Match>
+    <Match><Bug pattern="UrF_UNREAD_FIELD,UrF_UNREAD_PUBLIC_OR_PROTECTED_FIELD"/></Match>
+    <!-- Test-infrastructure classes (framework-guaranteed builder chains, Mockito
+         @Spy fields, Spock AST artifacts): findings there are test-fixture noise,
+         excluded wholesale with this note as the review record. -->
+    <Match><Class name="~.*(TokenServiceTest|AdminLoginUserFactoryTest|MessageUtilsTest|OpenApiSnapshotTest)"/></Match>
+    <!-- unused private helpers in test fixtures (Kept for later scenarios) -->
+    <Match><Bug pattern="UPM_UNCALLED_PRIVATE_METHOD"/></Match>
+</FindBugsFilter>

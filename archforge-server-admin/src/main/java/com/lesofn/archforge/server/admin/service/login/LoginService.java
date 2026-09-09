@@ -209,9 +209,6 @@ public class LoginService {
             expression = expressionAndAnswer[0];
             answer = expressionAndAnswer[1];
             image = captchaProducerMath.createImage(expression);
-        } else if (captchaType == CaptchaType.CHAR) {
-            expression = answer = captchaProducer.createText();
-            image = captchaProducer.createImage(expression);
         } else {
             // 默认使用字符验证码
             expression = answer = captchaProducer.createText();

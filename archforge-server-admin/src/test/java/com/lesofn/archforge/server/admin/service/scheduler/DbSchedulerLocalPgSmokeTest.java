@@ -54,23 +54,25 @@ class DbSchedulerLocalPgSmokeTest {
 
     @BeforeAll
     static void prepareDatabases() throws Exception {
-        try (Connection admin = DriverManager.getConnection(URL)) {
+        try (Connection admin = DriverManager.getConnection(URL);
+                java.sql.Statement stmt = admin.createStatement()) {
             for (String db : new String[] {
                     FRESH_DB, LEGACY_DB
             }) {
-                admin.createStatement().execute("DROP DATABASE IF EXISTS " + db);
-                admin.createStatement().execute("CREATE DATABASE " + db);
+                stmt.execute("DROP DATABASE IF EXISTS " + db);
+                stmt.execute("CREATE DATABASE " + db);
             }
         }
     }
 
     @AfterAll
     static void cleanup() throws Exception {
-        try (Connection admin = DriverManager.getConnection(URL)) {
+        try (Connection admin = DriverManager.getConnection(URL);
+                java.sql.Statement stmt = admin.createStatement()) {
             for (String db : new String[] {
                     FRESH_DB, LEGACY_DB
             }) {
-                admin.createStatement().execute("DROP DATABASE IF EXISTS " + db);
+                stmt.execute("DROP DATABASE IF EXISTS " + db);
             }
         }
     }
@@ -104,14 +106,16 @@ class DbSchedulerLocalPgSmokeTest {
             assertFalse(tableExists(c, "qrtz_triggers"), "Quartz tables must never exist on fresh DBs");
             assertFalse(tableExists(c, "sys_quartz_job"));
 
-            try (ResultSet rs = c.createStatement().executeQuery(
-                    "SELECT job_name, bean_name, cron, status FROM sys_scheduled_job WHERE job_name='demo-hello'")) {
+            try (java.sql.Statement st = c.createStatement();
+                    ResultSet rs = st.executeQuery(
+                            "SELECT job_name, bean_name, cron, status FROM sys_scheduled_job WHERE job_name='demo-hello'")) {
                 assertTrue(rs.next());
                 assertEquals("demoSchedulerJob", rs.getString("bean_name"));
                 assertEquals("0/30 * * * * *", rs.getString("cron"));
             }
-            try (ResultSet rs = c.createStatement().executeQuery(
-                    "SELECT remark FROM sys_menu WHERE menu_id=100")) {
+            try (java.sql.Statement st = c.createStatement();
+                    ResultSet rs = st.executeQuery(
+                            "SELECT remark FROM sys_menu WHERE menu_id=100")) {
                 assertTrue(rs.next());
                 assertFalse(rs.getString("remark").contains("Quartz"));
             }
@@ -142,16 +146,16 @@ class DbSchedulerLocalPgSmokeTest {
             assertTrue(tableExists(c, "sys_scheduled_job"));
             assertTrue(tableExists(c, "scheduled_tasks"));
 
-            try (ResultSet rs = c.prepareStatement(
-                    "SELECT id, bean_name, cron, status, description FROM sys_scheduled_job WHERE job_name='legacy-job'")
-                    .executeQuery()) {
+            try (java.sql.PreparedStatement ps = c.prepareStatement(
+                    "SELECT id, bean_name, cron, status, description FROM sys_scheduled_job WHERE job_name='legacy-job'");
+                    ResultSet rs = ps.executeQuery()) {
                 assertTrue(rs.next(), "legacy row must be moved");
                 assertEquals("demoSchedulerJob", rs.getString("bean_name"), "bean rename applied");
                 assertEquals("0/15 * * * * *", rs.getString("cron"), "cron ? normalized to *");
                 assertEquals(0, rs.getShort("status"));
             }
-            try (ResultSet rs = c.prepareStatement(
-                    "SELECT count(*) FROM sys_job_log").executeQuery()) {
+            try (java.sql.PreparedStatement ps = c.prepareStatement(
+                    "SELECT count(*) FROM sys_job_log"); ResultSet rs = ps.executeQuery()) {
                 assertTrue(rs.next());
                 assertEquals(1, rs.getInt(1), "execution log history preserved");
             }

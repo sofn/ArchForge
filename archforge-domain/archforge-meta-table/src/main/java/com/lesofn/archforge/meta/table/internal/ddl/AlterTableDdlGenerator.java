@@ -123,7 +123,6 @@ public class AlterTableDdlGenerator {
 
     private List<SchemaDdl> generateAlterType(MetaTable table, SchemaChange change) {
         String physicalName = SqlIdentifier.quote(table.physicalTableName());
-        MetaColumn oldColumn = change.getOldColumn();
         MetaColumn newColumn = change.getNewColumn();
         String oldType = change.getOldType();
         String newType = change.getNewType();

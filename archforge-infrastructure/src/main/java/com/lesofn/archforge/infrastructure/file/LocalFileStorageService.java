@@ -44,7 +44,11 @@ public class LocalFileStorageService implements FileStorageService {
     public String upload(String path, InputStream inputStream, String contentType, long size) {
         try {
             Path targetPath = safePath(path);
-            Files.createDirectories(targetPath.getParent());
+            Path parent = targetPath.getParent();
+            if (parent == null) {
+                throw new IllegalArgumentException("path must be under the storage root: " + path);
+            }
+            Files.createDirectories(parent);
             Files.copy(inputStream, targetPath, StandardCopyOption.REPLACE_EXISTING);
             return path;
         } catch (IOException e) {

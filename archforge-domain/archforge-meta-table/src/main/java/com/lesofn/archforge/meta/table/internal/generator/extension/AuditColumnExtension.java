@@ -46,7 +46,10 @@ public class AuditColumnExtension implements CodeGenExtension {
     public void postProcess(Path backendDir, Path frontendDir, Map<String, Object> model, List<Path> generatedFiles) {
         try {
             Path marker = backendDir.resolve("AUDIT.md");
-            Files.createDirectories(marker.getParent());
+            java.nio.file.Path markerParent = marker.toAbsolutePath().getParent();
+            if (markerParent != null) {
+                Files.createDirectories(markerParent);
+            }
             Files.writeString(marker, "# Generated with AuditColumnExtension\n", StandardCharsets.UTF_8);
             generatedFiles.add(marker);
         } catch (Exception e) {

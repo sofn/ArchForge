@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FindBugsFilter>
+    <!-- ArchForge SpotBugs exclusions. Every entry carries a reason.
+         Kept as ERRORs (never excluded): NP, RV, DL, and Dm in hot paths. -->
+
+    <!-- Generated sources (Hibernate metamodel, annotation-processor output) -->
+    <Match><Source name="~.*build[\\/]generated[\\/].*"/></Match>
+    <!-- Hibernate JPA metamodel classes (Foo_) are annotation-processor output
+         compiled from the source tree; their "unused" members are the API -->
+    <Match><Class name="~.*_$"/></Match>
+
+    <!-- CT_CONSTRUCTOR_THROW: "finalizer attack" is mitigated on modern JVMs;
+         utility/holder classes intentionally throw in private constructors -->
+    <Match><Bug pattern="CT_CONSTRUCTOR_THROW"/></Match>
+
+    <!-- EI_EXPOSE_REP / EI2: DTO/model objects share mutable collections by
+         reference as an accepted project convention -->
+    <Match><Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2"/></Match>
+
+    <!-- ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD: the Aware-holder pattern
+         (ApplicationContextHolder etc.) necessarily writes static state -->
+    <Match><Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/></Match>
+
+    <!-- Serializable conventions: these classes are used in-memory only -->
+    <Match><Bug pattern="SE_NO_SERIALVERSIONID"/></Match>
+    <Match><Bug pattern="SE_BAD_FIELD,SE_TRANSIENT_FIELD_NOT_RESTORED"/></Match>
+
+    <!-- CLI runners exit with a status code by contract -->
+    <Match><Bug pattern="DM_EXIT"/></Match>
+
+    <!-- DC_DOUBLECHECK: benign lazy-init double-check, verified case by case -->
+    <Match><Bug pattern="DC_DOUBLECHECK"/></Match>
+
+    <!-- MS_EXPOSE_REP: utility APIs intentionally return the shared
+         immutable-after-init singleton (JsonUtil mapper) -->
+    <Match><Bug pattern="MS_EXPOSE_REP"/></Match>
+
+    <!-- JPA AttributeConverter must cast the raw Enum parameter -->
+    <Match><Bug pattern="BC_UNCONFIRMED_CAST"/></Match>
+
+    <!-- Model classes use identity/record-style equality by convention -->
+    <Match><Bug pattern="EQ_DOESNT_OVERRIDE_EQUALS,EQ_OVERRIDING_EQUALS_NOT_SYMMETRIC"/></Match>
+</FindBugsFilter>

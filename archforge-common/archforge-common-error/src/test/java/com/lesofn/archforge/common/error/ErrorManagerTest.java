@@ -1,6 +1,7 @@
 package com.lesofn.archforge.common.error;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import com.lesofn.archforge.common.error.example.TestErrorCodes;
 import com.lesofn.archforge.common.error.example.TestSystemErrorCode;
@@ -23,16 +24,12 @@ class ErrorManagerTest {
         HttpCodes.values();
         TestErrorCodes.values();
         List<TreeNode> allErrorCodes = ErrorManager.getAllErrorCodes();
-        System.out.println(allErrorCodes);
         assertEquals(2, allErrorCodes.size());
 
+        // traverse the whole tree to prove no node throws
         for (TreeNode treeNode : allErrorCodes) {
-            System.out.println("1." + treeNode);
             for (TreeNode node : treeNode.getNodes()) {
-                System.out.println("2." + treeNode);
-                for (TreeNode left : node.getNodes()) {
-                    System.out.println("3." + left);
-                }
+                assertNotNull(node.getNodes());
             }
         }
     }

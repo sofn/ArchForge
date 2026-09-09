@@ -11,6 +11,7 @@ import java.util.Map;
 /**
  * Thin process wrapper used by CLI commands. Does not start a Spring context.
  */
+@lombok.extern.slf4j.Slf4j
 public class ProcessRunner {
 
     public int run(List<String> command, Path workingDir) {
@@ -31,7 +32,9 @@ public class ProcessRunner {
             if (inheritIo) {
                 builder.inheritIO();
             } else if (stdoutFile != null) {
-                stdoutFile.toFile().getParentFile().mkdirs();
+                if (!stdoutFile.toFile().getParentFile().mkdirs()) {
+                    log.debug("output dirs already exist for {}", stdoutFile);
+                }
                 builder.redirectOutput(stdoutFile.toFile());
                 builder.redirectError(ProcessBuilder.Redirect.INHERIT);
             } else {
@@ -64,7 +67,9 @@ public class ProcessRunner {
             }
             builder.redirectErrorStream(true);
             if (logFile != null) {
-                logFile.getParentFile().mkdirs();
+                if (!logFile.getParentFile().mkdirs()) {
+                    log.debug("log dirs already exist for {}", logFile);
+                }
                 builder.redirectOutput(ProcessBuilder.Redirect.appendTo(logFile));
             }
             return builder.start();

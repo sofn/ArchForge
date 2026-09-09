@@ -67,7 +67,11 @@ public class MetaTableMigrationExporter {
         }
         try (Stream<Path> files = Files.list(outputDir)) {
             for (Path file : files.toList()) {
-                String name = file.getFileName().toString();
+                java.nio.file.Path fileName = file.getFileName();
+                if (fileName == null) {
+                    continue;
+                }
+                String name = fileName.toString();
                 Matcher matcher = FLYWAY_VERSION_PATTERN.matcher(name);
                 if (matcher.matches()) {
                     int version = Integer.parseInt(matcher.group(1));

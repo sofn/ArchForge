@@ -18,6 +18,9 @@ import org.apache.commons.codec.binary.Hex;
  */
 public class AESEncrypter {
 
+    /** dedicated monitor — never lock on a String constant (interned/shared) */
+    private static final Object LOCK = new Object();
+
     private static final String AESKEYSTR = "ZTZjZGVjZDcxNmMwMWQzZTIzOWE4ZjNkZjk3ZTJiZTM=";
 
     private SecretKey aesKey;
@@ -36,7 +39,7 @@ public class AESEncrypter {
 
     public static AESEncrypter getInstance() {
         if (INSTANCE == null) {
-            synchronized (AESKEYSTR) {
+            synchronized (LOCK) {
                 if (INSTANCE == null) {
                     INSTANCE = new AESEncrypter();
                 }
@@ -47,7 +50,7 @@ public class AESEncrypter {
 
     public static AESEncrypter getInstance(String aes) {
         if (INSTANCES.get(aes) == null) {
-            synchronized (AESKEYSTR) {
+            synchronized (LOCK) {
                 if (INSTANCES.get(aes) == null) {
                     INSTANCES.put(aes, new AESEncrypter(aes));
                 }

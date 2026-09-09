@@ -173,7 +173,10 @@ public final class XdbManager {
     }
 
     private static Path download(String url, Path target, boolean ipv6) throws IOException, InterruptedException {
-        Files.createDirectories(target.getParent());
+        Path parent = target.toAbsolutePath().getParent();
+        if (parent != null) {
+            Files.createDirectories(parent);
+        }
         Path tmp = target.resolveSibling(target.getFileName() + ".tmp");
         HttpRequest request = HttpRequest.newBuilder(URI.create(url))
                 .timeout(Duration.ofSeconds(300))

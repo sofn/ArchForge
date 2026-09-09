@@ -34,8 +34,9 @@ public final class FileUploadValidator {
             throw new SystemException(SystemErrorCode.E_FILE_SIZE_EXCEEDED);
         }
 
-        String extension = extension(file.getOriginalFilename());
-        String contentType = file.getContentType() == null ? "" : file.getContentType().toLowerCase(Locale.ROOT);
+        String extension = extension(java.util.Objects.requireNonNullElse(file.getOriginalFilename(), ""));
+        String rawContentType = file.getContentType();
+        String contentType = rawContentType == null ? "" : rawContentType.toLowerCase(Locale.ROOT);
         if (SCRIPTABLE_EXTENSIONS.contains(extension) || isScriptableMime(contentType)) {
             throw new SystemException(SystemErrorCode.E_FILE_TYPE_NOT_ALLOWED);
         }

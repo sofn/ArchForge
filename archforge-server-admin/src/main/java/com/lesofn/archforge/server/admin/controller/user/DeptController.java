@@ -49,14 +49,21 @@ public class DeptController {
     @PostMapping("/create")
     public Long createDept(@RequestBody @Valid DeptCreateRequest request) {
         SysDept dept = new SysDept();
-        dept.setParentId(request.getParentId() != null ? request.getParentId() : 0L);
+        Long parentId = request.getParentId();
+        String principal = request.getPrincipal();
+        String phone = request.getPhone();
+        dept.setParentId(parentId != null ? parentId : 0L);
         dept.setName(request.getName());
-        dept.setPrincipal(request.getPrincipal() != null ? request.getPrincipal() : "");
-        dept.setPhone(request.getPhone() != null ? request.getPhone() : "");
-        dept.setEmail(request.getEmail() != null ? request.getEmail() : "");
-        dept.setSort(request.getSort() != null ? request.getSort() : 0);
-        dept.setStatus(request.getStatus() != null ? request.getStatus() : 1);
-        dept.setRemark(request.getRemark() != null ? request.getRemark() : "");
+        dept.setPrincipal(principal != null ? principal : "");
+        dept.setPhone(phone != null ? phone : "");
+        String email = request.getEmail();
+        Integer sort = request.getSort();
+        Integer status = request.getStatus();
+        String remark = request.getRemark();
+        dept.setEmail(email != null ? email : "");
+        dept.setSort(sort != null ? sort : 0);
+        dept.setStatus(status != null ? status : 1);
+        dept.setRemark(remark != null ? remark : "");
         SysDept saved = deptService.create(dept);
         return saved.getDeptId();
     }

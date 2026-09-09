@@ -62,10 +62,14 @@ public class NoticeController {
     public Long createNotice(@RequestBody @Valid NoticeCreateRequest request) {
         SysNotice notice = new SysNotice();
         notice.setNoticeTitle(request.getNoticeTitle());
-        notice.setNoticeType(request.getNoticeType() != null ? request.getNoticeType() : 1);
-        notice.setNoticeContent(request.getNoticeContent() != null ? request.getNoticeContent() : "");
-        notice.setStatus(request.getStatus() != null ? request.getStatus() : 1);
-        notice.setRemark(request.getRemark() != null ? request.getRemark() : "");
+        Integer noticeType = request.getNoticeType();
+        String noticeContent = request.getNoticeContent();
+        Integer status = request.getStatus();
+        String remark = request.getRemark();
+        notice.setNoticeType(noticeType != null ? noticeType : 1);
+        notice.setNoticeContent(noticeContent != null ? noticeContent : "");
+        notice.setStatus(status != null ? status : 1);
+        notice.setRemark(remark != null ? remark : "");
         SysNotice saved = noticeService.create(notice);
         return saved.getNoticeId();
     }

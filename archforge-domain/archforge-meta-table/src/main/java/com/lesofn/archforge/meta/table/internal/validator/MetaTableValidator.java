@@ -318,7 +318,7 @@ public class MetaTableValidator {
             if (!node.isArray()) {
                 throw new MetaTableException(MetaTableErrorCode.META_COLUMN_VALUE_INVALID, "多图片必须是 JSON 数组");
             }
-        } catch (Exception e) {
+        } catch (com.fasterxml.jackson.core.JsonProcessingException e) {
             throw new MetaTableException(MetaTableErrorCode.META_COLUMN_VALUE_INVALID, "多图片格式错误");
         }
     }
@@ -574,8 +574,11 @@ public class MetaTableValidator {
                     yield value.toString();
                 }
                 yield items.stream()
-                        .filter(o -> Objects.equals(o.getValue(), value) || Objects.equals(o.getValue().toString(), value
-                                .toString()))
+                        .filter(o -> {
+                            Object optionValue = o.getValue();
+                            return Objects.equals(optionValue, value) || (optionValue != null && Objects.equals(optionValue
+                                    .toString(), value.toString()));
+                        })
                         .findFirst()
                         .map(OptionItem::getLabel)
                         .orElse(value.toString());

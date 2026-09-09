@@ -64,8 +64,10 @@ public class ConfigController {
         config.setConfigName(request.getConfigName());
         config.setConfigKey(request.getConfigKey());
         config.setConfigValue(request.getConfigValue());
-        config.setConfigType(request.getConfigType() != null ? request.getConfigType() : 0);
-        config.setRemark(request.getRemark() != null ? request.getRemark() : "");
+        Integer configType = request.getConfigType();
+        String remark = request.getRemark();
+        config.setConfigType(configType != null ? configType : 0);
+        config.setRemark(remark != null ? remark : "");
         SysConfig saved = configService.create(config);
         return saved.getConfigId();
     }

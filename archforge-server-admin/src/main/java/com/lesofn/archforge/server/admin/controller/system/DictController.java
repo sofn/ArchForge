@@ -90,8 +90,9 @@ public class DictController {
                 .setDescription(request.getDescription())
                 .setStatus(request.getStatus())
                 .setSort(request.getSort());
-        List<SysDictItem> items = request.getItems() == null ? List.of()
-                : request.getItems().stream()
+        List<DictItemRequest> reqItems = request.getItems();
+        List<SysDictItem> items = reqItems == null ? List.of()
+                : reqItems.stream()
                         .map(this::toItemDomain)
                         .toList();
         SysDictType saved = dictService.saveTypeWithItems(type, items);

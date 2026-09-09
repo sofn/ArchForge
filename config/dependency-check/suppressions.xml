@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
+    <!-- ArchForge dependency-check suppressions. Each entry needs: CVE, reason, expiry. -->
+    <!-- (empty baseline — known-vulnerable deps must be FIXED, not suppressed) -->
+</suppressions>

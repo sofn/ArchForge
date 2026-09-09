@@ -57,8 +57,8 @@ public class BlogCategoryController {
         BlogCategory category = new BlogCategory()
                 .setName(request.getName())
                 .setSlug(request.getSlug())
-                .setSortOrder(request.getSortOrder() == null ? 0 : request.getSortOrder())
-                .setStatus(request.getStatus() == null ? 1 : request.getStatus());
+                .setSortOrder(java.util.Objects.requireNonNullElse(request.getSortOrder(), 0))
+                .setStatus(java.util.Objects.requireNonNullElse(request.getStatus(), 1));
         return categoryService.create(category).getId();
     }
 
@@ -69,8 +69,8 @@ public class BlogCategoryController {
                 .setId(request.getId())
                 .setName(request.getName())
                 .setSlug(request.getSlug())
-                .setSortOrder(request.getSortOrder() == null ? 0 : request.getSortOrder())
-                .setStatus(request.getStatus() == null ? 1 : request.getStatus());
+                .setSortOrder(java.util.Objects.requireNonNullElse(request.getSortOrder(), 0))
+                .setStatus(java.util.Objects.requireNonNullElse(request.getStatus(), 1));
         categoryService.update(category);
         return true;
     }

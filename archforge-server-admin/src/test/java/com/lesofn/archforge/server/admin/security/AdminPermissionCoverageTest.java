@@ -18,21 +18,24 @@ class AdminPermissionCoverageTest {
     void adminControllersDeclareLoginOrRoleGuard() throws IOException {
         Path controllerDir = Path.of("src/main/java/com/lesofn/archforge/server/admin/controller");
         try (Stream<Path> files = Files.walk(controllerDir)) {
-            files.filter(path -> path.getFileName().toString().endsWith("Controller.java"))
-                    .forEach(path -> {
-                        try {
-                            String source = Files.readString(path);
-                            if (path.getFileName().toString().equals("LoginController.java")) {
-                                return;
-                            }
-                            assertTrue(
-                                    source.contains(SaCheckLogin.class.getSimpleName()) || source.contains(SaCheckRole.class
-                                            .getSimpleName()),
-                                    () -> "Missing login/role annotation: " + path);
-                        } catch (IOException e) {
-                            throw new IllegalStateException(e);
-                        }
-                    });
+            files.filter(path -> {
+                java.nio.file.Path name1 = path.getFileName();
+                return name1 != null && name1.toString().endsWith("Controller.java");
+            }).forEach(path -> {
+                try {
+                    String source = Files.readString(path);
+                    java.nio.file.Path name2 = path.getFileName();
+                    if (name2 != null && name2.toString().equals("LoginController.java")) {
+                        return;
+                    }
+                    assertTrue(
+                            source.contains(SaCheckLogin.class.getSimpleName()) || source.contains(SaCheckRole.class
+                                    .getSimpleName()),
+                            () -> "Missing login/role annotation: " + path);
+                } catch (IOException e) {
+                    throw new IllegalStateException(e);
+                }
+            });
         }
     }
 }

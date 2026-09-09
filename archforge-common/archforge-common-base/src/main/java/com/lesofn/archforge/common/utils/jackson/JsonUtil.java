@@ -11,7 +11,6 @@ import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URL;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -105,7 +104,6 @@ public class JsonUtil {
         return JsonMapper.builder()
                 .enable(JSON_READ_FEATURES_ENABLED.toArray(new JsonReadFeature[0]))
                 .enable(StreamWriteFeature.IGNORE_UNKNOWN, StreamWriteFeature.WRITE_BIGDECIMAL_AS_PLAIN)
-                .defaultDateFormat(new SimpleDateFormat(DATE_TIME_FORMAT))
                 .changeDefaultPropertyInclusion(
                         v -> JsonInclude.Value.construct(JsonInclude.Include.NON_NULL, JsonInclude.Include.NON_NULL))
                 .configure(SerializationFeature.INDENT_OUTPUT, false)

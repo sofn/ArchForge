@@ -1,0 +1,24 @@
+# ArchForge forbidden-API signatures (de.thetaphi.forbiddenapis).
+#
+# Bundled signatures cover: System.out/err, deprecated APIs, internal JDK APIs
+# (sun.*, jdk.internal.*). Custom rules below add the project-specific bans.
+# archforge-cli is exempted from jdk-system-out in build.gradle.kts (MCP stdio).
+
+@defaultMessage Do not spawn processes via Runtime.exec; use ProcessBuilder explicitly where reviewed (archforge-cli)
+java.lang.Runtime#exec(java.lang.String)
+java.lang.Runtime#exec(java.lang.String[])
+java.lang.Runtime#exec(java.lang.String,java.lang.String[])
+java.lang.Runtime#exec(java.lang.String[],java.lang.String[])
+java.lang.Runtime#exec(java.lang.String,java.lang.String[],java.io.File)
+java.lang.Runtime#exec(java.lang.String[],java.lang.String[],java.io.File)
+
+@defaultMessage Never block threads with sleep; use db-scheduler / @Scheduled / CompletableFuture.delayedExecutor
+java.lang.Thread#sleep(long)
+java.lang.Thread#sleep(long,int)
+java.lang.Thread#sleep(java.time.Duration)
+
+@defaultMessage Use java.time (Instant/LocalDateTime) — java.util.Date is mutable and timezone-unsafe
+java.util.Date
+# java.sql.Date is deliberately NOT banned: JDBC interop must instanceof-match it to convert
+java.util.Calendar
+java.text.SimpleDateFormat

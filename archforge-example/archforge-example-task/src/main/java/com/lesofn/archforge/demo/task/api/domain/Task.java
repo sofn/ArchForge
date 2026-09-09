@@ -29,14 +29,14 @@ public class Task extends BaseEntity<Task> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    public Long id;
+    private Long id;
 
-    public String title;
+    private String title;
 
-    public String description;
+    private String description;
 
     @Column(name = "uid", nullable = false)
-    public long uid;
+    private long uid;
 
     @Enumerated(EnumType.STRING)
     private TaskStatus status = TaskStatus.CREATED;

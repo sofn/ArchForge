@@ -122,15 +122,21 @@ public class MetaTableCodeGenerator {
 
     private Path resolveFrontendRoot(Path frontendOutputDir, String tableCode) {
         Path normalized = frontendOutputDir.normalize();
-        if (isPathSegment(normalized, tableCode) && isPathSegment(normalized.getParent(), "views") && isPathSegment(normalized
-                .getParent().getParent(), "src")) {
-            return normalized.getParent().getParent().getParent().normalize();
+        Path views = normalized.getParent();
+        Path src = views == null ? null : views.getParent();
+        if (isPathSegment(normalized, tableCode) && isPathSegment(views, "views") && isPathSegment(src, "src")) {
+            Path appRoot = src == null ? null : src.getParent();
+            return appRoot == null ? normalized : appRoot.normalize();
         }
         return normalized;
     }
 
     private boolean isPathSegment(Path path, String segment) {
-        return path != null && path.getFileName() != null && path.getFileName().toString().equals(segment);
+        if (path == null) {
+            return false;
+        }
+        java.nio.file.Path fileName = path.getFileName();
+        return fileName != null && fileName.toString().equals(segment);
     }
 
     private void checkNotEmpty(Path dir) {
@@ -209,8 +215,6 @@ public class MetaTableCodeGenerator {
 
     private List<Path> renderFrontend(Path frontendRoot, Path frontendOutputDir, Map<String, Object> model) {
         String tableCode = (String) model.get("tableCode");
-        String className = (String) model.get("className");
-
         Map<String, String> templateToPath = new LinkedHashMap<>();
         templateToPath.put("api.ts.ftl", "src/api/" + tableCode + ".ts");
         templateToPath.put("route.ts.ftl", "src/router/modules/" + tableCode + ".ts");
@@ -244,7 +248,10 @@ public class MetaTableCodeGenerator {
     private Path renderTemplate(String templateName, Path target, Map<String, Object> model) {
         try {
             Template template = configuration.getTemplate(templateName);
-            Files.createDirectories(target.getParent());
+            java.nio.file.Path targetParent = target.toAbsolutePath().getParent();
+            if (targetParent != null) {
+                Files.createDirectories(targetParent);
+            }
             try (Writer writer = Files.newBufferedWriter(target, StandardCharsets.UTF_8)) {
                 template.process(model, writer);
             }

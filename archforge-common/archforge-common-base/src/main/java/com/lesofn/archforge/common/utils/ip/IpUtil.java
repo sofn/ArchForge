@@ -27,6 +27,9 @@ import org.apache.commons.lang3.StringUtils;
 @Slf4j
 public class IpUtil {
 
+    /** dedicated RNG for port probing (instance-free, shared) */
+    private static final java.util.Random RANDOM = new java.util.Random();
+
     public static final String INNER_IP_REGEX = "^(127\\.0\\.0\\.\\d{1,3})|(localhost)|(10\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})|(172\\.((1[6-9])|(2\\d)|" +
             "(3[01]))\\.\\d{1,3}\\.\\d{1,3})|(192\\.168\\.\\d{1,3}\\.\\d{1,3})$";
     public static final Pattern INNER_IP_PATTERN = Pattern.compile(INNER_IP_REGEX);
@@ -66,7 +69,6 @@ public class IpUtil {
             ia = InetAddress.getByAddress(ip);
         } catch (UnknownHostException e) {
             log.error("解析Ip失败", e);
-            e.printStackTrace();
         }
         if (ia == null) {
             return false;
@@ -152,7 +154,7 @@ public class IpUtil {
     public static int randomAvailablePort() {
         int port;
         do {
-            port = (int) ((MAX_USER_PORT_NUMBER - MIN_USER_PORT_NUMBER) * Math.random()) + MIN_USER_PORT_NUMBER;
+            port = RANDOM.nextInt(MAX_USER_PORT_NUMBER - MIN_USER_PORT_NUMBER) + MIN_USER_PORT_NUMBER;
         } while (!availablePort(port));
         return port;
     }

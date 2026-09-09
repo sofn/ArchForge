@@ -155,3 +155,28 @@ jobs:
           name: test-reports
           path: '**/build/reports/tests/'
           retention-days: 7
+
+  # OWASP Dependency Check: CVE scan of the runtime classpath (transitives included).
+  # Split into a dedicated job because the NVD data sync is heavy; keyed by the
+  # OWASP_NVD_API_KEY secret (NVD API requires a key since dependency-check 13).
+  # OSS Index (OSV/CVE aggregate, anonymous) runs as the secondary data source.
+  dependency-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: zulu
+          java-version: '25'
+      - name: Run dependency check
+        env:
+          OWASP_NVD_API_KEY: ${{ secrets.OWASP_NVD_API_KEY }}
+        run: ./gradlew dependencyCheckAnalyze --no-daemon
+      - name: Upload reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-check-reports
+          path: '**/build/reports/dependency-check-report.*'
+          retention-days: 30
