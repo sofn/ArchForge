@@ -1,5 +1,7 @@
 package com.lesofn.archforge.common.profile;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * @author sofn
  * @version 1.0 Created at: 2022-03-14 20:58
@@ -14,7 +16,7 @@ public enum Env {
      * {@code valueOf(name) != null} guard never worked as intended (found by Error Prone's
      * ImpossibleNullComparison).
      */
-    public static Env fromName(String name) {
+    public static @Nullable Env fromName(@Nullable String name) {
         if (name == null) {
             return null;
         }

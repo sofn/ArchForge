@@ -6,6 +6,7 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -99,7 +100,7 @@ public class EnumOptionsMigrationRunner implements ApplicationRunner {
         for (OptionItem item : items) {
             MapSqlParameterSource itemParams = new MapSqlParameterSource()
                     .addValue("dictTypeId", dictTypeId)
-                    .addValue("itemCode", String.valueOf(item.getValue()))
+                    .addValue("itemCode", Objects.toString(item.getValue(), ""))
                     .addValue("itemLabel", item.getLabel())
                     .addValue("sort", 0)
                     .addValue("status", 1)

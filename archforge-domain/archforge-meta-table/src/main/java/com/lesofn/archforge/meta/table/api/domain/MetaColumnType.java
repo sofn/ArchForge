@@ -27,10 +27,10 @@ public enum MetaColumnType {
 
     /** 解析字段类型字符串，非法值抛业务异常而非裸 IllegalArgumentException。 */
     public static MetaColumnType of(String value) {
-        if (value == null) {
-            throw new IllegalArgumentException("column type must not be null");
-        }
         try {
+            if (value == null) {
+                throw new IllegalArgumentException("column type must not be null");
+            }
             return MetaColumnType.valueOf(value);
         } catch (IllegalArgumentException e) {
             throw new MetaTableException(MetaTableErrorCode.META_COLUMN_TYPE_INVALID, "不支持的字段类型: " + value);

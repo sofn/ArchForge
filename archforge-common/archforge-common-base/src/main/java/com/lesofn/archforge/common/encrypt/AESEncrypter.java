@@ -1,9 +1,10 @@
 package com.lesofn.archforge.common.encrypt;
 
 import java.security.NoSuchAlgorithmException;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import javax.crypto.Cipher;
+import org.jspecify.annotations.Nullable;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -33,30 +34,26 @@ public class AESEncrypter {
         aesKey = loadAesKey(aes);
     }
 
-    private static AESEncrypter INSTANCE;
+    private static volatile @Nullable AESEncrypter INSTANCE;
 
-    private static Map<String, AESEncrypter> INSTANCES = new HashMap<>();
+    private static final Map<String, AESEncrypter> INSTANCES = new ConcurrentHashMap<>();
 
     public static AESEncrypter getInstance() {
-        if (INSTANCE == null) {
+        AESEncrypter instance = INSTANCE;
+        if (instance == null) {
             synchronized (LOCK) {
-                if (INSTANCE == null) {
-                    INSTANCE = new AESEncrypter();
+                instance = INSTANCE;
+                if (instance == null) {
+                    instance = new AESEncrypter();
+                    INSTANCE = instance;
                 }
             }
         }
-        return INSTANCE;
+        return instance;
     }
 
     public static AESEncrypter getInstance(String aes) {
-        if (INSTANCES.get(aes) == null) {
-            synchronized (LOCK) {
-                if (INSTANCES.get(aes) == null) {
-                    INSTANCES.put(aes, new AESEncrypter(aes));
-                }
-            }
-        }
-        return INSTANCES.get(aes);
+        return INSTANCES.computeIfAbsent(aes, AESEncrypter::new);
     }
 
     public String encrypt(String msg) {

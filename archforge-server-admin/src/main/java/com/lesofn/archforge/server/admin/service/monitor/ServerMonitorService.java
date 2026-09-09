@@ -78,7 +78,11 @@ public class ServerMonitorService {
         // CPU使用率：oshi 需要一个采样窗口（两次 tick 读取之间等待），用 parkNanos
         // 而非 Thread.sleep（后者被 forbiddenapis 禁令覆盖；parkNanos 语义等价且可中断）
         long[] prevTicks = processor.getSystemCpuLoadTicks();
+        boolean interrupted = Thread.currentThread().isInterrupted();
         java.util.concurrent.locks.LockSupport.parkNanos(500_000_000L);
+        if (interrupted || Thread.interrupted()) {
+            Thread.currentThread().interrupt();
+        }
         long[] ticks = processor.getSystemCpuLoadTicks();
 
         long user = ticks[CentralProcessor.TickType.USER.getIndex()] - prevTicks[CentralProcessor.TickType.USER.getIndex()];

@@ -13,7 +13,14 @@
     <Match><Bug pattern="SE_NO_SERIALVERSIONID"/></Match>
     <Match><Bug pattern="SE_BAD_FIELD,SE_TRANSIENT_FIELD_NOT_RESTORED"/></Match>
     <Match><Bug pattern="DM_EXIT"/></Match>
-    <Match><Bug pattern="DC_DOUBLECHECK"/></Match>
+    <Match>
+        <Class name="com.lesofn.archforge.common.encrypt.AESEncrypter"/>
+        <Bug pattern="DC_DOUBLECHECK"/>
+    </Match>
+    <Match>
+        <Class name="com.lesofn.archforge.common.profile.DefaultProfileLoader"/>
+        <Bug pattern="DC_DOUBLECHECK"/>
+    </Match>
     <Match><Bug pattern="MS_EXPOSE_REP"/></Match>
     <Match><Bug pattern="BC_UNCONFIRMED_CAST"/></Match>
     <Match><Bug pattern="EQ_DOESNT_OVERRIDE_EQUALS,EQ_OVERRIDING_EQUALS_NOT_SYMMETRIC"/></Match>

@@ -3,6 +3,7 @@ package com.lesofn.archforge.cli.proc;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +12,6 @@ import java.util.Map;
 /**
  * Thin process wrapper used by CLI commands. Does not start a Spring context.
  */
-@lombok.extern.slf4j.Slf4j
 public class ProcessRunner {
 
     public int run(List<String> command, Path workingDir) {
@@ -32,8 +32,9 @@ public class ProcessRunner {
             if (inheritIo) {
                 builder.inheritIO();
             } else if (stdoutFile != null) {
-                if (!stdoutFile.toFile().getParentFile().mkdirs()) {
-                    log.debug("output dirs already exist for {}", stdoutFile);
+                Path parent = stdoutFile.toAbsolutePath().getParent();
+                if (parent != null) {
+                    Files.createDirectories(parent);
                 }
                 builder.redirectOutput(stdoutFile.toFile());
                 builder.redirectError(ProcessBuilder.Redirect.INHERIT);
@@ -67,8 +68,9 @@ public class ProcessRunner {
             }
             builder.redirectErrorStream(true);
             if (logFile != null) {
-                if (!logFile.getParentFile().mkdirs()) {
-                    log.debug("log dirs already exist for {}", logFile);
+                Path parent = logFile.toPath().toAbsolutePath().getParent();
+                if (parent != null) {
+                    Files.createDirectories(parent);
                 }
                 builder.redirectOutput(ProcessBuilder.Redirect.appendTo(logFile));
             }

@@ -28,8 +28,15 @@
     <!-- CLI runners exit with a status code by contract -->
     <Match><Bug pattern="DM_EXIT"/></Match>
 
-    <!-- DC_DOUBLECHECK: benign lazy-init double-check, verified case by case -->
-    <Match><Bug pattern="DC_DOUBLECHECK"/></Match>
+    <!-- DC_DOUBLECHECK: only verified lazy-init sites, not a repo-wide mute -->
+    <Match>
+        <Class name="com.lesofn.archforge.common.encrypt.AESEncrypter"/>
+        <Bug pattern="DC_DOUBLECHECK"/>
+    </Match>
+    <Match>
+        <Class name="com.lesofn.archforge.common.profile.DefaultProfileLoader"/>
+        <Bug pattern="DC_DOUBLECHECK"/>
+    </Match>
 
     <!-- MS_EXPOSE_REP: utility APIs intentionally return the shared
          immutable-after-init singleton (JsonUtil mapper) -->

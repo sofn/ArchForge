@@ -151,8 +151,7 @@ subprojects {
                 listOf("jdk-system-out", "jdk-deprecated", "jdk-internal")
             )
             signaturesFiles = rootProject.files("config/forbiddenapis/forbidden-signatures.txt")
-            // 代码级豁免：被 @SuppressWarnings 标注的方法/类跳过检查（须附理由注释）
-            suppressAnnotations.add("java.lang.SuppressWarnings")
+            // 豁免须用 de.thetaphi.forbiddenapis.SuppressForbidden（勿把任意 @SuppressWarnings 当跳过）
             ignoreFailures = false
         }
         // 豁免：archforge-cli（MCP stdio 协议直写 stdout）与全部测试源集

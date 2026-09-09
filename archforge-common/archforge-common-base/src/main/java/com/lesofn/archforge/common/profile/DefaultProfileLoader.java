@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.Nullable;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
@@ -25,11 +26,14 @@ public class DefaultProfileLoader {
 
     private static final DefaultProfileLoader LOADER = new DefaultProfileLoader();
 
-    private volatile Env envVar;
-
-    public static DefaultProfileLoader getInstance() { return LOADER; }
+    private volatile @Nullable Env envVar;
 
     private final Object envLock = new Object();
+
+    private DefaultProfileLoader() {
+    }
+
+    public static DefaultProfileLoader getInstance() { return LOADER; }
 
     public Env getEnv() {
         Env snapshot = envVar;
@@ -56,11 +60,19 @@ public class DefaultProfileLoader {
                 env = envOptional.get();
             }
         }
-        Env parsed = Env.fromName(env);
-        envVar = parsed != null ? parsed : DEFAULT_DEV;
+        envVar = resolveEnv(env);
         System.setProperty(APP_ENV_VAR, envVar.name());
         log.info("AppEnv {}", envVar);
         return envVar;
+    }
+
+    /** Maps a raw profile name to {@link Env}. Unknown non-null names fail fast. */
+    static Env resolveEnv(@Nullable String env) {
+        Env parsed = Env.fromName(env);
+        if (env != null && parsed == null) {
+            throw new IllegalStateException("Unknown profile: " + env);
+        }
+        return parsed != null ? parsed : DEFAULT_DEV;
     }
 
     private Optional<String> readFromProperties() {
