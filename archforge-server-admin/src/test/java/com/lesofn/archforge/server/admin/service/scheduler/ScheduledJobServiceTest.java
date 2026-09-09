@@ -96,7 +96,7 @@ class ScheduledJobServiceTest {
     }
 
     @Test
-    void quartzStyleQuestionMarkIsNormalized() {
+    void sixFieldCronQuestionMarkIsNormalized() {
         assertEquals("0/30 * * * * *", ScheduledJobService.normalizeCron("0/30 * * * * ?"));
         assertEquals("0 0 1 1 1 *", ScheduledJobService.normalizeCron("0 0 1 1 1 *"));
     }

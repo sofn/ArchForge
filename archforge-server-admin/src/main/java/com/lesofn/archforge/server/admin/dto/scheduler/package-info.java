@@ -2,8 +2,8 @@
  * Scheduler-related DTOs (db-scheduler job management).
  *
  * <p>
- * JSON field names are contract-stable with the former Quartz DTOs — the admin frontend and
- * the spec/openapi.yaml contract depend on them.
+ * JSON field names are consumed by ArchForgeAdmin {@code src/api/scheduler.ts} and
+ * {@code spec/openapi.yaml}.
  */
 @NullMarked
 package com.lesofn.archforge.server.admin.dto.scheduler;

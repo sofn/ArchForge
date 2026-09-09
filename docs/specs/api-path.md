@@ -40,6 +40,7 @@ New endpoints go under `/admin/{resource}` or `/web/{resource}`. Do not add a th
 /admin/chat/sessions/{id}/messages
 /admin/permission-matrix/menus/tree
 /admin/permission-matrix/roles/{roleId}/permissions
+/admin/scheduler-job
 ```
 
 Admin paths that still lack `/admin` (legacy, migrate when touched):
@@ -51,7 +52,6 @@ Admin paths that still lack `/admin` (legacy, migrate when touched):
 /meta-table
 /file
 /monitor
-/quartz                 # db-scheduler; rename to /admin/scheduler-job with ArchForgeAdmin
 ```
 
 ## Example endpoints — not in the contract
@@ -70,6 +70,7 @@ Do not add `/task` or `/web/task` to the OpenAPI contract unless the example mod
 ```
 /system/menu
 /system/role
+/quartz
 ```
 
 Those controllers are not part of the contract. Menu and role live at `/admin/menu` and `/admin/role`.

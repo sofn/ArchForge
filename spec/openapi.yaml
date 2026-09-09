@@ -678,23 +678,23 @@ paths:
         "200":
           $ref: "#/components/responses/AdminOk"
 
-  /quartz:
+  /admin/scheduler-job:
     get:
-      tags: [admin-legacy]
+      tags: [admin]
       summary: Scheduled job list (db-scheduler)
       responses:
         "200":
           $ref: "#/components/responses/AdminOk"
-  /quartz/add:
+  /admin/scheduler-job/add:
     post:
-      tags: [admin-legacy]
+      tags: [admin]
       summary: Add scheduled job
       responses:
         "200":
           $ref: "#/components/responses/AdminOk"
-  /quartz/update/{id}:
+  /admin/scheduler-job/update/{id}:
     put:
-      tags: [admin-legacy]
+      tags: [admin]
       summary: Update scheduled job
       parameters:
         - in: path
@@ -704,9 +704,9 @@ paths:
       responses:
         "200":
           $ref: "#/components/responses/AdminOk"
-  /quartz/{id}:
+  /admin/scheduler-job/{id}:
     delete:
-      tags: [admin-legacy]
+      tags: [admin]
       summary: Delete scheduled job
       parameters:
         - in: path
@@ -716,9 +716,9 @@ paths:
       responses:
         "200":
           $ref: "#/components/responses/AdminOk"
-  /quartz/pause/{id}:
+  /admin/scheduler-job/pause/{id}:
     post:
-      tags: [admin-legacy]
+      tags: [admin]
       summary: Pause scheduled job
       parameters:
         - in: path
@@ -728,9 +728,9 @@ paths:
       responses:
         "200":
           $ref: "#/components/responses/AdminOk"
-  /quartz/resume/{id}:
+  /admin/scheduler-job/resume/{id}:
     post:
-      tags: [admin-legacy]
+      tags: [admin]
       summary: Resume scheduled job
       parameters:
         - in: path
@@ -740,9 +740,9 @@ paths:
       responses:
         "200":
           $ref: "#/components/responses/AdminOk"
-  /quartz/run/{id}:
+  /admin/scheduler-job/run/{id}:
     post:
-      tags: [admin-legacy]
+      tags: [admin]
       summary: Run scheduled job once
       parameters:
         - in: path
@@ -752,10 +752,17 @@ paths:
       responses:
         "200":
           $ref: "#/components/responses/AdminOk"
-  /quartz/log:
+  /admin/scheduler-job/log:
     get:
-      tags: [admin-legacy]
+      tags: [admin]
       summary: Scheduled job logs
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+  /admin/scheduler-job/validate-cron:
+    post:
+      tags: [admin]
+      summary: Validate cron expression
       responses:
         "200":
           $ref: "#/components/responses/AdminOk"

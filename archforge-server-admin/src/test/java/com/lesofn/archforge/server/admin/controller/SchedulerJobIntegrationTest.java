@@ -19,7 +19,7 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.web.client.RestClient;
 
 /**
- * RestClient-based integration test for {@code /quartz/*} endpoints. Walks the full lifecycle:
+ * RestClient-based integration test for {@code /admin/scheduler-job/*} endpoints. Walks the full lifecycle:
  * login → add → list → run → log → pause → resume → delete.
  *
  * @author sofn
@@ -127,11 +127,11 @@ class SchedulerJobIntegrationTest extends AbstractIntegrationTest {
     @Test
     @Order(1)
     void validateCron() {
-        Map<String, Object> good = post("/quartz/validate-cron", Map.of("cron", "0/30 * * * * ?"));
+        Map<String, Object> good = post("/admin/scheduler-job/validate-cron", Map.of("cron", "0/30 * * * * ?"));
         assertEquals(0, good.get("code"));
         assertEquals(Boolean.TRUE, good.get("data"));
 
-        Map<String, Object> bad = post("/quartz/validate-cron", Map.of("cron", "not-a-cron"));
+        Map<String, Object> bad = post("/admin/scheduler-job/validate-cron", Map.of("cron", "not-a-cron"));
         assertEquals(0, bad.get("code"));
         assertEquals(Boolean.FALSE, bad.get("data"));
     }
@@ -141,7 +141,7 @@ class SchedulerJobIntegrationTest extends AbstractIntegrationTest {
     @SuppressWarnings("unchecked")
     void addJob() {
         Map<String, Object> resp = post(
-                "/quartz/add",
+                "/admin/scheduler-job/add",
                 Map.of(
                         "jobName", "it-demo-hello",
                         "jobGroup", "DEFAULT",
@@ -162,7 +162,7 @@ class SchedulerJobIntegrationTest extends AbstractIntegrationTest {
     @SuppressWarnings("unchecked")
     void listJobs() {
         Map<String, Object> resp = get(
-                "/quartz",
+                "/admin/scheduler-job",
                 Map.of("jobName", "it-demo", "currentPage", 1, "pageSize", 10));
         assertEquals(0, resp.get("code"));
         Map<String, Object> data = (Map<String, Object>) resp.get("data");
@@ -175,7 +175,7 @@ class SchedulerJobIntegrationTest extends AbstractIntegrationTest {
     @Test
     @Order(4)
     void runJobAndCheckLog() throws Exception {
-        Map<String, Object> runResp = post("/quartz/run/" + createdJobId, null);
+        Map<String, Object> runResp = post("/admin/scheduler-job/run/" + createdJobId, null);
         assertEquals(0, runResp.get("code"), "run failed: " + runResp);
 
         // poll the log endpoint up to 5 seconds
@@ -184,7 +184,7 @@ class SchedulerJobIntegrationTest extends AbstractIntegrationTest {
         while (System.currentTimeMillis() < deadline) {
             @SuppressWarnings("unchecked")
             Map<String, Object> logResp = get(
-                    "/quartz/log",
+                    "/admin/scheduler-job/log",
                     Map.of("jobId", createdJobId, "currentPage", 1, "pageSize", 10));
             assertEquals(0, logResp.get("code"));
             @SuppressWarnings("unchecked")
@@ -206,7 +206,7 @@ class SchedulerJobIntegrationTest extends AbstractIntegrationTest {
     @Order(5)
     void updateJob() {
         Map<String, Object> resp = put(
-                "/quartz/update/" + createdJobId,
+                "/admin/scheduler-job/update/" + createdJobId,
                 Map.of(
                         "jobName", "it-demo-hello",
                         "jobGroup", "DEFAULT",
@@ -223,14 +223,14 @@ class SchedulerJobIntegrationTest extends AbstractIntegrationTest {
     @Test
     @Order(6)
     void pauseAndResume() {
-        assertEquals(0, post("/quartz/pause/" + createdJobId, null).get("code"));
-        assertEquals(0, post("/quartz/resume/" + createdJobId, null).get("code"));
+        assertEquals(0, post("/admin/scheduler-job/pause/" + createdJobId, null).get("code"));
+        assertEquals(0, post("/admin/scheduler-job/resume/" + createdJobId, null).get("code"));
     }
 
     @Test
     @Order(7)
     void deleteJob() {
-        Map<String, Object> resp = delete("/quartz/" + createdJobId);
+        Map<String, Object> resp = delete("/admin/scheduler-job/" + createdJobId);
         assertEquals(0, resp.get("code"));
     }
 }

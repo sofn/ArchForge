@@ -256,12 +256,11 @@ public void export(HttpServletResponse response) throws IOException {
 - **Tables**: `scheduled_tasks` (db-scheduler runtime, optimistic-lock clustering) + ArchForge metadata `sys_scheduled_job` / audit `sys_job_log`. All three live on the primary (`user_master`) PostgreSQL database so one transaction can touch metadata and runtime rows.
 - **Reflective dispatch pattern**: a single handler — `ReflectionJobHandler` — reads `beanName` / `methodName` / `methodParams` from `JobInvocationData`, resolves the Spring bean via `ApplicationContext`, invokes the method by reflection (arity-matched), and persists a `SysJobLog` row capturing duration and any error. New scheduled tasks therefore require only a metadata row and an allow-listed Spring bean — **no new Job class per task**. Bean names must appear in `arch-forge.scheduler.allowed-job-beans`.
 - **Method params**: stored as a JSON array of primitives (`["foo", 42, true]`) for transparency.
-- **REST surface** (`server-admin`, **legacy path kept for the Admin client**):
-  - `GET /quartz` paged query · `POST /quartz/add` · `PUT /quartz/update/{id}` · `DELETE /quartz/{id}`
-  - `POST /quartz/pause/{id}` · `POST /quartz/resume/{id}` · `POST /quartz/run/{id}` (one-shot)
-  - `GET /quartz/log` · `POST /quartz/validate-cron`
-  - Rename plan (not done until ArchForgeAdmin moves with it): `/quartz` → `/admin/scheduler-job`.
-- **UI**: ArchForgeAdmin → System → 定时任务 (`/system/quartz/index`, `src/api/quartz.ts`).
+- **REST surface** (`server-admin`):
+  - `GET /admin/scheduler-job` paged query · `POST /admin/scheduler-job/add` · `PUT /admin/scheduler-job/update/{id}` · `DELETE /admin/scheduler-job/{id}`
+  - `POST /admin/scheduler-job/pause/{id}` · `POST /admin/scheduler-job/resume/{id}` · `POST /admin/scheduler-job/run/{id}` (one-shot)
+  - `GET /admin/scheduler-job/log` · `POST /admin/scheduler-job/validate-cron`
+- **UI**: ArchForgeAdmin → System → 定时任务 (`/system/scheduler-job/index`, `src/api/scheduler.ts`).
 
 ```java
 @Component("demoSchedulerJob")

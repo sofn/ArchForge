@@ -33,9 +33,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Admin API for the db-scheduler-backed job platform (URL space {@code /quartz} and permission
- * codes {@code monitor:job:*} are contract-stable with the former Quartz API — the admin frontend
- * and spec/openapi.yaml depend on them).
+ * Admin API for the db-scheduler-backed job platform.
  *
  * <p>
  * Execution is reflective: a job row names a Spring bean and method (optionally a JSON array of
@@ -48,7 +46,7 @@ import org.springframework.web.bind.annotation.RestController;
 @SaCheckLogin(type = StpAdminUtil.TYPE)
 @SaCheckRole(value = "ADMIN", type = StpAdminUtil.TYPE)
 @RestController
-@RequestMapping("/quartz")
+@RequestMapping("/admin/scheduler-job")
 @RequiredArgsConstructor
 public class SchedulerJobController {
 

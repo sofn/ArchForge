@@ -4,7 +4,7 @@ import com.lesofn.archforge.common.annotation.Query;
 import lombok.Data;
 
 /**
- * Declarative criteria DTO for {@code POST /quartz/list}. Resolved into a JPA Specification by
+ * Declarative criteria DTO for {@code GET /admin/scheduler-job}. Resolved into a JPA Specification by
  * {@code QueryHelp}.
  *
  * @author sofn

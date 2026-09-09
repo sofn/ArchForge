@@ -128,6 +128,6 @@ archforge/
   put `/task` or `/web/task` in `spec/openapi.yaml`. Uncoupling is a dedicated
   change (v7.1 Stage 2, needs Q1/Q2). Production EntityManagerFactories must
   not use `hibernate.hbm2ddl.auto=update` — schema belongs to Flyway.
-- **Scheduler is db-scheduler**, not Quartz. HTTP still lives at `/quartz`
-  until ArchForgeAdmin moves; do not document `sys_quartz_job` /
-  `QuartzReflectionJob` as current. See `skills/archforge-project-standard/standard.md` §3.8.
+- **Scheduler is db-scheduler**, not Quartz. HTTP lives at `/admin/scheduler-job`.
+  Do not reintroduce `/quartz` or document `sys_quartz_job` / `QuartzReflectionJob`
+  as current. See `skills/archforge-project-standard/standard.md` §3.8.

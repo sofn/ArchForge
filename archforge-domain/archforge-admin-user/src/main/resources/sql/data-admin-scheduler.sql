@@ -31,12 +31,11 @@ VALUES
     ('demo-hello', 'DEFAULT', 'Demo: prints hello every 30s', 'demoSchedulerJob', 'helloWorld', NULL, '0/30 * * * * *', 1, 0, 1, 0, NOW(), NOW())
 ON CONFLICT (job_name, job_group) DO NOTHING;
 
--- Menu entry (menu_id=100 stays stable; path targets the admin frontend component
--- views/system/quartz/index.vue, router/permission codes unchanged).
+-- Menu entry (menu_id=100 stays stable; path targets views/system/scheduler-job/index.vue).
 INSERT INTO sys_menu
     (menu_id, menu_name, menu_type, router_name, parent_id, path, is_button, permission, meta_info, status, remark, creator_id, create_time, updater_id, update_time, deleted)
 VALUES
-    (100, '定时任务', 1, 'SystemQuartz', 1, '/system/quartz/index', 0, 'system:quartz:list',
+    (100, '定时任务', 1, 'SystemSchedulerJob', 1, '/system/scheduler-job/index', 0, 'system:scheduler-job:list',
      '{"title":"定时任务","icon":"ep:timer","showParent":true}',
      1, 'db-scheduler 反射调度任务管理', 0, NOW(), 1, NOW(), 0)
 ON CONFLICT (menu_id) DO NOTHING;

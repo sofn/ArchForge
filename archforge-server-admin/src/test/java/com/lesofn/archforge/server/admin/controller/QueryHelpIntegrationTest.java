@@ -29,7 +29,7 @@ import org.springframework.web.client.RestClient;
  * <li>{@code INNER_LIKE} — username filter on {@code POST /user}
  * <li>blurry multi-field LIKE — blurry filter on {@code POST /user}
  * <li>{@code EQUAL} — status filter on {@code POST /user}
- * <li>{@code INNER_LIKE} — jobName filter on {@code POST /quartz/list}
+ * <li>{@code INNER_LIKE} — jobName filter on {@code GET /admin/scheduler-job}
  * </ul>
  *
  * @author sofn
@@ -181,15 +181,15 @@ class QueryHelpIntegrationTest extends AbstractIntegrationTest {
     }
 
     // =========================================================
-    // /quartz/list — INNER_LIKE on jobName (proves Task 3 refactor)
+    // GET /admin/scheduler-job — INNER_LIKE on jobName
     // =========================================================
 
     @Test
     @Order(5)
     @SuppressWarnings("unchecked")
-    void quartzListFiltersByJobNameInnerLike() {
+    void schedulerJobListFiltersByJobNameInnerLike() {
         // seeded demo-hello from data-admin-scheduler.sql
-        Map<String, Object> resp = get("/quartz", Map.of("jobName", "demo", "currentPage", 1, "pageSize", 10));
+        Map<String, Object> resp = get("/admin/scheduler-job", Map.of("jobName", "demo", "currentPage", 1, "pageSize", 10));
         assertEquals(0, resp.get("code"));
 
         Map<String, Object> data = (Map<String, Object>) resp.get("data");
@@ -203,9 +203,9 @@ class QueryHelpIntegrationTest extends AbstractIntegrationTest {
     @Test
     @Order(6)
     @SuppressWarnings("unchecked")
-    void quartzListNoMatchReturnsEmptyPage() {
+    void schedulerJobListNoMatchReturnsEmptyPage() {
         Map<String, Object> resp = get(
-                "/quartz",
+                "/admin/scheduler-job",
                 Map.of("jobName", "zzz_no_such_job", "currentPage", 1, "pageSize", 10));
         assertEquals(0, resp.get("code"));
 
