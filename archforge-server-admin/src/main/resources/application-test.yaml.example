@@ -37,18 +37,6 @@ spring:
           url: jdbc:postgresql://localhost:5432/archforge_user_test
           username: <your-db-username>
           password: <your-db-password>
-        task_master:
-          type: com.alibaba.druid.pool.DruidDataSource
-          driver-class-name: org.postgresql.Driver
-          url: jdbc:postgresql://localhost:5432/archforge_task_test
-          username: <your-db-username>
-          password: <your-db-password>
-        task_slave:
-          type: com.alibaba.druid.pool.DruidDataSource
-          driver-class-name: org.postgresql.Driver
-          url: jdbc:postgresql://localhost:5432/archforge_task_test
-          username: <your-db-username>
-          password: <your-db-password>
 
 # OpenTelemetry (tracing endpoint configured via OTEL_EXPORTER_OTLP_ENDPOINT env var; sampling via SAMPLING_PROBABILITY)
 management:

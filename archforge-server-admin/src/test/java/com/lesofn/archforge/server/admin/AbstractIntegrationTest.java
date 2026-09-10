@@ -1,6 +1,5 @@
 package com.lesofn.archforge.server.admin;
 
-import java.io.IOException;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.GenericContainer;
@@ -32,7 +31,6 @@ public abstract class AbstractIntegrationTest {
     private static final String DB_USER = "archforge";
     private static final String DB_PASSWORD = "archforge";
     private static final String USER_DATABASE = "archforge_user";
-    private static final String TASK_DATABASE = "archforge_task";
 
     private static final int POSTGRES_PORT = 5432;
     private static final int REDIS_PORT = 6379;
@@ -59,20 +57,6 @@ public abstract class AbstractIntegrationTest {
                 .withUsername(DB_USER)
                 .withPassword(DB_PASSWORD);
         container.start();
-        // user 库由 withDatabaseName 创建；task 库用容器自带的 createdb 补建，
-        // 这样一个容器同时服务两个数据源组，比启动两个容器快一倍。
-        try {
-            var createdb = container.execInContainer("createdb", "-U", DB_USER, TASK_DATABASE);
-            if (createdb.getExitCode() != 0) {
-                throw new IllegalStateException("failed to create test database " + TASK_DATABASE + ": " + createdb
-                        .getStderr());
-            }
-        } catch (IOException | InterruptedException e) {
-            if (e instanceof InterruptedException) {
-                Thread.currentThread().interrupt();
-            }
-            throw new IllegalStateException("failed to create test database " + TASK_DATABASE, e);
-        }
         return container;
     }
 
@@ -119,17 +103,11 @@ public abstract class AbstractIntegrationTest {
      */
     public static void registerInfrastructureProperties(DynamicPropertyRegistry registry) {
         String userUrl = jdbcUrl(USER_DATABASE);
-        String taskUrl = jdbcUrl(TASK_DATABASE);
 
         for (String name : new String[] {
                 "user_master", "user_slave"
         }) {
             registerDataSource(registry, name, userUrl);
-        }
-        for (String name : new String[] {
-                "task_master", "task_slave"
-        }) {
-            registerDataSource(registry, name, taskUrl);
         }
 
         registry.add("spring.data.redis.host", REDIS::getHost);

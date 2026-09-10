@@ -56,7 +56,7 @@ Admin paths that still lack `/admin` (legacy, migrate when touched):
 
 ## Example endpoints — not in the contract
 
-`archforge-example-task` is still linked from production `server-admin` today. Its HTTP surface is **not** in `spec/openapi.yaml` (OpenApiSnapshot does not cover it):
+`archforge-example-task` is an unlinked example; it is **not** assembled into `server-admin`. Its HTTP surface is **not** in `spec/openapi.yaml`:
 
 ```
 /task                   # TaskController — example only; do not treat as a platform API

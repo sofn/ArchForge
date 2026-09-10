@@ -122,12 +122,13 @@ archforge/
 - **Contract sync rule**: whenever the backend API changes (paths, parameters,
   request/response schemas, auth), update `spec/openapi.yaml` in the same
   change. CI diffs the live export against it and blocks breaking changes.
-- **Example modules are not the product.** `archforge-example-task` is still
-  linked from `server-admin` today (`api(project)` + `scanBasePackages` +
-  `task_master` + `hbm2ddl.auto=update`). Do not expand that coupling. Do not
-  put `/task` or `/web/task` in `spec/openapi.yaml`. Uncoupling is a dedicated
-  change (v7.1 Stage 2, needs Q1/Q2). Production EntityManagerFactories must
-  not use `hibernate.hbm2ddl.auto=update` — schema belongs to Flyway.
+- **Example modules are not the product.** `archforge-example-task` is an
+  unlinked in-tree example (`settings.gradle.kts` dynamic include). Do not
+  add it to `server-admin` (`api(project)`, `scanBasePackages`, a second
+  EMF, `task_master`, or `hibernate.hbm2ddl.auto=update`). Do not put
+  `/task` or `/web/task` in `spec/openapi.yaml`. Production
+  EntityManagerFactories must not hard-code `hibernate.hbm2ddl.auto=update`
+  — schema belongs to Flyway.
 - **Scheduler is db-scheduler**, not Quartz. HTTP lives at `/admin/scheduler-job`.
   Do not reintroduce `/quartz` or document `sys_quartz_job` / `QuartzReflectionJob`
   as current. See `skills/archforge-project-standard/standard.md` §3.8.

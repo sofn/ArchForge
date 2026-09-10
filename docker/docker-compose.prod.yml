@@ -38,8 +38,6 @@ services:
       REDIS_HOST: redis
       DB_USER_MASTER_URL: jdbc:postgresql://postgres:5432/archforge_user
       DB_USER_SLAVE_URL: jdbc:postgresql://postgres:5432/archforge_user
-      DB_TASK_MASTER_URL: jdbc:postgresql://postgres:5432/archforge_task
-      DB_TASK_SLAVE_URL: jdbc:postgresql://postgres:5432/archforge_task
       DB_USERNAME: ${DB_USERNAME:-archforge}
       DB_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD}
       JWT_SECRET: ${JWT_SECRET}

@@ -46,7 +46,7 @@ See `repos.yaml` for the full list. Grouping:
 | Apps | `archforge-server-admin`, `archforge-server-web`, `archforge-cli` |
 | Infra | `archforge-infrastructure`, `archforge-dependencies` |
 | Starters | `archforge-cache-starter`, `archforge-lock-starter`, `archforge-redisson-starter`, `archforge-trace-starter` |
-| Example | `archforge-example-task` |
+| Example | `archforge-example-task` (unlinked; not a runtime dependency of either server) |
 
 Dependency flow is top-down: servers → infrastructure + domain → common. Domain modules never depend on a server module.
 

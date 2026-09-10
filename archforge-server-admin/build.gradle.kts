@@ -95,7 +95,6 @@ dependencies {
     api(project(":archforge-domain:archforge-admin-user"))
     api(project(":archforge-domain:archforge-meta-table"))
     api(project(":archforge-domain:archforge-blog"))
-    api(project(":archforge-example:archforge-example-task"))
 
     // 排除logback，使用log4j2
     api("org.springframework.boot:spring-boot-starter-web") {

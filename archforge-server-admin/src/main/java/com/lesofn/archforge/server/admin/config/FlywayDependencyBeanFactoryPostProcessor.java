@@ -10,9 +10,9 @@ import org.springframework.stereotype.Component;
  * 保证 Flyway 在 JPA 的 EntityManagerFactory 构建之前执行迁移。
  *
  * <p>
- * UserDbConfig 与 TaskDbConfig 定义在 domain 模块，无法直接感知 server-admin 中的 Flyway
- * bean。此 post-processor 在 Flyway bean 存在时，为 domain 的 EMF 配置类添加 dependsOn，
- * 确保 schema 先由 Flyway 创建，再被 Hibernate validate/update。
+ * User / blog / user-domain EMF configs live in domain modules and cannot see the
+ * Flyway bean in server-admin. This post-processor, when Flyway is present, adds
+ * dependsOn so schema is migrated before Hibernate validate.
  */
 @Component
 public class FlywayDependencyBeanFactoryPostProcessor implements BeanFactoryPostProcessor, Ordered {
@@ -24,7 +24,7 @@ public class FlywayDependencyBeanFactoryPostProcessor implements BeanFactoryPost
         }
 
         String[] targetNames = {
-                "userDbConfig", "taskDbConfig", "blogDbConfig", "userDomainDbConfig"
+                "userDbConfig", "blogDbConfig", "userDomainDbConfig"
         };
         for (String name : targetNames) {
             if (!beanFactory.containsBeanDefinition(name)) {

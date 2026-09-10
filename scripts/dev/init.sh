@@ -10,7 +10,6 @@ REPO_ROOT="$(cd "${DIR}/../.." && pwd)"
 DB_USERNAME="${DB_USERNAME:-archforge}"
 DB_PASSWORD="${DB_PASSWORD:-archforge}"
 DB_NAME_USER="${DB_NAME_USER:-archforge_user}"
-DB_NAME_TASK="${DB_NAME_TASK:-archforge_task}"
 RUSTFS_ROOT_USER="${RUSTFS_ROOT_USER:-minioadmin}"
 RUSTFS_ROOT_PASSWORD="${RUSTFS_ROOT_PASSWORD:-minioadmin}"
 S3_BUCKET="${S3_BUCKET:-archforge}"
@@ -97,12 +96,10 @@ start_s3() {
 
 init_databases() {
     echo "Ensuring databases exist..."
-    for db in "${DB_NAME_USER}" "${DB_NAME_TASK}"; do
-        exists=$(docker exec "${POSTGRES_CONTAINER}" psql -U "${DB_USERNAME}" -d postgres -Atc "SELECT 1 FROM pg_database WHERE datname = '${db}';" || true)
-        if [ "${exists}" != "1" ]; then
-            docker exec "${POSTGRES_CONTAINER}" psql -U "${DB_USERNAME}" -d postgres -c "CREATE DATABASE ${db};"
-        fi
-    done
+    exists=$(docker exec "${POSTGRES_CONTAINER}" psql -U "${DB_USERNAME}" -d postgres -Atc "SELECT 1 FROM pg_database WHERE datname = '${DB_NAME_USER}';" || true)
+    if [ "${exists}" != "1" ]; then
+        docker exec "${POSTGRES_CONTAINER}" psql -U "${DB_USERNAME}" -d postgres -c "CREATE DATABASE ${DB_NAME_USER};"
+    fi
 }
 
 import_seed() {

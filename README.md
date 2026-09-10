@@ -133,7 +133,7 @@ Default admin login is `admin / admin123` (captcha is on in `dev`). C-end API:
 | `archforge-server-web` | C-end application (`:8081`) |
 | `archforge-starters/*` | cache / lock / redisson / trace starters |
 | `archforge-cli` | `./archforge` developer CLI + MCP server |
-| `archforge-example/archforge-example-task` | demo task module (legacy `/task`; not in OpenAPI) |
+| `archforge-example/archforge-example-task` | unlinked example module (not in server-admin; `/task` is not in OpenAPI) |
 | `archforge-dependencies` | version platform (BOM) |
 
 Non-Gradle dirs stay unprefixed: `docker/`, `config/`, `scripts/`, `skills/`.

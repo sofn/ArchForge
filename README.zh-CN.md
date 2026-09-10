@@ -140,7 +140,7 @@ FILE_STORAGE_TYPE=local ./gradlew :archforge-server-admin:bootRun
 | `archforge-server-web` | C 端应用（`:8081`） |
 | `archforge-starters/*` | cache / lock / redisson / trace 启动器 |
 | `archforge-cli` | `./archforge` 开发者 CLI + MCP server |
-| `archforge-example/archforge-example-task` | 示例任务模块（遗留 `/task`，不入 OpenAPI 契约） |
+| `archforge-example/archforge-example-task` | 未接入 server-admin 的示例模块（`/task` 不入 OpenAPI 契约） |
 | `archforge-dependencies` | 版本平台（BOM） |
 
 非 Gradle 目录不加前缀：`docker/`、`config/`、`scripts/`、`skills/`。

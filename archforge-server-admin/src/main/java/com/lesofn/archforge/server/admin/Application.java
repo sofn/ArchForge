@@ -12,7 +12,6 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
         scanBasePackages = {
                 "com.lesofn.archforge.blog",
                 "com.lesofn.archforge.common",
-                "com.lesofn.archforge.demo.task",
                 "com.lesofn.archforge.infrastructure",
                 "com.lesofn.archforge.meta.table",
                 "com.lesofn.archforge.server.admin",

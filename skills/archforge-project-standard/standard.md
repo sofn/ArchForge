@@ -516,7 +516,7 @@ PostgreSQL and one Redis container **once per JVM** and publishes them via
 ```java
 @SpringBootTest(classes = Application.class, webEnvironment = RANDOM_PORT)
 class UserRepositoryIntegrationTest extends AbstractIntegrationTest {
-    // archforge_user + archforge_task on PostgreSQL, and Redis, are already wired up
+    // archforge_user on PostgreSQL, and Redis, are already wired up
 }
 ```
 

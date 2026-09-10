@@ -33,16 +33,6 @@ spring:
           url: jdbc:postgresql://<db-slave-host>:5432/archforge_user?sslmode=require
           username: ${DB_USERNAME}
           password: ${DB_PASSWORD}
-        task_master:
-          driver-class-name: org.postgresql.Driver
-          url: jdbc:postgresql://<db-master-host>:5432/archforge_task?sslmode=require
-          username: ${DB_USERNAME}
-          password: ${DB_PASSWORD}
-        task_slave:
-          driver-class-name: org.postgresql.Driver
-          url: jdbc:postgresql://<db-slave-host>:5432/archforge_task?sslmode=require
-          username: ${DB_USERNAME}
-          password: ${DB_PASSWORD}
 
 # OpenTelemetry (tracing endpoint configured via OTEL_EXPORTER_OTLP_ENDPOINT env var; sampling via SAMPLING_PROBABILITY)
 management:
