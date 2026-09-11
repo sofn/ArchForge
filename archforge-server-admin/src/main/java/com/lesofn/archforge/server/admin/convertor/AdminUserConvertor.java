@@ -1,4 +1,4 @@
-package com.lesofn.archforge.server.admin.mapper;
+package com.lesofn.archforge.server.admin.convertor;
 
 import com.lesofn.archforge.common.enums.common.GenderEnum;
 import com.lesofn.archforge.server.admin.dto.AdminUserDTO;

@@ -18,7 +18,7 @@ import com.lesofn.archforge.server.admin.dto.LoginRequest;
 import com.lesofn.archforge.server.admin.service.cache.RedisCacheService;
 import com.lesofn.archforge.user.api.domain.SysLoginLog;
 import com.lesofn.archforge.user.api.service.SysLoginLogService;
-import eu.bitwalker.useragentutils.UserAgent;
+import com.lesofn.archforge.infrastructure.frame.utils.UserAgentUtil;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import java.awt.image.BufferedImage;
@@ -144,11 +144,11 @@ public class LoginService {
     private void fillLoginLogFromRequest(SysLoginLog loginLog) {
         HttpServletRequest request = ScopedValueContext.getServletRequest();
         String ip = request == null ? "" : IpUtil.getRealIpAddr(request);
-        UserAgent userAgent = UserAgent.parseUserAgentString(request == null ? "" : request.getHeader("User-Agent"));
+        UserAgentUtil.AgentInfo userAgent = UserAgentUtil.parse(request == null ? "" : request.getHeader("User-Agent"));
         loginLog.setIp(ip);
         loginLog.setAddress(IpRegionUtil.getBriefLocationByIp(ip));
-        loginLog.setSystemName(userAgent.getOperatingSystem().getName());
-        loginLog.setBrowser(userAgent.getBrowser().getName());
+        loginLog.setSystemName(userAgent.operatingSystem());
+        loginLog.setBrowser(userAgent.browser());
     }
 
     private void saveLoginLog(SysLoginLog loginLog) {

@@ -18,7 +18,7 @@ import com.lesofn.archforge.server.admin.dto.request.UserRoleRequest;
 import com.lesofn.archforge.server.admin.dto.request.UserStatusRequest;
 import com.lesofn.archforge.server.admin.dto.request.UserUpdateRequest;
 import com.lesofn.archforge.server.admin.dto.user.SysUserQueryRequest;
-import com.lesofn.archforge.server.admin.mapper.AdminUserConvertor;
+import com.lesofn.archforge.server.admin.convertor.AdminUserConvertor;
 import com.lesofn.archforge.server.admin.service.user.AdminUserService;
 import com.lesofn.archforge.user.api.domain.SysDept;
 import com.lesofn.archforge.user.api.domain.SysUser;

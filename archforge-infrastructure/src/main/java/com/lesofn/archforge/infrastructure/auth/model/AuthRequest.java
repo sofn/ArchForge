@@ -3,13 +3,14 @@ package com.lesofn.archforge.infrastructure.auth.model;
 import com.lesofn.archforge.common.utils.ip.IpUtil;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.javatuples.KeyValue;
 
 /** Authors: sofn Version: 1.0 Created at 2015-09-17 22:05. */
 public class AuthRequest {
@@ -18,7 +19,7 @@ public class AuthRequest {
     public static final String FROM_HEADER = "X-Engine-From"; // 用于判断内网外网（Nginx配置添加Header）
     public static final String SSL_HEADER = "X-Engine-SSL";
     private HttpServletRequest request;
-    private List<KeyValue<String, String>> cacheCookies;
+    private List<Map.Entry<String, String>> cacheCookies;
 
     public AuthRequest(HttpServletRequest request) {
         if (request == null) {
@@ -79,15 +80,15 @@ public class AuthRequest {
         };
     }
 
-    public List<KeyValue<String, String>> getCookies() {
+    public List<Map.Entry<String, String>> getCookies() {
         if (cacheCookies != null) {
             return cacheCookies;
         }
-        List<KeyValue<String, String>> ret = new ArrayList<>();
+        List<Map.Entry<String, String>> ret = new ArrayList<>();
         Cookie[] cookieArr = request.getCookies();
         if (cookieArr != null) {
             for (Cookie acookie : cookieArr) {
-                ret.add(new KeyValue<>(acookie.getName(), acookie.getValue()));
+                ret.add(new AbstractMap.SimpleImmutableEntry<>(acookie.getName(), acookie.getValue()));
             }
         }
         cacheCookies = ret;
@@ -98,8 +99,8 @@ public class AuthRequest {
         if (name == null) {
             return null;
         }
-        List<KeyValue<String, String>> cookies = getCookies();
-        for (KeyValue<String, String> pair : cookies) {
+        List<Map.Entry<String, String>> cookies = getCookies();
+        for (Map.Entry<String, String> pair : cookies) {
             if (name.equals(pair.getKey()))
                 return pair.getValue();
         }

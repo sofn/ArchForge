@@ -4,9 +4,9 @@ import com.lesofn.archforge.common.utils.ip.IpRegionUtil;
 import com.lesofn.archforge.common.utils.ip.IpUtil;
 import com.lesofn.archforge.infrastructure.annotation.Log;
 import com.lesofn.archforge.infrastructure.frame.context.ScopedValueContext;
+import com.lesofn.archforge.infrastructure.frame.utils.UserAgentUtil;
 import com.lesofn.archforge.server.admin.event.LogEvent;
 import com.lesofn.archforge.user.api.domain.SysOperLog;
-import eu.bitwalker.useragentutils.UserAgent;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
@@ -41,7 +41,7 @@ public class LogAspect {
 
         HttpServletRequest request = ScopedValueContext.getServletRequest();
         String userAgentHeader = request == null ? "" : request.getHeader("User-Agent");
-        UserAgent userAgent = UserAgent.parseUserAgentString(userAgentHeader);
+        UserAgentUtil.AgentInfo userAgent = UserAgentUtil.parse(userAgentHeader);
         String ip = request == null ? "" : IpUtil.getRealIpAddr(request);
 
         SysOperLog operLog = new SysOperLog();
@@ -50,8 +50,8 @@ public class LogAspect {
         operLog.setSummary(resolveSummary(logAnnotation, signature));
         operLog.setIp(ip);
         operLog.setAddress(IpRegionUtil.getBriefLocationByIp(ip));
-        operLog.setSystemName(userAgent.getOperatingSystem().getName());
-        operLog.setBrowser(userAgent.getBrowser().getName());
+        operLog.setSystemName(userAgent.operatingSystem());
+        operLog.setBrowser(userAgent.browser());
         operLog.setOperatingTime(LocalDateTime.now());
 
         Integer status = 1;

@@ -1,4 +1,4 @@
-package com.lesofn.archforge.infrastructure.frame.filters;
+package com.lesofn.archforge.infrastructure.frame.filter;
 
 import com.lesofn.archforge.common.context.ClientVersion;
 import com.lesofn.archforge.common.utils.GlobalConstants;

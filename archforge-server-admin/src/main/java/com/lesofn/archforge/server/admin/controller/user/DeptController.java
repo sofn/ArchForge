@@ -5,7 +5,7 @@ import com.lesofn.archforge.server.admin.dto.AdminDeptDTO;
 import com.lesofn.archforge.server.admin.dto.request.DeptCreateRequest;
 import com.lesofn.archforge.server.admin.dto.request.DeptDeleteRequest;
 import com.lesofn.archforge.server.admin.dto.request.DeptUpdateRequest;
-import com.lesofn.archforge.server.admin.mapper.AdminDeptConvertor;
+import com.lesofn.archforge.server.admin.convertor.AdminDeptConvertor;
 import com.lesofn.archforge.user.api.domain.SysDept;
 import com.lesofn.archforge.user.api.service.SysDeptService;
 import io.swagger.v3.oas.annotations.Operation;

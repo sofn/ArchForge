@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.lesofn.archforge.common.utils.ServletHolderUtil;
 import com.lesofn.archforge.common.utils.ip.IpRegionUtil;
 import com.lesofn.archforge.common.utils.ip.IpUtil;
-import eu.bitwalker.useragentutils.UserAgent;
+import com.lesofn.archforge.infrastructure.frame.utils.UserAgentUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
@@ -66,21 +66,13 @@ public class BaseLoginUser implements java.io.Serializable {
                 userAgentHeader = "unknown";
             }
 
-            UserAgent userAgent = UserAgent.parseUserAgentString(userAgentHeader);
+            UserAgentUtil.AgentInfo userAgent = UserAgentUtil.parse(userAgentHeader);
             String ip = IpUtil.getRealIpAddr(request);
 
             this.getLoginInfo().setIpAddress(ip);
             this.getLoginInfo().setLocation(IpRegionUtil.getBriefLocationByIp(ip));
-            this.getLoginInfo()
-                    .setBrowser(
-                            userAgent.getBrowser() != null
-                                    ? userAgent.getBrowser().getName()
-                                    : "unknown");
-            this.getLoginInfo()
-                    .setOperationSystem(
-                            userAgent.getOperatingSystem() != null
-                                    ? userAgent.getOperatingSystem().getName()
-                                    : "unknown");
+            this.getLoginInfo().setBrowser(userAgent.browser());
+            this.getLoginInfo().setOperationSystem(userAgent.operatingSystem());
             this.getLoginInfo().setLoginTime(System.currentTimeMillis());
         } catch (Exception e) {
             // 如果处理请求信息时发生异常，使用默认值

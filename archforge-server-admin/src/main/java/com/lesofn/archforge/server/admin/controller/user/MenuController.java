@@ -5,7 +5,7 @@ import com.lesofn.archforge.server.admin.dto.AdminMenuDTO;
 import com.lesofn.archforge.server.admin.dto.request.MenuCreateRequest;
 import com.lesofn.archforge.server.admin.dto.request.MenuDeleteRequest;
 import com.lesofn.archforge.server.admin.dto.request.MenuUpdateRequest;
-import com.lesofn.archforge.server.admin.mapper.AdminMenuConvertor;
+import com.lesofn.archforge.server.admin.convertor.AdminMenuConvertor;
 import com.lesofn.archforge.user.api.domain.SysMenu;
 import com.lesofn.archforge.user.api.menu.SysMenuService;
 import com.lesofn.archforge.user.api.menu.dto.MetaDTO;

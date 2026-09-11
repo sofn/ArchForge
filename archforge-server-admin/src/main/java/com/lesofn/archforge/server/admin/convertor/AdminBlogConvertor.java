@@ -1,4 +1,4 @@
-package com.lesofn.archforge.server.admin.mapper;
+package com.lesofn.archforge.server.admin.convertor;
 
 import com.lesofn.archforge.blog.api.domain.BlogArticle;
 import com.lesofn.archforge.blog.api.domain.BlogCategory;

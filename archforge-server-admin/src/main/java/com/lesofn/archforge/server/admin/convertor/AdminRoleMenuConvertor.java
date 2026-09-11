@@ -1,4 +1,4 @@
-package com.lesofn.archforge.server.admin.mapper;
+package com.lesofn.archforge.server.admin.convertor;
 
 import com.lesofn.archforge.server.admin.dto.AdminRoleMenuDTO;
 import com.lesofn.archforge.user.api.domain.SysMenu;

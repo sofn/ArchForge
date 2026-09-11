@@ -9,7 +9,7 @@ import com.lesofn.archforge.server.admin.dto.request.AdminBlogCategoryListReques
 import com.lesofn.archforge.server.admin.dto.request.AdminBlogCategoryUpdateRequest;
 import com.lesofn.archforge.server.admin.dto.request.IdRequest;
 import com.lesofn.archforge.server.admin.dto.response.AdminBlogCategoryResponse;
-import com.lesofn.archforge.server.admin.mapper.AdminBlogConvertor;
+import com.lesofn.archforge.server.admin.convertor.AdminBlogConvertor;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;

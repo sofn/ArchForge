@@ -1,6 +1,5 @@
-package com.lesofn.archforge.infrastructure.frame.filters;
+package com.lesofn.archforge.infrastructure.frame.filter;
 
-import com.lesofn.archforge.infrastructure.frame.filter.RepeatableFilter;
 import io.micrometer.observation.ObservationRegistry;
 import jakarta.servlet.DispatcherType;
 import jakarta.servlet.Filter;

@@ -27,11 +27,6 @@ dependencies {
 
     // Logging
     api("org.slf4j:slf4j-api")
-    // util (使用自定义 BOM 管理的版本)
-    api("org.javatuples:javatuples")
-
-    // HTTP客户端
-    api("com.konghq:unirest-java-core")
 
     // Jackson for JSON processing (Spring Boot BOM 管理的版本)
     api("tools.jackson.core:jackson-databind")
@@ -50,7 +45,6 @@ dependencies {
     // other (使用自定义 BOM 管理的版本)
     api("com.google.code.findbugs:annotations")
     api("org.lionsoul:ip2region")
-    api("eu.bitwalker:UserAgentUtils")
     api("org.jspecify:jspecify")
 
     // Spring Modulith annotations (transitively available to all modules)

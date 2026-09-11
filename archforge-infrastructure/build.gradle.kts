@@ -28,6 +28,9 @@ dependencies {
     // Kaptcha 验证码
     api("com.github.penggle:kaptcha")
 
+    // User-Agent 解析（frame.utils.UserAgentUtil）
+    implementation("nl.basjes.parse.useragent:yauaa")
+
     // 日志依赖 (Spring Boot BOM 管理的版本)
     // Using Log4j2 to avoid SLF4J multiple providers issue
     api("org.slf4j:slf4j-api")

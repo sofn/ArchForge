@@ -26,21 +26,10 @@ dependencies {
         api("commons-codec:commons-codec:1.22.0")
         api("org.apache.commons:commons-collections4:4.5.0")
         
-        // 实用工具
-        api("org.javatuples:javatuples:1.2")
-        
-        // HTTP客户端
-        api("com.konghq:unirest-java-core:4.10.0")
-        
         // Web相关
         api("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.3")
 
         api("org.jolokia:jolokia-core:1.7.2")
-        
-        // JWT
-        api("io.jsonwebtoken:jjwt-api:0.12.7")
-        api("io.jsonwebtoken:jjwt-impl:0.12.7")
-        api("io.jsonwebtoken:jjwt-jackson:0.12.7")
 
         // Sa-Token
         api("cn.dev33:sa-token-spring-boot3-starter:1.45.0")
@@ -52,7 +41,8 @@ dependencies {
 // carries the v4/v6 dual-version API; xdb DATA files track the upstream GitHub tags
 // (see archforge-common-base: ip2region-xdb-version injected as a resource).
 api("org.lionsoul:ip2region:3.3.7")
-        api("eu.bitwalker:UserAgentUtils:1.21")
+        // User-Agent 解析：yauaa（维护中），替代已停更的 eu.bitwalker UserAgentUtils
+        api("nl.basjes.parse.useragent:yauaa:8.1.1")
         api("org.jspecify:jspecify:1.0.0")
         
         // Lombok and SLF4J (versions managed by Spring Boot BOM)
