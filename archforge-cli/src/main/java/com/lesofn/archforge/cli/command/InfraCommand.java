@@ -9,6 +9,7 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
 @Command(
+        mixinStandardHelpOptions = true,
         name = "infra",
         description = "Manage dependency containers via docker compose",
         subcommands = {
@@ -16,7 +17,7 @@ import picocli.CommandLine.Option;
         })
 public class InfraCommand {
 
-    @Command(name = "up", description = "Start postgres/redis")
+    @Command(mixinStandardHelpOptions = true, name = "up", description = "Start postgres/redis")
     static class Up implements Callable<Integer> {
         @Option(names = "--profile", defaultValue = "dev")
         String profile;
@@ -28,7 +29,7 @@ public class InfraCommand {
         }
     }
 
-    @Command(name = "down", description = "Remove dependency containers")
+    @Command(mixinStandardHelpOptions = true, name = "down", description = "Remove dependency containers")
     static class Down implements Callable<Integer> {
         @Option(names = "--profile", defaultValue = "dev")
         String profile;
@@ -39,7 +40,7 @@ public class InfraCommand {
         }
     }
 
-    @Command(name = "stop", description = "Pause dependency containers")
+    @Command(mixinStandardHelpOptions = true, name = "stop", description = "Pause dependency containers")
     static class Stop implements Callable<Integer> {
         @Option(names = "--profile", defaultValue = "dev")
         String profile;

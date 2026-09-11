@@ -12,7 +12,7 @@ import java.util.concurrent.Callable;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
-@Command(name = "init", description = "Generate credentials and optionally start local dependencies")
+@Command(mixinStandardHelpOptions = true, name = "init", description = "Generate credentials and optionally start local dependencies")
 public class InitCommand implements Callable<Integer> {
 
     @Option(names = "--profile", defaultValue = "dev", description = "dev|test|staging|prod")

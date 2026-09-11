@@ -8,6 +8,7 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
 @Command(
+        mixinStandardHelpOptions = true,
         name = "skills",
         description = "Install ArchForge skills into AI tools",
         subcommands = {
@@ -20,7 +21,7 @@ public class SkillsCommand {
 
     static final Set<String> TOOLS = Set.of("claude", "codex", "cursor", "devin");
 
-    @Command(name = "install", description = "Append skills to the selected tool")
+    @Command(mixinStandardHelpOptions = true, name = "install", description = "Append skills to the selected tool")
     static class Install implements Callable<Integer> {
         @Option(names = "--tool", required = true)
         String tool;
@@ -37,7 +38,7 @@ public class SkillsCommand {
         }
     }
 
-    @Command(name = "list", description = "List supported tools")
+    @Command(mixinStandardHelpOptions = true, name = "list", description = "List supported tools")
     static class List implements Callable<Integer> {
         @Override
         public Integer call() {
@@ -46,7 +47,7 @@ public class SkillsCommand {
         }
     }
 
-    @Command(name = "update", description = "Re-apply skill snippets")
+    @Command(mixinStandardHelpOptions = true, name = "update", description = "Re-apply skill snippets")
     static class Update implements Callable<Integer> {
         @Option(names = "--tool", required = true)
         String tool;
@@ -59,7 +60,7 @@ public class SkillsCommand {
         }
     }
 
-    @Command(name = "remove", description = "Remove generated skill block")
+    @Command(mixinStandardHelpOptions = true, name = "remove", description = "Remove generated skill block")
     static class Remove implements Callable<Integer> {
         @Option(names = "--tool", required = true)
         String tool;

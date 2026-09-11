@@ -13,6 +13,7 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
 @Command(
+        mixinStandardHelpOptions = true,
         name = "db",
         description = "Database operations",
         subcommands = {
@@ -20,7 +21,7 @@ import picocli.CommandLine.Option;
         })
 public class DbCommand {
 
-    @Command(name = "init", description = "Start database and apply migrations")
+    @Command(mixinStandardHelpOptions = true, name = "init", description = "Start database and apply migrations")
     static class Init implements Callable<Integer> {
         @Override
         public Integer call() {
@@ -35,7 +36,7 @@ public class DbCommand {
         }
     }
 
-    @Command(name = "update", description = "Apply latest Flyway migrations")
+    @Command(mixinStandardHelpOptions = true, name = "update", description = "Apply latest Flyway migrations")
     static class Update implements Callable<Integer> {
         @Override
         public Integer call() {
@@ -46,7 +47,7 @@ public class DbCommand {
         }
     }
 
-    @Command(name = "backup", description = "Dump database into backup/db/")
+    @Command(mixinStandardHelpOptions = true, name = "backup", description = "Dump database into backup/db/")
     static class Backup implements Callable<Integer> {
         @Override
         public Integer call() {
@@ -79,7 +80,7 @@ public class DbCommand {
         }
     }
 
-    @Command(name = "recovery", description = "Restore a backup after confirmation")
+    @Command(mixinStandardHelpOptions = true, name = "recovery", description = "Restore a backup after confirmation")
     static class Recovery implements Callable<Integer> {
         @Option(names = "--file", required = true)
         Path file;

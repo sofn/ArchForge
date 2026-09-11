@@ -9,6 +9,7 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
 @Command(
+        mixinStandardHelpOptions = true,
         name = "docker",
         description = "Manage business images",
         subcommands = {
@@ -16,7 +17,7 @@ import picocli.CommandLine.Option;
         })
 public class DockerCommand {
 
-    @Command(name = "up", description = "Start latest images; start deps and migrate if needed")
+    @Command(mixinStandardHelpOptions = true, name = "up", description = "Start latest images; start deps and migrate if needed")
     static class Up implements Callable<Integer> {
         @Option(names = "--profile", defaultValue = "dev")
         String profile;
@@ -39,7 +40,7 @@ public class DockerCommand {
         }
     }
 
-    @Command(name = "down", description = "Stop all compose services")
+    @Command(mixinStandardHelpOptions = true, name = "down", description = "Stop all compose services")
     static class Down implements Callable<Integer> {
         @Option(names = "--profile", defaultValue = "dev")
         String profile;

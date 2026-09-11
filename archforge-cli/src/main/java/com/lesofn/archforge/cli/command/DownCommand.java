@@ -7,7 +7,7 @@ import java.util.concurrent.Callable;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
-@Command(name = "down", description = "Stop the full stack")
+@Command(mixinStandardHelpOptions = true, name = "down", description = "Stop the full stack")
 public class DownCommand implements Callable<Integer> {
 
     @Option(names = "--profile", defaultValue = "dev")

@@ -9,7 +9,7 @@ import java.util.concurrent.Callable;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
-@Command(name = "build", description = "Build backend images and frontend docker images")
+@Command(mixinStandardHelpOptions = true, name = "build", description = "Build backend images and frontend docker images")
 public class BuildCommand implements Callable<Integer> {
 
     @Option(names = "--profile", defaultValue = "dev")
