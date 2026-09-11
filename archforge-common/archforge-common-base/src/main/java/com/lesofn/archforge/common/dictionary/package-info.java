@@ -1,4 +1,4 @@
 @NullMarked
-package com.lesofn.archforge.infrastructure.user.base;
+package com.lesofn.archforge.common.dictionary;
 
 import org.jspecify.annotations.NullMarked;

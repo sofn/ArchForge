@@ -5,9 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
-import com.lesofn.archforge.infrastructure.dictionary.EnumDictionary;
-import com.lesofn.archforge.infrastructure.dictionary.EnumDictionaryItem;
-import com.lesofn.archforge.infrastructure.dictionary.EnumDictionaryRegistry;
+import com.lesofn.archforge.common.dictionary.EnumDictionary;
+import com.lesofn.archforge.common.dictionary.EnumDictionaryItem;
+import com.lesofn.archforge.common.dictionary.EnumDictionaryRegistry;
 import com.lesofn.archforge.user.api.dao.dict.SysDictItemRepository;
 import com.lesofn.archforge.user.api.dao.dict.SysDictTypeRepository;
 import com.lesofn.archforge.user.api.domain.dict.SysDictType;

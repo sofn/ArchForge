@@ -1,6 +1,6 @@
 package com.lesofn.archforge.server.admin.service.login;
 
-import com.lesofn.archforge.infrastructure.auth.model.SystemLoginUser;
+import com.lesofn.archforge.common.auth.SystemLoginUser;
 import com.lesofn.archforge.infrastructure.auth.stp.LoginSessionKeys;
 import com.lesofn.archforge.infrastructure.auth.stp.StpAdminUtil;
 import com.lesofn.archforge.infrastructure.config.ArchForgeProperties;

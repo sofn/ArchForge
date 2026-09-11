@@ -4,7 +4,7 @@ import com.lesofn.archforge.common.context.ClientVersion;
 import com.lesofn.archforge.common.utils.GlobalConstants;
 import com.lesofn.archforge.infrastructure.auth.annotation.BaseInfo;
 import com.lesofn.archforge.infrastructure.auth.errors.AdminAuthException;
-import com.lesofn.archforge.infrastructure.auth.model.AuthRequest;
+import com.lesofn.archforge.common.auth.AuthRequest;
 import com.lesofn.archforge.infrastructure.auth.model.AuthResponse;
 import com.lesofn.archforge.infrastructure.auth.service.AuthService;
 import com.lesofn.archforge.infrastructure.frame.context.RequestContext;

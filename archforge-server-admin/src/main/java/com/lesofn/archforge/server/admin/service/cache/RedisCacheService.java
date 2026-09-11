@@ -1,6 +1,6 @@
 package com.lesofn.archforge.server.admin.service.cache;
 
-import com.lesofn.archforge.infrastructure.auth.model.SystemLoginUser;
+import com.lesofn.archforge.common.auth.SystemLoginUser;
 import com.lesofn.archforge.infrastructure.db.redis.RedisUtil;
 import com.lesofn.archforge.user.api.domain.SysRole;
 import com.lesofn.archforge.user.api.domain.SysUser;

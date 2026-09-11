@@ -8,11 +8,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import cn.dev33.satoken.context.mock.SaTokenContextMockUtil;
-import com.lesofn.archforge.infrastructure.auth.model.SystemLoginUser;
+import com.lesofn.archforge.common.auth.SystemLoginUser;
 import com.lesofn.archforge.infrastructure.auth.stp.LoginSessionKeys;
 import com.lesofn.archforge.infrastructure.auth.stp.StpAdminUtil;
 import com.lesofn.archforge.infrastructure.config.ArchForgeProperties;
-import com.lesofn.archforge.infrastructure.user.web.RoleInfo;
+import com.lesofn.archforge.common.auth.RoleInfo;
 import com.lesofn.archforge.server.admin.service.cache.RedisCacheService;
 import com.lesofn.archforge.server.admin.service.cache.RedisCacheTemplate;
 import org.junit.jupiter.api.AfterEach;

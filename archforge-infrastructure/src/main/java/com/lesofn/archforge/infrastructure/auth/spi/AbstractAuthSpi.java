@@ -1,6 +1,6 @@
 package com.lesofn.archforge.infrastructure.auth.spi;
 
-import com.lesofn.archforge.infrastructure.auth.model.AuthRequest;
+import com.lesofn.archforge.common.auth.AuthRequest;
 import com.lesofn.archforge.infrastructure.frame.utils.log.ApiLogger;
 
 /**

@@ -1,10 +1,10 @@
 package com.lesofn.archforge.server.admin.service.login;
 
 import com.lesofn.archforge.common.enums.BasicEnumUtil;
-import com.lesofn.archforge.infrastructure.auth.model.SystemLoginUser;
+import com.lesofn.archforge.common.auth.SystemLoginUser;
 import com.lesofn.archforge.infrastructure.config.ArchForgeProperties;
-import com.lesofn.archforge.infrastructure.user.web.DataScopeEnum;
-import com.lesofn.archforge.infrastructure.user.web.RoleInfo;
+import com.lesofn.archforge.common.auth.DataScopeEnum;
+import com.lesofn.archforge.common.auth.RoleInfo;
 import com.lesofn.archforge.user.api.domain.SysMenu;
 import com.lesofn.archforge.user.api.domain.SysRole;
 import com.lesofn.archforge.user.api.domain.SysUser;

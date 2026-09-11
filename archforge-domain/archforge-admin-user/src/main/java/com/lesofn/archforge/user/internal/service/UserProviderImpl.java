@@ -1,7 +1,7 @@
 package com.lesofn.archforge.user.internal.service;
 
-import com.lesofn.archforge.infrastructure.auth.model.AuthRequest;
-import com.lesofn.archforge.infrastructure.auth.provider.UserProvider;
+import com.lesofn.archforge.common.auth.AuthRequest;
+import com.lesofn.archforge.common.auth.UserProvider;
 import com.lesofn.archforge.user.api.domain.SysUser;
 import com.lesofn.archforge.user.api.service.UserService;
 import java.util.Optional;

@@ -1,4 +1,4 @@
-package com.lesofn.archforge.infrastructure.auth.model;
+package com.lesofn.archforge.common.auth;
 
 import com.lesofn.archforge.common.utils.ip.IpUtil;
 import jakarta.servlet.http.Cookie;

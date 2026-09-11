@@ -3,7 +3,7 @@ package com.lesofn.archforge.infrastructure.auth;
 import static com.lesofn.archforge.infrastructure.auth.errors.AdminAuthErrorCode.USER_FAIL_TO_GET_USER_ID;
 
 import com.lesofn.archforge.infrastructure.auth.errors.AdminAuthException;
-import com.lesofn.archforge.infrastructure.auth.model.SystemLoginUser;
+import com.lesofn.archforge.common.auth.SystemLoginUser;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 /**

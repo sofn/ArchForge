@@ -1,6 +1,6 @@
 package com.lesofn.archforge.infrastructure.security.datascope;
 
-import com.lesofn.archforge.infrastructure.user.web.DataScopeEnum;
+import com.lesofn.archforge.common.auth.DataScopeEnum;
 import java.util.HashSet;
 import java.util.Set;
 import lombok.AllArgsConstructor;

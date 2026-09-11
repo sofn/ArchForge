@@ -1,6 +1,6 @@
 package com.lesofn.archforge.server.admin.service.user;
 
-import com.lesofn.archforge.infrastructure.auth.model.SystemLoginUser;
+import com.lesofn.archforge.common.auth.SystemLoginUser;
 import com.lesofn.archforge.server.admin.dto.AdminPageResponse;
 import com.lesofn.archforge.server.admin.dto.AdminUserDTO;
 import com.lesofn.archforge.server.admin.dto.AdminUserListRequest;

@@ -6,7 +6,7 @@ import com.lesofn.archforge.blog.api.enums.BlogArticleStatus;
 import com.lesofn.archforge.blog.api.service.BlogArticleService;
 import com.lesofn.archforge.blog.api.service.BlogCategoryService;
 import com.lesofn.archforge.infrastructure.auth.LoginContext;
-import com.lesofn.archforge.infrastructure.auth.model.SystemLoginUser;
+import com.lesofn.archforge.common.auth.SystemLoginUser;
 import com.lesofn.archforge.server.admin.dto.AdminPageResponse;
 import com.lesofn.archforge.server.admin.dto.request.AdminBlogArticleCreateRequest;
 import com.lesofn.archforge.server.admin.dto.request.AdminBlogArticleListRequest;

@@ -1,4 +1,4 @@
-package com.lesofn.archforge.infrastructure.user.web;
+package com.lesofn.archforge.common.auth;
 
 import java.util.Collections;
 import java.util.HashSet;

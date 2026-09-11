@@ -1,4 +1,4 @@
-package com.lesofn.archforge.infrastructure.frame.utils;
+package com.lesofn.archforge.common.utils;
 
 import nl.basjes.parse.useragent.UserAgent;
 import nl.basjes.parse.useragent.UserAgentAnalyzer;

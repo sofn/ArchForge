@@ -3,7 +3,7 @@ package com.lesofn.archforge.infrastructure.auth.spi;
 import com.lesofn.archforge.common.context.ClientVersion;
 import com.lesofn.archforge.infrastructure.auth.errors.AdminAuthErrorCode;
 import com.lesofn.archforge.infrastructure.auth.errors.AdminAuthException;
-import com.lesofn.archforge.infrastructure.auth.model.AuthRequest;
+import com.lesofn.archforge.common.auth.AuthRequest;
 import org.springframework.stereotype.Component;
 
 /**

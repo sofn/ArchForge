@@ -4,7 +4,7 @@ import com.lesofn.archforge.common.encrypt.AESEncrypter;
 import com.lesofn.archforge.common.encrypt.EncrypterException;
 import com.lesofn.archforge.infrastructure.auth.errors.AdminAuthErrorCode;
 import com.lesofn.archforge.infrastructure.auth.errors.AdminAuthException;
-import com.lesofn.archforge.infrastructure.auth.model.AuthRequest;
+import com.lesofn.archforge.common.auth.AuthRequest;
 import com.lesofn.archforge.infrastructure.frame.utils.log.ApiLogger;
 import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang3.StringUtils;

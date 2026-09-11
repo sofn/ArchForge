@@ -1,10 +1,10 @@
-package com.lesofn.archforge.infrastructure.user.base;
+package com.lesofn.archforge.common.auth;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.lesofn.archforge.common.utils.ServletHolderUtil;
 import com.lesofn.archforge.common.utils.ip.IpRegionUtil;
 import com.lesofn.archforge.common.utils.ip.IpUtil;
-import com.lesofn.archforge.infrastructure.frame.utils.UserAgentUtil;
+import com.lesofn.archforge.common.utils.UserAgentUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;

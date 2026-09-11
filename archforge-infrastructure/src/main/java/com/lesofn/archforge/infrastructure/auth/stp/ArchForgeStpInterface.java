@@ -2,8 +2,8 @@ package com.lesofn.archforge.infrastructure.auth.stp;
 
 import cn.dev33.satoken.session.SaSession;
 import cn.dev33.satoken.stp.StpInterface;
-import com.lesofn.archforge.infrastructure.auth.model.SystemLoginUser;
-import com.lesofn.archforge.infrastructure.user.web.RoleInfo;
+import com.lesofn.archforge.common.auth.SystemLoginUser;
+import com.lesofn.archforge.common.auth.RoleInfo;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

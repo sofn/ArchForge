@@ -1,10 +1,10 @@
 package com.lesofn.archforge.server.admin.controller.monitor;
 
 import cn.dev33.satoken.session.SaSession;
-import com.lesofn.archforge.infrastructure.auth.model.SystemLoginUser;
+import com.lesofn.archforge.common.auth.SystemLoginUser;
 import com.lesofn.archforge.infrastructure.auth.stp.LoginSessionKeys;
 import com.lesofn.archforge.infrastructure.db.redis.RedisUtil;
-import com.lesofn.archforge.infrastructure.user.base.LoginInfo;
+import com.lesofn.archforge.common.auth.LoginInfo;
 import com.lesofn.archforge.server.admin.dto.AdminPageResponse;
 import com.lesofn.archforge.server.admin.dto.request.OnlineLogListRequest;
 import com.lesofn.archforge.server.admin.dto.response.CacheInfoResponse;

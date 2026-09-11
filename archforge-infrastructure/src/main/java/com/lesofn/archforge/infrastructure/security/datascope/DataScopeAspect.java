@@ -1,9 +1,9 @@
 package com.lesofn.archforge.infrastructure.security.datascope;
 
 import com.lesofn.archforge.infrastructure.auth.LoginContext;
-import com.lesofn.archforge.infrastructure.auth.model.SystemLoginUser;
-import com.lesofn.archforge.infrastructure.user.web.DataScopeEnum;
-import com.lesofn.archforge.infrastructure.user.web.RoleInfo;
+import com.lesofn.archforge.common.auth.SystemLoginUser;
+import com.lesofn.archforge.common.auth.DataScopeEnum;
+import com.lesofn.archforge.common.auth.RoleInfo;
 import java.util.HashSet;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;

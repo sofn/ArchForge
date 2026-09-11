@@ -1,7 +1,7 @@
 package com.lesofn.archforge.server.admin.datascope;
 
 import com.lesofn.archforge.infrastructure.security.datascope.DataScopeContext;
-import com.lesofn.archforge.infrastructure.user.web.DataScopeEnum;
+import com.lesofn.archforge.common.auth.DataScopeEnum;
 import com.lesofn.archforge.user.api.domain.SysDept;
 import com.lesofn.archforge.user.api.domain.SysUser;
 import com.lesofn.archforge.user.api.service.SysDeptService;

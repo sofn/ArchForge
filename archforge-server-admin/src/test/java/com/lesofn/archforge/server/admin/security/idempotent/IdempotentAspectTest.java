@@ -15,7 +15,7 @@ import com.lesofn.archforge.infrastructure.annotation.Idempotent;
 import com.lesofn.archforge.infrastructure.annotation.IdempotentType;
 import com.lesofn.archforge.infrastructure.aspect.IdempotentAspect;
 import com.lesofn.archforge.infrastructure.auth.LoginContext;
-import com.lesofn.archforge.infrastructure.auth.model.SystemLoginUser;
+import com.lesofn.archforge.common.auth.SystemLoginUser;
 import com.lesofn.archforge.infrastructure.frame.context.RequestContext;
 import com.lesofn.archforge.infrastructure.frame.context.ScopedValueContext;
 import com.lesofn.archforge.infrastructure.security.SecurityException;

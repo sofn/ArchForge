@@ -45,6 +45,8 @@ dependencies {
     // other (使用自定义 BOM 管理的版本)
     api("com.google.code.findbugs:annotations")
     api("org.lionsoul:ip2region")
+    // User-Agent 解析（common.utils.UserAgentUtil）
+    implementation("nl.basjes.parse.useragent:yauaa")
     api("org.jspecify:jspecify")
 
     // Spring Modulith annotations (transitively available to all modules)

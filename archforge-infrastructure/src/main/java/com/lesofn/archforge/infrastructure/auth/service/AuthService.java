@@ -1,7 +1,7 @@
 package com.lesofn.archforge.infrastructure.auth.service;
 
 import com.lesofn.archforge.infrastructure.auth.annotation.BaseInfo;
-import com.lesofn.archforge.infrastructure.auth.model.AuthRequest;
+import com.lesofn.archforge.common.auth.AuthRequest;
 import com.lesofn.archforge.infrastructure.auth.model.AuthResponse;
 import java.util.Optional;
 

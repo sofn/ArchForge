@@ -4,9 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import cn.dev33.satoken.session.SaSession;
-import com.lesofn.archforge.infrastructure.auth.model.SystemLoginUser;
-import com.lesofn.archforge.infrastructure.user.web.DataScopeEnum;
-import com.lesofn.archforge.infrastructure.user.web.RoleInfo;
+import com.lesofn.archforge.common.auth.SystemLoginUser;
+import com.lesofn.archforge.common.auth.DataScopeEnum;
+import com.lesofn.archforge.common.auth.RoleInfo;
 import java.util.List;
 import java.util.Set;
 import cn.dev33.satoken.context.mock.SaTokenContextMockUtil;

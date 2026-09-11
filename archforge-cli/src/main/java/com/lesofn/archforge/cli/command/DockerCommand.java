@@ -17,7 +17,8 @@ import picocli.CommandLine.Option;
         })
 public class DockerCommand {
 
-    @Command(mixinStandardHelpOptions = true, name = "up", description = "Start latest images; start deps and migrate if needed")
+    @Command(mixinStandardHelpOptions = true, name = "up",
+            description = "Start latest images; start deps and migrate if needed")
     static class Up implements Callable<Integer> {
         @Option(names = "--profile", defaultValue = "dev")
         String profile;

@@ -1,7 +1,7 @@
 package com.lesofn.archforge.infrastructure.auth.spi;
 
 import com.lesofn.archforge.infrastructure.auth.errors.AdminAuthException;
-import com.lesofn.archforge.infrastructure.auth.model.AuthRequest;
+import com.lesofn.archforge.common.auth.AuthRequest;
 
 /**
  * @author sofn

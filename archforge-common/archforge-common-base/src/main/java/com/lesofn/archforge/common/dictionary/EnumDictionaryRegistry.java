@@ -1,10 +1,9 @@
-package com.lesofn.archforge.infrastructure.dictionary;
+package com.lesofn.archforge.common.dictionary;
 
 import com.lesofn.archforge.common.enums.BasicEnum;
 import com.lesofn.archforge.common.enums.DictionaryEnum;
 import com.lesofn.archforge.common.enums.dictionary.Dictionary;
 import com.lesofn.archforge.common.enums.dictionary.DictionaryData;
-import com.lesofn.archforge.infrastructure.config.ArchForgeProperties;
 import jakarta.annotation.PostConstruct;
 import java.io.IOException;
 import java.util.List;
@@ -20,15 +19,17 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.type.classreading.CachingMetadataReaderFactory;
 import org.springframework.core.type.classreading.MetadataReader;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
+@EnableConfigurationProperties(DictionaryProperties.class)
 public class EnumDictionaryRegistry {
 
-    private final ArchForgeProperties config;
+    private final DictionaryProperties config;
 
     private final Map<String, EnumDictionary> byCode = new LinkedHashMap<>();
     private final Map<Long, EnumDictionary> byTypeId = new HashMap<>();
@@ -36,14 +37,14 @@ public class EnumDictionaryRegistry {
 
     @PostConstruct
     public void init() {
-        if (!config.getDictionary().isEnabled()) {
+        if (!config.isEnabled()) {
             log.info("Enum dictionary scan is disabled");
             return;
         }
         PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
         CachingMetadataReaderFactory factory = new CachingMetadataReaderFactory(resolver);
         ClassLoader classLoader = this.getClass().getClassLoader();
-        for (String basePackage : config.getDictionary().getEnumBasePackages()) {
+        for (String basePackage : config.getEnumBasePackages()) {
             scanPackage(basePackage, resolver, factory, classLoader);
         }
         factory.clearCache();

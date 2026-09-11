@@ -8,7 +8,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.lesofn.archforge.infrastructure.security.datascope.DataScopeContext;
-import com.lesofn.archforge.infrastructure.user.web.DataScopeEnum;
+import com.lesofn.archforge.common.auth.DataScopeEnum;
 import com.lesofn.archforge.user.api.domain.SysDept;
 import com.lesofn.archforge.user.api.domain.SysUser;
 import com.lesofn.archforge.user.api.service.SysDeptService;

@@ -1,4 +1,4 @@
-package com.lesofn.archforge.infrastructure.user.base;
+package com.lesofn.archforge.common.auth;
 
 import lombok.Data;
 

@@ -1,9 +1,7 @@
-package com.lesofn.archforge.infrastructure.auth.model;
+package com.lesofn.archforge.common.auth;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.lesofn.archforge.infrastructure.user.base.BaseLoginUser;
-import com.lesofn.archforge.infrastructure.user.web.RoleInfo;
 import java.util.Optional;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

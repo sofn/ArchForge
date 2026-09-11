@@ -9,8 +9,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.lesofn.archforge.infrastructure.auth.model.SystemLoginUser;
-import com.lesofn.archforge.infrastructure.user.web.RoleInfo;
+import com.lesofn.archforge.common.auth.SystemLoginUser;
+import com.lesofn.archforge.common.auth.RoleInfo;
 import com.lesofn.archforge.infrastructure.db.redis.RedisUtil;
 import com.lesofn.archforge.server.admin.dto.CurrentLoginUserResponse;
 import com.lesofn.archforge.server.admin.dto.request.UserCreateRequest;

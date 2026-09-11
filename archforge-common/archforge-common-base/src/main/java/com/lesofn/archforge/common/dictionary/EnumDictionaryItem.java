@@ -1,4 +1,4 @@
-package com.lesofn.archforge.infrastructure.dictionary;
+package com.lesofn.archforge.common.dictionary;
 
 import lombok.Value;
 

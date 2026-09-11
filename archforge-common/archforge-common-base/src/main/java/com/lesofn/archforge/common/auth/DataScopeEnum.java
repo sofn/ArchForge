@@ -1,4 +1,4 @@
-package com.lesofn.archforge.infrastructure.user.web;
+package com.lesofn.archforge.common.auth;
 
 import com.lesofn.archforge.common.enums.BasicEnum;
 import com.lesofn.archforge.common.enums.dictionary.Dictionary;

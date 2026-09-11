@@ -1,6 +1,6 @@
 package com.lesofn.archforge.user.api.menu;
 
-import com.lesofn.archforge.infrastructure.auth.model.SystemLoginUser;
+import com.lesofn.archforge.common.auth.SystemLoginUser;
 import com.lesofn.archforge.user.api.domain.SysMenu;
 import com.lesofn.archforge.user.api.menu.dto.RouterDTO;
 import java.util.List;

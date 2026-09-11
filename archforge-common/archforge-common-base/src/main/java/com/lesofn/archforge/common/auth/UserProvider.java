@@ -1,6 +1,4 @@
-package com.lesofn.archforge.infrastructure.auth.provider;
-
-import com.lesofn.archforge.infrastructure.auth.model.AuthRequest;
+package com.lesofn.archforge.common.auth;
 
 /**
  * @author sofn

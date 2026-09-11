@@ -1,7 +1,7 @@
 package com.lesofn.archforge.server.admin.service.user.impl;
 
 import com.lesofn.archforge.common.utils.query.QueryHelp;
-import com.lesofn.archforge.infrastructure.auth.model.SystemLoginUser;
+import com.lesofn.archforge.common.auth.SystemLoginUser;
 import com.lesofn.archforge.infrastructure.db.redis.RedisUtil;
 import com.lesofn.archforge.infrastructure.security.datascope.DataPermission;
 import com.lesofn.archforge.infrastructure.security.datascope.DataScopeContextHolder;

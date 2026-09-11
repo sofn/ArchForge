@@ -2,8 +2,8 @@ package com.lesofn.archforge.infrastructure.auth.spi;
 
 import com.lesofn.archforge.infrastructure.auth.errors.AdminAuthErrorCode;
 import com.lesofn.archforge.infrastructure.auth.errors.AdminAuthException;
-import com.lesofn.archforge.infrastructure.auth.model.AuthRequest;
-import com.lesofn.archforge.infrastructure.auth.provider.UserProvider;
+import com.lesofn.archforge.common.auth.AuthRequest;
+import com.lesofn.archforge.common.auth.UserProvider;
 import com.lesofn.archforge.infrastructure.auth.service.DefaultAuthService;
 import com.lesofn.archforge.infrastructure.frame.utils.log.ApiLogger;
 import java.util.Optional;

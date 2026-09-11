@@ -4,7 +4,7 @@ import com.lesofn.archforge.common.utils.ip.IpRegionUtil;
 import com.lesofn.archforge.common.utils.ip.IpUtil;
 import com.lesofn.archforge.infrastructure.annotation.Log;
 import com.lesofn.archforge.infrastructure.frame.context.ScopedValueContext;
-import com.lesofn.archforge.infrastructure.frame.utils.UserAgentUtil;
+import com.lesofn.archforge.common.utils.UserAgentUtil;
 import com.lesofn.archforge.server.admin.event.LogEvent;
 import com.lesofn.archforge.user.api.domain.SysOperLog;
 import io.swagger.v3.oas.annotations.Operation;

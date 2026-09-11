@@ -1,6 +1,7 @@
 package com.lesofn.archforge.infrastructure.auth.provider;
 
-import com.lesofn.archforge.infrastructure.auth.model.AuthRequest;
+import com.lesofn.archforge.common.auth.AuthRequest;
+import com.lesofn.archforge.common.auth.UserProvider;
 import org.springframework.stereotype.Service;
 
 /**
