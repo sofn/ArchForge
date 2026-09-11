@@ -68,6 +68,9 @@ api("org.lionsoul:ip2region:3.3.7")
         // MapStruct
         api("org.mapstruct:mapstruct:1.6.3")
         api("org.mapstruct:mapstruct-processor:1.6.3")
+        // Hibernate Static Metamodel Generator——与 Spring Boot 4.1 BOM 的 Hibernate 7.4.x 对齐
+        api("org.hibernate.orm:hibernate-processor:7.4.1.Final")
+        api("org.apache.commons:commons-csv:1.10.0")
 
         // Micrometer + OpenTelemetry (versions aligned with Spring Boot 4.1.0 BOM)
         api("io.micrometer:micrometer-tracing:1.6.6")

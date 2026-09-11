@@ -136,11 +136,11 @@ dependencies {
     developmentOnly("org.springframework.boot:spring-boot-devtools:4.1.0")
     
     // Lombok注解处理器
-    annotationProcessor("org.projectlombok:lombok:1.18.46")
+    annotationProcessor("org.projectlombok:lombok")
     compileOnly("org.projectlombok:lombok")
 
     // MapStruct注解处理器
-    annotationProcessor("org.mapstruct:mapstruct-processor:1.6.3")
+    annotationProcessor("org.mapstruct:mapstruct-processor")
     compileOnly("org.mapstruct:mapstruct:1.6.3")
 
     // Spring Modulith verification and documentation

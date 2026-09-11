@@ -9,8 +9,8 @@ dependencies {
     implementation(project(":archforge-common:archforge-common-base"))
     implementation(project(":archforge-common:archforge-common-error"))
 
-    implementation("info.picocli:picocli:4.7.6")
-    implementation("info.picocli:picocli-shell-jline3:4.7.6")
+    implementation("info.picocli:picocli")
+    implementation("info.picocli:picocli-shell-jline3")
     implementation("tools.jackson.dataformat:jackson-dataformat-yaml")
     implementation("org.slf4j:slf4j-api")
     implementation("org.slf4j:slf4j-simple")

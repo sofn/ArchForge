@@ -11,7 +11,7 @@ dependencies {
 
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
-    annotationProcessor("org.hibernate.orm:hibernate-processor:7.4.1.Final")
+    annotationProcessor("org.hibernate.orm:hibernate-processor")
 
     compileOnly(platform(project(":archforge-dependencies")))
     compileOnly("org.mapstruct:mapstruct")

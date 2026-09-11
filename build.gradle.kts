@@ -289,10 +289,13 @@ subprojects {
             add("implementation", platform("org.springframework.boot:spring-boot-dependencies:4.1.0"))
             // 引入自定义 dependencies
             add("implementation", platform(project(":archforge-dependencies")))
+            // annotationProcessor 不继承 implementation——平台需单独挂，版本单源在 BOM
+            add("annotationProcessor", platform(project(":archforge-dependencies")))
+            add("testAnnotationProcessor", platform(project(":archforge-dependencies")))
 
-            // compile - Lombok配置
-            add("annotationProcessor", "org.projectlombok:lombok:1.18.46")
-            add("testAnnotationProcessor", "org.projectlombok:lombok:1.18.46")
+            // compile - Lombok配置（版本由 BOM 管理）
+            add("annotationProcessor", "org.projectlombok:lombok")
+            add("testAnnotationProcessor", "org.projectlombok:lombok")
 
             // 全局测试依赖 - Spock 2.4 (Groovy 5.x)
             add("testImplementation", "org.junit.jupiter:junit-jupiter-api")
