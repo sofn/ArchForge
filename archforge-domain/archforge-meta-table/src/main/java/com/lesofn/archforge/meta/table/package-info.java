@@ -1,6 +1,6 @@
 @NullMarked
-@ApplicationModule(id = "meta-table", type = ApplicationModule.Type.OPEN, allowedDependencies = {
-        "common", "infrastructure"
+@ApplicationModule(id = "meta-table", type = ApplicationModule.Type.CLOSED, allowedDependencies = {
+        "common"
 })
 package com.lesofn.archforge.meta.table;
 

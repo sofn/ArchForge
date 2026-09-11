@@ -19,6 +19,7 @@ import com.lesofn.archforge.meta.table.api.domain.MetaColumn;
 import com.lesofn.archforge.meta.table.api.domain.MetaColumnType;
 import com.lesofn.archforge.meta.table.api.domain.MetaTable;
 import com.lesofn.archforge.meta.table.api.errors.MetaTableException;
+import com.lesofn.archforge.meta.table.api.service.MetaTableMigrationService;
 import com.lesofn.archforge.meta.table.internal.ddl.AlterTableDdlGenerator;
 import com.lesofn.archforge.meta.table.internal.ddl.MetaTableDdlGenerator;
 import com.lesofn.archforge.meta.table.internal.ddl.SchemaDdl;

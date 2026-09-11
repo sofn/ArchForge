@@ -16,8 +16,8 @@ import com.lesofn.archforge.meta.table.api.errors.MetaTableErrorCode;
 import com.lesofn.archforge.meta.table.api.errors.MetaTableException;
 import com.lesofn.archforge.meta.table.api.service.MetaTableAdminService;
 import com.lesofn.archforge.meta.table.api.service.MetaTableCrudService;
-import com.lesofn.archforge.meta.table.internal.generator.MetaTableCodeGenerator;
-import com.lesofn.archforge.meta.table.internal.service.MetaTableMigrationService;
+import com.lesofn.archforge.meta.table.api.codegen.MetaTableCodeGenerator;
+import com.lesofn.archforge.meta.table.api.service.MetaTableMigrationService;
 import com.lesofn.archforge.server.admin.config.CodeGenWorkspaceResolver;
 import com.lesofn.archforge.server.admin.controller.metatable.MetaTableController;
 import com.lesofn.archforge.server.admin.dto.request.MetaDataListRequest;
@@ -39,7 +39,7 @@ class MetaTableControllerListDataTest {
         controller = new MetaTableController(mock(MetaTableAdminService.class), metaTableCrudService, mock(
                 MetaTableCodeGenerator.class), mock(CodeGenWorkspaceResolver.class), mock(
                         MetaTableMigrationService.class), mock(
-                                com.lesofn.archforge.meta.table.internal.service.MetaTableMigrationExporter.class), mock(
+                                com.lesofn.archforge.meta.table.api.service.MetaTableMigrationExporter.class), mock(
                                         SysUserService.class), new ArchForgeProperties());
         when(metaTableCrudService.list(any(), any()))
                 .thenReturn(MetaPageResponse.of(List.of(), 0, 10, 1));

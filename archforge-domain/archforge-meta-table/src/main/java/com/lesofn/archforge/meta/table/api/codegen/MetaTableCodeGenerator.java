@@ -1,10 +1,10 @@
-package com.lesofn.archforge.meta.table.internal.generator;
+package com.lesofn.archforge.meta.table.api.codegen;
 
 import com.lesofn.archforge.meta.table.api.domain.MetaColumn;
 import com.lesofn.archforge.meta.table.api.domain.MetaTable;
 import com.lesofn.archforge.meta.table.api.service.DictionaryProvider;
 import com.lesofn.archforge.meta.table.api.errors.MetaTableException;
-import com.lesofn.archforge.meta.table.internal.generator.extension.CodeGenExtensionRegistry;
+import com.lesofn.archforge.meta.table.api.codegen.extension.CodeGenExtensionRegistry;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateExceptionHandler;

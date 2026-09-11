@@ -1,6 +1,6 @@
 @NullMarked
-@ApplicationModule(id = "blog", type = ApplicationModule.Type.OPEN, allowedDependencies = {
-        "common", "infrastructure"
+@ApplicationModule(id = "blog", type = ApplicationModule.Type.CLOSED, allowedDependencies = {
+        "common"
 })
 package com.lesofn.archforge.blog;
 

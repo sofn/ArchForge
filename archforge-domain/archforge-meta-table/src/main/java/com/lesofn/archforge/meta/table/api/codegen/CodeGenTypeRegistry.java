@@ -1,7 +1,7 @@
-package com.lesofn.archforge.meta.table.internal.generator;
+package com.lesofn.archforge.meta.table.api.codegen;
 
 import com.lesofn.archforge.meta.table.api.domain.MetaColumnType;
-import com.lesofn.archforge.meta.table.internal.generator.handler.DefaultCodeGenTypeHandler;
+import com.lesofn.archforge.meta.table.api.codegen.handler.DefaultCodeGenTypeHandler;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;

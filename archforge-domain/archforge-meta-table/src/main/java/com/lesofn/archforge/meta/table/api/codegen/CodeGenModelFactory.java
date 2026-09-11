@@ -1,11 +1,11 @@
-package com.lesofn.archforge.meta.table.internal.generator;
+package com.lesofn.archforge.meta.table.api.codegen;
 
 import com.lesofn.archforge.meta.table.api.domain.MetaColumn;
 import com.lesofn.archforge.meta.table.api.domain.MetaColumnType;
 import com.lesofn.archforge.meta.table.api.domain.MetaTable;
 import com.lesofn.archforge.meta.table.api.domain.OptionItem;
 import com.lesofn.archforge.meta.table.api.service.DictionaryProvider;
-import com.lesofn.archforge.meta.table.internal.generator.extension.CodeGenExtensionRegistry;
+import com.lesofn.archforge.meta.table.api.codegen.extension.CodeGenExtensionRegistry;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;

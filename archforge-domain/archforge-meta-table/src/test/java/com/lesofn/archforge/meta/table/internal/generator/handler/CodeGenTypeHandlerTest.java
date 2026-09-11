@@ -1,9 +1,9 @@
-package com.lesofn.archforge.meta.table.internal.generator.handler;
+package com.lesofn.archforge.meta.table.api.codegen.handler;
 
 import com.lesofn.archforge.meta.table.api.domain.MetaColumn;
 import com.lesofn.archforge.meta.table.api.domain.MetaColumnType;
-import com.lesofn.archforge.meta.table.internal.generator.CodeGenColumn;
-import com.lesofn.archforge.meta.table.internal.generator.CodeGenTypeRegistry;
+import com.lesofn.archforge.meta.table.api.codegen.CodeGenColumn;
+import com.lesofn.archforge.meta.table.api.codegen.CodeGenTypeRegistry;
 import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
 

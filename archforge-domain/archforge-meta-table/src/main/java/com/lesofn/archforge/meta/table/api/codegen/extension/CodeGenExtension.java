@@ -1,8 +1,8 @@
-package com.lesofn.archforge.meta.table.internal.generator.extension;
+package com.lesofn.archforge.meta.table.api.codegen.extension;
 
 import com.lesofn.archforge.meta.table.api.domain.MetaColumn;
 import com.lesofn.archforge.meta.table.api.domain.MetaTable;
-import com.lesofn.archforge.meta.table.internal.generator.CodeGenOptions;
+import com.lesofn.archforge.meta.table.api.codegen.CodeGenOptions;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;

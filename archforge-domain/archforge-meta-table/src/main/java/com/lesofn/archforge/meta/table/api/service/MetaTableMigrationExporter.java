@@ -1,9 +1,8 @@
-package com.lesofn.archforge.meta.table.internal.service;
+package com.lesofn.archforge.meta.table.api.service;
 
 import com.lesofn.archforge.meta.table.api.dao.MetaTableMigrationRepository;
 import com.lesofn.archforge.meta.table.api.domain.MetaTable;
 import com.lesofn.archforge.meta.table.api.domain.MetaTableMigration;
-import com.lesofn.archforge.meta.table.api.service.MetaTableAdminService;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;

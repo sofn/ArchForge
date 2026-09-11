@@ -1,6 +1,6 @@
 @NullMarked
-@ApplicationModule(id = "server-admin", type = ApplicationModule.Type.OPEN, allowedDependencies = {
-        "common", "infrastructure", "admin-user", "meta-table", "blog"
+@ApplicationModule(id = "server-admin", type = ApplicationModule.Type.CLOSED, allowedDependencies = {
+        "common", "infrastructure", "admin-user::*", "meta-table::*", "blog::*"
 })
 package com.lesofn.archforge.server.admin;
 

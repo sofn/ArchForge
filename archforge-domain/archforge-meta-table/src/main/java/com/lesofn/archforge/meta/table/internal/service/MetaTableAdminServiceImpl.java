@@ -8,6 +8,7 @@ import static com.lesofn.archforge.meta.table.api.errors.MetaTableErrorCode.META
 
 import com.lesofn.archforge.meta.table.api.dao.MetaColumnRepository;
 import com.lesofn.archforge.meta.table.api.dao.MetaTableRepository;
+import com.lesofn.archforge.meta.table.api.service.MetaTableMigrationService;
 import com.lesofn.archforge.meta.table.api.domain.MetaColumn;
 import com.lesofn.archforge.meta.table.api.domain.MetaTable;
 import com.lesofn.archforge.meta.table.api.domain.MetaTableMigration;
@@ -120,8 +121,8 @@ public class MetaTableAdminServiceImpl implements MetaTableAdminService {
         int currentVersion = existing.getSchemaVersion() == null ? 1 : existing.getSchemaVersion();
         int nextVersion = currentVersion + 1;
 
-        List<MetaTableMigration> records = migrationService.createPendingRecords(existing, nextVersion, ddlStatements,
-                operatorId);
+        List<MetaTableMigration> records = migrationService.saveAll(
+                buildPendingMigrations(existing, nextVersion, ddlStatements, operatorId));
 
         for (SchemaDdl ddl : ddlStatements) {
             executeWithPreflight(existing, ddl);
@@ -323,5 +324,45 @@ public class MetaTableAdminServiceImpl implements MetaTableAdminService {
 
     private String quotePhysical(MetaTable table) {
         return "\"" + table.physicalTableName().replace("\"", "\"\"") + "\"";
+    }
+
+    private List<MetaTableMigration> buildPendingMigrations(MetaTable table, int version, List<SchemaDdl> ddlList,
+            Long operatorId) {
+        LocalDateTime now = LocalDateTime.now();
+        List<MetaTableMigration> records = new ArrayList<>();
+        for (SchemaDdl ddl : ddlList) {
+            MetaTableMigration record = new MetaTableMigration();
+            record.setTableId(table.getId());
+            record.setVersion(version);
+            record.setChangeType(ddl.change().getType().name());
+            record.setDdlSql(String.join(";\n", ddl.sqls()));
+            record.setStatus("PENDING");
+            record.setCreatorId(operatorId);
+            record.setCreateTime(now);
+            record.setDeleted(false);
+
+            MetaColumn oldColumn = ddl.change().getOldColumn();
+            MetaColumn newColumn = ddl.change().getNewColumn();
+
+            if (ddl.change().getOldIndexGroup() != null) {
+                record.setColumnCode(ddl.change().getOldIndexGroup());
+            } else if (ddl.change().getNewIndexGroup() != null) {
+                record.setColumnCode(ddl.change().getNewIndexGroup());
+            } else if (oldColumn != null) {
+                record.setColumnCode(oldColumn.getColumnCode());
+            } else if (newColumn != null) {
+                record.setColumnCode(newColumn.getColumnCode());
+            }
+            if (newColumn != null && oldColumn != null && ddl.change().getOldIndexGroup() == null) {
+                record.setOldColumnCode(oldColumn.getColumnCode());
+            }
+
+            record.setOldType(ddl.change().getOldType());
+            record.setNewType(ddl.change().getNewType());
+            record.setOldDefault(ddl.change().getOldDefault());
+            record.setNewDefault(ddl.change().getNewDefault());
+            records.add(record);
+        }
+        return records;
     }
 }

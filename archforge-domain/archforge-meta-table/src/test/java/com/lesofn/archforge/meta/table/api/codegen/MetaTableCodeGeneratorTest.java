@@ -1,16 +1,17 @@
-package com.lesofn.archforge.meta.table.internal.generator;
+package com.lesofn.archforge.meta.table.api.codegen;
 
 import com.lesofn.archforge.meta.table.api.domain.MetaColumn;
 import com.lesofn.archforge.meta.table.api.domain.MetaColumnType;
 import com.lesofn.archforge.meta.table.api.domain.MetaTable;
 import com.lesofn.archforge.meta.table.api.domain.OptionItem;
-import com.lesofn.archforge.meta.table.internal.generator.extension.CodeGenExtensionRegistry;
+import com.lesofn.archforge.meta.table.api.codegen.extension.CodeGenExtensionRegistry;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 class MetaTableCodeGeneratorTest {

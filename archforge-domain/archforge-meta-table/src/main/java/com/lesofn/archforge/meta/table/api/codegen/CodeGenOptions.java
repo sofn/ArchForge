@@ -1,4 +1,4 @@
-package com.lesofn.archforge.meta.table.internal.generator;
+package com.lesofn.archforge.meta.table.api.codegen;
 
 import java.nio.file.Path;
 import lombok.Data;
