@@ -10,6 +10,11 @@ dependencies {
     api("com.alibaba:druid")
     api("org.postgresql:postgresql")
 
+    // Flyway：schema 迁移由 common.persistence.FlywayConfig 手工装配
+    //（Boot 4 无 Flyway 自动配置；migration SQL 资源也在本模块，server-admin/server-web 共用）
+    api("org.flywaydb:flyway-core")
+    api("org.flywaydb:flyway-database-postgresql")
+
     // Hibernate Static Metamodel Generator (类型安全字段引用，替代 QueryDSL Q-classes)
     // 版本与 Spring Boot 4.1.0 BOM 对齐 (Hibernate 7.4.x)
     annotationProcessor("org.hibernate.orm:hibernate-processor:7.4.1.Final")

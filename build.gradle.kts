@@ -1,4 +1,8 @@
 plugins {
+    // GraalVM native 插件提升到根 scope（apply false）：server-admin 与 server-web 共用同一
+    // 插件 classloader，否则两侧插件 classpath 不同时 GraalVMReachabilityMetadataService 报
+    // "loaded with different classloader"（Gradle 官方建议的修法）。
+    id("org.graalvm.buildtools.native") apply false
     id("org.sonarqube") version "7.3.0.8198"
     id("com.diffplug.spotless") version "6.13.0" apply false
     id("net.ltgt.errorprone") version "5.1.1" apply false

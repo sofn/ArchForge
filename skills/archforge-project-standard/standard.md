@@ -86,7 +86,7 @@ archforge-server-* → archforge-infrastructure → archforge-common/{base,error
 1. Create `domain/<context-name>/build.gradle.kts`
 2. Add `include("domain:<context-name>")` to `settings.gradle.kts`
 3. Add dependency in the server module: `implementation(project(":domain:<context-name>"))`
-4. Create Flyway migrations under the server module if the context introduces new tables
+4. Create Flyway migrations under `archforge-common/archforge-common-jpa/src/main/resources/db/migration/` if the context introduces new tables
 
 ---
 
@@ -583,9 +583,13 @@ Full stack includes: PostgreSQL + Redis + Application + Nginx reverse proxy.
 
 ### 6.4 Database Migrations
 
-- Flyway manages all schema changes.
+- Flyway manages all schema changes; JPA `ddl-auto` is `validate` everywhere (no `update`).
 - Migration files: `V<version>__<description>.sql` (e.g., `V1__create_user_table.sql`)
-- Location: `server-<name>/src/main/resources/db/migration/`
+- Location: `archforge-common/archforge-common-jpa/src/main/resources/db/migration/` —
+  shared classpath so `server-admin` and `server-web` migrate the same `archforge_user` DB.
+- Wiring: `FlywayConfig` + `FlywayDependencyBeanFactoryPostProcessor` in
+  `common.persistence`, gated on `arch-forge.flyway.enabled` (see `docs/specs/flyway.md`).
+- CLI: `archforge db init` / `archforge db update` run `./gradlew :archforge-server-admin:flywayMigrate`.
 - Flyway runs automatically on application startup (can be disabled per profile).
 
 ### 6.5 Health Checks

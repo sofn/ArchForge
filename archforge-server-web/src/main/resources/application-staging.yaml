@@ -49,6 +49,13 @@ management:
         include: health,info
 
 arch-forge:
+  # 与 server-admin 共享 archforge_user 库与 flyway_schema_history；双写安全（DB 锁串行化）
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    ignore-migration-patterns: "*:missing"
+    locations: classpath:db/migration
+    default-schema: public
   file-storage:
     type: ${FILE_STORAGE_TYPE:s3}
     local-dir: ${FILE_STORAGE_LOCAL_DIR:../uploads}

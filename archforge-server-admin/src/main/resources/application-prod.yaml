@@ -8,14 +8,6 @@ spring:
       enabled: false
     livereload:
       enabled: false
-  flyway:
-    enabled: true
-    baseline-on-migrate: true
-    # V4.1/V5 (pre-db-scheduler) were removed from the repository; legacy databases that already
-    # applied them report them as missing — tolerated, and V23 prunes the stale history rows.
-    ignore-migration-patterns: "*:missing"
-    locations: classpath:db/migration
-    default-schema: public
   jpa:
     hibernate:
       ddl-auto: validate
@@ -76,8 +68,15 @@ springdoc:
 
 arch-forge:
   rsa-private-key: ${ARCH_FORGE_RSA_PRIVATE_KEY}
+  # Flyway 由 common.persistence.FlywayConfig 装配并消费本段配置（spring.flyway.* 在本项目无自动配置可消费）。
   flyway:
     enabled: true
+    baseline-on-migrate: true
+    # V4.1/V5 (pre-db-scheduler) were removed from the repository; legacy databases that already
+    # applied them report them as missing — tolerated, and V23 prunes the stale history rows.
+    ignore-migration-patterns: "*:missing"
+    locations: classpath:db/migration
+    default-schema: public
   monitor:
     enabled: true
   web:

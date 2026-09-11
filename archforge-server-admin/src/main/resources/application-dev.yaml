@@ -15,8 +15,6 @@ spring:
       enabled: true
       port: 35729
   # Dev: local Docker containers started by scripts/dev/init.sh
-  flyway:
-    enabled: false
   jpa:
     open-in-view: false
     hibernate:

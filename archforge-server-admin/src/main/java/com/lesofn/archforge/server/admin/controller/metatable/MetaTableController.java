@@ -226,7 +226,8 @@ public class MetaTableController {
     @GetMapping("/{id}/export-migration")
     public String exportMigration(@PathVariable Long id) throws IOException {
         Path projectRoot = codeGenWorkspaceResolver.resolve();
-        Path outputDir = projectRoot.resolve("server-admin/src/main/resources/db/migration");
+        Path outputDir = projectRoot.resolve(
+                "archforge-common/archforge-common-jpa/src/main/resources/db/migration");
         Path file = metaTableMigrationExporter.export(id, outputDir);
         return file.toString();
     }

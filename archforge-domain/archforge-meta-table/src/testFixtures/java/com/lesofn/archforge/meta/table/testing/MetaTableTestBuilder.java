@@ -136,7 +136,6 @@ public final class MetaTableTestBuilder {
         }
 
         public MetaTableTestBuilder add() {
-            long seq = SEQUENCE.incrementAndGet();
             if (column.getColumnName() == null) {
                 column.setColumnName(column.getColumnCode());
             }

@@ -74,7 +74,7 @@ ArchForge/
   - `application-staging.yaml`: external services, Flyway
   - `application-prod.yaml`: production hardened, Flyway
 - Logging: Log4j2 via `log4j2-spring.xml` with `<SpringProfile>` sections
-- Database: PostgreSQL via Flyway migrations (`archforge-server-admin/src/main/resources/db/migration/`) and `archforge-domain/archforge-admin-user/src/main/resources/sql/` seed data
+- Database: PostgreSQL via Flyway migrations (`archforge-common/archforge-common-jpa/src/main/resources/db/migration/` — shared by server-admin and server-web) and `archforge-domain/archforge-admin-user/src/main/resources/sql/` seed data
 
 ## JDK 25 Features
 

@@ -1,6 +1,9 @@
 plugins {
     id("org.springframework.boot") version "4.1.0"
     id("org.graalvm.buildtools.native")
+    // Flyway Gradle 插件：提供 flywayMigrate 任务供 `archforge db init/update` 使用
+    //（运行时迁移仍由应用内 FlywayConfig 负责，插件只面向开发期命令行）
+    id("org.flywaydb.flyway") version "12.4.0"
 }
 
 // 构建可执行jar/war包
@@ -111,10 +114,7 @@ dependencies {
     // Redis
     api("org.springframework.boot:spring-boot-starter-data-redis")
     
-    // Flyway
-    api("org.flywaydb:flyway-core")
-    api("org.flywaydb:flyway-database-postgresql")
-    
+    // Flyway 依赖经 common-jpa api() 传递（FlywayConfig 与 db/migration 均已下沉）
     // Oshi (系统监控)
     api("com.github.oshi:oshi-core")
 
@@ -203,3 +203,23 @@ val buildMinimalJre by tasks.registering(Exec::class) {
     )
 }
 
+
+// Flyway Gradle 插件配置（archforge db init/update → :archforge-server-admin:flywayMigrate）
+// 迁移 SQL 位于 common-jpa 资源目录（server-admin 与 server-web 共享 classpath:db/migration）。
+flyway {
+    driver = "org.postgresql.Driver"
+    url = providers.environmentVariable("DB_USER_MASTER_URL")
+        .getOrElse("jdbc:postgresql://localhost:5432/archforge_user")
+    user = providers.environmentVariable("DB_USERNAME").getOrElse("archforge")
+    password = providers.environmentVariable("DB_PASSWORD").getOrElse("archforge")
+    schemas = arrayOf("public")
+    defaultSchema = "public"
+    locations = arrayOf(
+        "filesystem:${rootDir}/archforge-common/archforge-common-jpa/src/main/resources/db/migration"
+    )
+    baselineOnMigrate = true
+    baselineVersion = "0"
+    ignoreMigrationPatterns = arrayOf("*:missing")
+    outOfOrder = false
+    validateOnMigrate = true
+}

@@ -2,6 +2,7 @@ package com.lesofn.archforge.server.admin.architecture;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -19,6 +20,9 @@ class NullMarkedPackageTest {
         try (Stream<Path> javaRoots = Files.walk(repoRoot, 8)) {
             javaRoots.filter(path -> path.endsWith(Path.of("src", "main", "java")))
                     .filter(Files::isDirectory)
+                    // 跳过构建产物中的拷贝（如 build/spotless/spotlessJava/src/main/java），
+                    // 它们不含 package-info.java，并非真实源码包。
+                    .filter(path -> !path.toString().contains(File.separator + "build" + File.separator))
                     .forEach(javaRoot -> collectMissing(javaRoot, missing));
         }
         assertTrue(missing.isEmpty(), () -> "Packages without @NullMarked package-info.java (" + missing.size() + "):\n" +
