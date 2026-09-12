@@ -3,6 +3,7 @@ package com.lesofn.archforge.starter.lock;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.Nullable;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 
@@ -68,11 +69,11 @@ public class DistributedLockService {
         executeWithLock(lockName, 3, -1, TimeUnit.SECONDS, runnable);
     }
 
-    public RLock tryLock(String lockName, long waitTime, long leaseTime, TimeUnit timeUnit) {
+    public @Nullable RLock tryLock(String lockName, long waitTime, long leaseTime, TimeUnit timeUnit) {
         return tryLock(lockName, LockType.REENTRANT, waitTime, leaseTime, timeUnit);
     }
 
-    public RLock tryLock(String lockName, LockType lockType, long waitTime, long leaseTime, TimeUnit timeUnit) {
+    public @Nullable RLock tryLock(String lockName, LockType lockType, long waitTime, long leaseTime, TimeUnit timeUnit) {
         String key = LOCK_KEY_PREFIX + lockName;
         RLock lock = lockType.getLock(redissonClient, key);
         try {

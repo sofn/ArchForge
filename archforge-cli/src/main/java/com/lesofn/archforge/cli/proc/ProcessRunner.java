@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Thin process wrapper used by CLI commands. Does not start a Spring context.
@@ -22,7 +23,8 @@ public class ProcessRunner {
         return run(command, workingDir, extraEnv, inheritIo, null);
     }
 
-    public int run(List<String> command, Path workingDir, Map<String, String> extraEnv, boolean inheritIo, Path stdoutFile) {
+    public int run(List<String> command, Path workingDir, Map<String, String> extraEnv, boolean inheritIo,
+            @Nullable Path stdoutFile) {
         try {
             ProcessBuilder builder = new ProcessBuilder(new ArrayList<>(command));
             if (workingDir != null) {

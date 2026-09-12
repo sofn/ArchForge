@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import org.jspecify.annotations.Nullable;
 
 /**
  * All docker operations go through compose files under docker/.
@@ -55,7 +56,7 @@ public class ComposeSupport {
         return exec(profile, execArgs, null);
     }
 
-    public int exec(String profile, List<String> execArgs, Path stdoutFile) {
+    public int exec(String profile, List<String> execArgs, @Nullable Path stdoutFile) {
         List<String> command = base(profile);
         command.add("exec");
         command.add("-T");

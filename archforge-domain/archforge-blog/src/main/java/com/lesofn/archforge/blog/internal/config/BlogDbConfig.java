@@ -3,6 +3,7 @@ package com.lesofn.archforge.blog.internal.config;
 import com.lesofn.archforge.common.persistence.GroupDataSourceProxy;
 import jakarta.annotation.Resource;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.Map;
 import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,7 +34,7 @@ public class BlogDbConfig {
 
     @Bean
     PlatformTransactionManager blogTransactionManager() {
-        return new JpaTransactionManager(blogEntityManagerFactory().getObject());
+        return new JpaTransactionManager(Objects.requireNonNull(blogEntityManagerFactory().getObject()));
     }
 
     @Bean
