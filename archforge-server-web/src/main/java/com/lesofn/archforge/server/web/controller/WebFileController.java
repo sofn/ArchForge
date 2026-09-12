@@ -70,7 +70,7 @@ public class WebFileController {
         if (Boolean.TRUE.equals(sysFile.getPublicVisible())) {
             return true;
         }
-        Long userId = LoginContext.getWebUserId();
+        Long userId = java.util.Objects.requireNonNull(LoginContext.getWebUserId());
         return userId != null && userId.equals(sysFile.getCreatorId());
     }
 
@@ -78,24 +78,26 @@ public class WebFileController {
     @PostMapping("/upload")
     public FileUploadResponse upload(@RequestParam("file") MultipartFile file) throws IOException {
         FileUploadValidator.validateImage(file, appForgeConfig.getFileStorage());
-        String originalName = file.getOriginalFilename();
+        String originalName = java.util.Objects.requireNonNullElse(file.getOriginalFilename(), "");
         String extension = FileUploadValidator.extension(originalName);
         String baseName = UUID.randomUUID().toString().replace("-", "");
         String storageName = extension.isEmpty() ? baseName : baseName + "." + extension;
         String datePath = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd"));
         String storagePath = datePath + "/" + storageName;
 
-        fileStorageService.upload(storagePath, file.getInputStream(), file.getContentType(), file.getSize());
+        fileStorageService.upload(storagePath, file.getInputStream(), java.util.Objects.requireNonNullElse(file
+                .getContentType(), org.springframework.http.MediaType.APPLICATION_OCTET_STREAM_VALUE), file.getSize());
 
         SysFile sysFile = new SysFile();
         sysFile.setOriginalName(originalName);
         sysFile.setStorageName(storageName);
         sysFile.setStoragePath(storagePath);
         sysFile.setFileSize(file.getSize());
-        sysFile.setContentType(file.getContentType());
+        sysFile.setContentType(java.util.Objects.requireNonNullElse(file.getContentType(),
+                org.springframework.http.MediaType.APPLICATION_OCTET_STREAM_VALUE));
         sysFile.setExtension(extension);
         sysFile.setStorageType(appForgeConfig.getFileStorage().getType());
-        sysFile.setCreatorId(LoginContext.getWebUserId());
+        sysFile.setCreatorId(java.util.Objects.requireNonNull(LoginContext.getWebUserId()));
         sysFile.setPublicVisible(true);
         SysFile saved = sysFileService.create(sysFile);
 

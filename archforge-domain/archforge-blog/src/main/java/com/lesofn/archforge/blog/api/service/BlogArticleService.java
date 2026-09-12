@@ -1,6 +1,7 @@
 package com.lesofn.archforge.blog.api.service;
 
 import com.lesofn.archforge.blog.api.domain.BlogArticle;
+import org.jspecify.annotations.Nullable;
 import com.lesofn.archforge.blog.api.enums.BlogArticleStatus;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
@@ -8,7 +9,7 @@ import org.springframework.data.domain.Pageable;
 
 public interface BlogArticleService {
 
-    Page<BlogArticle> pagePublished(Pageable pageable, Long categoryId, String keyword);
+    Page<BlogArticle> pagePublished(Pageable pageable, @Nullable Long categoryId, @Nullable String keyword);
 
     Page<BlogArticle> pageAll(Pageable pageable, Long categoryId, String keyword, BlogArticleStatus status);
 

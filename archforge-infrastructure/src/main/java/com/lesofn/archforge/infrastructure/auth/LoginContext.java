@@ -42,7 +42,7 @@ public final class LoginContext {
 
     public static boolean isAdmin() { return findAdminUser().map(SystemLoginUser::isAdmin).orElse(false); }
 
-    public static void setWebUser(Long userId, String username) {
+    public static void setWebUser(Long userId, @Nullable String username) {
         OVERRIDE_WEB_USER_ID.set(userId);
         OVERRIDE_WEB_USERNAME.set(username);
     }

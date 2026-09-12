@@ -1,6 +1,7 @@
 package com.lesofn.archforge.server.web.interceptor;
 
 import com.lesofn.archforge.infrastructure.auth.stp.LoginSessionKeys;
+import org.jspecify.annotations.Nullable;
 import com.lesofn.archforge.infrastructure.auth.stp.StpWebUtil;
 import com.lesofn.archforge.infrastructure.auth.LoginContext;
 import jakarta.servlet.http.HttpServletRequest;
@@ -34,7 +35,8 @@ public class WebAuthInterceptor implements HandlerInterceptor {
     }
 
     @Override
-    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex)
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler,
+            @Nullable Exception ex)
             throws Exception {
         LoginContext.clearWebUser();
     }

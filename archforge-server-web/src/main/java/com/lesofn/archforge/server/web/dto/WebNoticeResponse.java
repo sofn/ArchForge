@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@SuppressWarnings("NullAway.Init")
 public class WebNoticeResponse {
 
     private Long id;

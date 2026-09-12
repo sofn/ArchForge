@@ -1,6 +1,7 @@
 package com.lesofn.archforge.server.web.auth;
 
 import com.lesofn.archforge.infrastructure.auth.LoginContext;
+import org.jspecify.annotations.Nullable;
 import com.lesofn.archforge.user.api.domain.SysUser;
 import com.lesofn.archforge.user.api.service.SysUserService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -43,7 +44,8 @@ public class MockWebAuthInterceptor implements HandlerInterceptor, Ordered {
     }
 
     @Override
-    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler,
+            @Nullable Exception ex) {
         LoginContext.clearWebUser();
     }
 

@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@SuppressWarnings("NullAway.Init")
 public class WebSendVerificationCodeRequest {
 
     @NotBlank(message = "邮箱不能为空")

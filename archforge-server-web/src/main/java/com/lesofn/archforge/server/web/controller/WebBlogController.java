@@ -1,6 +1,7 @@
 package com.lesofn.archforge.server.web.controller;
 
 import com.lesofn.archforge.blog.api.domain.BlogArticle;
+import org.jspecify.annotations.Nullable;
 import com.lesofn.archforge.blog.api.enums.BlogArticleStatus;
 import com.lesofn.archforge.blog.api.domain.BlogCategory;
 import com.lesofn.archforge.blog.api.service.BlogArticleService;
@@ -81,7 +82,7 @@ public class WebBlogController {
 
     @PostMapping("/articles")
     public Long createArticle(@RequestBody @Valid WebArticleCreateRequest request) {
-        Long authorId = LoginContext.getWebUserId();
+        Long authorId = java.util.Objects.requireNonNull(LoginContext.getWebUserId());
         String baseSlug = request.getTitle().trim()
                 .replaceAll("\\s+", "-")
                 .replaceAll("[^a-zA-Z0-9-]", "")
@@ -106,7 +107,7 @@ public class WebBlogController {
     public WebPageResponse<WebArticleSummaryResponse> myArticles(
             @RequestParam(required = false, defaultValue = "1") int currentPage,
             @RequestParam(required = false, defaultValue = "10") int pageSize) {
-        Long authorId = LoginContext.getWebUserId();
+        Long authorId = java.util.Objects.requireNonNull(LoginContext.getWebUserId());
         PageRequest pageRequest = PageRequest.of(
                 Math.max(currentPage - 1, 0),
                 Math.max(pageSize, 1),
@@ -126,7 +127,7 @@ public class WebBlogController {
                 .getSummary(), article.getCoverImageFileId(), coverUrl, categoryName, article.getPublishTime());
     }
 
-    private WebArticleDetailResponse toDetailResponse(BlogArticle article, BlogCategory category) {
+    private WebArticleDetailResponse toDetailResponse(BlogArticle article, @Nullable BlogCategory category) {
         String coverUrl = buildFileUrl(article.getCoverImageFileId());
         return new WebArticleDetailResponse(article.getId(), article.getTitle(), article.getSlug(), article
                 .getSummary(), article.getContent(), article.getCoverImageFileId(), coverUrl, category != null ? category

@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@SuppressWarnings("NullAway.Init")
 public class FileUploadResponse {
 
     private Long fileId;

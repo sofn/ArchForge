@@ -34,6 +34,7 @@ val nullAwayCleanMain =
             "archforge-lock-starter",
             "archforge-meta-table",
             "archforge-redisson-starter",
+            "archforge-server-web",
             "archforge-trace-starter")
 val nullAwayCleanTest = setOf<String>()
 // Checkstyle: semantic style gate — runs before `test` and as part of `check`/`build`

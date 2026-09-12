@@ -1,6 +1,7 @@
 package com.lesofn.archforge.server.web.dto;
 
 import java.time.LocalDateTime;
+import org.jspecify.annotations.Nullable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,6 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@SuppressWarnings("NullAway.Init")
 public class WebArticleDetailResponse {
 
     private Long id;
@@ -17,9 +19,9 @@ public class WebArticleDetailResponse {
     private String content;
     private Long coverImageFileId;
     private String coverImageUrl;
-    private Long categoryId;
-    private String categoryName;
-    private String categorySlug;
+    private @Nullable Long categoryId;
+    private @Nullable String categoryName;
+    private @Nullable String categorySlug;
     private LocalDateTime publishTime;
     private LocalDateTime createTime;
 }

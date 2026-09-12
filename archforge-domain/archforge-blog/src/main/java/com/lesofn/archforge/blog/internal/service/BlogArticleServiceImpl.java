@@ -1,6 +1,7 @@
 package com.lesofn.archforge.blog.internal.service;
 
 import com.lesofn.archforge.blog.api.dao.BlogArticleRepository;
+import org.jspecify.annotations.Nullable;
 import com.lesofn.archforge.blog.api.dao.BlogCategoryRepository;
 import com.lesofn.archforge.blog.api.domain.BlogArticle;
 import com.lesofn.archforge.blog.api.enums.BlogArticleStatus;
@@ -23,7 +24,8 @@ public class BlogArticleServiceImpl implements BlogArticleService {
     private final BlogArticleRepository articleRepository;
     private final BlogCategoryRepository categoryRepository;
 
-    private Specification<BlogArticle> buildSpec(Long categoryId, String keyword, BlogArticleStatus status) {
+    private Specification<BlogArticle> buildSpec(@Nullable Long categoryId, @Nullable String keyword,
+            BlogArticleStatus status) {
         return (root, query, cb) -> {
             jakarta.persistence.criteria.Predicate predicate = cb.equal(root.get("deleted"), false);
             if (categoryId != null) {
@@ -43,7 +45,7 @@ public class BlogArticleServiceImpl implements BlogArticleService {
     }
 
     @Override
-    public Page<BlogArticle> pagePublished(Pageable pageable, Long categoryId, String keyword) {
+    public Page<BlogArticle> pagePublished(Pageable pageable, @Nullable Long categoryId, @Nullable String keyword) {
         return articleRepository.findAll(buildSpec(categoryId, keyword, BlogArticleStatus.PUBLISHED), pageable);
     }
 

@@ -24,7 +24,7 @@ public class WebUserController {
 
     @GetMapping("/profile")
     public WebUserProfileResponse profile() {
-        SysUser user = sysUserService.findById(LoginContext.getWebUserId())
+        SysUser user = sysUserService.findById(java.util.Objects.requireNonNull(LoginContext.getWebUserId()))
                 .orElseThrow(() -> new com.lesofn.archforge.user.api.errors.AdminUserException("用户不存在"));
         return WebUserProfileResponse.builder()
                 .userId(user.getUserId())
@@ -39,7 +39,7 @@ public class WebUserController {
         if (!request.getNewPassword().equals(request.getConfirmPassword())) {
             throw new com.lesofn.archforge.user.api.errors.AdminUserException("两次输入的新密码不一致");
         }
-        SysUser user = sysUserService.findById(LoginContext.getWebUserId())
+        SysUser user = sysUserService.findById(java.util.Objects.requireNonNull(LoginContext.getWebUserId()))
                 .orElseThrow(() -> new com.lesofn.archforge.user.api.errors.AdminUserException("用户不存在"));
         if (!passwordEncoderPort.matches(request.getOldPassword(), user.getPassword())) {
             throw new com.lesofn.archforge.user.api.errors.AdminUserException("旧密码错误");
