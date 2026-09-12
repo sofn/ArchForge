@@ -3,6 +3,7 @@ package com.lesofn.archforge.server.admin.service.scheduler;
 import com.github.kagkarlsson.scheduler.ScheduledExecution;
 import com.github.kagkarlsson.scheduler.SchedulerClient;
 import com.lesofn.archforge.user.api.dao.SysScheduledJobRepository;
+import com.lesofn.archforge.user.api.scheduler.SchedulerJobRuntime;
 import com.lesofn.archforge.user.api.domain.SysScheduledJob;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -27,15 +28,15 @@ public class SchedulerStartupSync {
 
     private final SysScheduledJobRepository jobRepository;
     private final SchedulerClient schedulerClient;
-    private final ScheduledJobService jobService;
+    private final SchedulerJobRuntime jobRuntime;
 
     public SchedulerStartupSync(
             SysScheduledJobRepository jobRepository,
             SchedulerClient schedulerClient,
-            ScheduledJobService jobService) {
+            SchedulerJobRuntime jobRuntime) {
         this.jobRepository = jobRepository;
         this.schedulerClient = schedulerClient;
-        this.jobService = jobService;
+        this.jobRuntime = jobRuntime;
     }
 
     @EventListener(ApplicationReadyEvent.class)
@@ -45,7 +46,7 @@ public class SchedulerStartupSync {
             if (Boolean.TRUE.equals(job.getDeleted())) {
                 continue;
             }
-            jobService.syncSchedule(job);
+            jobRuntime.syncSchedule(job);
             synced++;
         }
 

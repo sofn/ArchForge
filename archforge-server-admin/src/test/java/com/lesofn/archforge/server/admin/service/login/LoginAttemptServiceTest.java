@@ -7,6 +7,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.lesofn.archforge.infrastructure.auth.errors.AdminAuthException;
+import com.lesofn.archforge.infrastructure.auth.service.LoginAttemptService;
 import com.lesofn.archforge.infrastructure.config.ArchForgeProperties;
 import java.time.Duration;
 import org.junit.jupiter.api.BeforeEach;

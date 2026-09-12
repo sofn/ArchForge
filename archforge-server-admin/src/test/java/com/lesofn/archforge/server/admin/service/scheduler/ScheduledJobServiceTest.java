@@ -15,9 +15,13 @@ import com.lesofn.archforge.common.error.system.SystemException;
 import com.lesofn.archforge.user.api.dao.SysJobLogRepository;
 import com.lesofn.archforge.user.api.dao.SysScheduledJobRepository;
 import com.lesofn.archforge.user.api.domain.SysScheduledJob;
+import com.lesofn.archforge.user.api.scheduler.SchedulerJobRuntime;
+import com.lesofn.archforge.user.internal.service.SysScheduledJobServiceImpl;
 import java.util.Optional;
+import java.util.function.Supplier;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.ApplicationContext;
 
 /**
@@ -29,17 +33,21 @@ class ScheduledJobServiceTest {
     private ApplicationContext applicationContext;
     private SchedulerClient schedulerClient;
     private SysScheduledJobRepository jobRepository;
-    private ScheduledJobService service;
+    private SysScheduledJobServiceImpl service;
 
     @BeforeEach
+    @SuppressWarnings("unchecked")
     void setUp() {
         applicationContext = mock(ApplicationContext.class);
         schedulerClient = mock(SchedulerClient.class);
         jobRepository = mock(SysScheduledJobRepository.class);
         when(jobRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
         when(schedulerClient.getScheduledExecution(any())).thenReturn(Optional.empty());
-        service = new ScheduledJobService(jobRepository, mock(
-                SysJobLogRepository.class), schedulerClient, applicationContext, "demoSchedulerJob");
+        SchedulerJobRuntime runtime = new DbSchedulerJobRuntime(schedulerClient);
+        ObjectProvider<SchedulerJobRuntime> provider = mock(ObjectProvider.class);
+        when(provider.getIfAvailable(any(Supplier.class))).thenReturn(runtime);
+        service = new SysScheduledJobServiceImpl(jobRepository, mock(
+                SysJobLogRepository.class), provider, applicationContext, "demoSchedulerJob");
     }
 
     @Test
@@ -97,8 +105,8 @@ class ScheduledJobServiceTest {
 
     @Test
     void sixFieldCronQuestionMarkIsNormalized() {
-        assertEquals("0/30 * * * * *", ScheduledJobService.normalizeCron("0/30 * * * * ?"));
-        assertEquals("0 0 1 1 1 *", ScheduledJobService.normalizeCron("0 0 1 1 1 *"));
+        assertEquals("0/30 * * * * *", SchedulerJobRuntime.normalizeCron("0/30 * * * * ?"));
+        assertEquals("0 0 1 1 1 *", SchedulerJobRuntime.normalizeCron("0 0 1 1 1 *"));
     }
 
     @Test

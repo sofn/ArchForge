@@ -8,12 +8,12 @@ import com.lesofn.archforge.infrastructure.annotation.Log;
 import com.lesofn.archforge.server.admin.dto.AdminPageResponse;
 import com.lesofn.archforge.server.admin.dto.scheduler.CronValidateRequest;
 import com.lesofn.archforge.server.admin.dto.scheduler.SchedulerJobListRequest;
-import com.lesofn.archforge.server.admin.dto.scheduler.SchedulerJobQueryRequest;
+import com.lesofn.archforge.user.api.domain.query.SysScheduledJobQuery;
 import com.lesofn.archforge.server.admin.dto.scheduler.SchedulerJobResponse;
 import com.lesofn.archforge.server.admin.dto.scheduler.SchedulerJobUpsertRequest;
 import com.lesofn.archforge.server.admin.dto.scheduler.SchedulerLogListRequest;
 import com.lesofn.archforge.server.admin.dto.scheduler.SchedulerLogResponse;
-import com.lesofn.archforge.server.admin.service.scheduler.ScheduledJobService;
+import com.lesofn.archforge.user.api.service.SysScheduledJobService;
 import com.lesofn.archforge.user.api.domain.SysJobLog;
 import com.lesofn.archforge.user.api.domain.SysScheduledJob;
 import io.swagger.v3.oas.annotations.Operation;
@@ -50,7 +50,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class SchedulerJobController {
 
-    private final ScheduledJobService jobService;
+    private final SysScheduledJobService jobService;
 
     @Operation(summary = "查询定时任务列表")
     @SaCheckPermission(value = "monitor:job:list", type = StpAdminUtil.TYPE)
@@ -61,7 +61,7 @@ public class SchedulerJobController {
                 : 1;
         int pageSize = query.getPageSize() != null && query.getPageSize() > 0 ? query.getPageSize() : 10;
         Pageable pageable = PageRequest.of(currentPage - 1, pageSize, Sort.by(Sort.Direction.DESC, "id"));
-        SchedulerJobQueryRequest criteria = new SchedulerJobQueryRequest();
+        SysScheduledJobQuery criteria = new SysScheduledJobQuery();
         criteria.setJobName(query.getJobName());
         criteria.setJobGroup(query.getJobGroup());
         criteria.setStatus(query.getStatus());

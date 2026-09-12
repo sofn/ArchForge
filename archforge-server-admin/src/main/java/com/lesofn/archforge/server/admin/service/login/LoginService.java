@@ -7,6 +7,7 @@ import com.lesofn.archforge.common.encrypt.RsaEncrypter;
 import com.lesofn.archforge.common.utils.ip.IpRegionUtil;
 import com.lesofn.archforge.common.utils.ip.IpUtil;
 import com.lesofn.archforge.infrastructure.auth.errors.AdminAuthException;
+import com.lesofn.archforge.infrastructure.auth.service.LoginAttemptService;
 import com.lesofn.archforge.common.auth.SystemLoginUser;
 import com.lesofn.archforge.infrastructure.config.ArchForgeProperties;
 import com.lesofn.archforge.infrastructure.config.CaptchaType;

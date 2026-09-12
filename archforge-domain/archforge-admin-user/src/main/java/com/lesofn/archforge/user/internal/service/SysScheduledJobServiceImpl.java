@@ -1,27 +1,23 @@
-package com.lesofn.archforge.server.admin.service.scheduler;
+package com.lesofn.archforge.user.internal.service;
 
-import com.github.kagkarlsson.scheduler.SchedulerClient;
-import com.github.kagkarlsson.scheduler.task.SchedulableInstance;
-import com.github.kagkarlsson.scheduler.task.TaskDescriptor;
-import com.github.kagkarlsson.scheduler.task.schedule.Schedule;
-import com.github.kagkarlsson.scheduler.task.schedule.Schedules;
 import com.lesofn.archforge.common.error.system.SystemException;
 import com.lesofn.archforge.common.utils.jackson.JsonUtil;
 import com.lesofn.archforge.common.utils.query.QueryHelp;
-import com.lesofn.archforge.server.admin.dto.scheduler.SchedulerJobQueryRequest;
 import com.lesofn.archforge.user.api.dao.SysJobLogRepository;
 import com.lesofn.archforge.user.api.dao.SysScheduledJobRepository;
 import com.lesofn.archforge.user.api.domain.SysJobLog;
 import com.lesofn.archforge.user.api.domain.SysScheduledJob;
+import com.lesofn.archforge.user.api.domain.query.SysScheduledJobQuery;
+import com.lesofn.archforge.user.api.scheduler.SchedulerJobRuntime;
+import com.lesofn.archforge.user.api.service.SysScheduledJobService;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
-import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.Nullable;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.Page;
@@ -30,46 +26,34 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Admin CRUD for db-scheduler-backed jobs: metadata rows in {@code sys_scheduled_job} kept in
- * lockstep with runtime instances in {@code scheduled_tasks}.
+ * Domain side of the db-scheduler job platform: owns {@code sys_scheduled_job} metadata rules and
+ * delegates runtime-instance operations to the {@link SchedulerJobRuntime} port.
  *
  * <p>
- * Synchronization is idempotent — {@code scheduleIfNotExists} for creation, {@code reschedule}
- * for updates (a reschedule rewrites the persisted {@link Schedule} in the instance data), {@code
- * cancel} for deletion, and a {@link DisabledSchedule} as the persisted schedule for paused jobs.
- *
- * <p>
- * Semantics notes vs the former Quartz implementation:
- *
- * <ul>
- * <li>missed executions are always skipped (db-scheduler cron semantics); {@code misfirePolicy}
- * is kept as metadata for API compatibility
- * <li>one instance never runs concurrently with itself; {@code concurrent} is kept as metadata
- * <li>cron expressions use 6-field unix style with seconds; Quartz-style {@code ?} is accepted
- * and normalized to {@code *}
- * </ul>
+ * The port is resolved lazily via {@link ObjectProvider}: contexts that scan this bean without a
+ * scheduler runtime (e.g. server-web) still get working read methods, while mutating operations
+ * fail explicitly.
  *
  * @author sofn
  */
-@Slf4j
 @Service
-public class ScheduledJobService {
+public class SysScheduledJobServiceImpl implements SysScheduledJobService {
 
     private final SysScheduledJobRepository jobRepository;
     private final SysJobLogRepository logRepository;
-    private final SchedulerClient schedulerClient;
+    private final ObjectProvider<SchedulerJobRuntime> runtime;
     private final ApplicationContext applicationContext;
     private final Set<String> allowedJobBeans;
 
-    public ScheduledJobService(
+    public SysScheduledJobServiceImpl(
             SysScheduledJobRepository jobRepository,
             SysJobLogRepository logRepository,
-            SchedulerClient schedulerClient,
+            ObjectProvider<SchedulerJobRuntime> runtime,
             ApplicationContext applicationContext,
             @Value("${arch-forge.scheduler.allowed-job-beans:}") String allowedJobBeans) {
         this.jobRepository = jobRepository;
         this.logRepository = logRepository;
-        this.schedulerClient = schedulerClient;
+        this.runtime = runtime;
         this.applicationContext = applicationContext;
         this.allowedJobBeans = Arrays.stream(allowedJobBeans.split(","))
                 .map(String::trim)
@@ -77,9 +61,10 @@ public class ScheduledJobService {
                 .collect(Collectors.toUnmodifiableSet());
     }
 
+    @Override
     @Transactional(readOnly = true)
-    public Page<SysScheduledJob> page(SchedulerJobQueryRequest criteria, Pageable pageable) {
-        SchedulerJobQueryRequest effective = criteria == null ? new SchedulerJobQueryRequest() : criteria;
+    public Page<SysScheduledJob> page(@Nullable SysScheduledJobQuery criteria, Pageable pageable) {
+        SysScheduledJobQuery effective = criteria == null ? new SysScheduledJobQuery() : criteria;
         if (effective.getDeleted() == null) {
             effective.setDeleted(false);
         }
@@ -87,6 +72,7 @@ public class ScheduledJobService {
                 (root, q, cb) -> QueryHelp.getPredicate(root, effective, cb), pageable);
     }
 
+    @Override
     @Transactional(readOnly = true)
     public SysScheduledJob get(Long id) {
         return jobRepository
@@ -94,24 +80,15 @@ public class ScheduledJobService {
                 .orElseThrow(() -> new IllegalArgumentException("Scheduled job not found: " + id));
     }
 
-    /** Validates a cron expression. Public so the controller can expose it directly. */
+    @Override
     public boolean validateCron(String cron) {
         if (cron == null || cron.isBlank()) {
             return false;
         }
-        try {
-            Schedules.cron(normalizeCron(cron));
-            return true;
-        } catch (IllegalArgumentException e) {
-            return false;
-        }
+        return runtime().isValidCron(cron);
     }
 
-    /** Quartz-style {@code ?} is accepted for backward compatibility, normalized to {@code *}. */
-    public static String normalizeCron(String cron) {
-        return cron == null ? null : cron.replace('?', '*');
-    }
-
+    @Override
     @Transactional
     public Long add(SysScheduledJob input) {
         validateInput(input);
@@ -128,12 +105,13 @@ public class ScheduledJobService {
         if (input.getConcurrent() == null) {
             input.setConcurrent(false);
         }
-        input.setCron(normalizeCron(input.getCron()));
+        input.setCron(SchedulerJobRuntime.normalizeCron(input.getCron()));
         SysScheduledJob saved = jobRepository.save(input);
-        syncSchedule(saved);
+        runtime().syncSchedule(saved);
         return saved.getId();
     }
 
+    @Override
     @Transactional
     public void update(Long id, SysScheduledJob input) {
         SysScheduledJob existing = get(id);
@@ -144,7 +122,7 @@ public class ScheduledJobService {
         existing.setBeanName(input.getBeanName());
         existing.setMethodName(input.getMethodName());
         existing.setMethodParams(input.getMethodParams());
-        existing.setCron(normalizeCron(input.getCron()));
+        existing.setCron(SchedulerJobRuntime.normalizeCron(input.getCron()));
         if (input.getMisfirePolicy() != null) {
             existing.setMisfirePolicy(input.getMisfirePolicy());
         }
@@ -153,18 +131,14 @@ public class ScheduledJobService {
         }
         SysScheduledJob saved = jobRepository.save(existing);
         // A paused job keeps its DisabledSchedule; a running job gets the (possibly new) cron.
-        syncSchedule(saved);
+        runtime().syncSchedule(saved);
     }
 
+    @Override
     @Transactional
     public void delete(Long id) {
         SysScheduledJob job = get(id);
-        try {
-            schedulerClient.cancel(
-                    SchedulerConfig.ADMIN_JOB_TASK.instanceId(JobInvocationData.recurringInstanceId(id)));
-        } catch (RuntimeException e) {
-            log.warn("Failed to cancel scheduled instance for job {}", id, e);
-        }
+        runtime().cancelSchedule(job);
         job.setDeleted(true);
         jobRepository.save(job);
     }
@@ -175,80 +149,39 @@ public class ScheduledJobService {
      * {@code resume()} re-creates the instance from it. Execution history stats in
      * scheduled_tasks are not preserved across a pause, matching Quartz's pause semantics.
      */
+    @Override
     @Transactional
     public void pause(Long id) {
         SysScheduledJob job = get(id);
-        cancelQuietly(job);
+        runtime().cancelSchedule(job);
         job.pause();
         jobRepository.save(job);
     }
 
+    @Override
     @Transactional
     public void resume(Long id) {
         SysScheduledJob job = get(id);
-        persistSchedule(job, Schedules.cron(normalizeCron(job.getCron())));
+        runtime().persistSchedule(job);
         job.resume();
         jobRepository.save(job);
     }
 
-    /** Triggers an immediate one-shot execution (in addition to the recurring schedule). */
+    @Override
     public void runOnce(Long id) {
-        SysScheduledJob job = get(id);
-        JobInvocationData data = new JobInvocationData(job.getId(), job.getJobName(), job.getJobGroup(), job.getBeanName(), job
-                .getMethodName(), job.getMethodParams(), null);
-        schedulerClient.schedule(
-                SchedulerConfig.ADMIN_JOB_ONCE_TASK
-                        .instance(JobInvocationData.recurringInstanceId(id) + "-" + UUID.randomUUID())
-                        .data(data)
-                        .scheduledTo(Instant.now()));
+        runtime().triggerOnce(get(id));
     }
 
+    @Override
     @Transactional(readOnly = true)
     public Page<SysJobLog> logPage(Long jobId, Pageable pageable) {
         return logRepository.findByJobIdOrderByStartedAtDesc(jobId, pageable);
     }
 
-    // ---------- scheduler wiring ----------
-
-    /**
-     * Idempotent upsert of the runtime instance: schedule if absent, reschedule otherwise.
-     * Invoked after every admin mutation and at startup.
-     */
-    public void syncSchedule(SysScheduledJob job) {
-        if (job.isRunning()) {
-            persistSchedule(job, Schedules.cron(normalizeCron(job.getCron())));
-        } else {
-            cancelQuietly(job);
-        }
-    }
-
-    private void persistSchedule(SysScheduledJob job, Schedule schedule) {
-        TaskDescriptor<JobInvocationData> task = SchedulerConfig.ADMIN_JOB_TASK;
-        SchedulableInstance<JobInvocationData> schedulable = task.instance(JobInvocationData.recurringInstanceId(job.getId()))
-                .data(toData(job, schedule))
-                .scheduledAccordingToData();
-
-        if (schedulerClient.getScheduledExecution(
-                task.instanceId(JobInvocationData.recurringInstanceId(job.getId())))
-                .isPresent()) {
-            schedulerClient.reschedule(schedulable);
-        } else {
-            schedulerClient.scheduleIfNotExists(schedulable);
-        }
-    }
-
-    private void cancelQuietly(SysScheduledJob job) {
-        try {
-            schedulerClient.cancel(
-                    SchedulerConfig.ADMIN_JOB_TASK.instanceId(JobInvocationData.recurringInstanceId(job.getId())));
-        } catch (RuntimeException e) {
-            log.warn("Failed to cancel scheduled instance for job {}", job.getId(), e);
-        }
-    }
-
-    private static JobInvocationData toData(SysScheduledJob job, Schedule schedule) {
-        return new JobInvocationData(job.getId(), job.getJobName(), job.getJobGroup(), job.getBeanName(), job
-                .getMethodName(), job.getMethodParams(), schedule);
+    private SchedulerJobRuntime runtime() {
+        return runtime.getIfAvailable(() -> {
+            throw new SystemException("Scheduler runtime is not available in this application");
+        });
     }
 
     /** Reflective dispatch is only permitted for allowlisted beans with a public declared method. */

@@ -1,6 +1,6 @@
 package com.lesofn.archforge.server.admin.controller.user;
 
-import com.lesofn.archforge.server.admin.service.excel.UserExportService;
+import com.lesofn.archforge.user.api.service.UserExportService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;

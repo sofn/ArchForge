@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
  *
  * <p>
  * Runs on db-scheduler worker threads; the allowlist check happens at admin write time (see
- * ScheduledJobService), keeping this path lean.
+ * SysScheduledJobService), keeping this path lean.
  *
  * @author sofn
  */

@@ -1,4 +1,4 @@
-package com.lesofn.archforge.server.admin.service.permission;
+package com.lesofn.archforge.user.api.service;
 
 import java.util.ArrayList;
 import java.util.List;

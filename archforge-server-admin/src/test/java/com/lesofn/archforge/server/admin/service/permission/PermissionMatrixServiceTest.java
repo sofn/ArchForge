@@ -8,6 +8,7 @@ import com.lesofn.archforge.user.api.domain.SysMenu;
 import com.lesofn.archforge.user.api.domain.SysRoleMenu;
 import com.lesofn.archforge.user.api.menu.SysMenuService;
 import com.lesofn.archforge.user.api.service.SysRoleMenuService;
+import com.lesofn.archforge.user.internal.service.PermissionMatrixServiceImpl;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,7 +26,7 @@ class PermissionMatrixServiceTest {
     private SysRoleMenuService roleMenuService;
 
     @InjectMocks
-    private PermissionMatrixService permissionMatrixService;
+    private PermissionMatrixServiceImpl permissionMatrixService;
 
     @Test
     void rolePermissionsReturnAssignedMenuIds() {

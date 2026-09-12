@@ -1,4 +1,4 @@
-package com.lesofn.archforge.server.admin.service.login;
+package com.lesofn.archforge.infrastructure.auth.service;
 
 import com.lesofn.archforge.infrastructure.auth.errors.AdminAuthErrorCode;
 import com.lesofn.archforge.infrastructure.auth.errors.AdminAuthException;

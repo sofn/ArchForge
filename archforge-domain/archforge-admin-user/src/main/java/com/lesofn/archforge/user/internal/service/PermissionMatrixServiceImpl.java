@@ -1,8 +1,10 @@
-package com.lesofn.archforge.server.admin.service.permission;
+package com.lesofn.archforge.user.internal.service;
 
 import com.lesofn.archforge.user.api.domain.SysMenu;
 import com.lesofn.archforge.user.api.domain.SysRoleMenu;
 import com.lesofn.archforge.user.api.menu.SysMenuService;
+import com.lesofn.archforge.user.api.service.PermissionMatrixService;
+import com.lesofn.archforge.user.api.service.PermissionMenuNode;
 import com.lesofn.archforge.user.api.service.SysRoleMenuService;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -13,11 +15,12 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class PermissionMatrixService {
+public class PermissionMatrixServiceImpl implements PermissionMatrixService {
 
     private final SysMenuService menuService;
     private final SysRoleMenuService roleMenuService;
 
+    @Override
     public List<PermissionMenuNode> menuTree() {
         List<SysMenu> menus = menuService.findAllActiveMenus();
         Map<Long, PermissionMenuNode> nodes = new LinkedHashMap<>();
@@ -39,10 +42,12 @@ public class PermissionMatrixService {
         return roots;
     }
 
+    @Override
     public List<Long> rolePermissions(Long roleId) {
         return roleMenuService.findByRoleId(roleId).stream().map(SysRoleMenu::getMenuId).toList();
     }
 
+    @Override
     public void saveRolePermissions(Long roleId, List<Long> menuIds) {
         roleMenuService.updateRoleMenus(roleId, menuIds != null ? menuIds : List.of());
     }

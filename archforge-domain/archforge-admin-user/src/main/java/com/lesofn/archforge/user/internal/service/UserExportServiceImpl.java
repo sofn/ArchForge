@@ -1,8 +1,9 @@
-package com.lesofn.archforge.server.admin.service.excel;
+package com.lesofn.archforge.user.internal.service;
 
 import com.lesofn.archforge.common.utils.excel.FastExcelUtil;
 import com.lesofn.archforge.user.api.domain.SysUser;
 import com.lesofn.archforge.user.api.service.SysUserService;
+import com.lesofn.archforge.user.api.service.UserExportService;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -10,18 +11,13 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-/**
- * Exports admin users as a FastExcel-generated xlsx workbook.
- *
- * @author sofn
- */
 @Service
 @RequiredArgsConstructor
-public class UserExportService {
+public class UserExportServiceImpl implements UserExportService {
 
     private final SysUserService userService;
 
-    /** Writes a single-sheet workbook of users to the given output stream. */
+    @Override
     public void exportTo(OutputStream out) throws IOException {
         List<SysUser> users = userService.findAll();
         List<String> headers = List.of("ID", "Username", "Nickname", "Email", "Phone", "Sex", "Status");
