@@ -134,6 +134,8 @@ subprojects {
                     // 起步 severity WARN（存量未标注分支逐步清零后升 ERROR）。
                     check("NullAway", net.ltgt.gradle.errorprone.CheckSeverity.WARN)
                     option("NullAway:AnnotatedPackages", "com.lesofn.archforge")
+                    // Generated code (MapStruct impls etc.) is not hand-written — exclude from all checks.
+                    excludedPaths.set(".*/build/generated/sources/.*")
                 }
         }
 
