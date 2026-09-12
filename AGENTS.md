@@ -41,8 +41,8 @@ Five layers run automatically — you never invoke them separately:
   `config/spotbugs/spotbugs-exclude.xml` (main) and `spotbugs-exclude-test.xml`
   (test — mirrors the main ruleset plus test allowances); every entry needs a
   reason. **NullAway** (0.14.1) extends Error Prone with null-safety analysis
-  over the jspecify `@NullMarked` base — currently WARN severity while the
-  baseline is driven to zero.
+  over the jspecify `@NullMarked` base — enforced at ERROR severity on all
+  source sets; any nullness violation fails the compile.
 - **Forbidden APIs** (3.10) bans by signature: `System.out/err` (cli and test
   sources exempt — MCP stdio / debug prints), `Runtime.exec`, `Thread.sleep`,
   `java.util.Date/Calendar/SimpleDateFormat`, internal JDK APIs. Rules:
