@@ -121,11 +121,9 @@ dependencies {
     // Druid monitoring
     api("com.alibaba:druid")
 
-    // Testcontainers — 仅供集成测试使用（AbstractIntegrationTest）。
-    // 必须是 testImplementation：放 api 会把 testcontainers 打进生产包并泄漏给下游模块。
-    testImplementation("org.testcontainers:testcontainers")
-    testImplementation("org.testcontainers:testcontainers-postgresql")
-    
+    // Testcontainers 经 common-jpa testFixtures（testsupport.AbstractIntegrationTest）传入，
+    // testFixtures 变体不进入生产包，无需在本模块重复声明。
+
     // AWS S3 SDK
     api("software.amazon.awssdk:s3")
 
@@ -150,7 +148,8 @@ dependencies {
     // ArchUnit architecture tests
     testImplementation("com.tngtech.archunit:archunit")
 
-    // Cross-module test data builders (G2)
+    // Cross-module test data builders (G2) + shared integration-test container base
+    testImplementation(testFixtures(project(":archforge-common:archforge-common-jpa")))
     testImplementation(testFixtures(project(":archforge-domain:archforge-admin-user")))
     testImplementation(testFixtures(project(":archforge-domain:archforge-blog")))
     testImplementation(testFixtures(project(":archforge-domain:archforge-meta-table")))

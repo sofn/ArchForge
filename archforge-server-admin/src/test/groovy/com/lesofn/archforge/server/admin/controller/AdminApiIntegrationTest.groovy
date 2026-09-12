@@ -1,7 +1,7 @@
 package com.lesofn.archforge.server.admin.controller
 
 import tools.jackson.databind.ObjectMapper
-import com.lesofn.archforge.server.admin.AbstractIntegrationTest
+import com.lesofn.archforge.common.persistence.testsupport.AbstractIntegrationTest
 import com.lesofn.archforge.server.admin.Application
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.server.LocalServerPort

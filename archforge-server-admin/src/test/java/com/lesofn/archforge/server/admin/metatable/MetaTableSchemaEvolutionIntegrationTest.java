@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.lesofn.archforge.server.admin.AbstractIntegrationTest;
+import com.lesofn.archforge.common.persistence.testsupport.AbstractIntegrationTest;
 import org.jspecify.annotations.Nullable;
 import com.lesofn.archforge.meta.table.api.dao.MetaColumnRepository;
 import com.lesofn.archforge.meta.table.api.dao.MetaTableRepository;

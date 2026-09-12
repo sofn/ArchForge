@@ -109,6 +109,11 @@ dependencies {
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 
+    // 集成测试容器基座（Testcontainers PG/Redis，DynamicPropertySource 注入数据源）
+    // + blog 测试数据 builder
+    testImplementation(testFixtures(project(":archforge-common:archforge-common-jpa")))
+    testImplementation(testFixtures(project(":archforge-domain:archforge-blog")))
+
     // ArchUnit architecture tests (G7)
     testImplementation("com.tngtech.archunit:archunit")
 }

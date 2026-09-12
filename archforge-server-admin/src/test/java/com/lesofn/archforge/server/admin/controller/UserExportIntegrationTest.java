@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import tools.jackson.databind.ObjectMapper;
 import org.jspecify.annotations.Nullable;
-import com.lesofn.archforge.server.admin.AbstractIntegrationTest;
+import com.lesofn.archforge.common.persistence.testsupport.AbstractIntegrationTest;
 import com.lesofn.archforge.server.admin.Application;
 import java.io.ByteArrayInputStream;
 import java.util.List;

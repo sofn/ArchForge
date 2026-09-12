@@ -2,6 +2,7 @@ package com.lesofn.archforge.server.admin;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
+import com.lesofn.archforge.common.persistence.testsupport.AbstractIntegrationTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

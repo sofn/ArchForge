@@ -2,7 +2,7 @@ package com.lesofn.archforge.server.admin.metatable;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.lesofn.archforge.server.admin.AbstractIntegrationTest;
+import com.lesofn.archforge.common.persistence.testsupport.AbstractIntegrationTest;
 import com.lesofn.archforge.meta.table.api.dao.MetaTableRepository;
 import com.lesofn.archforge.meta.table.api.domain.MetaTable;
 import com.lesofn.archforge.server.admin.Application;

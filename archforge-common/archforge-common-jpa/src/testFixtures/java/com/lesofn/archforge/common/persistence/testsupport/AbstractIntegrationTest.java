@@ -1,4 +1,4 @@
-package com.lesofn.archforge.server.admin;
+package com.lesofn.archforge.common.persistence.testsupport;
 
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.jspecify.annotations.Nullable;
@@ -18,7 +18,8 @@ import org.testcontainers.utility.DockerImageName;
  * 这里只负责「把依赖服务准备好并把连接信息告诉 Spring」，不参与任何业务逻辑。 容器在静态块中启动一次，同一 JVM 内的所有集成测试共享，避免每个测试类都拉一次镜像。
  *
  * <p>
- * 与过去的区别：这些代码位于 {@code src/test}，不会进入生产包，testcontainers 也不再以 {@code api} 作用域泄漏给下游模块。
+ * 本类位于 common-jpa 的 {@code testFixtures} 源集，server-admin 与 server-web 的集成测试共用 —— 两者使用同一组
+ * 数据源（{@code user_master}/{@code user_slave}），schema 由本模块 {@code classpath:db/migration} 的 Flyway 迁移建立。
  *
  * <p>
  * 对象存储默认不做任何处理 —— 应用本身默认使用本地文件存储（{@code arch-forge.file-storage.type=local}）， 因此没有 S3 也能正常跑。需要覆盖真实 S3 路径时，用

@@ -1,6 +1,7 @@
 package com.lesofn.archforge.server.admin;
 
 import com.lesofn.archforge.common.persistence.GroupDataSourceProxy;
+import com.lesofn.archforge.common.persistence.testsupport.AbstractIntegrationTest;
 import jakarta.annotation.PostConstruct;
 import java.nio.charset.StandardCharsets;
 import javax.sql.DataSource;

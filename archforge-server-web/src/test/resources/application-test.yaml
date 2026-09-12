@@ -15,6 +15,12 @@ spring:
   sql:
     init:
       mode: never
+  # 数据源连接信息由 AbstractIntegrationTest 经 @DynamicPropertySource 注入（user_master/user_slave）；
+  # 这里只需声明分组骨架 —— 主 application.yaml 不含 datasource 块（dev/prod 各自完整声明）。
+  datasource:
+    dynamic:
+      primary: user_master
+      strict: false
   data:
     redis:
       host: 127.0.0.1
@@ -29,6 +35,17 @@ management:
         include: health,info
 
 arch-forge:
+  # 依赖服务（PostgreSQL / Redis）由 common-jpa testFixtures 的 testsupport.AbstractIntegrationTest 提供；
+  # schema 由 Flyway 迁移建立（migrations 在 common-jpa classpath 上）。
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations: classpath:db/migration
+    default-schema: public
+  jwt:
+    secret: ${JWT_SECRET:test-jwt-secret-for-integration-only}
+  token:
+    secret: ${JWT_SECRET:test-jwt-secret-for-integration-only}
   mock-auth:
     enabled: true
   file-storage:
