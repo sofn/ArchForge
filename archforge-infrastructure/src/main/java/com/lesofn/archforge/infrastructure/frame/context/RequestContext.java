@@ -35,7 +35,7 @@ public class RequestContext implements Serializable {
     private @Nullable String platform;
 
     @JsonProperty("client_version")
-    private ClientVersion clientVersion;
+    private @Nullable ClientVersion clientVersion;
 
     private @Nullable Map<String, @Nullable Object> attribute;
 
@@ -119,10 +119,7 @@ public class RequestContext implements Serializable {
         RequestContext other = (RequestContext) obj;
         if (appId != other.appId)
             return false;
-        if (clientVersion == null) {
-            if (other.clientVersion != null)
-                return false;
-        } else if (!clientVersion.equals(other.clientVersion))
+        if (!java.util.Objects.equals(clientVersion, other.clientVersion))
             return false;
         if (currentUid != other.currentUid)
             return false;
