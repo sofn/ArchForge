@@ -37,7 +37,7 @@ public class RequestContext implements Serializable {
     @JsonProperty("client_version")
     private ClientVersion clientVersion;
 
-    private Map<String, Object> attribute;
+    private @Nullable Map<String, @Nullable Object> attribute;
 
     private transient @Nullable HttpServletRequest originRequest;
 
@@ -82,11 +82,17 @@ public class RequestContext implements Serializable {
     public void setOriginRequest(@Nullable HttpServletRequest originRequest) { this.originRequest = originRequest; }
 
     public @Nullable Object getAttribute(String name) {
-        return this.attribute.get(name);
+        Map<String, @Nullable Object> attrs = this.attribute;
+        return attrs == null ? null : attrs.get(name);
     }
 
     public void setAttribute(String name, @Nullable Object value) {
-        this.attribute.put(name, value);
+        Map<String, @Nullable Object> attrs = this.attribute;
+        if (attrs == null) {
+            attrs = new HashMap<>();
+            this.attribute = attrs;
+        }
+        attrs.put(name, value);
     }
 
     @Override
