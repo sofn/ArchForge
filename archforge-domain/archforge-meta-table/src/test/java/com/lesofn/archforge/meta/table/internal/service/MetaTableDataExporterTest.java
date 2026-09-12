@@ -3,7 +3,7 @@ package com.lesofn.archforge.meta.table.internal.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.ArgumentMatchers.eq;
@@ -21,6 +21,7 @@ import com.lesofn.archforge.meta.table.api.enums.MetaDataFormat;
 import com.lesofn.archforge.meta.table.api.errors.MetaTableException;
 import com.lesofn.archforge.meta.table.api.service.MetaTableAdminService;
 import com.lesofn.archforge.meta.table.internal.config.MetaTableTransferProperties;
+import com.lesofn.archforge.meta.table.internal.datascope.MetaDataScopeFilter;
 import com.lesofn.archforge.meta.table.internal.validator.MetaTableValidator;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -31,6 +32,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.dhatim.fastexcel.reader.ReadableWorkbook;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.dhatim.fastexcel.reader.Row;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -52,17 +55,19 @@ class MetaTableDataExporterTest {
         jdbcTemplate = mock(NamedParameterJdbcTemplate.class);
         adminService = mock(MetaTableAdminService.class);
         properties = new MetaTableTransferProperties();
-        exporter = new MetaTableDataExporter(jdbcTemplate, adminService, new MetaTableValidator(), properties);
+        MetaDataScopeFilter dataScopeFilter = mock(MetaDataScopeFilter.class);
+        when(dataScopeFilter.buildClause(any(), anyString(), any(MapSqlParameterSource.class))).thenReturn("");
+        exporter = new MetaTableDataExporter(jdbcTemplate, adminService, new MetaTableValidator(), properties, dataScopeFilter);
         when(adminService.findById(1L)).thenReturn(stubTable());
         when(adminService.findColumns(1L)).thenReturn(nameColumns());
-        when(jdbcTemplate.queryForObject(contains("COUNT(*)"), anyMap(), eq(Long.class)))
+        when(jdbcTemplate.queryForObject(contains("COUNT(*)"), any(SqlParameterSource.class), eq(Long.class)))
                 .thenReturn(2L);
     }
 
     @Test
     void csvExportNeutralizesFormulaPrefixesAndUsesKeysetChunks() throws Exception {
         properties.setExportChunkSize(2);
-        when(jdbcTemplate.queryForList(anyString(), anyMap()))
+        when(jdbcTemplate.queryForList(anyString(), any(SqlParameterSource.class)))
                 .thenReturn(List.of(row(1L, "=cmd|/c calc"), row(2L, "+add")))
                 .thenReturn(List.of(row(3L, "plain")));
 
@@ -77,20 +82,18 @@ class MetaTableDataExporterTest {
         assertEquals("plain", lines.get(3));
 
         ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);
-        @SuppressWarnings("unchecked")
-        ArgumentCaptor<Map<String, Object>> paramCaptor = ArgumentCaptor.forClass(
-                (Class<Map<String, Object>>) (Class<?>) Map.class);
+        ArgumentCaptor<SqlParameterSource> paramCaptor = ArgumentCaptor.forClass(SqlParameterSource.class);
         verify(jdbcTemplate, times(2)).queryForList(sqlCaptor.capture(), paramCaptor.capture());
         String sql = sqlCaptor.getValue();
         assertTrue(sql.contains("deleted = 0 AND main.id > :lastId"));
         assertTrue(sql.contains("ORDER BY main.id ASC LIMIT :chunkSize"));
-        assertEquals(0L, paramCaptor.getAllValues().get(0).get("lastId"));
-        assertEquals(2L, paramCaptor.getAllValues().get(1).get("lastId"));
+        assertEquals(0L, paramCaptor.getAllValues().get(0).getValue("lastId"));
+        assertEquals(2L, paramCaptor.getAllValues().get(1).getValue("lastId"));
     }
 
     @Test
     void excelExportStreamsSanitizedCells() throws Exception {
-        when(jdbcTemplate.queryForList(anyString(), anyMap()))
+        when(jdbcTemplate.queryForList(anyString(), any(SqlParameterSource.class)))
                 .thenReturn(List.of(row(1L, "@at"), row(2L, "-minus")))
                 .thenReturn(List.of());
 
@@ -114,7 +117,7 @@ class MetaTableDataExporterTest {
 
     @Test
     void jsonExportStreamsArrayWithoutCellMutation() throws Exception {
-        when(jdbcTemplate.queryForList(anyString(), anyMap()))
+        when(jdbcTemplate.queryForList(anyString(), any(SqlParameterSource.class)))
                 .thenReturn(List.of(row(1L, "=keep")))
                 .thenReturn(List.of());
 
@@ -130,7 +133,7 @@ class MetaTableDataExporterTest {
 
     @Test
     void exportBeyondRowCapIsRejectedWithFilterHint() {
-        when(jdbcTemplate.queryForObject(contains("COUNT(*)"), anyMap(), eq(Long.class)))
+        when(jdbcTemplate.queryForObject(contains("COUNT(*)"), any(SqlParameterSource.class), eq(Long.class)))
                 .thenReturn(50_001L);
 
         MetaTableException e = assertThrows(

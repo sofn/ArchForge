@@ -3,6 +3,7 @@ package com.lesofn.archforge.server.admin.controller.metatable;
 import com.lesofn.archforge.infrastructure.annotation.Log;
 import com.lesofn.archforge.infrastructure.config.ArchForgeProperties;
 import com.lesofn.archforge.infrastructure.frame.context.RequestContext;
+import com.lesofn.archforge.infrastructure.security.datascope.DataPermission;
 import com.lesofn.archforge.meta.table.api.domain.MetaColumn;
 import com.lesofn.archforge.meta.table.api.domain.MetaTable;
 import com.lesofn.archforge.meta.table.api.domain.MetaTableMigration;
@@ -234,6 +235,7 @@ public class MetaTableController {
 
     @Operation(summary = "获取元表格数据")
     @SaCheckPermission(value = "meta-table:list", type = StpAdminUtil.TYPE)
+    @DataPermission
     @PostMapping("/{id}/data")
     public AdminPageResponse<Map<String, Object>> listData(
             @PathVariable Long id, @RequestBody MetaDataListRequest request) {
@@ -280,6 +282,7 @@ public class MetaTableController {
     }
 
     @Operation(summary = "导出元表格数据")
+    @DataPermission
     @GetMapping("/{id}/export")
     public void export(
             @PathVariable Long id,

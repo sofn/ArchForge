@@ -12,6 +12,7 @@ import com.lesofn.archforge.meta.table.api.errors.MetaTableErrorCode;
 import com.lesofn.archforge.meta.table.api.errors.MetaTableException;
 import com.lesofn.archforge.meta.table.api.service.MetaTableAdminService;
 import com.lesofn.archforge.meta.table.api.service.MetaTableCrudService;
+import com.lesofn.archforge.meta.table.internal.datascope.MetaDataScopeFilter;
 import com.lesofn.archforge.meta.table.internal.ddl.SqlIdentifier;
 import com.lesofn.archforge.meta.table.internal.validator.MetaTableValidator;
 import java.io.InputStream;
@@ -53,6 +54,7 @@ public class MetaTableCrudServiceImpl implements MetaTableCrudService {
     private final MetaTableDataInserter inserter;
     private final MetaTableDataExporter exporter;
     private final MetaTableDataImporter importer;
+    private final MetaDataScopeFilter dataScopeFilter;
 
     @Override
     @Transactional("metaTableTransactionManager")
@@ -122,7 +124,8 @@ public class MetaTableCrudServiceImpl implements MetaTableCrudService {
         List<String> joins = ReferenceDisplayBuilder.buildJoins(columns, mainAlias);
 
         MapSqlParameterSource params = new MapSqlParameterSource();
-        String whereClause = buildWhereClause(columns, query.filters(), params, mainAlias);
+        String whereClause = buildWhereClause(columns, query.filters(), params, mainAlias) + dataScopeFilter.buildClause(
+                columns, mainAlias, params);
 
         String fromClause = " FROM " + physicalName + " " + mainAlias + " " + String.join(" ", joins);
         long total = -1L;

@@ -12,6 +12,7 @@ import com.lesofn.archforge.meta.table.api.errors.MetaTableErrorCode;
 import com.lesofn.archforge.meta.table.api.errors.MetaTableException;
 import com.lesofn.archforge.meta.table.api.service.MetaTableAdminService;
 import com.lesofn.archforge.meta.table.internal.config.MetaTableTransferProperties;
+import com.lesofn.archforge.meta.table.internal.datascope.MetaDataScopeFilter;
 import com.lesofn.archforge.meta.table.internal.ddl.SqlIdentifier;
 import com.lesofn.archforge.meta.table.internal.validator.MetaTableValidator;
 import java.io.BufferedWriter;
@@ -31,6 +32,7 @@ import org.apache.commons.csv.CSVPrinter;
 import org.dhatim.fastexcel.Workbook;
 import org.dhatim.fastexcel.Worksheet;
 import org.postgresql.util.PGobject;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
 
@@ -45,12 +47,13 @@ public class MetaTableDataExporter {
     private final MetaTableAdminService metaTableAdminService;
     private final MetaTableValidator validator;
     private final MetaTableTransferProperties transferProperties;
+    private final MetaDataScopeFilter dataScopeFilter;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public void export(Long tableId, MetaDataFormat format, OutputStream out) {
         MetaTable table = metaTableAdminService.findById(tableId);
         List<MetaColumn> columns = metaTableAdminService.findColumns(tableId);
-        enforceRowLimit(table);
+        enforceRowLimit(table, columns);
 
         switch (format) {
             case EXCEL -> exportExcel(table, columns, out);
@@ -60,10 +63,13 @@ public class MetaTableDataExporter {
         }
     }
 
-    private void enforceRowLimit(MetaTable table) {
+    private void enforceRowLimit(MetaTable table, List<MetaColumn> columns) {
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        String scopeClause = dataScopeFilter.buildClause(columns, "main", params);
         Long total = jdbcTemplate.queryForObject(
-                "SELECT COUNT(*) FROM " + SqlIdentifier.quote(table.physicalTableName()) + " WHERE deleted = 0",
-                Map.of(), Long.class);
+                "SELECT COUNT(*) FROM " + SqlIdentifier.quote(table.physicalTableName()) + " main WHERE main.deleted = 0" +
+                        scopeClause,
+                params, Long.class);
         long maxRows = transferProperties.getMaxExportRows();
         if (total != null && total > maxRows) {
             throw new MetaTableException("导出行数 " + total + " 超过上限 " + maxRows + "，请添加过滤条件缩小导出范围");
@@ -150,14 +156,19 @@ public class MetaTableDataExporter {
         String mainAlias = "main";
         List<String> selectColumns = ReferenceDisplayBuilder.buildSelectColumns(columns, mainAlias);
         List<String> joins = ReferenceDisplayBuilder.buildJoins(columns, mainAlias);
+        MapSqlParameterSource scopeParams = new MapSqlParameterSource();
+        String scopeClause = dataScopeFilter.buildClause(columns, mainAlias, scopeParams);
         String querySql = "SELECT " + String.join(", ", selectColumns) + " FROM " + physicalName + " " + mainAlias +
                 " " + String.join(" ", joins) + " WHERE " + mainAlias + ".deleted = 0 AND " + mainAlias +
-                ".id > :lastId ORDER BY " + mainAlias + ".id ASC LIMIT :chunkSize";
+                ".id > :lastId" + scopeClause + " ORDER BY " + mainAlias + ".id ASC LIMIT :chunkSize";
         int chunkSize = transferProperties.getExportChunkSize();
         long lastId = 0L;
         while (true) {
-            List<Map<String, Object>> rows = jdbcTemplate.queryForList(querySql, Map.of("lastId", lastId, "chunkSize",
-                    chunkSize));
+            MapSqlParameterSource params = new MapSqlParameterSource();
+            params.addValue("lastId", lastId);
+            params.addValue("chunkSize", chunkSize);
+            params.addValues(scopeParams.getValues());
+            List<Map<String, Object>> rows = jdbcTemplate.queryForList(querySql, params);
             if (rows.isEmpty()) {
                 break;
             }

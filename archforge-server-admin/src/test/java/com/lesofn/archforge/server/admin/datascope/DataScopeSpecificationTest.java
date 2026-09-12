@@ -73,7 +73,7 @@ class DataScopeSpecificationTest {
 
     @BeforeEach
     void setUp() {
-        dataScopeSpecification = new DataScopeSpecification(deptService);
+        dataScopeSpecification = new DataScopeSpecification(new DeptTreeResolver(deptService));
         when(root.get("deptId")).thenReturn(deptPath);
         when(root.get("id")).thenReturn(userPath);
     }

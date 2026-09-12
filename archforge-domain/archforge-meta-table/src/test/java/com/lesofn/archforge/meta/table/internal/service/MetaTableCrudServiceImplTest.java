@@ -18,6 +18,7 @@ import com.lesofn.archforge.meta.table.api.dto.MetaDataQuery;
 import com.lesofn.archforge.meta.table.api.dto.MetaPageResponse;
 import com.lesofn.archforge.meta.table.api.errors.MetaTableException;
 import com.lesofn.archforge.meta.table.api.service.MetaTableAdminService;
+import com.lesofn.archforge.meta.table.internal.datascope.MetaDataScopeFilter;
 import com.lesofn.archforge.meta.table.internal.validator.MetaTableValidator;
 import java.util.List;
 import java.util.Map;
@@ -38,9 +39,11 @@ class MetaTableCrudServiceImplTest {
     void setUp() {
         jdbcTemplate = mock(NamedParameterJdbcTemplate.class);
         metaTableAdminService = mock(MetaTableAdminService.class);
+        MetaDataScopeFilter dataScopeFilter = mock(MetaDataScopeFilter.class);
+        when(dataScopeFilter.buildClause(any(), anyString(), any(MapSqlParameterSource.class))).thenReturn("");
         service = new MetaTableCrudServiceImpl(jdbcTemplate, metaTableAdminService, mock(MetaTableValidator.class), mock(
                 MetaTableDataInserter.class), mock(MetaTableDataExporter.class), mock(
-                        MetaTableDataImporter.class));
+                        MetaTableDataImporter.class), dataScopeFilter);
     }
 
     @Test
