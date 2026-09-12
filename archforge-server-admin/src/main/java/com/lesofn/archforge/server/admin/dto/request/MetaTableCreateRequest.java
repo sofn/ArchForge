@@ -11,6 +11,7 @@ import lombok.Data;
  * 元表格创建请求
  */
 @Data
+@SuppressWarnings("NullAway.Init")
 public class MetaTableCreateRequest {
 
     @NotBlank

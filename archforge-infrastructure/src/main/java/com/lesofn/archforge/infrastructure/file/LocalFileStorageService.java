@@ -1,6 +1,7 @@
 package com.lesofn.archforge.infrastructure.file;
 
 import java.io.IOException;
+import org.jspecify.annotations.Nullable;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -41,7 +42,7 @@ public class LocalFileStorageService implements FileStorageService {
     }
 
     @Override
-    public String upload(String path, InputStream inputStream, String contentType, long size) {
+    public String upload(String path, InputStream inputStream, @Nullable String contentType, long size) {
         try {
             Path targetPath = safePath(path);
             Path parent = targetPath.getParent();

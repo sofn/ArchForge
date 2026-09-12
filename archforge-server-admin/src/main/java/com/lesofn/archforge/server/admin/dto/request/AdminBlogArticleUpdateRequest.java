@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@SuppressWarnings("NullAway.Init")
 public class AdminBlogArticleUpdateRequest {
 
     @NotNull(message = "文章ID不能为空")

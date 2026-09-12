@@ -16,6 +16,7 @@ import org.jspecify.annotations.Nullable;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@SuppressWarnings("NullAway.Init")
 public class ConfigUpdateRequest {
 
     @NotNull(message = "参数ID不能为空")

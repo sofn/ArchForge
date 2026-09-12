@@ -18,6 +18,7 @@ import org.jspecify.annotations.Nullable;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@SuppressWarnings("NullAway.Init")
 public class UserCreateRequest {
 
     @NotBlank(message = "用户名不能为空")

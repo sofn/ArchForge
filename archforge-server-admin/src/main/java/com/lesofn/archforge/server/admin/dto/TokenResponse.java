@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@SuppressWarnings("NullAway.Init")
 public class TokenResponse {
 
     /** 访问令牌 */

@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@SuppressWarnings("NullAway.Init")
 public class UserDeleteRequest {
 
     @NotNull(message = "用户ID不能为空")

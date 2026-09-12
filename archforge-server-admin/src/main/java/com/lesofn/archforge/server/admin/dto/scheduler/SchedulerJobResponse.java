@@ -6,6 +6,7 @@ import lombok.Data;
 
 /** Response DTO mirroring {@link SysScheduledJob} for the admin list view. */
 @Data
+@SuppressWarnings("NullAway.Init")
 public class SchedulerJobResponse {
     private Long id;
     private String jobName;

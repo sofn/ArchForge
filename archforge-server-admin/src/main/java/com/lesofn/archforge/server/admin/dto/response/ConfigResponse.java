@@ -1,6 +1,7 @@
 package com.lesofn.archforge.server.admin.dto.response;
 
 import lombok.AllArgsConstructor;
+import org.jspecify.annotations.Nullable;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -12,19 +13,20 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@SuppressWarnings("NullAway.Init")
 public class ConfigResponse {
 
-    private Long id;
+    private @Nullable Long id;
 
-    private String configName;
+    private @Nullable String configName;
 
-    private String configKey;
+    private @Nullable String configKey;
 
-    private String configValue;
+    private @Nullable String configValue;
 
-    private Integer configType;
+    private @Nullable Integer configType;
 
-    private String remark;
+    private @Nullable String remark;
 
-    private Long createTime;
+    private @Nullable Long createTime;
 }

@@ -1,6 +1,7 @@
 package com.lesofn.archforge.server.admin.dto.response;
 
 import lombok.AllArgsConstructor;
+import org.jspecify.annotations.Nullable;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -12,19 +13,20 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@SuppressWarnings("NullAway.Init")
 public class NoticeResponse {
 
-    private Long id;
+    private @Nullable Long id;
 
-    private String noticeTitle;
+    private @Nullable String noticeTitle;
 
-    private Integer noticeType;
+    private @Nullable Integer noticeType;
 
-    private String noticeContent;
+    private @Nullable String noticeContent;
 
-    private Integer status;
+    private @Nullable Integer status;
 
-    private String remark;
+    private @Nullable String remark;
 
-    private Long createTime;
+    private @Nullable Long createTime;
 }

@@ -11,6 +11,7 @@ import org.jspecify.annotations.Nullable;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@SuppressWarnings("NullAway.Init")
 public class DictTypeUpdateRequest {
 
     @NotBlank(message = "字典名称不能为空")

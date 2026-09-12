@@ -1,6 +1,7 @@
 package com.lesofn.archforge.user.api.service.dict;
 
 import com.lesofn.archforge.user.api.domain.dict.SysDictItem;
+import org.jspecify.annotations.Nullable;
 import com.lesofn.archforge.user.api.domain.dict.SysDictType;
 import java.util.List;
 import java.util.Optional;
@@ -13,7 +14,7 @@ public interface SysDictService {
 
     Optional<SysDictType> findTypeByCode(String dictCode);
 
-    Page<SysDictType> findTypePage(String keyword, Pageable pageable);
+    Page<SysDictType> findTypePage(@Nullable String keyword, Pageable pageable);
 
     List<SysDictItem> findItemsByTypeCode(String dictCode);
 

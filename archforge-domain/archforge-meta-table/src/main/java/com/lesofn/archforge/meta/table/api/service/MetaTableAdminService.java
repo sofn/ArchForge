@@ -1,6 +1,7 @@
 package com.lesofn.archforge.meta.table.api.service;
 
 import com.lesofn.archforge.meta.table.api.domain.MetaColumn;
+import org.jspecify.annotations.Nullable;
 import com.lesofn.archforge.meta.table.api.domain.MetaTable;
 import java.util.List;
 import org.springframework.data.domain.Page;
@@ -13,7 +14,7 @@ public interface MetaTableAdminService {
 
     Long create(MetaTable table, List<MetaColumn> columns);
 
-    void update(Long id, MetaTable table, List<MetaColumn> columns, Long operatorId);
+    void update(Long id, MetaTable table, @Nullable List<MetaColumn> columns, Long operatorId);
 
     Long copy(Long id);
 

@@ -10,6 +10,7 @@ import lombok.Data;
  * @author sofn
  */
 @Data
+@SuppressWarnings("NullAway.Init")
 public class RoleDataScopeRequest {
 
     /** 角色ID */

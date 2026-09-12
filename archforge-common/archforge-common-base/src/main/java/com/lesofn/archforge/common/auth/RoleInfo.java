@@ -1,6 +1,7 @@
 package com.lesofn.archforge.common.auth;
 
 import java.util.Collections;
+import org.jspecify.annotations.Nullable;
 import java.util.HashSet;
 import java.util.Set;
 import lombok.AllArgsConstructor;
@@ -26,7 +27,7 @@ public class RoleInfo {
     public RoleInfo(
             Long roleId,
             String roleKey,
-            DataScopeEnum dataScope,
+            @Nullable DataScopeEnum dataScope,
             Set<Long> deptIdSet,
             Set<String> menuPermissions,
             Set<Long> menuIds) {
@@ -50,7 +51,7 @@ public class RoleInfo {
 
     private Long roleId;
     private String roleName;
-    private DataScopeEnum dataScope;
+    private @Nullable DataScopeEnum dataScope;
     private Set<Long> deptIdSet;
     private String roleKey;
     private Set<String> menuPermissions;

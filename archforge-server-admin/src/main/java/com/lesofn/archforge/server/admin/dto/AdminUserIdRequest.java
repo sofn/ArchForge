@@ -8,6 +8,7 @@ import lombok.Data;
  * @author lesofn
  */
 @Data
+@SuppressWarnings("NullAway.Init")
 public class AdminUserIdRequest {
 
     /** 用户ID */

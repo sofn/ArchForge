@@ -7,6 +7,7 @@ import lombok.EqualsAndHashCode;
 /** 列表查询请求 */
 @Data
 @EqualsAndHashCode(callSuper = true)
+@SuppressWarnings("NullAway.Init")
 public class SchedulerJobListRequest extends BasePageRequest {
 
     /** 任务名 */

@@ -9,6 +9,7 @@ import lombok.Data;
  * @author lesofn
  */
 @Data
+@SuppressWarnings("NullAway.Init")
 public class AdminRoleDTO {
 
     /** 角色ID */

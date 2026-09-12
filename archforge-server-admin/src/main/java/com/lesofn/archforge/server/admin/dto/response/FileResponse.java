@@ -1,6 +1,7 @@
 package com.lesofn.archforge.server.admin.dto.response;
 
 import lombok.AllArgsConstructor;
+import org.jspecify.annotations.Nullable;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -12,23 +13,24 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@SuppressWarnings("NullAway.Init")
 public class FileResponse {
 
-    private Long id;
+    private @Nullable Long id;
 
-    private String originalName;
+    private @Nullable String originalName;
 
-    private String storageName;
+    private @Nullable String storageName;
 
-    private String storagePath;
+    private @Nullable String storagePath;
 
-    private Long fileSize;
+    private @Nullable Long fileSize;
 
-    private String contentType;
+    private @Nullable String contentType;
 
-    private String extension;
+    private @Nullable String extension;
 
-    private String storageType;
+    private @Nullable String storageType;
 
-    private Long createTime;
+    private @Nullable Long createTime;
 }

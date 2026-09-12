@@ -1,6 +1,7 @@
 package com.lesofn.archforge.server.admin.dto.request;
 
 import com.lesofn.archforge.meta.table.api.domain.MetaColumn;
+import org.jspecify.annotations.Nullable;
 import com.lesofn.archforge.meta.table.api.domain.MetaTable;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -11,6 +12,7 @@ import lombok.Data;
  * 元表格更新请求
  */
 @Data
+@SuppressWarnings("NullAway.Init")
 public class MetaTableUpdateRequest {
 
     @NotBlank
@@ -33,7 +35,7 @@ public class MetaTableUpdateRequest {
         return table;
     }
 
-    public List<MetaColumn> toColumns() {
+    public @Nullable List<MetaColumn> toColumns() {
         if (columns == null) {
             return null;
         }

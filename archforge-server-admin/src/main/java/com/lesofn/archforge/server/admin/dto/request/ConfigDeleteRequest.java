@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@SuppressWarnings("NullAway.Init")
 public class ConfigDeleteRequest {
 
     @NotNull(message = "参数ID不能为空")

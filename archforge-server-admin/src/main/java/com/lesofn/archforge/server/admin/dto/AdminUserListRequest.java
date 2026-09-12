@@ -1,6 +1,7 @@
 package com.lesofn.archforge.server.admin.dto;
 
 import java.time.LocalDateTime;
+import org.jspecify.annotations.Nullable;
 import java.util.List;
 import lombok.Data;
 
@@ -10,6 +11,7 @@ import lombok.Data;
  * @author lesofn
  */
 @Data
+@SuppressWarnings("NullAway.Init")
 public class AdminUserListRequest {
 
     /** 用户名 */
@@ -39,7 +41,7 @@ public class AdminUserListRequest {
     /** 每页大小 */
     private Integer pageSize = 10;
 
-    public Long getDeptIdAsLong() {
+    public @Nullable Long getDeptIdAsLong() {
         if (deptId == null || deptId.isEmpty())
             return null;
         try {
@@ -49,7 +51,7 @@ public class AdminUserListRequest {
         }
     }
 
-    public Integer getStatusAsInt() {
+    public @Nullable Integer getStatusAsInt() {
         if (status == null || status.isEmpty())
             return null;
         try {

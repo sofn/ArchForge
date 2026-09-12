@@ -17,6 +17,7 @@ import org.jspecify.annotations.Nullable;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@SuppressWarnings("NullAway.Init")
 public class UserRoleRequest {
 
     @NotNull(message = "用户ID不能为空")

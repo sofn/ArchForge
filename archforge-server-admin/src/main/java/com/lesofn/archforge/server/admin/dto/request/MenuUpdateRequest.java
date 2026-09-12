@@ -16,6 +16,7 @@ import org.jspecify.annotations.Nullable;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@SuppressWarnings("NullAway.Init")
 public class MenuUpdateRequest {
 
     @NotNull(message = "菜单ID不能为空")

@@ -7,6 +7,7 @@ import static com.lesofn.archforge.meta.table.api.errors.MetaTableErrorCode.META
 import static com.lesofn.archforge.meta.table.api.errors.MetaTableErrorCode.META_TABLE_NOT_EXISTS;
 
 import com.lesofn.archforge.meta.table.api.dao.MetaColumnRepository;
+import org.jspecify.annotations.Nullable;
 import com.lesofn.archforge.meta.table.api.dao.MetaTableRepository;
 import com.lesofn.archforge.meta.table.api.service.MetaTableMigrationService;
 import com.lesofn.archforge.meta.table.api.domain.MetaColumn;
@@ -88,7 +89,7 @@ public class MetaTableAdminServiceImpl implements MetaTableAdminService {
 
     @Override
     @Transactional("metaTableTransactionManager")
-    public void update(Long id, MetaTable table, List<MetaColumn> columns, Long operatorId) {
+    public void update(Long id, MetaTable table, @Nullable List<MetaColumn> columns, Long operatorId) {
         MetaTable existing = findById(id);
         existing.setUpdaterId(operatorId);
 

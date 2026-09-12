@@ -1,6 +1,7 @@
 package com.lesofn.archforge.server.admin.controller.blog;
 
 import com.lesofn.archforge.infrastructure.file.FileStorageService;
+import org.jspecify.annotations.Nullable;
 import com.lesofn.archforge.user.api.domain.SysFile;
 import com.lesofn.archforge.user.api.service.SysFileService;
 import java.io.IOException;
@@ -86,7 +87,7 @@ public class BlogFileController {
         return ResponseEntity.ok(result);
     }
 
-    private boolean isImage(String extension) {
+    private boolean isImage(@Nullable String extension) {
         if (!StringUtils.hasText(extension)) {
             return false;
         }

@@ -65,8 +65,7 @@ public class DbSchedulerJobRuntime implements SchedulerJobRuntime {
 
     @Override
     public void triggerOnce(SysScheduledJob job) {
-        JobInvocationData data = new JobInvocationData(job.getId(), job.getJobName(), job.getJobGroup(), job.getBeanName(), job
-                .getMethodName(), job.getMethodParams(), null);
+        JobInvocationData data = toData(job, Schedules.cron(SchedulerJobRuntime.normalizeCron(job.getCron())));
         schedulerClient.schedule(
                 SchedulerConfig.ADMIN_JOB_ONCE_TASK
                         .instance(JobInvocationData.recurringInstanceId(job.getId()) + "-" + UUID.randomUUID())

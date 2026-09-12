@@ -1,6 +1,7 @@
 package com.lesofn.archforge.server.admin.service.login;
 
 import com.lesofn.archforge.common.auth.SystemLoginUser;
+import org.jspecify.annotations.Nullable;
 import com.lesofn.archforge.infrastructure.auth.stp.LoginSessionKeys;
 import com.lesofn.archforge.infrastructure.auth.stp.StpAdminUtil;
 import com.lesofn.archforge.infrastructure.config.ArchForgeProperties;
@@ -37,7 +38,7 @@ public class TokenService {
         return refreshToken;
     }
 
-    public SystemLoginUser getLoginUserByRefreshToken(String refreshToken) {
+    public @Nullable SystemLoginUser getLoginUserByRefreshToken(String refreshToken) {
         String userId = redisCacheService.getRefreshTokenCache().get(refreshToken);
         if (userId == null) {
             return null;

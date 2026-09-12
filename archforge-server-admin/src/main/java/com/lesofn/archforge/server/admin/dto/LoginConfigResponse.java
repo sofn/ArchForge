@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@SuppressWarnings("NullAway.Init")
 public class LoginConfigResponse {
 
     /** 是否开启验证码 */

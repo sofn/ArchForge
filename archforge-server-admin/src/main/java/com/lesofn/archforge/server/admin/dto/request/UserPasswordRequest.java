@@ -16,6 +16,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@SuppressWarnings("NullAway.Init")
 public class UserPasswordRequest {
 
     @NotNull(message = "用户ID不能为空")

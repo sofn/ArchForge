@@ -1,6 +1,7 @@
 package com.lesofn.archforge.server.admin.controller;
 
 import java.time.LocalDateTime;
+import org.jspecify.annotations.Nullable;
 import java.time.ZoneId;
 
 /**
@@ -11,7 +12,7 @@ public final class ControllerHelper {
     private ControllerHelper() {
     }
 
-    public static Long toEpochMilli(LocalDateTime dateTime) {
+    public static @Nullable Long toEpochMilli(@Nullable LocalDateTime dateTime) {
         if (dateTime == null) {
             return null;
         }

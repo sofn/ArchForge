@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
+@SuppressWarnings("NullAway.Init")
 public class SchedulerLogListRequest extends BasePageRequest {
 
     private Long jobId;

@@ -45,7 +45,7 @@ public class RedisHealthConfig {
                     log.debug("Redis health check failed", e);
                     return Health.down()
                             .withDetail("redis", "Not available")
-                            .withDetail("error", e.getMessage())
+                            .withDetail("error", java.util.Objects.requireNonNullElse(e.getMessage(), e.toString()))
                             .build();
                 }
             }

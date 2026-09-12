@@ -58,7 +58,7 @@ public class SysUser extends BaseEntity<SysUser> {
     private String avatar;
 
     @Sensitive(SensitiveType.PASSWORD)
-    private String password;
+    private @Nullable String password;
 
     private Integer status;
 

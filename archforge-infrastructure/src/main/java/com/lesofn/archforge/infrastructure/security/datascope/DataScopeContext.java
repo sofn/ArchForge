@@ -1,6 +1,7 @@
 package com.lesofn.archforge.infrastructure.security.datascope;
 
 import com.lesofn.archforge.common.auth.DataScopeEnum;
+import org.jspecify.annotations.Nullable;
 import java.util.HashSet;
 import java.util.Set;
 import lombok.AllArgsConstructor;
@@ -28,7 +29,7 @@ public class DataScopeContext {
     private Long userId;
 
     /** 当前登录用户所属部门 ID */
-    private Long deptId;
+    private @Nullable Long deptId;
 
     /** 自定义部门 ID 集合（CUSTOM_DEFINE 时使用） */
     private Set<Long> customDeptIds;

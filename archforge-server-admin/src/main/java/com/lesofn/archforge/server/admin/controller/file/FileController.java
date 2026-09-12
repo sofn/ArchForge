@@ -90,7 +90,7 @@ public class FileController {
         } else {
             FileUploadValidator.validate(file, appForgeConfig.getFileStorage());
         }
-        String originalName = file.getOriginalFilename();
+        String originalName = java.util.Objects.requireNonNullElse(file.getOriginalFilename(), "");
         String extension = FileUploadValidator.extension(originalName);
         String storageName = UUID.randomUUID().toString().replace("-", "") + "." + extension;
         String datePath = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd"));
@@ -108,7 +108,8 @@ public class FileController {
         sysFile.setStorageName(storageName);
         sysFile.setStoragePath(storagePath);
         sysFile.setFileSize(file.getSize());
-        sysFile.setContentType(file.getContentType());
+        sysFile.setContentType(java.util.Objects.requireNonNullElse(file.getContentType(),
+                org.springframework.http.MediaType.APPLICATION_OCTET_STREAM_VALUE));
         sysFile.setExtension(extension);
         sysFile.setStorageType(appForgeConfig.getFileStorage().getType());
         SysFile saved = fileService.create(sysFile);
@@ -148,7 +149,8 @@ public class FileController {
         InputStream inputStream = fileStorageService.download(sysFile.getStoragePath());
 
         return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(sysFile.getContentType()))
+                .contentType(MediaType.parseMediaType(java.util.Objects.requireNonNullElse(sysFile.getContentType(),
+                        org.springframework.http.MediaType.APPLICATION_OCTET_STREAM_VALUE)))
                 .header(
                         HttpHeaders.CONTENT_DISPOSITION,
                         org.springframework.http.ContentDisposition.attachment()

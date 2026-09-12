@@ -69,10 +69,11 @@ public class ChatAiController {
     @RateLimit(key = "admin-chat", time = 60, maxCount = 20, limitType = RateLimit.LimitType.USER)
     @PostMapping(value = "/sessions/{id}/messages", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter send(@PathVariable String id, @RequestBody @Valid ChatMessageRequest request) {
-        return chatAiService.stream(id, request.getContent());
+        return chatAiService.stream(id, java.util.Objects.requireNonNull(request.getContent()));
     }
 
     @Data
+    @SuppressWarnings("NullAway.Init")
     public static class ChatMessageRequest {
         @NotBlank
         private String content;

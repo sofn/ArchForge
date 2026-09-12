@@ -1,6 +1,7 @@
 package com.lesofn.archforge.infrastructure.file;
 
 import java.io.InputStream;
+import org.jspecify.annotations.Nullable;
 
 /**
  * 可重新配置的文件存储服务包装类。
@@ -21,7 +22,7 @@ public class AdaptiveFileStorageService implements FileStorageService {
     public void setDelegate(FileStorageService delegate) { this.delegate = delegate; }
 
     @Override
-    public String upload(String path, InputStream inputStream, String contentType, long size) {
+    public String upload(String path, InputStream inputStream, @Nullable String contentType, long size) {
         return delegate.upload(path, inputStream, contentType, size);
     }
 

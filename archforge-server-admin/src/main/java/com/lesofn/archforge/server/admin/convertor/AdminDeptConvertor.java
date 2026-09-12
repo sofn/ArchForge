@@ -1,6 +1,7 @@
 package com.lesofn.archforge.server.admin.convertor;
 
 import com.lesofn.archforge.server.admin.dto.AdminDeptDTO;
+import org.jspecify.annotations.Nullable;
 import com.lesofn.archforge.user.api.domain.SysDept;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -16,7 +17,7 @@ public interface AdminDeptConvertor {
     AdminDeptDTO toDto(SysDept dept);
 
     @org.mapstruct.Named("toEpochMilli")
-    default Long toEpochMilli(LocalDateTime dateTime) {
+    default @Nullable Long toEpochMilli(@Nullable LocalDateTime dateTime) {
         if (dateTime == null) {
             return null;
         }

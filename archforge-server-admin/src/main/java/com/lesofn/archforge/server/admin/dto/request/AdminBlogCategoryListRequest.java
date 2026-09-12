@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
+@SuppressWarnings("NullAway.Init")
 public class AdminBlogCategoryListRequest extends BasePageRequest {
 
     private String name;

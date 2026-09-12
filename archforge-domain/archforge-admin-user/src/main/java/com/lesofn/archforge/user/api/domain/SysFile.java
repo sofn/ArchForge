@@ -1,6 +1,7 @@
 package com.lesofn.archforge.user.api.domain;
 
 import com.lesofn.archforge.common.repository.BaseEntity;
+import org.jspecify.annotations.Nullable;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -43,10 +44,10 @@ public class SysFile extends BaseEntity<SysFile> {
     private Long fileSize;
 
     /** 文件类型 (MIME type) */
-    private String contentType;
+    private @Nullable String contentType;
 
     /** 文件后缀 */
-    private String extension;
+    private @Nullable String extension;
 
     /** 存储类型: local / s3 */
     private String storageType;

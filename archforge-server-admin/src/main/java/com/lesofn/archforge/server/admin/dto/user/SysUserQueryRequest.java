@@ -1,6 +1,7 @@
 package com.lesofn.archforge.server.admin.dto.user;
 
 import com.lesofn.archforge.common.annotation.Query;
+import org.jspecify.annotations.Nullable;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Data;
@@ -12,6 +13,7 @@ import lombok.Data;
  * @author sofn
  */
 @Data
+@SuppressWarnings("NullAway.Init")
 public class SysUserQueryRequest {
 
     /** Multi-field LIKE across {@code username,nickname,email}. */
@@ -28,10 +30,10 @@ public class SysUserQueryRequest {
     private String phoneNumber;
 
     @Query
-    private Integer status;
+    private @Nullable Integer status;
 
     @Query
-    private Long deptId;
+    private @Nullable Long deptId;
 
     @Query
     private Boolean deleted;

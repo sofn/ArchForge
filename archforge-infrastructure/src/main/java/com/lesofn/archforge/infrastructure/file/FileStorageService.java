@@ -1,6 +1,7 @@
 package com.lesofn.archforge.infrastructure.file;
 
 import java.io.InputStream;
+import org.jspecify.annotations.Nullable;
 
 /**
  * 文件存储服务接口
@@ -18,7 +19,7 @@ public interface FileStorageService {
      * @param size 文件大小
      * @return 文件访问路径
      */
-    String upload(String path, InputStream inputStream, String contentType, long size);
+    String upload(String path, InputStream inputStream, @Nullable String contentType, long size);
 
     /**
      * 下载文件

@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@SuppressWarnings("NullAway.Init")
 public class NoticeDeleteRequest {
 
     @NotNull(message = "通知ID不能为空")

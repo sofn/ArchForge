@@ -7,6 +7,7 @@ import org.jspecify.annotations.Nullable;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
+@SuppressWarnings("NullAway.Init")
 public class DictTypeQueryRequest extends BasePageRequest {
 
     @Nullable

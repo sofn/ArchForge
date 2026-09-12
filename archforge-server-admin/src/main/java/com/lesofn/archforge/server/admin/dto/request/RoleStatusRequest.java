@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@SuppressWarnings("NullAway.Init")
 public class RoleStatusRequest {
 
     @NotNull(message = "角色ID不能为空")

@@ -1,6 +1,7 @@
 package com.lesofn.archforge.server.admin.dto;
 
 import java.util.List;
+import org.jspecify.annotations.Nullable;
 import lombok.Data;
 
 /**
@@ -9,16 +10,17 @@ import lombok.Data;
  * @author lesofn
  */
 @Data
+@SuppressWarnings("NullAway.Init")
 public class LoginResponse {
 
     /** 用户头像 */
-    private String avatar;
+    private @Nullable String avatar;
 
     /** 用户名 */
-    private String username;
+    private @Nullable String username;
 
     /** 用户昵称 */
-    private String nickname;
+    private @Nullable String nickname;
 
     /** 角色列表 */
     private List<String> roles;

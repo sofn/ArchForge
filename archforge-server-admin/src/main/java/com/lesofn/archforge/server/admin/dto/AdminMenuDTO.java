@@ -1,6 +1,7 @@
 package com.lesofn.archforge.server.admin.dto;
 
 import lombok.Data;
+import org.jspecify.annotations.Nullable;
 
 /**
  * 管理端菜单列表项DTO（扁平结构），匹配vue-pure-admin前端菜单管理格式
@@ -8,6 +9,7 @@ import lombok.Data;
  * @author lesofn
  */
 @Data
+@SuppressWarnings("NullAway.Init")
 public class AdminMenuDTO {
 
     /** 父级菜单ID */
@@ -35,7 +37,7 @@ public class AdminMenuDTO {
     private String component;
 
     /** 排序 */
-    private Integer rank;
+    private @Nullable Integer rank;
 
     /** 重定向地址 */
     private String redirect;

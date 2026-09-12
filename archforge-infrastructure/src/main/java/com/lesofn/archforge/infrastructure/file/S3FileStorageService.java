@@ -1,6 +1,7 @@
 package com.lesofn.archforge.infrastructure.file;
 
 import java.io.InputStream;
+import org.jspecify.annotations.Nullable;
 import java.net.URI;
 import lombok.extern.slf4j.Slf4j;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
@@ -51,7 +52,7 @@ public class S3FileStorageService implements FileStorageService {
     }
 
     @Override
-    public String upload(String path, InputStream inputStream, String contentType, long size) {
+    public String upload(String path, InputStream inputStream, @Nullable String contentType, long size) {
         PutObjectRequest request = PutObjectRequest.builder()
                 .bucket(bucket)
                 .key(path)

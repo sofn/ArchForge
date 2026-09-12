@@ -8,6 +8,7 @@ import lombok.Data;
  * @author lesofn
  */
 @Data
+@SuppressWarnings("NullAway.Init")
 public class AdminRoleMenuDTO {
 
     /** 父级菜单ID */

@@ -1,6 +1,7 @@
 package com.lesofn.archforge.user.internal.service.dict;
 
 import com.lesofn.archforge.common.dictionary.EnumDictionary;
+import org.jspecify.annotations.Nullable;
 import com.lesofn.archforge.common.dictionary.EnumDictionaryItem;
 import com.lesofn.archforge.common.dictionary.EnumDictionaryRegistry;
 import com.lesofn.archforge.user.api.dao.dict.SysDictItemRepository;
@@ -50,7 +51,7 @@ public class SysDictServiceImpl implements SysDictService {
     }
 
     @Override
-    public Page<SysDictType> findTypePage(String keyword, Pageable pageable) {
+    public Page<SysDictType> findTypePage(@Nullable String keyword, Pageable pageable) {
         List<SysDictType> dbTypes = queryDbTypes(keyword, pageable);
         Set<String> dbCodes = dbTypes.stream()
                 .map(SysDictType::getDictCode)
@@ -67,7 +68,7 @@ public class SysDictServiceImpl implements SysDictService {
         return toPage(combined, pageable);
     }
 
-    private List<SysDictType> queryDbTypes(String keyword, Pageable pageable) {
+    private List<SysDictType> queryDbTypes(@Nullable String keyword, Pageable pageable) {
         Iterable<SysDictType> iterable;
         if (!StringUtils.hasText(keyword)) {
             iterable = typeRepository.findAll(pageable.getSort());
@@ -87,7 +88,7 @@ public class SysDictServiceImpl implements SysDictService {
         return result;
     }
 
-    private boolean matchesKeyword(EnumDictionary dict, String keyword) {
+    private boolean matchesKeyword(EnumDictionary dict, @Nullable String keyword) {
         if (!StringUtils.hasText(keyword)) {
             return true;
         }

@@ -16,6 +16,7 @@ import org.jspecify.annotations.Nullable;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@SuppressWarnings("NullAway.Init")
 public class DeptUpdateRequest {
 
     @NotNull(message = "部门ID不能为空")

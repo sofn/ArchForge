@@ -7,6 +7,7 @@ import lombok.Data;
  * 元表格数据列表查询请求
  */
 @Data
+@SuppressWarnings("NullAway.Init")
 public class MetaDataListRequest {
 
     /** 搜索过滤条件（字段编码 -> 值） */

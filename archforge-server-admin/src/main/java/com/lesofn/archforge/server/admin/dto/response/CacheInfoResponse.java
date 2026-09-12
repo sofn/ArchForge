@@ -1,6 +1,7 @@
 package com.lesofn.archforge.server.admin.dto.response;
 
 import lombok.AllArgsConstructor;
+import org.jspecify.annotations.Nullable;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -12,23 +13,24 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@SuppressWarnings("NullAway.Init")
 public class CacheInfoResponse {
 
-    private Long dbSize;
+    private @Nullable Long dbSize;
 
-    private String usedMemory;
+    private @Nullable String usedMemory;
 
-    private String usedMemoryHuman;
+    private @Nullable String usedMemoryHuman;
 
-    private String connectedClients;
+    private @Nullable String connectedClients;
 
-    private String instantaneousOpsPerSec;
+    private @Nullable String instantaneousOpsPerSec;
 
-    private String totalCommandsProcessed;
+    private @Nullable String totalCommandsProcessed;
 
-    private String keyspaceHits;
+    private @Nullable String keyspaceHits;
 
-    private String keyspaceMisses;
+    private @Nullable String keyspaceMisses;
 
-    private String info;
+    private @Nullable String info;
 }

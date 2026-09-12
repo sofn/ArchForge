@@ -63,7 +63,7 @@ public class ConfigController {
         SysConfig config = new SysConfig();
         config.setConfigName(request.getConfigName());
         config.setConfigKey(request.getConfigKey());
-        config.setConfigValue(request.getConfigValue());
+        config.setConfigValue(java.util.Objects.requireNonNullElse(request.getConfigValue(), ""));
         Integer configType = request.getConfigType();
         String remark = request.getRemark();
         config.setConfigType(configType != null ? configType : 0);

@@ -11,7 +11,8 @@ public interface BlogArticleService {
 
     Page<BlogArticle> pagePublished(Pageable pageable, @Nullable Long categoryId, @Nullable String keyword);
 
-    Page<BlogArticle> pageAll(Pageable pageable, Long categoryId, String keyword, BlogArticleStatus status);
+    Page<BlogArticle> pageAll(Pageable pageable, @Nullable Long categoryId, @Nullable String keyword,
+            @Nullable BlogArticleStatus status);
 
     Page<BlogArticle> pageByAuthorId(Pageable pageable, Long authorId);
 

@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@SuppressWarnings("NullAway.Init")
 public class AdminBlogCategoryCreateRequest {
 
     @NotBlank(message = "分类名称不能为空")

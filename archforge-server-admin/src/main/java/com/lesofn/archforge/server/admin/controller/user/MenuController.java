@@ -1,6 +1,7 @@
 package com.lesofn.archforge.server.admin.controller.user;
 
 import com.lesofn.archforge.infrastructure.annotation.Log;
+import org.jspecify.annotations.Nullable;
 import com.lesofn.archforge.server.admin.dto.AdminMenuDTO;
 import com.lesofn.archforge.server.admin.dto.request.MenuCreateRequest;
 import com.lesofn.archforge.server.admin.dto.request.MenuDeleteRequest;
@@ -122,22 +123,22 @@ public class MenuController {
 
     private void applyMenuFields(
             SysMenu menu,
-            Long parentId,
-            Integer menuType,
-            Boolean isButton,
-            String name,
-            String path,
-            String auths,
-            Integer status,
-            String title,
-            String icon,
-            Integer rank,
-            Boolean showLink,
-            Boolean showParent,
-            Boolean keepAlive,
-            String frameSrc,
-            Boolean frameLoading,
-            Boolean hiddenTag) {
+            @Nullable Long parentId,
+            @Nullable Integer menuType,
+            @Nullable Boolean isButton,
+            @Nullable String name,
+            @Nullable String path,
+            @Nullable String auths,
+            @Nullable Integer status,
+            @Nullable String title,
+            @Nullable String icon,
+            @Nullable Integer rank,
+            @Nullable Boolean showLink,
+            @Nullable Boolean showParent,
+            @Nullable Boolean keepAlive,
+            @Nullable String frameSrc,
+            @Nullable Boolean frameLoading,
+            @Nullable Boolean hiddenTag) {
         if (parentId != null)
             menu.setParentId(parentId);
         if (menuType != null) {

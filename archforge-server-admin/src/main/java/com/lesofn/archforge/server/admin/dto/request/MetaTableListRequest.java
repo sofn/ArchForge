@@ -6,6 +6,7 @@ import lombok.Data;
  * 元表格列表查询请求
  */
 @Data
+@SuppressWarnings("NullAway.Init")
 public class MetaTableListRequest {
 
     /** 搜索关键字（表格编码/名称） */

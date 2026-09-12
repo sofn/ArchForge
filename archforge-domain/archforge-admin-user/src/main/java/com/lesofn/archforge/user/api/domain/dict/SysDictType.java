@@ -1,6 +1,7 @@
 package com.lesofn.archforge.user.api.domain.dict;
 
 import com.lesofn.archforge.common.repository.BaseEntity;
+import org.jspecify.annotations.Nullable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -33,7 +34,7 @@ public class SysDictType extends BaseEntity<SysDictType> {
     private String dictName;
 
     @Column(name = "description", length = 255)
-    private String description;
+    private @Nullable String description;
 
     /** 状态：1 启用，0 禁用 */
     @Column(name = "status")

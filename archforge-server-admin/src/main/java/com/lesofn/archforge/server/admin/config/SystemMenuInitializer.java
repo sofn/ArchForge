@@ -40,7 +40,7 @@ public class SystemMenuInitializer implements ApplicationRunner {
                 log.warn("未找到系统管理菜单，跳过字典菜单初始化");
                 return;
             }
-            Long parentId = ((Number) parentRows.get(0).get("menu_id")).longValue();
+            Long parentId = ((Number) java.util.Objects.requireNonNull(parentRows.get(0).get("menu_id"))).longValue();
 
             String insertType = """
                     INSERT INTO sys_menu (menu_id, menu_name, menu_type, router_name, parent_id, path, is_button, permission, meta_info,

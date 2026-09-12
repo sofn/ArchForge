@@ -1,6 +1,7 @@
 package com.lesofn.archforge.server.admin.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import org.jspecify.annotations.Nullable;
 import com.lesofn.archforge.user.api.domain.SysUser;
 import java.time.LocalDateTime;
 import lombok.Data;
@@ -13,79 +14,80 @@ import lombok.NoArgsConstructor;
  */
 @Data
 @NoArgsConstructor
+@SuppressWarnings("NullAway.Init")
 public class UserResponse {
 
     /** 用户ID */
-    private Long userId;
+    private @Nullable Long userId;
 
     /** 角色ID */
-    private Long roleId;
+    private @Nullable Long roleId;
 
     /** 角色名称 */
-    private String roleName;
+    private @Nullable String roleName;
 
     /** 部门ID */
-    private Long deptId;
+    private @Nullable Long deptId;
 
     /** 部门名称 */
-    private String deptName;
+    private @Nullable String deptName;
 
     /** 用户名 */
-    private String username;
+    private @Nullable String username;
 
     /** 用户昵称 */
-    private String nickname;
+    private @Nullable String nickname;
 
     /** 用户类型 */
-    private Integer userType;
+    private @Nullable Integer userType;
 
     /** 邮件 */
-    private String email;
+    private @Nullable String email;
 
     /** 号码 */
-    private String phoneNumber;
+    private @Nullable String phoneNumber;
 
     /** 性别 (0=女, 1=男, 2=未知) */
-    private Integer sex;
+    private @Nullable Integer sex;
 
     /** 用户头像 */
-    private String avatar;
+    private @Nullable String avatar;
 
     /** 状态 (0=正常, 1=停用) */
-    private Integer status;
+    private @Nullable Integer status;
 
     /** 最后登录IP */
-    private String loginIp;
+    private @Nullable String loginIp;
 
     /** 最后登录时间 */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime loginDate;
+    private @Nullable LocalDateTime loginDate;
 
     /** 创建者ID */
-    private Long creatorId;
+    private @Nullable Long creatorId;
 
     /** 创建者名称 */
-    private String creatorName;
+    private @Nullable String creatorName;
 
     /** 创建时间 */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime createTime;
+    private @Nullable LocalDateTime createTime;
 
     /** 修改者ID */
-    private Long updaterId;
+    private @Nullable Long updaterId;
 
     /** 修改者名称 */
-    private String updaterName;
+    private @Nullable String updaterName;
 
     /** 修改时间 */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime updateTime;
+    private @Nullable LocalDateTime updateTime;
 
     /** 备注 */
-    private String remark;
+    private @Nullable String remark;
 
     /** 从SysUser实体构建UserResponse */
-    public UserResponse(SysUser user) {
+    public UserResponse(@Nullable SysUser user) {
         if (user != null) {
             // 基本信息
             this.userId = user.getUserId();

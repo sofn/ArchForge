@@ -34,6 +34,7 @@ val nullAwayCleanMain =
             "archforge-lock-starter",
             "archforge-meta-table",
             "archforge-redisson-starter",
+            "archforge-server-admin",
             "archforge-server-web",
             "archforge-trace-starter")
 val nullAwayCleanTest = setOf<String>()

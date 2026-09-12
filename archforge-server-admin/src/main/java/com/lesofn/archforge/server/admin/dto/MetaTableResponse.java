@@ -1,6 +1,7 @@
 package com.lesofn.archforge.server.admin.dto;
 
 import com.lesofn.archforge.meta.table.api.domain.MetaColumn;
+import org.jspecify.annotations.Nullable;
 import com.lesofn.archforge.meta.table.api.domain.MetaTable;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -10,33 +11,34 @@ import lombok.Data;
  * 元表格响应 DTO
  */
 @Data
+@SuppressWarnings("NullAway.Init")
 public class MetaTableResponse {
 
-    private Long id;
+    private @Nullable Long id;
 
-    private String tableCode;
+    private @Nullable String tableCode;
 
-    private String tableName;
+    private @Nullable String tableName;
 
-    private String description;
+    private @Nullable String description;
 
-    private String tablePrefix;
+    private @Nullable String tablePrefix;
 
-    private Integer status;
+    private @Nullable Integer status;
 
-    private Long creatorId;
+    private @Nullable Long creatorId;
 
-    private String creatorName;
+    private @Nullable String creatorName;
 
-    private LocalDateTime createTime;
+    private @Nullable LocalDateTime createTime;
 
-    private Long updaterId;
+    private @Nullable Long updaterId;
 
-    private String updaterName;
+    private @Nullable String updaterName;
 
-    private LocalDateTime updateTime;
+    private @Nullable LocalDateTime updateTime;
 
-    private List<MetaColumn> columns;
+    private @Nullable List<MetaColumn> columns;
 
     public static MetaTableResponse of(MetaTable table) {
         MetaTableResponse response = new MetaTableResponse();

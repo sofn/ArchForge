@@ -9,6 +9,7 @@ import lombok.Data;
  * @author sofn
  */
 @Data
+@SuppressWarnings("NullAway.Init")
 public class LoginRequest {
 
     /** 用户名 */

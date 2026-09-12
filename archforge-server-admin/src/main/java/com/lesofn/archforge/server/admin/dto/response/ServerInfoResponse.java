@@ -1,6 +1,7 @@
 package com.lesofn.archforge.server.admin.dto.response;
 
 import lombok.AllArgsConstructor;
+import org.jspecify.annotations.Nullable;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,17 +15,18 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@SuppressWarnings("NullAway.Init")
 public class ServerInfoResponse {
 
-    private Object cpu;
+    private @Nullable Object cpu;
 
-    private Object memory;
+    private @Nullable Object memory;
 
-    private Object jvm;
+    private @Nullable Object jvm;
 
-    private Object os;
+    private @Nullable Object os;
 
-    private Object disks;
+    private @Nullable Object disks;
 
-    private String error;
+    private @Nullable String error;
 }

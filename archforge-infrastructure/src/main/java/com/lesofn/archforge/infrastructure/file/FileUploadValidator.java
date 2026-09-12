@@ -1,6 +1,7 @@
 package com.lesofn.archforge.infrastructure.file;
 
 import com.lesofn.archforge.common.error.SystemErrorCode;
+import org.jspecify.annotations.Nullable;
 import com.lesofn.archforge.common.error.system.SystemException;
 import com.lesofn.archforge.infrastructure.config.ArchForgeProperties;
 import java.util.List;
@@ -64,7 +65,7 @@ public final class FileUploadValidator {
         }
     }
 
-    public static String extension(String filename) {
+    public static String extension(@Nullable String filename) {
         if (filename == null || filename.isBlank()) {
             return "";
         }

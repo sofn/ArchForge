@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
+@SuppressWarnings("NullAway.Init")
 public class FileListRequest extends BasePageRequest {
 
     /** 原始文件名 */

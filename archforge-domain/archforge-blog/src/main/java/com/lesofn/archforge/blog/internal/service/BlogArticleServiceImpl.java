@@ -25,7 +25,7 @@ public class BlogArticleServiceImpl implements BlogArticleService {
     private final BlogCategoryRepository categoryRepository;
 
     private Specification<BlogArticle> buildSpec(@Nullable Long categoryId, @Nullable String keyword,
-            BlogArticleStatus status) {
+            @Nullable BlogArticleStatus status) {
         return (root, query, cb) -> {
             jakarta.persistence.criteria.Predicate predicate = cb.equal(root.get("deleted"), false);
             if (categoryId != null) {
@@ -50,7 +50,8 @@ public class BlogArticleServiceImpl implements BlogArticleService {
     }
 
     @Override
-    public Page<BlogArticle> pageAll(Pageable pageable, Long categoryId, String keyword, BlogArticleStatus status) {
+    public Page<BlogArticle> pageAll(Pageable pageable, @Nullable Long categoryId, @Nullable String keyword,
+            @Nullable BlogArticleStatus status) {
         return articleRepository.findAll(buildSpec(categoryId, keyword, status), pageable);
     }
 

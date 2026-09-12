@@ -1,6 +1,7 @@
 package com.lesofn.archforge.server.admin.service.scheduler;
 
 import com.github.kagkarlsson.scheduler.task.TaskInstanceId;
+import org.jspecify.annotations.Nullable;
 import com.github.kagkarlsson.scheduler.task.helper.ScheduleAndData;
 import com.github.kagkarlsson.scheduler.task.schedule.Schedule;
 import java.io.Serializable;
@@ -46,7 +47,7 @@ public record JobInvocationData(
     }
 
     /** Parses {@code job-<id>...} back into the job id, or null if malformed. */
-    public static Long parseJobId(TaskInstanceId instance) {
+    public static @Nullable Long parseJobId(TaskInstanceId instance) {
         String id = instance.getId();
         if (id == null || !id.startsWith("job-")) {
             return null;

@@ -33,7 +33,7 @@ public interface AdminRoleConvertor {
     AdminRoleDTO toDto(SysRole role);
 
     @Named("toEpochMilli")
-    default Long toEpochMilli(LocalDateTime dateTime) {
+    default @Nullable Long toEpochMilli(@Nullable LocalDateTime dateTime) {
         if (dateTime == null) {
             return null;
         }

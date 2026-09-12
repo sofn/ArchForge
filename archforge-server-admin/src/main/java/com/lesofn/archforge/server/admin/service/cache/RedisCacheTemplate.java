@@ -1,6 +1,7 @@
 package com.lesofn.archforge.server.admin.service.cache;
 
 import com.lesofn.archforge.infrastructure.db.redis.RedisUtil;
+import org.jspecify.annotations.Nullable;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -19,7 +20,7 @@ public class RedisCacheTemplate<T> {
         this.redisRedisEnum = redisRedisEnum;
     }
 
-    public T get(Object id) {
+    public @Nullable T get(Object id) {
         T res = redisUtil.getCacheObject(generateKey(id));
         if (res == null) {
             res = getObjectFromDb(id);
@@ -47,7 +48,7 @@ public class RedisCacheTemplate<T> {
         return redisRedisEnum.key() + id;
     }
 
-    public T getObjectFromDb(Object id) {
+    public @Nullable T getObjectFromDb(Object id) {
         return null;
     }
 }

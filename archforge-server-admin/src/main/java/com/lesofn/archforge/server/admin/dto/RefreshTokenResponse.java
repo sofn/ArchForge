@@ -8,6 +8,7 @@ import lombok.Data;
  * @author lesofn
  */
 @Data
+@SuppressWarnings("NullAway.Init")
 public class RefreshTokenResponse {
 
     /** 访问令牌 */

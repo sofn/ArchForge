@@ -1,6 +1,7 @@
 package com.lesofn.archforge.user.api.domain.dict;
 
 import com.lesofn.archforge.common.repository.BaseEntity;
+import org.jspecify.annotations.Nullable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -24,7 +25,7 @@ public class SysDictItem extends BaseEntity<SysDictItem> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long dictItemId;
+    private @Nullable Long dictItemId;
 
     @Column(name = "dict_type_id", nullable = false)
     private Long dictTypeId;

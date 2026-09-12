@@ -4,6 +4,7 @@ import lombok.Data;
 
 /** Create/update payload for a scheduled job. */
 @Data
+@SuppressWarnings("NullAway.Init")
 public class SchedulerJobUpsertRequest {
     private String jobName;
     private String jobGroup;

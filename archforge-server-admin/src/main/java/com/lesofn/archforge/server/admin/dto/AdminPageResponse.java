@@ -9,6 +9,7 @@ import lombok.Data;
  * @author lesofn
  */
 @Data
+@SuppressWarnings("NullAway.Init")
 public class AdminPageResponse<T> {
 
     /** 数据列表 */

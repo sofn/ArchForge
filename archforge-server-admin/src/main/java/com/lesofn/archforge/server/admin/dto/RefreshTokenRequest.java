@@ -9,6 +9,7 @@ import lombok.Data;
  * @author lesofn
  */
 @Data
+@SuppressWarnings("NullAway.Init")
 public class RefreshTokenRequest {
 
     /** 刷新令牌 */

@@ -1,6 +1,7 @@
 package com.lesofn.archforge.server.admin.convertor;
 
 import com.lesofn.archforge.common.enums.common.GenderEnum;
+import org.jspecify.annotations.Nullable;
 import com.lesofn.archforge.server.admin.dto.AdminUserDTO;
 import com.lesofn.archforge.server.admin.dto.request.UserCreateRequest;
 import com.lesofn.archforge.user.api.domain.SysUser;
@@ -55,17 +56,17 @@ public interface AdminUserConvertor {
     }
 
     @Named("genderToInt")
-    default Integer genderToInt(GenderEnum gender) {
+    default @Nullable Integer genderToInt(@Nullable GenderEnum gender) {
         return gender != null ? gender.getValue() : null;
     }
 
     @Named("intToGender")
-    default GenderEnum intToGender(Integer value) {
+    default @Nullable GenderEnum intToGender(@Nullable Integer value) {
         return value == null ? null : GenderEnum.fromValue(value);
     }
 
     @Named("toEpochMilli")
-    default Long toEpochMilli(LocalDateTime dateTime) {
+    default @Nullable Long toEpochMilli(@Nullable LocalDateTime dateTime) {
         if (dateTime == null) {
             return null;
         }

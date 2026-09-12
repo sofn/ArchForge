@@ -9,6 +9,7 @@ import lombok.Data;
  * @author sofn
  */
 @Data
+@SuppressWarnings("NullAway.Init")
 public class CurrentLoginUserResponse {
     /** 当前登录用户信息 */
     private UserResponse userInfo;

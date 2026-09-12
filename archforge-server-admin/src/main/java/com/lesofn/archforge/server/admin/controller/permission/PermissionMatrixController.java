@@ -46,10 +46,11 @@ public class PermissionMatrixController {
     @SaCheckPermission(value = "system:role:edit", type = StpAdminUtil.TYPE)
     @PutMapping("/roles/{roleId}/permissions")
     public void saveRolePermissions(@PathVariable Long roleId, @RequestBody @Valid PermissionUpdateRequest request) {
-        permissionMatrixService.saveRolePermissions(roleId, request.getMenuIds());
+        permissionMatrixService.saveRolePermissions(roleId, java.util.Objects.requireNonNull(request.getMenuIds()));
     }
 
     @Data
+    @SuppressWarnings("NullAway.Init")
     public static class PermissionUpdateRequest {
         @NotNull
         private List<Long> menuIds;

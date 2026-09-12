@@ -6,6 +6,7 @@ import lombok.Data;
  * 元表格代码生成请求。
  */
 @Data
+@SuppressWarnings("NullAway.Init")
 public class MetaTableGenerateRequest {
 
     /** 后端输出目录，相对项目根目录，默认 example/<tableCode> */

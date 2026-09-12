@@ -6,6 +6,7 @@ import lombok.Data;
 
 /** Response DTO mirroring {@link SysJobLog}. */
 @Data
+@SuppressWarnings("NullAway.Init")
 public class SchedulerLogResponse {
     private Long id;
     private Long jobId;

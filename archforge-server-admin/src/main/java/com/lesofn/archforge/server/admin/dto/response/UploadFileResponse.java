@@ -1,6 +1,7 @@
 package com.lesofn.archforge.server.admin.dto.response;
 
 import lombok.AllArgsConstructor;
+import org.jspecify.annotations.Nullable;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -12,13 +13,14 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@SuppressWarnings("NullAway.Init")
 public class UploadFileResponse {
 
-    private Long fileId;
+    private @Nullable Long fileId;
 
-    private String originalName;
+    private @Nullable String originalName;
 
-    private String url;
+    private @Nullable String url;
 
-    private Long fileSize;
+    private @Nullable Long fileSize;
 }

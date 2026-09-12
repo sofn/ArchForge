@@ -1,6 +1,7 @@
 package com.lesofn.archforge.server.admin.controller.system;
 
 import com.lesofn.archforge.infrastructure.annotation.Log;
+import org.jspecify.annotations.Nullable;
 import com.lesofn.archforge.server.admin.dto.AdminPageResponse;
 import com.lesofn.archforge.server.admin.dto.dict.DictItemRequest;
 import com.lesofn.archforge.server.admin.dto.dict.DictItemResponse;
@@ -65,7 +66,7 @@ public class DictController {
     @Operation(summary = "根据字典编码查询详情及全部项")
     @SaCheckPermission(value = "system:dict:query", type = StpAdminUtil.TYPE)
     @GetMapping("/type/{dictCode}")
-    public DictTypeResponse getTypeByCode(@PathVariable String dictCode) {
+    public @Nullable DictTypeResponse getTypeByCode(@PathVariable String dictCode) {
         Optional<SysDictType> type = dictService.findTypeByCode(dictCode);
         if (type.isEmpty() || Boolean.TRUE.equals(type.get().getDeleted())) {
             return null;
@@ -132,7 +133,7 @@ public class DictController {
     public Long createItem(@PathVariable Long typeId, @RequestBody @Valid DictItemRequest request) {
         SysDictItem item = toItemDomain(request);
         SysDictItem saved = dictService.saveItem(typeId, item);
-        return saved.getDictItemId();
+        return java.util.Objects.requireNonNull(saved.getDictItemId());
     }
 
     @Log(module = "字典配置", summary = "更新字典项")
@@ -175,7 +176,7 @@ public class DictController {
 
     private DictItemResponse toItemResponse(SysDictItem item) {
         return DictItemResponse.builder()
-                .id(item.getDictItemId())
+                .id(java.util.Objects.requireNonNull(item.getDictItemId()))
                 .dictTypeId(item.getDictTypeId())
                 .itemCode(item.getItemCode())
                 .itemLabel(item.getItemLabel())

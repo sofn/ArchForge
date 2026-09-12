@@ -1,6 +1,7 @@
 package com.lesofn.archforge.server.admin.controller.blog;
 
 import com.lesofn.archforge.blog.api.domain.BlogArticle;
+import org.jspecify.annotations.Nullable;
 import com.lesofn.archforge.blog.api.domain.BlogCategory;
 import com.lesofn.archforge.blog.api.enums.BlogArticleStatus;
 import com.lesofn.archforge.blog.api.service.BlogArticleService;
@@ -67,7 +68,7 @@ public class BlogArticleController {
     public Long create(@RequestBody @Valid AdminBlogArticleCreateRequest request) {
         SystemLoginUser loginUser = LoginContext.getAdminUser();
         BlogArticle article = buildFromRequest(request)
-                .setAuthorId(loginUser != null ? loginUser.getUserId() : null);
+                .setAuthorId(loginUser.getUserId());
         return articleService.create(article).getId();
     }
 
@@ -100,7 +101,7 @@ public class BlogArticleController {
         return true;
     }
 
-    private BlogArticleStatus toStatus(Integer value) {
+    private @Nullable BlogArticleStatus toStatus(@Nullable Integer value) {
         if (value == null) {
             return null;
         }
@@ -120,7 +121,7 @@ public class BlogArticleController {
                 .setSummary(request.getSummary())
                 .setContent(request.getContent())
                 .setCoverImageFileId(request.getCoverImageFileId())
-                .setStatus(toStatus(request.getStatus()));
+                .setStatus(java.util.Objects.requireNonNullElse(toStatus(request.getStatus()), BlogArticleStatus.DRAFT));
     }
 
     private BlogArticle buildFromRequest(AdminBlogArticleUpdateRequest request) {
@@ -131,7 +132,7 @@ public class BlogArticleController {
                 .setSummary(request.getSummary())
                 .setContent(request.getContent())
                 .setCoverImageFileId(request.getCoverImageFileId())
-                .setStatus(toStatus(request.getStatus()));
+                .setStatus(java.util.Objects.requireNonNullElse(toStatus(request.getStatus()), BlogArticleStatus.DRAFT));
     }
 
     private AdminBlogArticleResponse toResponse(BlogArticle article) {

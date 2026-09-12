@@ -1,6 +1,7 @@
 package com.lesofn.archforge.common.auth;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.jspecify.annotations.Nullable;
 import com.lesofn.archforge.common.utils.ServletHolderUtil;
 import com.lesofn.archforge.common.utils.ip.IpRegionUtil;
 import com.lesofn.archforge.common.utils.ip.IpUtil;
@@ -31,14 +32,14 @@ public class BaseLoginUser implements java.io.Serializable {
     protected String username;
 
     @JsonIgnore
-    protected String password;
+    protected @Nullable String password;
 
     protected List<String> authorities = new ArrayList<>();
 
     /** 登录信息 */
     protected final LoginInfo loginInfo = new LoginInfo();
 
-    public BaseLoginUser(Long userId, String username, String password) {
+    public BaseLoginUser(Long userId, String username, @Nullable String password) {
         this.userId = userId;
         this.username = username;
         this.password = password;

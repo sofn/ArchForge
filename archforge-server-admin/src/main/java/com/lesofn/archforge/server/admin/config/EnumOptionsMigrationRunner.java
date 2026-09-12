@@ -1,6 +1,7 @@
 package com.lesofn.archforge.server.admin.config;
 
 import com.lesofn.archforge.common.utils.jackson.JsonUtil;
+import org.jspecify.annotations.Nullable;
 import com.lesofn.archforge.meta.table.api.domain.OptionItem;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -56,7 +57,7 @@ public class EnumOptionsMigrationRunner implements ApplicationRunner {
     }
 
     private void migrateRow(Map<String, Object> row) {
-        Long columnId = ((Number) row.get("column_id")).longValue();
+        Long columnId = ((Number) java.util.Objects.requireNonNull(row.get("column_id"))).longValue();
         String tableCode = (String) row.get("table_code");
         String columnCode = (String) row.get("column_code");
         String columnName = (String) row.get("column_name");
@@ -118,7 +119,7 @@ public class EnumOptionsMigrationRunner implements ApplicationRunner {
         jdbcTemplate.update(updateColumn, Map.of("dictCode", dictCode, "id", columnId));
     }
 
-    private List<OptionItem> parseOptions(String json) {
+    private List<OptionItem> parseOptions(@Nullable String json) {
         if (json == null || json.isBlank()) {
             return List.of();
         }
