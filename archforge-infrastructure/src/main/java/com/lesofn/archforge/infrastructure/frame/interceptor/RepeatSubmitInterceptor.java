@@ -1,6 +1,7 @@
 package com.lesofn.archforge.infrastructure.frame.interceptor;
 
 import com.lesofn.archforge.common.error.SystemErrorCode;
+import java.util.Objects;
 import com.lesofn.archforge.common.utils.i18n.MessageUtils;
 import com.lesofn.archforge.common.utils.jackson.JsonUtil;
 import com.lesofn.archforge.infrastructure.annotation.RepeatSubmit;
@@ -42,7 +43,8 @@ public class RepeatSubmitInterceptor implements HandlerInterceptor {
             RepeatSubmit annotation = handlerMethod.getMethodAnnotation(RepeatSubmit.class);
             if (annotation != null && isRepeatSubmit(request, annotation)) {
                 String message = MessageUtils.messageOrDefault(annotation.message(), annotation.message());
-                renderJson(response, ResponseResult.error(SystemErrorCode.E_DUPLICATE_REQUEST.getCode(), message));
+                renderJson(response, ResponseResult.error(SystemErrorCode.E_DUPLICATE_REQUEST.getCode(), Objects
+                        .requireNonNullElse(message, annotation.message())));
                 return false;
             }
         }
@@ -86,12 +88,17 @@ public class RepeatSubmitInterceptor implements HandlerInterceptor {
     private boolean compareParams(Map<String, Object> nowMap, Map<String, Object> preMap) {
         String nowParams = (String) nowMap.get(REPEAT_PARAMS);
         String preParams = (String) preMap.get(REPEAT_PARAMS);
-        return nowParams.equals(preParams);
+        return Objects.equals(nowParams, preParams);
     }
 
     private boolean compareTime(Map<String, Object> nowMap, Map<String, Object> preMap, int interval) {
-        long time1 = ((Number) nowMap.get(REPEAT_TIME)).longValue();
-        long time2 = ((Number) preMap.get(REPEAT_TIME)).longValue();
+        Number nowTime = (Number) nowMap.get(REPEAT_TIME);
+        Number preTime = (Number) preMap.get(REPEAT_TIME);
+        if (nowTime == null || preTime == null) {
+            return false;
+        }
+        long time1 = nowTime.longValue();
+        long time2 = preTime.longValue();
         return (time1 - time2) < interval;
     }
 

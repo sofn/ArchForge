@@ -1,6 +1,7 @@
 package com.lesofn.archforge.infrastructure.auth;
 
 import com.lesofn.archforge.infrastructure.auth.errors.AdminAuthErrorCode;
+import org.jspecify.annotations.Nullable;
 import com.lesofn.archforge.infrastructure.auth.errors.AdminAuthException;
 import com.lesofn.archforge.common.auth.SystemLoginUser;
 import com.lesofn.archforge.infrastructure.auth.stp.LoginSessionKeys;
@@ -26,7 +27,7 @@ public final class LoginContext {
         }
         Object value = StpAdminUtil.getSession().get(LoginSessionKeys.LOGIN_USER);
         if (value instanceof SystemLoginUser loginUser) {
-            return Optional.of(restoreAuthorities(loginUser));
+            return Optional.ofNullable(restoreAuthorities(loginUser));
         }
         return Optional.empty();
     }
@@ -51,7 +52,7 @@ public final class LoginContext {
         OVERRIDE_WEB_USERNAME.remove();
     }
 
-    public static Long getWebUserId() {
+    public static @Nullable Long getWebUserId() {
         Long override = OVERRIDE_WEB_USER_ID.get();
         if (override != null) {
             return override;
@@ -63,7 +64,7 @@ public final class LoginContext {
         }
     }
 
-    public static String getWebUsername() {
+    public static @Nullable String getWebUsername() {
         String override = OVERRIDE_WEB_USERNAME.get();
         if (override != null) {
             return override;
@@ -79,7 +80,7 @@ public final class LoginContext {
         }
     }
 
-    public static SystemLoginUser restoreAuthorities(SystemLoginUser loginUser) {
+    public static @Nullable SystemLoginUser restoreAuthorities(@Nullable SystemLoginUser loginUser) {
         if (loginUser == null) {
             return null;
         }

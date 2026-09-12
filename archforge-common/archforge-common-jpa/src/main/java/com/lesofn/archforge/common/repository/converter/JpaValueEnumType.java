@@ -99,8 +99,7 @@ public class JpaValueEnumType implements DynamicParameterizedType, UserType<Enum
     public void setParameterValues(Properties parameters) {
         ParameterType params = (ParameterType) parameters.get(DynamicParameterizedType.PARAMETER_TYPE);
         if (params == null) {
-            throw new IllegalStateException(
-                    "JpaValueEnumType requires @TypeRegistration / DynamicParameterizedType metadata");
+            throw new IllegalStateException("JpaValueEnumType requires @TypeRegistration / DynamicParameterizedType metadata");
         }
         enumClass = (Class<Enum>) params.getReturnedClass();
     }

@@ -33,7 +33,8 @@ public interface SysRoleService {
 
     boolean existsByRoleName(String roleName);
 
-    @Nullable SysRole getById(Long roleId);
+    @Nullable
+    SysRole getById(Long roleId);
 
     List<SysMenu> getMenuListByRoleId(Long roleId);
 }

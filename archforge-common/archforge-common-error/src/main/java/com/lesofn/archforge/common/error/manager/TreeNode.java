@@ -16,7 +16,8 @@ import org.jspecify.annotations.Nullable;
 public class TreeNode {
     int code;
     String name;
-    @Nullable List<TreeNode> nodes;
+    @Nullable
+    List<TreeNode> nodes;
 
     public TreeNode(int code, String name) {
         this.code = code;

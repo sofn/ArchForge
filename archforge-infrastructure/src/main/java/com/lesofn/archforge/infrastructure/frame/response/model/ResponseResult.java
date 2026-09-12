@@ -1,6 +1,7 @@
 package com.lesofn.archforge.infrastructure.frame.response.model;
 
 import com.lesofn.archforge.common.error.api.ErrorCode;
+import org.jspecify.annotations.Nullable;
 import com.lesofn.archforge.common.error.manager.ErrorInfo;
 import com.lesofn.archforge.common.error.SystemErrorCode;
 import lombok.Getter;
@@ -12,13 +13,13 @@ import lombok.Getter;
 @Getter
 public class ResponseResult<T> extends ErrorInfo {
 
-    private T data;
+    private @Nullable T data;
 
     public ResponseResult(int code, String msg) {
         super(code, msg);
     }
 
-    public static <T> ResponseResult<T> success(T data) {
+    public static <T> ResponseResult<T> success(@Nullable T data) {
         ResponseResult<T> result = new ResponseResult<>(SystemErrorCode.SUCCESS.getCode(), SystemErrorCode.SUCCESS.getMsg());
         result.data = data;
         return result;

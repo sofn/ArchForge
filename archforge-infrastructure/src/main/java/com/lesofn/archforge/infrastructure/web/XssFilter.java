@@ -33,7 +33,7 @@ public class XssFilter extends OncePerRequestFilter {
         if (contentType == null) {
             return false;
         }
-        String normalized = contentType.toLowerCase();
+        String normalized = contentType.toLowerCase(java.util.Locale.ROOT);
         return normalized.startsWith("multipart/") || normalized.startsWith("application/octet-stream") || normalized
                 .startsWith("application/pdf") || normalized.startsWith("image/");
     }

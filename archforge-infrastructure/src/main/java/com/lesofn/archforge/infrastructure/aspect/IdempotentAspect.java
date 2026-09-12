@@ -1,5 +1,6 @@
 package com.lesofn.archforge.infrastructure.aspect;
 
+import org.jspecify.annotations.Nullable;
 import com.google.common.hash.Hashing;
 import com.lesofn.archforge.infrastructure.annotation.Idempotent;
 import com.lesofn.archforge.infrastructure.annotation.IdempotentType;
@@ -115,7 +116,10 @@ public class IdempotentAspect {
                 }
             }
             try {
-                return new SpelExpressionParser().parseExpression(keyExpression).getValue(context, String.class);
+                String value = new SpelExpressionParser().parseExpression(keyExpression).getValue(context, String.class);
+                if (value != null) {
+                    return value;
+                }
             } catch (Exception e) {
                 log.warn("Failed to parse idempotent key expression: {}", keyExpression, e);
             }
@@ -126,7 +130,7 @@ public class IdempotentAspect {
         return methodKey + ":" + userId + ":" + argsHash;
     }
 
-    private String resolveTokenHeader(String headerName) {
+    private @Nullable String resolveTokenHeader(String headerName) {
         RequestContext ctx = ScopedValueContext.getRequestContext();
         if (ctx == null || ctx.getOriginRequest() == null) {
             return null;

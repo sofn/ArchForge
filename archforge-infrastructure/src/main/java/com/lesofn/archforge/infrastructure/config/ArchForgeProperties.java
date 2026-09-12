@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 @Getter
 @Component
 @ConfigurationProperties(prefix = "arch-forge")
+@SuppressWarnings("NullAway.Init")
 public class ArchForgeProperties {
 
     /** 项目名称 */

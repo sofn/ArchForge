@@ -1,5 +1,6 @@
 package com.lesofn.archforge.infrastructure.frame.utils.log;
 
+import org.jspecify.annotations.Nullable;
 import com.lesofn.archforge.common.profile.DefaultProfileLoader;
 import com.lesofn.archforge.common.utils.jackson.JsonUtil;
 import tools.jackson.databind.node.ObjectNode;
@@ -17,7 +18,7 @@ public class ApiLogger {
 
     private static Logger fireLog = LoggerFactory.getLogger("fire");
 
-    private static String getRequestId() {
+    private static @Nullable String getRequestId() {
         RequestContext ctx = ScopedValueContext.getRequestContext();
         return ctx == null ? "-" : ctx.getRequestId();
     }
@@ -40,14 +41,14 @@ public class ApiLogger {
         }
     }
 
-    private static String formatMsg(Object msg) {
+    private static String formatMsg(@Nullable Object msg) {
         return String.format(
                 "%s\t%s",
                 getRequestId(),
                 msg == null ? "null" : msg.toString());
     }
 
-    private static String formatMsg(String tag, Object msg) {
+    private static String formatMsg(String tag, @Nullable Object msg) {
         return String.format(
                 "%s\t%s\t%s",
                 getRequestId(),
@@ -75,7 +76,7 @@ public class ApiLogger {
     }
 
     public static void fireSlow(
-            String resourceType, String resourceId, long useTime, ObjectNode ext) {
+            String resourceType, String resourceId, long useTime, @Nullable ObjectNode ext) {
         String extStr = "";
         if (ext != null) {
             try {

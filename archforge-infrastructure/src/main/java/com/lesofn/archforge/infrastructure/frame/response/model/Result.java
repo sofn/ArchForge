@@ -1,6 +1,7 @@
 package com.lesofn.archforge.infrastructure.frame.response.model;
 
 import lombok.Data;
+import org.jspecify.annotations.Nullable;
 
 /**
  * for customer special success response
@@ -12,5 +13,5 @@ import lombok.Data;
 public class Result<T> {
 
     /** 业务数据 */
-    private T data;
+    private @Nullable T data;
 }

@@ -2,6 +2,8 @@ package com.lesofn.archforge.infrastructure.auth.service;
 
 import static com.lesofn.archforge.infrastructure.auth.errors.AdminAuthErrorCode.USER_AUTHFAIL;
 
+import org.jspecify.annotations.Nullable;
+import java.util.Objects;
 import com.lesofn.archforge.common.context.ClientVersion;
 import com.lesofn.archforge.infrastructure.auth.annotation.AuthType;
 import com.lesofn.archforge.infrastructure.auth.annotation.BaseInfo;
@@ -37,7 +39,7 @@ public class DefaultAuthService implements AuthService, ApplicationContextAware,
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultAuthService.class);
 
-    private ApplicationContext context;
+    private @Nullable ApplicationContext context;
     private List<AuthSpi> authSpis = new ArrayList<>();
     private Map<String, AuthSpi> authSpiMap = new HashMap<>();
 
@@ -110,7 +112,7 @@ public class DefaultAuthService implements AuthService, ApplicationContextAware,
             authSpi = this.getAuthSpi(NullAuthSpi.SPI_NAME);
         }
 
-        return authSpi;
+        return Objects.requireNonNull(authSpi);
     }
 
     @Override
@@ -120,7 +122,7 @@ public class DefaultAuthService implements AuthService, ApplicationContextAware,
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        Map<String, AuthSpi> spis = this.context.getBeansOfType(AuthSpi.class);
+        Map<String, AuthSpi> spis = Objects.requireNonNull(this.context).getBeansOfType(AuthSpi.class);
 
         for (AuthSpi spi : spis.values()) {
             if (spi.getClass() != NullAuthSpi.class && spi.getClass() != GuestAuthSpi.class) {
@@ -131,7 +133,7 @@ public class DefaultAuthService implements AuthService, ApplicationContextAware,
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends AuthSpi> T getAuthSpi(String name) {
+    public <T extends AuthSpi> @Nullable T getAuthSpi(String name) {
         return (T) this.authSpiMap.get(name.toLowerCase());
     }
 

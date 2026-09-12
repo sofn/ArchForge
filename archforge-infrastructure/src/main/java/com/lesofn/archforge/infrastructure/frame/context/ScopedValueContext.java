@@ -1,6 +1,7 @@
 package com.lesofn.archforge.infrastructure.frame.context;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.jspecify.annotations.Nullable;
 
 /**
  * JDK 25 ScopedValue-based request context propagation.
@@ -32,12 +33,12 @@ public final class ScopedValueContext {
     }
 
     /** Get the current request context. Returns null if not in a scoped context. */
-    public static RequestContext getRequestContext() {
+    public static @Nullable RequestContext getRequestContext() {
         return CONTEXT.isBound() ? CONTEXT.get() : null;
     }
 
     /** Get the current servlet request, or null if not in scope. */
-    public static HttpServletRequest getServletRequest() {
+    public static @Nullable HttpServletRequest getServletRequest() {
         RequestContext ctx = getRequestContext();
         return ctx != null ? ctx.getOriginRequest() : null;
     }

@@ -16,12 +16,12 @@ import org.jspecify.annotations.Nullable;
 public class RequestContext implements Serializable {
 
     @JsonProperty("request_id")
-    private String requestId;
+    private @Nullable String requestId;
 
     @JsonProperty("current_uid")
     private long currentUid;
 
-    private String ip;
+    private @Nullable String ip;
 
     @JsonProperty("app_id")
     private int appId;
@@ -30,14 +30,14 @@ public class RequestContext implements Serializable {
     private boolean isOfficialApp;
 
     @JsonProperty("platform")
-    private String platform;
+    private @Nullable String platform;
 
     @JsonProperty("client_version")
     private ClientVersion clientVersion;
 
     private Map<String, Object> attribute;
 
-    private transient HttpServletRequest originRequest;
+    private transient @Nullable HttpServletRequest originRequest;
 
     public RequestContext(String requestId) {
         this.requestId = requestId;
@@ -75,15 +75,15 @@ public class RequestContext implements Serializable {
 
     // 貌似是jackson的bug,transient 变量的 annotation必须加到方法上才起作用
     @JsonIgnore
-    public HttpServletRequest getOriginRequest() { return originRequest; }
+    public @Nullable HttpServletRequest getOriginRequest() { return originRequest; }
 
-    public void setOriginRequest(HttpServletRequest originRequest) { this.originRequest = originRequest; }
+    public void setOriginRequest(@Nullable HttpServletRequest originRequest) { this.originRequest = originRequest; }
 
     public @Nullable Object getAttribute(String name) {
         return this.attribute.get(name);
     }
 
-    public void setAttribute(String name, Object value) {
+    public void setAttribute(String name, @Nullable Object value) {
         this.attribute.put(name, value);
     }
 
@@ -134,7 +134,7 @@ public class RequestContext implements Serializable {
         return JsonUtil.to(this);
     }
 
-    public String getPlatform() { return platform; }
+    public @Nullable String getPlatform() { return platform; }
 
-    public void setPlatform(String platform) { this.platform = platform; }
+    public void setPlatform(@Nullable String platform) { this.platform = platform; }
 }

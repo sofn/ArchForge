@@ -1,5 +1,6 @@
 package com.lesofn.archforge.infrastructure.security.datascope;
 
+import org.jspecify.annotations.Nullable;
 import com.lesofn.archforge.infrastructure.frame.context.RequestContext;
 import com.lesofn.archforge.infrastructure.frame.context.ScopedValueContext;
 
@@ -20,7 +21,7 @@ public final class DataScopeContextHolder {
      *
      * @return 上下文，未绑定或不存在时返回 null
      */
-    public static DataScopeContext get() {
+    public static @Nullable DataScopeContext get() {
         RequestContext requestContext = ScopedValueContext.getRequestContext();
         if (requestContext == null) {
             return null;

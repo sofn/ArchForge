@@ -1,5 +1,6 @@
 package com.lesofn.archforge.infrastructure.frame.filter;
 
+import org.jspecify.annotations.Nullable;
 import com.lesofn.archforge.common.context.ClientVersion;
 import com.lesofn.archforge.common.utils.GlobalConstants;
 import com.lesofn.archforge.infrastructure.auth.annotation.BaseInfo;
@@ -37,7 +38,7 @@ public class AuthResourceFilter extends RequestMappingHandlerAdapter {
     private String profile;
 
     @Override
-    protected ModelAndView handleInternal(
+    protected @Nullable ModelAndView handleInternal(
             HttpServletRequest request, HttpServletResponse response, HandlerMethod handlerMethod)
             throws Exception {
         if (Strings.CS.equals(request.getRequestURI(), "/error") || Strings.CS.startsWith(request.getRequestURI(),
@@ -50,6 +51,9 @@ public class AuthResourceFilter extends RequestMappingHandlerAdapter {
         }
 
         RequestContext context = ScopedValueContext.getRequestContext();
+        if (context == null) {
+            return super.handleInternal(request, response, handlerMethod);
+        }
         context.setOriginRequest(request);
 
         AuthRequest authRequest = new AuthRequest(request);

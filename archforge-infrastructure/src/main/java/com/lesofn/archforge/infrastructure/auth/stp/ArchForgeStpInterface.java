@@ -1,5 +1,6 @@
 package com.lesofn.archforge.infrastructure.auth.stp;
 
+import org.jspecify.annotations.Nullable;
 import cn.dev33.satoken.session.SaSession;
 import cn.dev33.satoken.stp.StpInterface;
 import com.lesofn.archforge.common.auth.SystemLoginUser;
@@ -43,7 +44,7 @@ public class ArchForgeStpInterface implements StpInterface {
         return List.of(roleInfo.getRoleKey());
     }
 
-    private static SystemLoginUser findAdminUser(Object loginId) {
+    private static @Nullable SystemLoginUser findAdminUser(Object loginId) {
         SaSession session = StpAdminUtil.getSessionByLoginId(loginId, false);
         if (session == null) {
             return null;

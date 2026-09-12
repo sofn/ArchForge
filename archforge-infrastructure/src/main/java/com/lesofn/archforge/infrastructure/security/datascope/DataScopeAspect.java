@@ -1,5 +1,6 @@
 package com.lesofn.archforge.infrastructure.security.datascope;
 
+import org.jspecify.annotations.Nullable;
 import com.lesofn.archforge.infrastructure.auth.LoginContext;
 import com.lesofn.archforge.common.auth.SystemLoginUser;
 import com.lesofn.archforge.common.auth.DataScopeEnum;
@@ -40,7 +41,7 @@ public class DataScopeAspect {
         }
     }
 
-    private DataScopeContext buildContext(DataPermission dataPermission) {
+    private @Nullable DataScopeContext buildContext(DataPermission dataPermission) {
         SystemLoginUser user;
         try {
             user = LoginContext.getAdminUser();

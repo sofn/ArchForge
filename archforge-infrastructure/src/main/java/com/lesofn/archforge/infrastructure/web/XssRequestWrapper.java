@@ -1,5 +1,6 @@
 package com.lesofn.archforge.infrastructure.web;
 
+import org.jspecify.annotations.Nullable;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletRequestWrapper;
 import java.util.LinkedHashMap;
@@ -12,13 +13,13 @@ public class XssRequestWrapper extends HttpServletRequestWrapper {
     }
 
     @Override
-    public String getParameter(String name) {
+    public @Nullable String getParameter(String name) {
         return XssSanitizer.sanitize(super.getParameter(name));
     }
 
     @Override
-    public String[] getParameterValues(String name) {
-        String[] values = super.getParameterValues(name);
+    public String @Nullable [] getParameterValues(String name) {
+        String @Nullable [] values = super.getParameterValues(name);
         if (values == null) {
             return null;
         }
@@ -38,7 +39,7 @@ public class XssRequestWrapper extends HttpServletRequestWrapper {
     }
 
     @Override
-    public String getHeader(String name) {
+    public @Nullable String getHeader(String name) {
         return XssSanitizer.sanitize(super.getHeader(name));
     }
 }

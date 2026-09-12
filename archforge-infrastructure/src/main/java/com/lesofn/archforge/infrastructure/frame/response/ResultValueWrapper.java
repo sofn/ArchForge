@@ -40,7 +40,7 @@ public class ResultValueWrapper implements ResponseBodyAdvice<Object> {
     }
 
     @Override
-    public Object beforeBodyWrite(
+    public @Nullable Object beforeBodyWrite(
             @Nullable Object body,
             @Nullable MethodParameter returnType,
             @Nullable MediaType selectedContentType,

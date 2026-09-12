@@ -12,5 +12,6 @@ public class EnumDictionaryItem {
     String label;
     Integer sort;
     Integer status;
-    @Nullable String cssTag;
+    @Nullable
+    String cssTag;
 }

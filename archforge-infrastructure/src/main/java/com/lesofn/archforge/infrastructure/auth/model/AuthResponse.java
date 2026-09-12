@@ -1,5 +1,6 @@
 package com.lesofn.archforge.infrastructure.auth.model;
 
+import org.jspecify.annotations.Nullable;
 import com.lesofn.archforge.common.context.ClientVersion;
 import java.io.Serializable;
 import java.util.HashMap;
@@ -40,7 +41,7 @@ public class AuthResponse implements Serializable {
         this.attributes.put(name, value);
     }
 
-    public Object getAttribute(String name) {
+    public @Nullable Object getAttribute(String name) {
         return this.attributes.get(name);
     }
 

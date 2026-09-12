@@ -30,6 +30,7 @@ val nullAwayCleanMain =
             "archforge-common-error",
             "archforge-common-jpa",
             "archforge-example-task",
+            "archforge-infrastructure",
             "archforge-lock-starter")
 val nullAwayCleanTest = setOf<String>()
 // Checkstyle: semantic style gate — runs before `test` and as part of `check`/`build`

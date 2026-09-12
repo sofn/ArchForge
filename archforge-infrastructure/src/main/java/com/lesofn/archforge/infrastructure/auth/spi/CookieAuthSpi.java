@@ -46,7 +46,7 @@ public class CookieAuthSpi extends AbstractAuthSpi {
     public long auth(AuthRequest request) throws AdminAuthException {
         String cookie = request.getCookie(COOKIE_NAME);
         try {
-            String decryptedString = encrypter.decryptAsString(cookie);
+            String decryptedString = encrypter.decryptAsString(java.util.Objects.requireNonNull(cookie));
             String[] timeAndUid = decryptedString.split(":");
             long time = NumberUtils.toLong(timeAndUid[0], 0);
             long now = System.currentTimeMillis();

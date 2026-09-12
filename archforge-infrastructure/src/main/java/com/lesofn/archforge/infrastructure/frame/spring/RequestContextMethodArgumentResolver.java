@@ -1,5 +1,6 @@
 package com.lesofn.archforge.infrastructure.frame.spring;
 
+import org.jspecify.annotations.Nullable;
 import com.lesofn.archforge.infrastructure.frame.context.RequestContext;
 import com.lesofn.archforge.infrastructure.frame.context.ScopedValueContext;
 import org.springframework.core.MethodParameter;
@@ -16,11 +17,11 @@ public class RequestContextMethodArgumentResolver implements HandlerMethodArgume
     }
 
     @Override
-    public Object resolveArgument(
+    public @Nullable Object resolveArgument(
             MethodParameter methodParameter,
-            ModelAndViewContainer modelAndViewContainer,
+            @Nullable ModelAndViewContainer modelAndViewContainer,
             NativeWebRequest nativeWebRequest,
-            WebDataBinderFactory webDataBinderFactory)
+            @Nullable WebDataBinderFactory webDataBinderFactory)
             throws Exception {
         return ScopedValueContext.getRequestContext();
     }

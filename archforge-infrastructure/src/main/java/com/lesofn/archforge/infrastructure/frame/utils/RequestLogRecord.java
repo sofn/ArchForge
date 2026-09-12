@@ -1,6 +1,7 @@
 package com.lesofn.archforge.infrastructure.frame.utils;
 
 import com.lesofn.archforge.common.context.ClientVersion;
+import org.jspecify.annotations.Nullable;
 import com.lesofn.archforge.common.utils.jackson.JsonUtil;
 import tools.jackson.databind.node.ObjectNode;
 import java.util.Collections;
@@ -12,17 +13,18 @@ import org.apache.commons.lang3.Strings;
  * @author sofn
  * @version 1.0 Created at: 2015-06-26 12:19
  */
+@SuppressWarnings("NullAway.Init")
 public class RequestLogRecord {
     static final String SPLIT = "\t";
 
-    private String requestId;
+    private @Nullable String requestId;
 
     private final transient java.time.Instant date = java.time.Instant.now();
 
-    private String api;
+    private @Nullable String api;
 
     /** http method */
-    private String method;
+    private @Nullable String method;
 
     /** http response status */
     private int responseStatus;
@@ -30,19 +32,19 @@ public class RequestLogRecord {
     /** 来源 appkey */
     private String source = "unknow";
 
-    private String platform;
+    private @Nullable String platform;
 
     private long uid;
 
     private Map<String, String[]> parameters = Collections.emptyMap();
 
-    private String parameterString;
+    private @Nullable String parameterString;
 
-    private String response;
+    private @Nullable String response;
 
-    private String userAgent;
+    private @Nullable String userAgent;
 
-    private ClientVersion clientVersion = ClientVersion.NULL;
+    private @Nullable ClientVersion clientVersion = ClientVersion.NULL;
 
     // /**
     // * 调用方ip，如果是 内网服务端调用，该ip是服务器ip， 否则该ip与用户ip一致
@@ -50,7 +52,7 @@ public class RequestLogRecord {
     // private String clientIp;
 
     /** 用户ip,如果是内网服务器端调用，该ip是调用方通过 Api-RemoteIP机制传递的用户ip */
-    private String ip;
+    private @Nullable String ip;
 
     /** 接口响应使用时间 */
     private long useTime;
@@ -63,13 +65,13 @@ public class RequestLogRecord {
     public RequestLogRecord() {
     }
 
-    public String getApi() { return api; }
+    public @Nullable String getApi() { return api; }
 
-    public void setApi(String api) { this.api = api; }
+    public void setApi(@Nullable String api) { this.api = api; }
 
-    public String getMethod() { return method; }
+    public @Nullable String getMethod() { return method; }
 
-    public void setMethod(String method) { this.method = method; }
+    public void setMethod(@Nullable String method) { this.method = method; }
 
     public int getResponseStatus() { return responseStatus; }
 
@@ -87,31 +89,31 @@ public class RequestLogRecord {
 
     public void setUid(long uid) { this.uid = uid; }
 
-    public String getIp() { return ip; }
+    public @Nullable String getIp() { return ip; }
 
-    public void setIp(String ip) { this.ip = ip; }
+    public void setIp(@Nullable String ip) { this.ip = ip; }
 
-    public String getUserAgent() { return userAgent; }
+    public @Nullable String getUserAgent() { return userAgent; }
 
-    public void setUserAgent(String userAgent) { this.userAgent = userAgent; }
+    public void setUserAgent(@Nullable String userAgent) { this.userAgent = userAgent; }
 
     public Map<String, String[]> getParameters() { return parameters; }
 
     public void setParameters(Map<String, String[]> parameters) { this.parameters = parameters; }
 
-    public void setParameterString(String parameterString) { this.parameterString = parameterString; }
+    public void setParameterString(@Nullable String parameterString) { this.parameterString = parameterString; }
 
     public long getUseTime() { return useTime; }
 
     public void setUseTime(long useTime) { this.useTime = useTime; }
 
-    public String getResponse() { return response; }
+    public @Nullable String getResponse() { return response; }
 
-    public void setResponse(String response) { this.response = response; }
+    public void setResponse(@Nullable String response) { this.response = response; }
 
-    public ClientVersion getClientVersion() { return clientVersion; }
+    public @Nullable ClientVersion getClientVersion() { return clientVersion; }
 
-    public void setClientVersion(ClientVersion clientVersion) {
+    public void setClientVersion(@Nullable ClientVersion clientVersion) {
         if (clientVersion != null) {
             this.clientVersion = clientVersion;
         }
@@ -206,11 +208,11 @@ public class RequestLogRecord {
         return value;
     }
 
-    public String getRequestId() { return requestId; }
+    public @Nullable String getRequestId() { return requestId; }
 
-    public void setRequestId(String requestId) { this.requestId = requestId; }
+    public void setRequestId(@Nullable String requestId) { this.requestId = requestId; }
 
-    public String getPlatform() { return platform; }
+    public @Nullable String getPlatform() { return platform; }
 
-    public void setPlatform(String platform) { this.platform = platform; }
+    public void setPlatform(@Nullable String platform) { this.platform = platform; }
 }

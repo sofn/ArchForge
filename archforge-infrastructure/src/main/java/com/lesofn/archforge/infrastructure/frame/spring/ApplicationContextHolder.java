@@ -1,5 +1,6 @@
 package com.lesofn.archforge.infrastructure.frame.spring;
 
+import org.jspecify.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.BeansException;
@@ -19,9 +20,9 @@ import org.springframework.stereotype.Service;
 @Lazy(false)
 public class ApplicationContextHolder implements ApplicationContextAware {
 
-    private static ApplicationContext context;
+    private static @Nullable ApplicationContext context;
 
-    public static ApplicationContext getApplicationContext() { return context; }
+    public static @Nullable ApplicationContext getApplicationContext() { return context; }
 
     /** 将该对象中的带有Autowired annotation的属性自动注入 */
     public static void autowireBean(Object obj) {
@@ -32,17 +33,17 @@ public class ApplicationContextHolder implements ApplicationContextAware {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> T getBean(String name) {
-        return (T) context.getBean(name);
+    public static <T> @Nullable T getBean(String name) {
+        return (T) java.util.Objects.requireNonNull(context).getBean(name);
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> T getBean(Class<T> clazz) {
-        String[] names = context.getBeanNamesForType(clazz);
+    public static <T> @Nullable T getBean(Class<T> clazz) {
+        String[] names = java.util.Objects.requireNonNull(context).getBeanNamesForType(clazz);
         if (names == null || names.length == 0) {
             return null;
         }
-        return (T) context.getBean(names[0]);
+        return (T) java.util.Objects.requireNonNull(context).getBean(names[0]);
     }
 
     @SuppressWarnings("unchecked")
