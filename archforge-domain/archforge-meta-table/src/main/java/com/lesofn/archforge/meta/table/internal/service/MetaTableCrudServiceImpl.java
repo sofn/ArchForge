@@ -62,6 +62,7 @@ public class MetaTableCrudServiceImpl implements MetaTableCrudService {
         MetaTable table = metaTableAdminService.findById(tableId);
         List<MetaColumn> columns = metaTableAdminService.findColumns(tableId);
         validator.validateValues(row, columns, true);
+        dataScopeFilter.checkRowInScope(columns, row);
         return inserter.insert(table, columns, row, currentUid);
     }
 
@@ -71,6 +72,7 @@ public class MetaTableCrudServiceImpl implements MetaTableCrudService {
         MetaTable table = metaTableAdminService.findById(tableId);
         List<MetaColumn> columns = metaTableAdminService.findColumns(tableId);
         validator.validateValues(row, columns, false);
+        dataScopeFilter.checkUpdatedRow(columns, row);
 
         String physicalName = SqlIdentifier.quote(table.physicalTableName());
         MapSqlParameterSource params = new MapSqlParameterSource();
@@ -85,9 +87,10 @@ public class MetaTableCrudServiceImpl implements MetaTableCrudService {
         appendUpdateColumns(columns, row, sets, params);
 
         String sql = String.format(
-                "UPDATE %s SET %s WHERE id = :id AND deleted = 0",
+                "UPDATE %s main SET %s WHERE main.id = :id AND main.deleted = 0%s",
                 physicalName,
-                String.join(", ", sets));
+                String.join(", ", sets),
+                dataScopeFilter.buildClause(columns, "main", params));
 
         int rows = jdbcTemplate.update(sql, params);
         return rows > 0;
@@ -97,6 +100,7 @@ public class MetaTableCrudServiceImpl implements MetaTableCrudService {
     @Transactional("metaTableTransactionManager")
     public Boolean softDelete(Long tableId, Long dataId, Long currentUid) {
         MetaTable table = metaTableAdminService.findById(tableId);
+        List<MetaColumn> columns = metaTableAdminService.findColumns(tableId);
         String physicalName = SqlIdentifier.quote(table.physicalTableName());
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("id", dataId);
@@ -105,9 +109,10 @@ public class MetaTableCrudServiceImpl implements MetaTableCrudService {
         params.addValue("updateTime", java.time.LocalDateTime.now(ZoneId.systemDefault()));
 
         String sql = String.format(
-                "UPDATE %s SET deleted = :deleted, updater_id = :updaterId, update_time = :updateTime " +
-                        "WHERE id = :id AND deleted = 0",
-                physicalName);
+                "UPDATE %s main SET deleted = :deleted, updater_id = :updaterId, update_time = :updateTime " +
+                        "WHERE main.id = :id AND main.deleted = 0%s",
+                physicalName,
+                dataScopeFilter.buildClause(columns, "main", params));
 
         int rows = jdbcTemplate.update(sql, params);
         return rows > 0;

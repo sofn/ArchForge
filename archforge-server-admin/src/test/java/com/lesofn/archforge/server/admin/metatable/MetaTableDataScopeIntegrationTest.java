@@ -1,6 +1,9 @@
 package com.lesofn.archforge.server.admin.metatable;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.lesofn.archforge.common.auth.DataScopeEnum;
@@ -14,12 +17,15 @@ import com.lesofn.archforge.meta.table.api.datascope.MetaDataScopeProvider;
 import com.lesofn.archforge.meta.table.api.domain.MetaColumn;
 import com.lesofn.archforge.meta.table.api.domain.MetaColumnType;
 import com.lesofn.archforge.meta.table.api.domain.MetaTable;
+import com.lesofn.archforge.meta.table.api.dto.ImportResponse;
 import com.lesofn.archforge.meta.table.api.dto.MetaDataQuery;
 import com.lesofn.archforge.meta.table.api.dto.MetaPageResponse;
 import com.lesofn.archforge.meta.table.api.enums.MetaDataFormat;
+import com.lesofn.archforge.meta.table.api.errors.MetaTableException;
 import com.lesofn.archforge.meta.table.api.service.MetaTableAdminService;
 import com.lesofn.archforge.meta.table.api.service.MetaTableCrudService;
 import com.lesofn.archforge.server.admin.Application;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -159,6 +165,114 @@ class MetaTableDataScopeIntegrationTest extends AbstractIntegrationTest {
         long dataLines = csv.lines().filter(l -> l.contains("r10a") || l.contains("r10b") || l.contains("r20"))
                 .count();
         assertEquals(2, dataLines, csv);
+    }
+
+    // ---- write path: scoped rows reject, in-scope rows proceed ----
+
+    @Test
+    void updateRespectsRowScope() throws Exception {
+        Long tableId = deptScopedTable("dsitupd");
+        Long inId = crudService.insert(tableId, Map.of("dept_id", 10, "name", "a"), 1L);
+        Long outId = crudService.insert(tableId, Map.of("dept_id", 20, "name", "b"), 1L);
+        DataScopeContext ctx = scope(DataScopeEnum.SINGLE_DEPT, 1L, 10L, null);
+
+        boolean[] results = new boolean[2];
+        ScopedValueContext.runInScope(new RequestContext("it-w"), () -> {
+            DataScopeContextHolder.set(ctx);
+            results[0] = crudService.update(tableId, inId, Map.of("name", "a2"), 1L);
+            results[1] = crudService.update(tableId, outId, Map.of("name", "b2"), 1L);
+        });
+
+        assertTrue(results[0]);
+        assertFalse(results[1]);
+        // the out-of-scope row is untouched, not deleted
+        assertEquals(2, listWithScope(tableId, scope(DataScopeEnum.ALL, 1L, null, null)).size());
+    }
+
+    @Test
+    void updateRejectsMarkedValueOutsideScope() throws Exception {
+        Long tableId = deptScopedTable("dsitupdv");
+        Long inId = crudService.insert(tableId, Map.of("dept_id", 10, "name", "a"), 1L);
+
+        assertThrows(MetaTableException.class, () -> ScopedValueContext.runInScope(new RequestContext("it-wv"), () -> {
+            DataScopeContextHolder.set(scope(DataScopeEnum.SINGLE_DEPT, 1L, 10L, null));
+            crudService.update(tableId, inId, Map.of("dept_id", 20), 1L);
+        }));
+    }
+
+    @Test
+    void deleteRespectsRowScope() throws Exception {
+        Long tableId = deptScopedTable("dsitdel");
+        Long inId = crudService.insert(tableId, Map.of("dept_id", 10, "name", "a"), 1L);
+        Long outId = crudService.insert(tableId, Map.of("dept_id", 20, "name", "b"), 1L);
+        DataScopeContext ctx = scope(DataScopeEnum.SINGLE_DEPT, 1L, 10L, null);
+
+        boolean[] results = new boolean[2];
+        ScopedValueContext.runInScope(new RequestContext("it-wd"), () -> {
+            DataScopeContextHolder.set(ctx);
+            results[0] = crudService.softDelete(tableId, inId, 1L);
+            results[1] = crudService.softDelete(tableId, outId, 1L);
+        });
+
+        assertTrue(results[0]);
+        assertFalse(results[1]);
+        List<Map<String, Object>> remaining = listWithScope(tableId, scope(DataScopeEnum.ALL, 1L, null, null));
+        assertEquals(1, remaining.size());
+        assertEquals(20L, ((Number) java.util.Objects.requireNonNull(remaining.get(0).get("dept_id"))).longValue());
+    }
+
+    @Test
+    void insertOutsideScopeRejectedInsideAccepted() throws Exception {
+        Long tableId = deptScopedTable("dsitins");
+        DataScopeContext ctx = scope(DataScopeEnum.SINGLE_DEPT, 1L, 10L, null);
+
+        assertThrows(MetaTableException.class, () -> ScopedValueContext.runInScope(new RequestContext("it-wi"), () -> {
+            DataScopeContextHolder.set(ctx);
+            crudService.insert(tableId, Map.of("dept_id", 30, "name", "x"), 1L);
+        }));
+
+        Long[] newId = new Long[1];
+        ScopedValueContext.runInScope(new RequestContext("it-wi2"), () -> {
+            DataScopeContextHolder.set(ctx);
+            newId[0] = crudService.insert(tableId, Map.of("dept_id", 10, "name", "ok"), 1L);
+        });
+        assertNotNull(newId[0]);
+    }
+
+    @Test
+    void onlySelfWriteFallsBackToCreatorId() throws Exception {
+        Long tableId = plainTable("dsitsw");
+        Long mine = crudService.insert(tableId, Map.of("name", "mine"), 7L);
+        Long theirs = crudService.insert(tableId, Map.of("name", "theirs"), 8L);
+        DataScopeContext ctx = scope(DataScopeEnum.ONLY_SELF, 7L, null, null);
+
+        boolean[] results = new boolean[3];
+        ScopedValueContext.runInScope(new RequestContext("it-ws"), () -> {
+            DataScopeContextHolder.set(ctx);
+            results[0] = crudService.update(tableId, mine, Map.of("name", "mine2"), 7L);
+            results[1] = crudService.update(tableId, theirs, Map.of("name", "hijack"), 7L);
+            results[2] = crudService.softDelete(tableId, theirs, 7L);
+        });
+
+        assertTrue(results[0]);
+        assertFalse(results[1]);
+        assertFalse(results[2]);
+    }
+
+    @Test
+    void importCountsOutOfScopeRowsAsFailed() throws Exception {
+        Long tableId = deptScopedTable("dsitimp");
+        byte[] csv = "dept_id,name\n10,a\n99,b\n10,c\n".getBytes(StandardCharsets.UTF_8);
+
+        ImportResponse[] holder = new ImportResponse[1];
+        ScopedValueContext.runInScope(new RequestContext("it-wimp"), () -> {
+            DataScopeContextHolder.set(scope(DataScopeEnum.SINGLE_DEPT, 1L, 10L, null));
+            holder[0] = crudService.importData(tableId, MetaDataFormat.CSV, new ByteArrayInputStream(csv), 1L);
+        });
+
+        assertEquals(3, holder[0].getTotal());
+        assertEquals(2, holder[0].getSuccess());
+        assertEquals(1, holder[0].getFailed());
     }
 
     // ---- fixtures ----

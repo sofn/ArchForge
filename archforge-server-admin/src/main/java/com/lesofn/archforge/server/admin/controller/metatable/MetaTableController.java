@@ -256,6 +256,7 @@ public class MetaTableController {
     @Log
     @Operation(summary = "新增元表格数据")
     @SaCheckPermission(value = "meta-table:add", type = StpAdminUtil.TYPE)
+    @DataPermission
     @PostMapping("/{id}/data/create")
     public Long createData(RequestContext rc, @PathVariable Long id, @RequestBody Map<String, Object> row) {
         return metaTableCrudService.insert(id, row, rc.getCurrentUid());
@@ -264,6 +265,7 @@ public class MetaTableController {
     @Log
     @Operation(summary = "修改元表格数据")
     @SaCheckPermission(value = "meta-table:edit", type = StpAdminUtil.TYPE)
+    @DataPermission
     @PutMapping("/{id}/data/{dataId}")
     public Boolean updateData(
             RequestContext rc,
@@ -276,6 +278,7 @@ public class MetaTableController {
     @Log
     @Operation(summary = "删除元表格数据")
     @SaCheckPermission(value = "meta-table:remove", type = StpAdminUtil.TYPE)
+    @DataPermission
     @PostMapping("/{id}/data/{dataId}/delete")
     public Boolean deleteData(RequestContext rc, @PathVariable Long id, @PathVariable Long dataId) {
         return metaTableCrudService.softDelete(id, dataId, rc.getCurrentUid());
@@ -308,6 +311,7 @@ public class MetaTableController {
     @Log
     @Operation(summary = "导入元表格数据")
     @SaCheckPermission(value = "meta-table:add", type = StpAdminUtil.TYPE)
+    @DataPermission
     @PostMapping("/{id}/import")
     public ImportResponse importData(
             RequestContext rc,

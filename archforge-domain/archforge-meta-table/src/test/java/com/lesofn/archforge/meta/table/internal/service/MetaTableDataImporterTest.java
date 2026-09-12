@@ -20,6 +20,7 @@ import com.lesofn.archforge.meta.table.api.enums.MetaDataFormat;
 import com.lesofn.archforge.meta.table.api.errors.MetaTableException;
 import com.lesofn.archforge.meta.table.api.service.MetaTableAdminService;
 import com.lesofn.archforge.meta.table.internal.config.MetaTableTransferProperties;
+import com.lesofn.archforge.meta.table.internal.datascope.MetaDataScopeFilter;
 import com.lesofn.archforge.meta.table.internal.validator.MetaTableValidator;
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
@@ -45,7 +46,8 @@ class MetaTableDataImporterTest {
         jdbcTemplate = mock(NamedParameterJdbcTemplate.class);
         adminService = mock(MetaTableAdminService.class);
         properties = new MetaTableTransferProperties();
-        importer = new MetaTableDataImporter(adminService, jdbcTemplate, new MetaTableValidator(), properties);
+        importer = new MetaTableDataImporter(adminService, jdbcTemplate, new MetaTableValidator(), properties, mock(
+                MetaDataScopeFilter.class));
     }
 
     @Test

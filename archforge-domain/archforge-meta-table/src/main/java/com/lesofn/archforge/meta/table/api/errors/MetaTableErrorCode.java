@@ -20,7 +20,8 @@ public enum MetaTableErrorCode implements ErrorCode {
     META_COLUMN_VALUE_INVALID(8, "字段值校验失败：{0}"),
     META_TABLE_CONCURRENT_MODIFY(9, "表定义已被他人修改，请刷新后重试"),
     META_TABLE_EVOLUTION_INVALID(10, "Schema 演进预检失败：{0}"),
-    META_QUERY_PARAM_INVALID(11, "查询参数非法：{0}");
+    META_QUERY_PARAM_INVALID(11, "查询参数非法：{0}"),
+    META_DATA_SCOPE_DENIED(12, "数据超出数据范围：{0}");
 
     private final int nodeNum;
     private final String msg;

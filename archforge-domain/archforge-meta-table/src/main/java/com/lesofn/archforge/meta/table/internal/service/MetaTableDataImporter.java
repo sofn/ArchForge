@@ -12,6 +12,7 @@ import com.lesofn.archforge.meta.table.api.errors.MetaTableErrorCode;
 import com.lesofn.archforge.meta.table.api.errors.MetaTableException;
 import com.lesofn.archforge.meta.table.api.service.MetaTableAdminService;
 import com.lesofn.archforge.meta.table.internal.config.MetaTableTransferProperties;
+import com.lesofn.archforge.meta.table.internal.datascope.MetaDataScopeFilter;
 import com.lesofn.archforge.meta.table.internal.ddl.SqlIdentifier;
 import com.lesofn.archforge.meta.table.internal.validator.MetaTableValidator;
 import java.io.ByteArrayInputStream;
@@ -50,6 +51,7 @@ public class MetaTableDataImporter {
     private final NamedParameterJdbcTemplate jdbcTemplate;
     private final MetaTableValidator validator;
     private final MetaTableTransferProperties transferProperties;
+    private final MetaDataScopeFilter dataScopeFilter;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public ImportResponse importData(Long tableId, MetaDataFormat format, InputStream in, Long currentUid) {
@@ -150,6 +152,7 @@ public class MetaTableDataImporter {
         try {
             validator.validateValues(row, ctx.columns, true);
             checkReferences(ctx, row);
+            dataScopeFilter.checkRowInScope(ctx.columns, row);
             ctx.pending.add(row);
         } catch (MetaTableException e) {
             recordError(ctx, rowNum, e.getMessage());
