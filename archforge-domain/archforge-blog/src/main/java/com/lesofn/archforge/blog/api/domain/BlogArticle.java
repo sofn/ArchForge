@@ -1,6 +1,7 @@
 package com.lesofn.archforge.blog.api.domain;
 
 import com.lesofn.archforge.blog.api.enums.BlogArticleStatus;
+import org.jspecify.annotations.Nullable;
 import com.lesofn.archforge.blog.api.errors.BlogErrorCode;
 import com.lesofn.archforge.blog.api.errors.BlogException;
 import com.lesofn.archforge.common.repository.BaseEntity;
@@ -36,7 +37,7 @@ public class BlogArticle extends BaseEntity<BlogArticle> {
     private Long categoryId;
 
     @Column(nullable = false, length = 256)
-    private String title;
+    private @Nullable String title;
 
     @Column(nullable = false, unique = true, length = 256)
     private String slug;

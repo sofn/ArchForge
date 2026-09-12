@@ -407,8 +407,9 @@ public class DefaultCodeGenTypeHandler implements CodeGenTypeHandler {
             attrs.add("unique = true");
         }
         if (col.isString() || col.isText() || col.isEnum()) {
-            if (col.getLength() != null && col.getLength() > 0) {
-                attrs.add("length = " + col.getLength());
+            Integer length = col.getLength();
+            if (length != null && length > 0) {
+                attrs.add("length = " + length);
             }
         }
         if (col.isDecimal()) {
@@ -479,7 +480,7 @@ public class DefaultCodeGenTypeHandler implements CodeGenTypeHandler {
         return Character.toUpperCase(name.charAt(0)) + name.substring(1);
     }
 
-    private int defaultLength(Integer value, int fallback) {
+    private int defaultLength(@Nullable Integer value, int fallback) {
         return value != null && value > 0 ? value : fallback;
     }
 

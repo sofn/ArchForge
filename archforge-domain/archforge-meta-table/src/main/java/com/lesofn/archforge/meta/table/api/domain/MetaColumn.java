@@ -1,6 +1,7 @@
 package com.lesofn.archforge.meta.table.api.domain;
 
 import com.lesofn.archforge.common.persistence.BasePO;
+import org.jspecify.annotations.Nullable;
 import com.lesofn.archforge.meta.table.api.domain.convert.OptionListConverter;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
@@ -32,7 +33,7 @@ public class MetaColumn extends BasePO {
     private static final long serialVersionUID = 1L;
 
     @Column(name = "table_id", nullable = false)
-    private Long tableId;
+    private @Nullable Long tableId;
 
     @Column(name = "column_code", nullable = false)
     private String columnCode;
@@ -45,7 +46,7 @@ public class MetaColumn extends BasePO {
     private MetaColumnType dataType;
 
     @Column(name = "length")
-    private Integer length;
+    private @Nullable Integer length;
 
     @Column(name = "precision")
     private Integer precision;
@@ -57,7 +58,7 @@ public class MetaColumn extends BasePO {
     private Boolean nullable;
 
     @Column(name = "default_value")
-    private String defaultValue;
+    private @Nullable String defaultValue;
 
     @Column(name = "is_unique")
     private Boolean unique;

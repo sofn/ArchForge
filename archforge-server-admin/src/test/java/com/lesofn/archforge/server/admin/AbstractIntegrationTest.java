@@ -1,7 +1,11 @@
 package com.lesofn.archforge.server.admin;
 
 import org.springframework.test.context.DynamicPropertyRegistry;
+import org.jspecify.annotations.Nullable;
 import org.springframework.test.context.DynamicPropertySource;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.HttpWaitStrategy;
 import org.testcontainers.postgresql.PostgreSQLContainer;
@@ -23,6 +27,24 @@ import org.testcontainers.utility.DockerImageName;
  * @author sofn
  */
 public abstract class AbstractIntegrationTest {
+
+    @SuppressWarnings("unchecked")
+    protected static Map<String, Object> dataOf(Map<String, Object> resp) {
+        return (Map<String, Object>) Objects.requireNonNull(resp.get("data"));
+    }
+
+    @SuppressWarnings("unchecked")
+    protected static List<Map<String, Object>> listOf(Map<String, Object> data) {
+        return (List<Map<String, Object>>) Objects.requireNonNull(data.get("list"));
+    }
+
+    protected static long numOf(Map<String, Object> row, String key) {
+        return ((Number) Objects.requireNonNull(row.get(key))).longValue();
+    }
+
+    protected static long numData(Map<String, Object> resp) {
+        return ((Number) Objects.requireNonNull(resp.get("data"))).longValue();
+    }
 
     private static final String POSTGRES_IMAGE = "postgres:17-alpine";
     private static final String REDIS_IMAGE = "redis:7-alpine";
@@ -49,7 +71,7 @@ public abstract class AbstractIntegrationTest {
     protected static final GenericContainer<?> REDIS = createRedis();
 
     /** 仅当开启 embedded S3 时非 null。 */
-    protected static final GenericContainer<?> RUSTFS = createRustfsIfEnabled();
+    protected static final @Nullable GenericContainer<?> RUSTFS = createRustfsIfEnabled();
 
     private static PostgreSQLContainer createPostgres() {
         PostgreSQLContainer container = new PostgreSQLContainer(DockerImageName.parse(POSTGRES_IMAGE))
@@ -67,7 +89,7 @@ public abstract class AbstractIntegrationTest {
         return container;
     }
 
-    private static GenericContainer<?> createRustfsIfEnabled() {
+    private static @Nullable GenericContainer<?> createRustfsIfEnabled() {
         if (!embeddedS3Enabled()) {
             return null;
         }

@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.lesofn.archforge.meta.table.api.domain.MetaColumn;
+import org.jspecify.annotations.Nullable;
 import com.lesofn.archforge.meta.table.api.domain.MetaColumnType;
 import com.lesofn.archforge.meta.table.api.domain.MetaTable;
 import com.lesofn.archforge.meta.table.internal.ddl.ColumnTypeResolver;
@@ -92,7 +93,7 @@ class SchemaDiffEngineTest {
         return table;
     }
 
-    private MetaColumn column(String code, MetaColumnType type, Integer length) {
+    private MetaColumn column(String code, MetaColumnType type, @Nullable Integer length) {
         MetaColumn column = new MetaColumn();
         column.setId(1L + code.hashCode());
         column.setColumnCode(code);

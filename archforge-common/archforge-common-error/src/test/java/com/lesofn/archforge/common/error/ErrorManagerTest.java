@@ -28,7 +28,7 @@ class ErrorManagerTest {
 
         // traverse the whole tree to prove no node throws
         for (TreeNode treeNode : allErrorCodes) {
-            for (TreeNode node : treeNode.getNodes()) {
+            for (TreeNode node : java.util.Objects.requireNonNull(treeNode.getNodes())) {
                 assertNotNull(node.getNodes());
             }
         }

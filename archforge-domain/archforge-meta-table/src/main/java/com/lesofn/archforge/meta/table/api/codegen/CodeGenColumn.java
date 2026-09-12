@@ -50,7 +50,7 @@ public class CodeGenColumn {
     private boolean unique;
     private boolean nullable;
 
-    private Integer length;
+    private @Nullable Integer length;
     private Integer precision;
     private Integer scale;
     private String arrayElementType;
@@ -82,7 +82,7 @@ public class CodeGenColumn {
 
     private String searchType;
     private boolean rangeSearch;
-    private Integer fileSizeLimit;
+    private @Nullable Integer fileSizeLimit;
 
     public boolean isEnum() { return enumType; }
 

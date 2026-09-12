@@ -87,7 +87,7 @@ class TokenServiceTest {
         when(refreshTokenCache.get("refresh")).thenReturn("1");
         when(adminLoginUserFactory.loadByUserId(1L)).thenReturn(user);
 
-        SystemLoginUser result = tokenService.getLoginUserByRefreshToken("refresh");
+        SystemLoginUser result = java.util.Objects.requireNonNull(tokenService.getLoginUserByRefreshToken("refresh"));
 
         assertEquals("admin", result.getUsername());
         assertEquals(1L, result.getUserId());

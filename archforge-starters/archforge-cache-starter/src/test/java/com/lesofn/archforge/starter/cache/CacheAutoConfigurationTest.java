@@ -44,11 +44,10 @@ public class CacheAutoConfigurationTest {
 
     @Test
     void shouldPutAndGetThroughCompositeCache() {
-        Cache testCache = cacheManager.getCache("test");
-        assertThat(testCache).isNotNull();
+        Cache testCache = java.util.Objects.requireNonNull(cacheManager.getCache("test"));
 
         testCache.put("key", "value");
-        assertThat(testCache.get("key").get()).isEqualTo("value");
+        assertThat(java.util.Objects.requireNonNull(testCache.get("key")).get()).isEqualTo("value");
 
         testCache.evict("key");
         assertThat(testCache.get("key")).isNull();

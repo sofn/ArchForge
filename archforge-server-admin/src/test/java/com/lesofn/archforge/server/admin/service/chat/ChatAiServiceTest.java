@@ -12,7 +12,7 @@ class ChatAiServiceTest {
         ArchForgeProperties properties = new ArchForgeProperties();
         properties.getLlm().setApiKey("");
         ChatAiService service = new ChatAiService(properties);
-        assertFalse((Boolean) service.configStatus().get("configured"));
+        assertFalse(Boolean.TRUE.equals(service.configStatus().get("configured")));
     }
 
 }

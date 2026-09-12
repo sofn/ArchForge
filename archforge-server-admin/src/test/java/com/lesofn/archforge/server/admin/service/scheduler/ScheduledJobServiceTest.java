@@ -56,7 +56,7 @@ class ScheduledJobServiceTest {
         job.setBeanName("environment");
 
         SystemException ex = assertThrows(SystemException.class, () -> service.add(job));
-        assertTrue(ex.getMessage().contains("not allowlisted"));
+        assertTrue(String.valueOf(ex.getMessage()).contains("not allowlisted"));
     }
 
     @Test
@@ -91,7 +91,7 @@ class ScheduledJobServiceTest {
         when(applicationContext.getBean("demoSchedulerJob")).thenReturn(new DemoSchedulerJobBean());
 
         SystemException ex = assertThrows(SystemException.class, () -> service.add(job));
-        assertTrue(ex.getMessage().contains("not invocable"));
+        assertTrue(String.valueOf(ex.getMessage()).contains("not invocable"));
     }
 
     @Test
@@ -100,7 +100,7 @@ class ScheduledJobServiceTest {
         when(applicationContext.containsBean("demoSchedulerJob")).thenReturn(false);
 
         SystemException ex = assertThrows(SystemException.class, () -> service.add(job));
-        assertTrue(ex.getMessage().contains("does not exist"));
+        assertTrue(String.valueOf(ex.getMessage()).contains("does not exist"));
     }
 
     @Test

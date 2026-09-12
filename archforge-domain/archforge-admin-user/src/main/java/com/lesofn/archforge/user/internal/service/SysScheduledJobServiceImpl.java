@@ -81,7 +81,7 @@ public class SysScheduledJobServiceImpl implements SysScheduledJobService {
     }
 
     @Override
-    public boolean validateCron(String cron) {
+    public boolean validateCron(@Nullable String cron) {
         if (cron == null || cron.isBlank()) {
             return false;
         }
@@ -204,7 +204,7 @@ public class SysScheduledJobServiceImpl implements SysScheduledJobService {
         }
     }
 
-    private static int parseArity(String methodParams) {
+    private static int parseArity(@Nullable String methodParams) {
         if (methodParams == null || methodParams.isBlank()) {
             return 0;
         }

@@ -70,7 +70,7 @@ public class WebFileController {
         if (Boolean.TRUE.equals(sysFile.getPublicVisible())) {
             return true;
         }
-        Long userId = java.util.Objects.requireNonNull(LoginContext.getWebUserId());
+        Long userId = LoginContext.getWebUserId();
         return userId != null && userId.equals(sysFile.getCreatorId());
     }
 

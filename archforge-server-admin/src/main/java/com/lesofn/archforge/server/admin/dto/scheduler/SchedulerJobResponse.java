@@ -1,6 +1,7 @@
 package com.lesofn.archforge.server.admin.dto.scheduler;
 
 import com.lesofn.archforge.user.api.domain.SysScheduledJob;
+import org.jspecify.annotations.Nullable;
 import java.time.LocalDateTime;
 import lombok.Data;
 
@@ -14,7 +15,7 @@ public class SchedulerJobResponse {
     private String description;
     private String beanName;
     private String methodName;
-    private String methodParams;
+    private @Nullable String methodParams;
     private String cron;
     private Short misfirePolicy;
     private Boolean concurrent;

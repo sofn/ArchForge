@@ -207,10 +207,11 @@ public class MetaTableCrudServiceImpl implements MetaTableCrudService {
             }
             MetaColumn column = filterPath.column();
             String paramName = "filter_" + key.replace('.', '_').replace(' ', '_');
-            if (filterPath.jsonPath() != null) {
+            String jsonPath = filterPath.jsonPath();
+            if (jsonPath != null) {
                 params.addValue(paramName, value.toString());
                 sb.append(" AND ")
-                        .append(buildJsonPathExpression(column, filterPath.jsonPath(), paramName, value, mainAlias));
+                        .append(buildJsonPathExpression(column, jsonPath, paramName, value, mainAlias));
             } else if (isRangeSearch(column, value)) {
                 appendRangeCondition(sb, column, key, value, paramName, params, mainAlias);
             } else if (isLikeSearch(column)) {

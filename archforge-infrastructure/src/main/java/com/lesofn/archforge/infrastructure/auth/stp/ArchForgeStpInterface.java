@@ -19,10 +19,11 @@ public class ArchForgeStpInterface implements StpInterface {
             return Collections.emptyList();
         }
         SystemLoginUser loginUser = findAdminUser(loginId);
-        if (loginUser == null || loginUser.getRoleInfo() == null || loginUser.getRoleInfo().getMenuPermissions() == null) {
+        RoleInfo roleInfo = loginUser == null ? null : loginUser.getRoleInfo();
+        if (roleInfo == null || roleInfo.getMenuPermissions() == null) {
             return Collections.emptyList();
         }
-        return new ArrayList<>(loginUser.getRoleInfo().getMenuPermissions());
+        return new ArrayList<>(roleInfo.getMenuPermissions());
     }
 
     @Override

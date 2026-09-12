@@ -3,6 +3,7 @@ package com.lesofn.archforge.blog.api.dao;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.lesofn.archforge.blog.api.domain.BlogArticle;
+import org.jspecify.annotations.Nullable;
 import com.lesofn.archforge.blog.api.enums.BlogArticleStatus;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Page;
@@ -28,9 +29,9 @@ class BlogArticleRepositoryTest {
 
     private static final class RecordingRepository {
 
-        private Long categoryId;
-        private BlogArticleStatus status;
-        private Pageable pageable;
+        private @Nullable Long categoryId;
+        private @Nullable BlogArticleStatus status;
+        private @Nullable Pageable pageable;
 
         Page<BlogArticle> findByCategoryIdAndStatusAndDeletedFalse(
                 Long categoryId, BlogArticleStatus status, Pageable pageable) {

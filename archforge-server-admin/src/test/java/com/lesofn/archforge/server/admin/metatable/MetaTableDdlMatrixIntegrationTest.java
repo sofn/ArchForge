@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.jspecify.annotations.Nullable;
 import com.lesofn.archforge.server.admin.AbstractIntegrationTest;
 import com.lesofn.archforge.meta.table.api.domain.MetaColumn;
 import com.lesofn.archforge.meta.table.api.domain.MetaColumnType;
@@ -68,8 +69,8 @@ class MetaTableDdlMatrixIntegrationTest extends AbstractIntegrationTest {
     private MetaTableCrudService crudService;
 
     private final List<Long> createdTables = new ArrayList<>();
-    private Long referenceTargetTableId;
-    private Long referenceTargetRowId;
+    private @Nullable Long referenceTargetTableId;
+    private @Nullable Long referenceTargetRowId;
 
     @AfterEach
     void cleanUp() {
@@ -98,12 +99,13 @@ class MetaTableDdlMatrixIntegrationTest extends AbstractIntegrationTest {
 
         assertPhysicalType(table.physicalTableName(), type);
 
-        Long rowId = crudService.insert(table.getId(), Map.of("payload", expected), 1L);
+        Long rowId = crudService.insert(java.util.Objects.requireNonNull(table.getId()), Map.of("payload", expected), 1L);
         Object actual = readScalar(table.physicalTableName(), "payload", rowId);
-        assertRoundTrip(type, expected, actual);
+        assertRoundTrip(type, expected, java.util.Objects.requireNonNull(actual));
 
         if (type == MetaColumnType.REFERENCE) {
-            List<Map<String, Object>> rows = crudService.list(table.getId(), MetaDataQuery.of(Map.of(), 1, 10)).getList();
+            List<Map<String, Object>> rows = crudService.list(java.util.Objects.requireNonNull(table.getId()), MetaDataQuery.of(
+                    Map.of(), 1, 10)).getList();
             assertEquals("T-001", rows.get(0).get("payload_display"));
         }
     }
@@ -111,7 +113,7 @@ class MetaTableDdlMatrixIntegrationTest extends AbstractIntegrationTest {
     @Test
     void renameColumnPreservesData() {
         MetaTable table = createTable("ddlmtrn" + SEQ.incrementAndGet(), "改名矩阵", column("origin", MetaColumnType.STRING));
-        Long rowId = crudService.insert(table.getId(), Map.of("origin", "keep-me"), 1L);
+        Long rowId = crudService.insert(java.util.Objects.requireNonNull(table.getId()), Map.of("origin", "keep-me"), 1L);
 
         updateColumns(table, columns -> columns.get(0).setColumnCode("renamed"));
 
@@ -125,7 +127,7 @@ class MetaTableDdlMatrixIntegrationTest extends AbstractIntegrationTest {
         MetaColumn narrow = column("payload", MetaColumnType.STRING);
         narrow.setLength(50);
         MetaTable table = createTable("ddlmtww" + SEQ.incrementAndGet(), "加宽矩阵", narrow);
-        Long rowId = crudService.insert(table.getId(), Map.of("payload", "加宽保留 widen"), 1L);
+        Long rowId = crudService.insert(java.util.Objects.requireNonNull(table.getId()), Map.of("payload", "加宽保留 widen"), 1L);
 
         updateColumns(table, columns -> {
             columns.get(0).setDataType(MetaColumnType.TEXT);
@@ -139,16 +141,18 @@ class MetaTableDdlMatrixIntegrationTest extends AbstractIntegrationTest {
     @Test
     void lossyTextToIntegerAlterFailsAtomically() {
         MetaTable table = createTable("ddlmtls" + SEQ.incrementAndGet(), "收窄矩阵", column("payload", MetaColumnType.TEXT));
-        Long rowId = crudService.insert(table.getId(), Map.of("payload", "abc-not-numeric"), 1L);
-        Integer versionBefore = adminService.findById(table.getId()).getSchemaVersion();
+        Long rowId = crudService.insert(java.util.Objects.requireNonNull(table.getId()), Map.of("payload", "abc-not-numeric"),
+                1L);
+        Integer versionBefore = adminService.findById(java.util.Objects.requireNonNull(table.getId())).getSchemaVersion();
 
         assertThrows(RuntimeException.class, () -> updateColumns(table, columns -> columns.get(0).setDataType(
                 MetaColumnType.INTEGER)));
 
         assertEquals("text", physicalDataType(table.physicalTableName(), "payload"), "physical type must not change");
-        assertEquals(MetaColumnType.TEXT, adminService.findColumns(table.getId()).get(0).getDataType(),
+        assertEquals(MetaColumnType.TEXT, adminService.findColumns(java.util.Objects.requireNonNull(table.getId())).get(0)
+                .getDataType(),
                 "metadata type must not change");
-        assertEquals(versionBefore, adminService.findById(table.getId()).getSchemaVersion());
+        assertEquals(versionBefore, adminService.findById(java.util.Objects.requireNonNull(table.getId())).getSchemaVersion());
         assertEquals("abc-not-numeric", readScalar(table.physicalTableName(), "payload", rowId));
     }
 
@@ -173,7 +177,7 @@ class MetaTableDdlMatrixIntegrationTest extends AbstractIntegrationTest {
     @Test
     void nullableToggleOnPopulatedColumn() {
         MetaTable table = createTable("ddlmtnl" + SEQ.incrementAndGet(), "空值矩阵", column("payload", MetaColumnType.STRING));
-        crudService.insert(table.getId(), Map.of("payload", "x"), 1L);
+        crudService.insert(java.util.Objects.requireNonNull(table.getId()), Map.of("payload", "x"), 1L);
 
         updateColumns(table, columns -> columns.get(0).setRequired(true));
         assertEquals("NO", physicalIsNullable(table.physicalTableName(), "payload"));
@@ -187,12 +191,13 @@ class MetaTableDdlMatrixIntegrationTest extends AbstractIntegrationTest {
             return;
         }
         MetaTable target = createTable("ddlmtxtgt" + SEQ.incrementAndGet(), "引用目标", column("code", MetaColumnType.STRING));
-        referenceTargetRowId = crudService.insert(target.getId(), Map.of("code", "T-001"), 1L);
-        referenceTargetTableId = target.getId();
+        referenceTargetRowId = crudService.insert(java.util.Objects.requireNonNull(target.getId()), Map.of("code", "T-001"),
+                1L);
+        referenceTargetTableId = java.util.Objects.requireNonNull(target.getId());
     }
 
     private void assertPhysicalType(String physicalName, MetaColumnType type) {
-        String dataType = physicalDataType(physicalName, "payload");
+        String dataType = java.util.Objects.requireNonNull(physicalDataType(physicalName, "payload"));
         assertEquals(expectedPgType(type), dataType.toLowerCase(), () -> type + " physical type mismatch");
 
         switch (type) {
@@ -250,7 +255,7 @@ class MetaTableDdlMatrixIntegrationTest extends AbstractIntegrationTest {
             case TIMESTAMPTZ -> "2026-08-26T10:15:30+08:00";
             case ARRAY -> List.of("x", "y");
             case GEO -> "{\"lat\":31.23,\"lng\":121.47}";
-            case REFERENCE -> referenceTargetRowId;
+            case REFERENCE -> java.util.Objects.requireNonNull(referenceTargetRowId);
         };
     }
 
@@ -308,7 +313,7 @@ class MetaTableDdlMatrixIntegrationTest extends AbstractIntegrationTest {
                 column.setScale(2);
             }
             case REFERENCE -> {
-                MetaTable target = adminService.findById(referenceTargetTableId);
+                MetaTable target = adminService.findById(java.util.Objects.requireNonNull(referenceTargetTableId));
                 column.setReferenceTable(target.physicalTableName());
                 column.setReferenceColumn("id");
                 column.setDisplayExpression("ref.code");
@@ -334,9 +339,10 @@ class MetaTableDdlMatrixIntegrationTest extends AbstractIntegrationTest {
     }
 
     private void updateColumns(MetaTable table, Consumer<List<MetaColumn>> mutator) {
-        List<MetaColumn> columns = new ArrayList<>(adminService.findColumns(table.getId()));
+        List<MetaColumn> columns = new ArrayList<>(adminService.findColumns(java.util.Objects.requireNonNull(table.getId())));
         mutator.accept(columns);
-        adminService.update(table.getId(), adminService.findById(table.getId()), columns, 1L);
+        adminService.update(java.util.Objects.requireNonNull(table.getId()), adminService.findById(java.util.Objects
+                .requireNonNull(table.getId())), columns, 1L);
     }
 
     private MetaColumn column(String code, MetaColumnType type) {
@@ -353,7 +359,7 @@ class MetaTableDdlMatrixIntegrationTest extends AbstractIntegrationTest {
     }
 
     private Long insertEmptyRow(MetaTable table) {
-        return crudService.insert(table.getId(), Map.of(), 1L);
+        return crudService.insert(java.util.Objects.requireNonNull(table.getId()), Map.of(), 1L);
     }
 
     private boolean physicalColumnExists(String physicalName, String columnName) {
@@ -363,25 +369,25 @@ class MetaTableDdlMatrixIntegrationTest extends AbstractIntegrationTest {
         return count != null && count > 0;
     }
 
-    private String physicalDataType(String physicalName, String columnName) {
+    private @Nullable String physicalDataType(String physicalName, String columnName) {
         return jdbc.getJdbcOperations().queryForObject(
                 "SELECT data_type FROM information_schema.columns WHERE table_name = ? AND column_name = ?",
                 String.class, physicalName, columnName);
     }
 
-    private String physicalColumnDefault(String physicalName, String columnName) {
+    private @Nullable String physicalColumnDefault(String physicalName, String columnName) {
         return jdbc.getJdbcOperations().queryForObject(
                 "SELECT column_default FROM information_schema.columns WHERE table_name = ? AND column_name = ?",
                 String.class, physicalName, columnName);
     }
 
-    private String physicalIsNullable(String physicalName, String columnName) {
+    private @Nullable String physicalIsNullable(String physicalName, String columnName) {
         return jdbc.getJdbcOperations().queryForObject(
                 "SELECT is_nullable FROM information_schema.columns WHERE table_name = ? AND column_name = ?",
                 String.class, physicalName, columnName);
     }
 
-    private Object readScalar(String physicalName, String columnName, long rowId) {
+    private @Nullable Object readScalar(String physicalName, String columnName, long rowId) {
         return jdbc.getJdbcOperations().queryForObject(
                 "SELECT \"" + columnName + "\" FROM \"" + physicalName + "\" WHERE id = ?",
                 Object.class, rowId);

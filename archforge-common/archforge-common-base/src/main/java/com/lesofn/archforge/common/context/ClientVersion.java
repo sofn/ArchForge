@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.lesofn.archforge.common.utils.URLUtils;
 import java.io.Serializable;
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.Nullable;
 import org.apache.commons.lang3.math.NumberUtils;
 
 /**
@@ -90,7 +91,7 @@ public class ClientVersion implements Serializable {
         }
 
         @Override
-        public int compareTo(Version o) {
+        public int compareTo(@Nullable Version o) {
             if (o == null) {
                 return 1;
             }
@@ -133,7 +134,7 @@ public class ClientVersion implements Serializable {
     }
 
     @JsonCreator
-    public static ClientVersion valueOf(String versionHeader) {
+    public static @Nullable ClientVersion valueOf(@Nullable String versionHeader) {
         if (StringUtils.isBlank(versionHeader)) {
             return NULL;
         } else {

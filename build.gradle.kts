@@ -17,27 +17,6 @@ plugins {
 // Error Prone: bug detection inside javac — runs on EVERY compile automatically.
 val errorproneToolVersion = "2.50.0"
 
-// NullAway ratchet — modules whose sources are already NullAway-clean are enforced
-// at ERROR for that source set. Drive both lists to cover every module, then flip
-// the default severity to ERROR and delete these lists.
-val nullAwayCleanMain =
-    setOf(
-            "archforge-admin-user",
-            "archforge-blog",
-            "archforge-cache-starter",
-            "archforge-cli",
-            "archforge-common-base",
-            "archforge-common-error",
-            "archforge-common-jpa",
-            "archforge-example-task",
-            "archforge-infrastructure",
-            "archforge-lock-starter",
-            "archforge-meta-table",
-            "archforge-redisson-starter",
-            "archforge-server-admin",
-            "archforge-server-web",
-            "archforge-trace-starter")
-val nullAwayCleanTest = setOf<String>()
 // Checkstyle: semantic style gate — runs before `test` and as part of `check`/`build`
 // (division of labor: formatting stays with Spotless, see config/checkstyle/checkstyle.xml)
 val checkstyleToolVersion = "10.26.1"
@@ -153,18 +132,8 @@ subprojects {
                     check("UnusedVariable", net.ltgt.gradle.errorprone.CheckSeverity.OFF)
 
                     // NullAway: 分析 jspecify @NullMarked 的包（项目全量 @NullMarked）。
-                    // Ratchet 策略：已清零的模块/source-set 立即升 ERROR 锁死进度，
-                    // 存量模块保持 WARN 直到清零（见 nullAwayCleanMain/Test 集合）。
-                    val nullAwayClean =
-                        when (name) {
-                            "compileJava" -> nullAwayCleanMain.contains(project.name)
-                            "compileTestJava" -> nullAwayCleanTest.contains(project.name)
-                            else -> false
-                        }
-                    check(
-                            "NullAway",
-                            if (nullAwayClean) net.ltgt.gradle.errorprone.CheckSeverity.ERROR
-                            else net.ltgt.gradle.errorprone.CheckSeverity.WARN)
+                    // 全仓库 main+test 已清零 —— 全局 ERROR，任何回归直接 fail compile。
+                    check("NullAway", net.ltgt.gradle.errorprone.CheckSeverity.ERROR)
                     option("NullAway:AnnotatedPackages", "com.lesofn.archforge")
                     // Framework-injected fields are initialized outside javac's view:
                     // Spring DI, JPA, picocli command-line binding. NullAway reads this

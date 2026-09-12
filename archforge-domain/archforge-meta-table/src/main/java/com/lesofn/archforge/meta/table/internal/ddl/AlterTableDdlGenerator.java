@@ -46,7 +46,8 @@ public class AlterTableDdlGenerator {
             return Optional.empty();
         }
         MetaColumn column = change.getNewColumn();
-        if (column.getDefaultValue() == null || column.getDefaultValue().isEmpty()) {
+        String defaultValue = column.getDefaultValue();
+        if (defaultValue == null || defaultValue.isEmpty()) {
             return Optional.empty();
         }
         String physicalName = SqlIdentifier.quote(table.physicalTableName());
@@ -98,7 +99,8 @@ public class AlterTableDdlGenerator {
         if (Boolean.TRUE.equals(column.getRequired())) {
             sb.append(" NOT NULL");
         }
-        if (column.getDefaultValue() != null && !column.getDefaultValue().isEmpty()) {
+        String defaultValue = column.getDefaultValue();
+        if (defaultValue != null && !defaultValue.isEmpty()) {
             sb.append(" DEFAULT ").append(columnTypeResolver.formatDefaultValue(column));
         }
         statements.add(sb.toString());

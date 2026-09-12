@@ -3,6 +3,7 @@ package com.lesofn.archforge.server.admin.controller;
 import static org.junit.jupiter.api.Assertions.*;
 
 import tools.jackson.databind.ObjectMapper;
+import org.jspecify.annotations.Nullable;
 import com.lesofn.archforge.server.admin.AbstractIntegrationTest;
 import com.lesofn.archforge.server.admin.Application;
 import java.io.ByteArrayInputStream;
@@ -36,7 +37,7 @@ class UserExportIntegrationTest extends AbstractIntegrationTest {
     int port;
 
     private RestClient restClient;
-    private String accessToken;
+    private @Nullable String accessToken;
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @BeforeAll
@@ -52,7 +53,7 @@ class UserExportIntegrationTest extends AbstractIntegrationTest {
                 .body(String.class);
         try {
             Map<String, Object> body = MAPPER.readValue(resp, Map.class);
-            Map<String, Object> data = (Map<String, Object>) body.get("data");
+            Map<String, Object> data = dataOf(body);
             accessToken = (String) data.get("accessToken");
         } catch (Exception e) {
             throw new RuntimeException("login failed: " + resp, e);

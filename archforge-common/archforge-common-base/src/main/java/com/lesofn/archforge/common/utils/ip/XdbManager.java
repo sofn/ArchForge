@@ -70,7 +70,8 @@ public final class XdbManager {
     }
 
     /** Spring wiring: overrides url templates / cache dir / switch from application.yaml. */
-    public static void configure(String v4Template, String v6Template, String directory, boolean enabled) {
+    public static void configure(@Nullable String v4Template, @Nullable String v6Template, @Nullable String directory,
+            boolean enabled) {
         offlineEnabled = enabled;
         if (v4Template != null && !v4Template.isBlank()) {
             v4UrlTemplate = v4Template.trim();

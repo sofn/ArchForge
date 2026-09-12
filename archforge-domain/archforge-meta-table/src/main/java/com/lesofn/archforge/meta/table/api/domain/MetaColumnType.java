@@ -1,6 +1,7 @@
 package com.lesofn.archforge.meta.table.api.domain;
 
 import com.lesofn.archforge.meta.table.api.errors.MetaTableErrorCode;
+import org.jspecify.annotations.Nullable;
 import com.lesofn.archforge.meta.table.api.errors.MetaTableException;
 
 /**
@@ -26,7 +27,7 @@ public enum MetaColumnType {
     REFERENCE;
 
     /** 解析字段类型字符串，非法值抛业务异常而非裸 IllegalArgumentException。 */
-    public static MetaColumnType of(String value) {
+    public static MetaColumnType of(@Nullable String value) {
         try {
             if (value == null) {
                 throw new IllegalArgumentException("column type must not be null");

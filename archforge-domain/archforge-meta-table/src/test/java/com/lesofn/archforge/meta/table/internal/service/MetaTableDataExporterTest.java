@@ -137,8 +137,8 @@ class MetaTableDataExporterTest {
                 MetaTableException.class,
                 () -> exporter.export(1L, MetaDataFormat.CSV, new ByteArrayOutputStream()));
 
-        assertTrue(e.getMessage().contains("超过上限 50000"));
-        assertTrue(e.getMessage().contains("过滤条件"));
+        assertTrue(String.valueOf(e.getMessage()).contains("超过上限 50000"));
+        assertTrue(String.valueOf(e.getMessage()).contains("过滤条件"));
     }
 
     private MetaTable stubTable() {

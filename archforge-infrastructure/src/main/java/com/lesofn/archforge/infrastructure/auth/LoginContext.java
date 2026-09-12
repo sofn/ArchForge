@@ -3,6 +3,7 @@ package com.lesofn.archforge.infrastructure.auth;
 import com.lesofn.archforge.infrastructure.auth.errors.AdminAuthErrorCode;
 import org.jspecify.annotations.Nullable;
 import com.lesofn.archforge.infrastructure.auth.errors.AdminAuthException;
+import com.lesofn.archforge.common.auth.RoleInfo;
 import com.lesofn.archforge.common.auth.SystemLoginUser;
 import com.lesofn.archforge.infrastructure.auth.stp.LoginSessionKeys;
 import com.lesofn.archforge.infrastructure.auth.stp.StpAdminUtil;
@@ -88,8 +89,9 @@ public final class LoginContext {
             grantIfAbsent(loginUser, "ROLE_ADMIN");
         }
         grantIfAbsent(loginUser, "ROLE_USER");
-        if (loginUser.getRoleInfo() != null && loginUser.getRoleInfo().getMenuPermissions() != null) {
-            for (String permission : loginUser.getRoleInfo().getMenuPermissions()) {
+        RoleInfo roleInfo = loginUser.getRoleInfo();
+        if (roleInfo != null && roleInfo.getMenuPermissions() != null) {
+            for (String permission : roleInfo.getMenuPermissions()) {
                 if (permission != null && !permission.isBlank()) {
                     grantIfAbsent(loginUser, permission);
                 }

@@ -132,10 +132,10 @@ public class IdempotentAspect {
 
     private @Nullable String resolveTokenHeader(String headerName) {
         RequestContext ctx = ScopedValueContext.getRequestContext();
-        if (ctx == null || ctx.getOriginRequest() == null) {
+        HttpServletRequest request = ctx == null ? null : ctx.getOriginRequest();
+        if (request == null) {
             return null;
         }
-        HttpServletRequest request = ctx.getOriginRequest();
         return request.getHeader(headerName != null && !headerName.isBlank() ? headerName
                 : idempotentProperties.getHeaderName());
     }
@@ -150,8 +150,9 @@ public class IdempotentAspect {
             // Fall through to request-based identifier
         }
         RequestContext ctx = ScopedValueContext.getRequestContext();
-        if (ctx != null && ctx.getOriginRequest() != null) {
-            return "ip:" + ctx.getOriginRequest().getRemoteAddr();
+        HttpServletRequest originRequest = ctx == null ? null : ctx.getOriginRequest();
+        if (originRequest != null) {
+            return "ip:" + originRequest.getRemoteAddr();
         }
         return ANONYMOUS;
     }

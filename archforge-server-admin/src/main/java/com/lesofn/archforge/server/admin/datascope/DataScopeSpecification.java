@@ -69,10 +69,11 @@ public class DataScopeSpecification {
                 yield cb.equal(deptPath, context.getDeptId());
             }
             case DEPT_TREE -> {
-                if (context.getDeptId() == null) {
+                Long deptId = context.getDeptId();
+                if (deptId == null) {
                     yield denyAll(cb);
                 }
-                Set<Long> deptIds = resolveDeptTree(context.getDeptId());
+                Set<Long> deptIds = resolveDeptTree(deptId);
                 yield deptPath.in(deptIds);
             }
             case CUSTOM_DEFINE -> {

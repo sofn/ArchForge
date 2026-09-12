@@ -53,8 +53,9 @@ public class TaskService {
     public Boolean updateTask(TaskUpdateRequest request) {
         Task task = findById(request.getId());
         task.updateInfo(request.getTitle(), request.getDescription());
-        if (request.getUid() != null) {
-            task.reassign(request.getUid());
+        Long uid = request.getUid();
+        if (uid != null) {
+            task.reassign(uid);
         }
         taskDao.save(task);
         return true;

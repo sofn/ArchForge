@@ -1,6 +1,7 @@
 package com.lesofn.archforge.user.api.domain;
 
 import com.lesofn.archforge.common.repository.BaseEntity;
+import org.jspecify.annotations.Nullable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -62,7 +63,7 @@ public class SysScheduledJob extends BaseEntity<SysScheduledJob> {
     private String methodName;
 
     @Column(columnDefinition = "TEXT")
-    private String methodParams;
+    private @Nullable String methodParams;
 
     private String cron;
 

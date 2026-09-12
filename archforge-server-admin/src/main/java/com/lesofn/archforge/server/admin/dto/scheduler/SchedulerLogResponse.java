@@ -1,6 +1,7 @@
 package com.lesofn.archforge.server.admin.dto.scheduler;
 
 import com.lesofn.archforge.user.api.domain.SysJobLog;
+import org.jspecify.annotations.Nullable;
 import java.time.LocalDateTime;
 import lombok.Data;
 
@@ -14,7 +15,7 @@ public class SchedulerLogResponse {
     private String jobGroup;
     private String beanName;
     private String methodName;
-    private String methodParams;
+    private @Nullable String methodParams;
     private Short status;
     private String errorMessage;
     private Long durationMs;

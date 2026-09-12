@@ -1,6 +1,7 @@
 package com.lesofn.archforge.common.repository;
 
 import jakarta.persistence.MappedSuperclass;
+import org.jspecify.annotations.Nullable;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import java.time.LocalDateTime;
@@ -18,7 +19,7 @@ import lombok.Setter;
 @SuppressWarnings("NullAway.Init")
 public class BaseEntity<T> {
 
-    private Long creatorId;
+    private @Nullable Long creatorId;
 
     private LocalDateTime createTime;
 

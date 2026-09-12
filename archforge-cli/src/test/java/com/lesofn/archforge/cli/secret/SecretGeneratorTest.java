@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.nio.file.Files;
+import org.jspecify.annotations.Nullable;
 import java.nio.file.Path;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -46,7 +47,7 @@ class SecretGeneratorTest {
         assertTrue(written.containsKey("DB_PASSWORD"));
     }
 
-    private static String readEnv(String content, String key) {
+    private static @Nullable String readEnv(String content, String key) {
         for (String line : content.split("\n")) {
             if (line.startsWith(key + "=")) {
                 return line.substring(key.length() + 1);

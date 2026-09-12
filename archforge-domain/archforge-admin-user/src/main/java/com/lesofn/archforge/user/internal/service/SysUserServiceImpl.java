@@ -249,7 +249,8 @@ public class SysUserServiceImpl implements SysUserService {
         if (user.getUsername() == null || !USERNAME_PATTERN.matcher(user.getUsername()).matches()) {
             throw new IllegalArgumentException("Username must be 2-64 characters and only contain letters, digits, underscore, dot or hyphen");
         }
-        if (user.getPassword() == null || user.getPassword().isBlank()) {
+        String password = user.getPassword();
+        if (password == null || password.isBlank()) {
             throw new IllegalArgumentException("Encrypted password must not be blank");
         }
         if (user.getEmail() != null && !user.getEmail().isBlank() && !EMAIL_PATTERN.matcher(user.getEmail()).matches()) {

@@ -6,6 +6,7 @@ import tools.jackson.databind.ObjectMapper;
 import com.lesofn.archforge.server.admin.AbstractIntegrationTest;
 import com.lesofn.archforge.server.admin.Application;
 import java.util.List;
+import org.jspecify.annotations.Nullable;
 import java.util.Map;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.BeforeAll;
@@ -38,13 +39,13 @@ class RestClientIntegrationTest extends AbstractIntegrationTest {
     int port;
 
     private RestClient restClient;
-    private String accessToken;
+    private @Nullable String accessToken;
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
     // 测试过程中记录的 ID
-    private Long createdUserId;
-    private Long createdRoleId;
-    private Long createdDeptId;
+    private @Nullable Long createdUserId;
+    private @Nullable Long createdRoleId;
+    private @Nullable Long createdDeptId;
 
     @BeforeAll
     void setup() {
@@ -54,7 +55,7 @@ class RestClientIntegrationTest extends AbstractIntegrationTest {
     // ==================== Helper Methods ====================
 
     @SuppressWarnings("unchecked")
-    private Map<String, Object> post(String path, Map<String, Object> body) {
+    private Map<String, Object> post(String path, @Nullable Map<String, Object> body) {
         String json;
         try {
             json = objectMapper.writeValueAsString(body);
@@ -121,9 +122,9 @@ class RestClientIntegrationTest extends AbstractIntegrationTest {
         Map<String, Object> response = post("/auth/login", Map.of("username", "admin", "password", "admin123"));
         assertEquals(0, response.get("code"));
         @SuppressWarnings("unchecked")
-        Map<String, Object> data = (Map<String, Object>) response.get("data");
+        Map<String, Object> data = dataOf(response);
         assertNotNull(data.get("accessToken"));
-        accessToken = (String) data.get("accessToken");
+        accessToken = (String) java.util.Objects.requireNonNull(data.get("accessToken"));
     }
 
     // ==================== 2. 用户管理 ====================
@@ -150,14 +151,14 @@ class RestClientIntegrationTest extends AbstractIntegrationTest {
     void listUsers() {
         Map<String, Object> response = post("/admin/user", Map.of("username", "", "currentPage", 1, "pageSize", 100));
         assertEquals(0, response.get("code"));
-        Map<String, Object> data = (Map<String, Object>) response.get("data");
-        List<Map<String, Object>> list = (List<Map<String, Object>>) data.get("list");
+        Map<String, Object> data = dataOf(response);
+        List<Map<String, Object>> list = listOf(data);
         assertTrue(list.stream().anyMatch(u -> "testadmin".equals(u.get("username"))));
         // 记录创建的用户ID
         createdUserId = list.stream()
                 .filter(u -> "testadmin".equals(u.get("username")))
                 .findFirst()
-                .map(u -> ((Number) u.get("id")).longValue())
+                .map(u -> numOf(u, "id"))
                 .orElse(null);
         assertNotNull(createdUserId);
     }
@@ -168,7 +169,7 @@ class RestClientIntegrationTest extends AbstractIntegrationTest {
         Map<String, Object> response = put(
                 "/admin/user/update",
                 Map.of(
-                        "id", createdUserId,
+                        "id", java.util.Objects.requireNonNull(createdUserId),
                         "nickname", "测试管理员-已修改",
                         "email", "testadmin-updated@archforge.com"));
         assertEquals(0, response.get("code"));
@@ -177,14 +178,16 @@ class RestClientIntegrationTest extends AbstractIntegrationTest {
     @Test
     @Order(13)
     void toggleUserStatus() {
-        Map<String, Object> response = post("/admin/user/status", Map.of("id", createdUserId, "status", 2));
+        Map<String, Object> response = post("/admin/user/status", Map.of("id", java.util.Objects.requireNonNull(createdUserId),
+                "status", 2));
         assertEquals(0, response.get("code"));
     }
 
     @Test
     @Order(14)
     void resetUserPassword() {
-        Map<String, Object> response = post("/admin/user/reset-password", Map.of("id", createdUserId, "newPwd", "NewPass123"));
+        Map<String, Object> response = post("/admin/user/reset-password", Map.of("id", java.util.Objects.requireNonNull(
+                createdUserId), "newPwd", "NewPass123"));
         assertEquals(0, response.get("code"));
     }
 
@@ -215,15 +218,15 @@ class RestClientIntegrationTest extends AbstractIntegrationTest {
     void listRoles() {
         Map<String, Object> response = post("/admin/role", Map.of("currentPage", 1, "pageSize", 100));
         assertEquals(0, response.get("code"));
-        Map<String, Object> data = (Map<String, Object>) response.get("data");
-        List<Map<String, Object>> list = (List<Map<String, Object>>) data.get("list");
+        Map<String, Object> data = dataOf(response);
+        List<Map<String, Object>> list = listOf(data);
         assertTrue(
                 list.stream().anyMatch(r -> "restclient_test_role".equals(r.get("code"))),
                 "Role list: " + list);
         createdRoleId = list.stream()
                 .filter(r -> "restclient_test_role".equals(r.get("code")))
                 .findFirst()
-                .map(r -> ((Number) r.get("id")).longValue())
+                .map(r -> numOf(r, "id"))
                 .orElse(null);
         assertNotNull(createdRoleId);
     }
@@ -235,7 +238,7 @@ class RestClientIntegrationTest extends AbstractIntegrationTest {
                 "/admin/role/update",
                 Map.of(
                         "id",
-                        createdRoleId,
+                        java.util.Objects.requireNonNull(createdRoleId),
                         "name",
                         "RestClient测试角色-已修改",
                         "code",
@@ -249,21 +252,22 @@ class RestClientIntegrationTest extends AbstractIntegrationTest {
     @Order(23)
     @SuppressWarnings("unchecked")
     void updateRoleDataScope() {
-        Map<String, Object> response = post("/admin/role/data-scope", Map.of("id", createdRoleId, "dataScope", 2, "deptIds",
+        Map<String, Object> response = post("/admin/role/data-scope", Map.of("id", java.util.Objects.requireNonNull(
+                createdRoleId), "dataScope", 2, "deptIds",
                 List
                         .of()));
         assertEquals(0, response.get("code"), "Update role data scope failed: " + response);
 
         response = post("/admin/role", Map.of("currentPage", 1, "pageSize", 100));
         assertEquals(0, response.get("code"));
-        Map<String, Object> data = (Map<String, Object>) response.get("data");
-        List<Map<String, Object>> list = (List<Map<String, Object>>) data.get("list");
+        Map<String, Object> data = dataOf(response);
+        List<Map<String, Object>> list = listOf(data);
         Map<String, Object> role = list.stream()
-                .filter(r -> createdRoleId.equals(((Number) r.get("id")).longValue()))
+                .filter(r -> java.util.Objects.requireNonNull(createdRoleId).equals(numOf(r, "id")))
                 .findFirst()
                 .orElse(null);
         assertNotNull(role);
-        assertEquals(2, ((Number) role.get("dataScope")).intValue());
+        assertEquals(2, ((Number) java.util.Objects.requireNonNull(role.get("dataScope"))).intValue());
         assertNotNull(role.get("customDeptIds"));
     }
 
@@ -298,12 +302,12 @@ class RestClientIntegrationTest extends AbstractIntegrationTest {
     void listDepts() {
         Map<String, Object> response = post("/admin/dept", Map.of());
         assertEquals(0, response.get("code"));
-        List<Map<String, Object>> data = (List<Map<String, Object>>) response.get("data");
+        List<Map<String, Object>> data = (List<Map<String, Object>>) java.util.Objects.requireNonNull(response.get("data"));
         assertTrue(data.stream().anyMatch(d -> "测试部门".equals(d.get("name"))));
         createdDeptId = data.stream()
                 .filter(d -> "测试部门".equals(d.get("name")))
                 .findFirst()
-                .map(d -> ((Number) d.get("id")).longValue())
+                .map(d -> numOf(d, "id"))
                 .orElse(null);
         assertNotNull(createdDeptId);
     }
@@ -314,7 +318,7 @@ class RestClientIntegrationTest extends AbstractIntegrationTest {
         Map<String, Object> response = put(
                 "/admin/dept/update",
                 Map.of(
-                        "id", createdDeptId,
+                        "id", java.util.Objects.requireNonNull(createdDeptId),
                         "name", "测试部门-已修改",
                         "principal", "新负责人",
                         "email", "updated-dept@archforge.com"));

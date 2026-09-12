@@ -283,9 +283,10 @@ public class MetaTableValidator {
 
     private void validateString(MetaColumn column, Object value) {
         String str = value.toString();
-        if (column.getLength() != null && column.getLength() > 0 && str.length() > column.getLength()) {
+        Integer maxLength = column.getLength();
+        if (maxLength != null && maxLength > 0 && str.length() > maxLength) {
             throw new MetaTableException(MetaTableErrorCode.META_COLUMN_VALUE_INVALID, column.getColumnName() + " 超过最大长度 " +
-                    column.getLength());
+                    maxLength);
         }
     }
 

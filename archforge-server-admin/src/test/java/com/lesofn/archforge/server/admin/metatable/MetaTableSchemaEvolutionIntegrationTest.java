@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.lesofn.archforge.server.admin.AbstractIntegrationTest;
+import org.jspecify.annotations.Nullable;
 import com.lesofn.archforge.meta.table.api.dao.MetaColumnRepository;
 import com.lesofn.archforge.meta.table.api.dao.MetaTableRepository;
 import com.lesofn.archforge.meta.table.api.domain.MetaColumn;
@@ -172,7 +173,7 @@ class MetaTableSchemaEvolutionIntegrationTest extends AbstractIntegrationTest {
 
         adminService.update(id, renameTo(adminService.findById(id)), columns, 1L);
 
-        assertTrue(columnDataType("meta_p1itwiden", "note").startsWith("character varying"));
+        assertTrue(java.util.Objects.requireNonNull(columnDataType("meta_p1itwiden", "note")).startsWith("character varying"));
         Map<String, Object> stored = jdbc.queryForMap(
                 "SELECT \"note\" FROM \"meta_p1itwiden\" WHERE id = 1", Map.of());
         assertEquals("hello", stored.get("note"));
@@ -236,7 +237,7 @@ class MetaTableSchemaEvolutionIntegrationTest extends AbstractIntegrationTest {
         return incoming;
     }
 
-    private MetaColumn stringColumn(String code, String defaultValue) {
+    private MetaColumn stringColumn(String code, @Nullable String defaultValue) {
         MetaColumn column = baseColumn(code, MetaColumnType.STRING);
         column.setLength(50);
         column.setDefaultValue(defaultValue);
@@ -269,14 +270,14 @@ class MetaTableSchemaEvolutionIntegrationTest extends AbstractIntegrationTest {
         return Map.of();
     }
 
-    private String columnNullable(String physicalTable, String column) {
+    private @Nullable String columnNullable(String physicalTable, String column) {
         return jdbc.queryForObject(
                 "SELECT is_nullable FROM information_schema.columns " + "WHERE table_name = :t AND column_name = :c",
                 Map.of("t", physicalTable, "c", column),
                 String.class);
     }
 
-    private String columnDataType(String physicalTable, String column) {
+    private @Nullable String columnDataType(String physicalTable, String column) {
         return jdbc.queryForObject(
                 "SELECT data_type FROM information_schema.columns " + "WHERE table_name = :t AND column_name = :c",
                 Map.of("t", physicalTable, "c", column),

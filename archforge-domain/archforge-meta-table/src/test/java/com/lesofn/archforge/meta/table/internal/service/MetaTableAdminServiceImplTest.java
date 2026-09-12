@@ -14,6 +14,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.lesofn.archforge.meta.table.api.dao.MetaColumnRepository;
+import org.jspecify.annotations.Nullable;
 import com.lesofn.archforge.meta.table.api.dao.MetaTableRepository;
 import com.lesofn.archforge.meta.table.api.domain.MetaColumn;
 import com.lesofn.archforge.meta.table.api.domain.MetaColumnType;
@@ -167,7 +168,7 @@ class MetaTableAdminServiceImplTest {
         verify(jdbcOperations).execute(alterSql);
     }
 
-    private void stubDiff(List<SchemaChange> changes, String violationSql, List<String> ddlSqls) {
+    private void stubDiff(List<SchemaChange> changes, @Nullable String violationSql, List<String> ddlSqls) {
         when(schemaDiffEngine.diff(any(), anyList(), anyList())).thenReturn(changes);
         when(alterTableDdlGenerator.generate(any(), anyList()))
                 .thenReturn(changes.stream().map(change -> new SchemaDdl(change, ddlSqls)).toList());

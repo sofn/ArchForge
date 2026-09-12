@@ -257,7 +257,7 @@ class LoginServiceTest {
     void decryptPassword_Success() throws Exception {
         Map<String, String> keys = RsaEncrypter.generateKeyPair();
         appForgeConfig.setRsaPrivateKey(keys.get("privateKey"));
-        String encrypted = RsaEncrypter.encrypt("secret", keys.get("publicKey"));
+        String encrypted = RsaEncrypter.encrypt("secret", java.util.Objects.requireNonNull(keys.get("publicKey")));
 
         String result = loginService.decryptPassword(encrypted);
 

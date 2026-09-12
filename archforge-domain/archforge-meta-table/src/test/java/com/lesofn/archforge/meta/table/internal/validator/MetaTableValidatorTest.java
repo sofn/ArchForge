@@ -108,7 +108,7 @@ class MetaTableValidatorTest {
     private void stubTargetTable(MetaColumn targetColumn) {
         MetaTable target = targetTable();
         when(metaTableRepository.findAllByDeletedFalse()).thenReturn(List.of(target));
-        when(metaColumnRepository.findByTableIdAndDeletedFalseOrderBySortAsc(target.getId()))
+        when(metaColumnRepository.findByTableIdAndDeletedFalseOrderBySortAsc(java.util.Objects.requireNonNull(target.getId())))
                 .thenReturn(List.of(targetColumn));
     }
 

@@ -13,7 +13,7 @@ class ClientVersionTest {
     @Test
     public void testClientVersion() {
         String header = "2.4.1.0-1.0.0.0-udid-iPhone-test";
-        ClientVersion version = ClientVersion.valueOf(header);
+        ClientVersion version = java.util.Objects.requireNonNull(ClientVersion.valueOf(header));
         assertEquals(2, version.sdkVersion.major);
         assertEquals(4, version.sdkVersion.minor);
         assertEquals(1, version.sdkVersion.revision);
@@ -26,7 +26,7 @@ class ClientVersionTest {
         assertEquals("iPhone", version.device);
         assertEquals("test", version.channel);
 
-        ClientVersion version2 = ClientVersion.valueOf(version.toString());
+        ClientVersion version2 = java.util.Objects.requireNonNull(ClientVersion.valueOf(version.toString()));
         assertEquals(version, version2);
         System.out.println(version);
         assertEquals(header, version2.toString());
@@ -35,7 +35,7 @@ class ClientVersionTest {
     @Test
     public void testClientVersionChannel() {
         String header = "0-0-unknow-unknow-test";
-        ClientVersion version = ClientVersion.valueOf(header);
+        ClientVersion version = java.util.Objects.requireNonNull(ClientVersion.valueOf(header));
         System.out.println(version.toString());
     }
 

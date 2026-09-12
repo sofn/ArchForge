@@ -3,6 +3,7 @@ package com.lesofn.archforge.server.admin.controller;
 import static org.junit.jupiter.api.Assertions.*;
 
 import tools.jackson.databind.ObjectMapper;
+import org.jspecify.annotations.Nullable;
 import com.lesofn.archforge.server.admin.AbstractIntegrationTest;
 import com.lesofn.archforge.server.admin.Application;
 import java.util.List;
@@ -36,9 +37,9 @@ class SchedulerJobIntegrationTest extends AbstractIntegrationTest {
     int port;
 
     private RestClient rest;
-    private String accessToken;
+    private @Nullable String accessToken;
     private static final ObjectMapper M = new ObjectMapper();
-    private Long createdJobId;
+    private @Nullable Long createdJobId;
 
     @BeforeAll
     @SuppressWarnings("unchecked")
@@ -51,12 +52,12 @@ class SchedulerJobIntegrationTest extends AbstractIntegrationTest {
                 .retrieve()
                 .body(String.class);
         Map<String, Object> body = M.readValue(resp, Map.class);
-        Map<String, Object> data = (Map<String, Object>) body.get("data");
-        accessToken = (String) data.get("accessToken");
+        Map<String, Object> data = dataOf(body);
+        accessToken = (String) java.util.Objects.requireNonNull(data.get("accessToken"));
         assertNotNull(accessToken);
     }
 
-    private Map<String, Object> get(String path, Map<String, Object> params) {
+    private Map<String, Object> get(String path, @Nullable Map<String, Object> params) {
         try {
             StringBuilder uri = new StringBuilder(path);
             if (params != null && !params.isEmpty()) {
@@ -81,7 +82,7 @@ class SchedulerJobIntegrationTest extends AbstractIntegrationTest {
         }
     }
 
-    private Map<String, Object> post(String path, Object body) {
+    private Map<String, Object> post(String path, @Nullable Object body) {
         try {
             String resp = rest.post()
                     .uri(path)
@@ -153,7 +154,7 @@ class SchedulerJobIntegrationTest extends AbstractIntegrationTest {
                         "misfirePolicy", 1,
                         "concurrent", false));
         assertEquals(0, resp.get("code"), "add failed: " + resp);
-        createdJobId = ((Number) resp.get("data")).longValue();
+        createdJobId = numOf(resp, "data");
         assertNotNull(createdJobId);
     }
 
@@ -165,8 +166,8 @@ class SchedulerJobIntegrationTest extends AbstractIntegrationTest {
                 "/admin/scheduler-job",
                 Map.of("jobName", "it-demo", "currentPage", 1, "pageSize", 10));
         assertEquals(0, resp.get("code"));
-        Map<String, Object> data = (Map<String, Object>) resp.get("data");
-        List<Map<String, Object>> list = (List<Map<String, Object>>) data.get("list");
+        Map<String, Object> data = dataOf(resp);
+        List<Map<String, Object>> list = listOf(data);
         assertTrue(
                 list.stream().anyMatch(j -> "it-demo-hello".equals(j.get("jobName"))),
                 "created job must appear in list");
@@ -188,12 +189,13 @@ class SchedulerJobIntegrationTest extends AbstractIntegrationTest {
                     Map.of("jobId", createdJobId, "currentPage", 1, "pageSize", 10));
             assertEquals(0, logResp.get("code"));
             @SuppressWarnings("unchecked")
-            Map<String, Object> data = (Map<String, Object>) logResp.get("data");
+            Map<String, Object> data = dataOf(logResp);
             @SuppressWarnings("unchecked")
-            List<Map<String, Object>> list = (List<Map<String, Object>>) data.get("list");
+            List<Map<String, Object>> list = listOf(data);
             if (!list.isEmpty()) {
                 Map<String, Object> entry = list.getFirst();
-                assertEquals(0, ((Number) entry.get("status")).intValue(), "should be SUCCESS");
+                assertEquals(0, ((Number) java.util.Objects.requireNonNull(entry.get("status"))).intValue(),
+                        "should be SUCCESS");
                 found = true;
                 break;
             }

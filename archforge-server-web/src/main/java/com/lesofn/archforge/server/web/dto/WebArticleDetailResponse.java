@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 public class WebArticleDetailResponse {
 
     private Long id;
-    private String title;
+    private @Nullable String title;
     private String slug;
     private String summary;
     private String content;

@@ -3,6 +3,7 @@ package com.lesofn.archforge.server.admin.controller;
 import static org.junit.jupiter.api.Assertions.*;
 
 import tools.jackson.databind.ObjectMapper;
+import org.jspecify.annotations.Nullable;
 import com.lesofn.archforge.server.admin.AbstractIntegrationTest;
 import com.lesofn.archforge.server.admin.Application;
 import java.util.List;
@@ -46,7 +47,7 @@ class QueryHelpIntegrationTest extends AbstractIntegrationTest {
     int port;
 
     private RestClient rest;
-    private String accessToken;
+    private @Nullable String accessToken;
     private static final ObjectMapper M = new ObjectMapper();
 
     @BeforeAll
@@ -60,13 +61,13 @@ class QueryHelpIntegrationTest extends AbstractIntegrationTest {
                 .retrieve()
                 .body(String.class);
         Map<String, Object> body = M.readValue(resp, Map.class);
-        Map<String, Object> data = (Map<String, Object>) body.get("data");
+        Map<String, Object> data = dataOf(body);
         accessToken = (String) data.get("accessToken");
         assertNotNull(accessToken, "login must return a valid token");
     }
 
     @SuppressWarnings("unchecked")
-    private Map<String, Object> get(String path, Map<String, Object> params) {
+    private Map<String, Object> get(String path, @Nullable Map<String, Object> params) {
         try {
             StringBuilder uri = new StringBuilder(path);
             if (params != null && !params.isEmpty()) {
@@ -91,7 +92,7 @@ class QueryHelpIntegrationTest extends AbstractIntegrationTest {
         }
     }
 
-    private Map<String, Object> post(String path, Object body) {
+    private Map<String, Object> post(String path, @Nullable Object body) {
         try {
             String resp = rest.post()
                     .uri(path)
@@ -117,8 +118,8 @@ class QueryHelpIntegrationTest extends AbstractIntegrationTest {
         Map<String, Object> resp = post("/admin/user", Map.of("username", "admin", "currentPage", 1, "pageSize", 10));
         assertEquals(0, resp.get("code"), "response code must be 0");
 
-        Map<String, Object> data = (Map<String, Object>) resp.get("data");
-        List<Map<String, Object>> list = (List<Map<String, Object>>) data.get("list");
+        Map<String, Object> data = dataOf(resp);
+        List<Map<String, Object>> list = listOf(data);
         assertFalse(list.isEmpty(), "result must be non-empty");
         assertTrue(
                 list.stream().anyMatch(u -> "admin".equals(u.get("username"))),
@@ -133,8 +134,8 @@ class QueryHelpIntegrationTest extends AbstractIntegrationTest {
         Map<String, Object> resp = post("/admin/user", Map.of("username", "zzz_no_match", "currentPage", 1, "pageSize", 10));
         assertEquals(0, resp.get("code"));
 
-        Map<String, Object> data = (Map<String, Object>) resp.get("data");
-        List<Map<String, Object>> list = (List<Map<String, Object>>) data.get("list");
+        Map<String, Object> data = dataOf(resp);
+        List<Map<String, Object>> list = listOf(data);
         assertTrue(list.isEmpty(), "no user should match the query");
     }
 
@@ -151,8 +152,8 @@ class QueryHelpIntegrationTest extends AbstractIntegrationTest {
         Map<String, Object> resp = post("/admin/user", Map.of("blurry", "dmin", "currentPage", 1, "pageSize", 50));
         assertEquals(0, resp.get("code"));
 
-        Map<String, Object> data = (Map<String, Object>) resp.get("data");
-        List<Map<String, Object>> list = (List<Map<String, Object>>) data.get("list");
+        Map<String, Object> data = dataOf(resp);
+        List<Map<String, Object>> list = listOf(data);
         assertFalse(list.isEmpty(), "blurry 'dmin' must match admin via username/nickname/email");
         assertTrue(
                 list.stream().anyMatch(u -> "admin".equals(u.get("username"))),
@@ -171,8 +172,8 @@ class QueryHelpIntegrationTest extends AbstractIntegrationTest {
         Map<String, Object> resp = post("/admin/user", Map.of("status", "1", "currentPage", 1, "pageSize", 100));
         assertEquals(0, resp.get("code"));
 
-        Map<String, Object> data = (Map<String, Object>) resp.get("data");
-        List<Map<String, Object>> list = (List<Map<String, Object>>) data.get("list");
+        Map<String, Object> data = dataOf(resp);
+        List<Map<String, Object>> list = listOf(data);
         assertFalse(list.isEmpty(), "active users must be returned");
         // all returned rows must be active
         assertTrue(
@@ -192,8 +193,8 @@ class QueryHelpIntegrationTest extends AbstractIntegrationTest {
         Map<String, Object> resp = get("/admin/scheduler-job", Map.of("jobName", "demo", "currentPage", 1, "pageSize", 10));
         assertEquals(0, resp.get("code"));
 
-        Map<String, Object> data = (Map<String, Object>) resp.get("data");
-        List<Map<String, Object>> list = (List<Map<String, Object>>) data.get("list");
+        Map<String, Object> data = dataOf(resp);
+        List<Map<String, Object>> list = listOf(data);
         assertFalse(list.isEmpty(), "INNER_LIKE on 'demo' must match demo-hello");
         assertTrue(
                 list.stream().anyMatch(j -> "demo-hello".equals(j.get("jobName"))),
@@ -209,8 +210,8 @@ class QueryHelpIntegrationTest extends AbstractIntegrationTest {
                 Map.of("jobName", "zzz_no_such_job", "currentPage", 1, "pageSize", 10));
         assertEquals(0, resp.get("code"));
 
-        Map<String, Object> data = (Map<String, Object>) resp.get("data");
-        List<Map<String, Object>> list = (List<Map<String, Object>>) data.get("list");
+        Map<String, Object> data = dataOf(resp);
+        List<Map<String, Object>> list = listOf(data);
         assertTrue(list.isEmpty(), "non-matching jobName must return empty list");
     }
 }

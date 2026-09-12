@@ -43,7 +43,8 @@ public class TaskController {
     @Operation(summary = "创建任务")
     @PostMapping("/create")
     public Long create(RequestContext rc, @RequestBody @Valid TaskCreateRequest request) {
-        return taskService.createTask(request, request.getUid() != null ? request.getUid() : rc.getCurrentUid());
+        Long uid = request.getUid();
+        return taskService.createTask(request, uid != null ? uid : rc.getCurrentUid());
     }
 
     @Operation(summary = "更新任务")

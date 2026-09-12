@@ -1,6 +1,7 @@
 package com.lesofn.archforge.server.web.service;
 
 import cn.dev33.satoken.SaManager;
+import org.jspecify.annotations.Nullable;
 import cn.dev33.satoken.dao.SaTokenDao;
 import com.lesofn.archforge.user.api.errors.AdminUserException;
 import java.util.UUID;
@@ -19,7 +20,7 @@ public class WebRefreshTokenService {
         return refreshToken;
     }
 
-    public Long validateRefreshToken(String refreshToken) {
+    public Long validateRefreshToken(@Nullable String refreshToken) {
         if (refreshToken == null || refreshToken.isBlank()) {
             throw new AdminUserException("refresh token 无效或已过期");
         }

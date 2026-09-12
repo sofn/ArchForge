@@ -100,7 +100,7 @@ class MetaTableDataImporterTest {
                 MetaTableException.class,
                 () -> importCsv("name,age\naaaa,11111\nbbbb,22222\n"));
 
-        assertTrue(e.getMessage().contains("大小上限 16"));
+        assertTrue(String.valueOf(e.getMessage()).contains("大小上限 16"));
         verify(jdbcTemplate, times(0)).batchUpdate(anyString(), any(SqlParameterSource[].class));
     }
 
@@ -117,7 +117,7 @@ class MetaTableDataImporterTest {
                         c,3
                         """));
 
-        assertTrue(e.getMessage().contains("已处理 2 行"));
+        assertTrue(String.valueOf(e.getMessage()).contains("已处理 2 行"));
     }
 
     @Test

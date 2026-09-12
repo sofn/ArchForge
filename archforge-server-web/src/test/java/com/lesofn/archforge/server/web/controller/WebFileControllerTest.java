@@ -13,6 +13,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.lesofn.archforge.infrastructure.auth.LoginContext;
+import org.jspecify.annotations.Nullable;
 import com.lesofn.archforge.infrastructure.auth.stp.StpWebUtil;
 import com.lesofn.archforge.infrastructure.config.ArchForgeProperties;
 import com.lesofn.archforge.infrastructure.file.FileStorageService;
@@ -38,7 +39,7 @@ class WebFileControllerTest {
 
     private SysFileService sysFileService;
     private MockMvc mockMvc;
-    private MockedStatic<StpWebUtil> stpWebUtil;
+    private @Nullable MockedStatic<StpWebUtil> stpWebUtil;
 
     @BeforeEach
     void setUp() {
@@ -126,7 +127,7 @@ class WebFileControllerTest {
         assertTrue(captor.getValue().getStoragePath().endsWith(".png"));
     }
 
-    private SysFile imageFile(Long creatorId, boolean publicVisible) {
+    private SysFile imageFile(@Nullable Long creatorId, boolean publicVisible) {
         SysFile file = new SysFile()
                 .setOriginalName("pic.png")
                 .setStoragePath("p")

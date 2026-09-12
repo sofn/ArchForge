@@ -1,6 +1,7 @@
 package com.lesofn.archforge.infrastructure.context;
 
 import org.junit.jupiter.api.Test;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author sofn
@@ -10,7 +11,7 @@ public class RequextContextTest {
 
     public static class MockContext {
         private long id;
-        private String name;
+        private @Nullable String name;
 
         @Override
         public boolean equals(Object o) {

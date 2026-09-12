@@ -27,7 +27,7 @@ public record JobInvocationData(
         String jobGroup,
         String beanName,
         String methodName,
-        String methodParams,
+        @Nullable String methodParams,
         Schedule schedule)
         implements
             ScheduleAndData,

@@ -31,7 +31,7 @@ public interface SysScheduledJobService {
     SysScheduledJob get(Long id);
 
     /** Validates a cron expression against the scheduler runtime. */
-    boolean validateCron(String cron);
+    boolean validateCron(@Nullable String cron);
 
     Long add(SysScheduledJob input);
 

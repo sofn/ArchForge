@@ -17,7 +17,7 @@ public class AuthResponse implements Serializable {
     private final int appId;
     private final String authedBy;
     private final String platform;
-    private final ClientVersion clientVersion;
+    private final @Nullable ClientVersion clientVersion;
 
     public AuthResponse(
             String platform,
@@ -25,7 +25,7 @@ public class AuthResponse implements Serializable {
             String ip,
             int appId,
             String authedBy,
-            ClientVersion clientVersion) {
+            @Nullable ClientVersion clientVersion) {
         this.platform = platform;
         this.uid = uid;
         this.attributes = new HashMap<>();
@@ -55,5 +55,5 @@ public class AuthResponse implements Serializable {
 
     public String getPlatform() { return platform; }
 
-    public ClientVersion getClientVersion() { return clientVersion; }
+    public @Nullable ClientVersion getClientVersion() { return clientVersion; }
 }

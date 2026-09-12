@@ -11,6 +11,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * Test data builder for chat session structures used by {@code ChatAiService}. Sessions are
  * in-memory {@code List<Map<String, String>>} message histories keyed by "role"/"content".
  */
+@SuppressWarnings("NullAway.Init")
 public final class ChatSessionTestBuilder {
 
     private static final AtomicLong SEQUENCE = new AtomicLong();

@@ -1,6 +1,7 @@
 package com.lesofn.archforge.server.admin.service.scheduler;
 
 import com.lesofn.archforge.user.api.dao.SysJobLogRepository;
+import org.jspecify.annotations.Nullable;
 import com.lesofn.archforge.user.api.domain.SysJobLog;
 import com.lesofn.archforge.user.api.domain.SysScheduledJob;
 import java.lang.reflect.InvocationTargetException;
@@ -102,7 +103,7 @@ public class ReflectionJobHandler {
         throw new NoSuchMethodException(type.getName() + "#" + name + " (arity " + arity + ")");
     }
 
-    private static Object[] parseParams(String params) {
+    private static Object[] parseParams(@Nullable String params) {
         if (params == null || params.isBlank()) {
             return new Object[0];
         }

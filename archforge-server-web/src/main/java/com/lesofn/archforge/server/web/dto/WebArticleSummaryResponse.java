@@ -1,6 +1,7 @@
 package com.lesofn.archforge.server.web.dto;
 
 import java.time.LocalDateTime;
+import org.jspecify.annotations.Nullable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,7 +13,7 @@ import lombok.NoArgsConstructor;
 public class WebArticleSummaryResponse {
 
     private Long id;
-    private String title;
+    private @Nullable String title;
     private String slug;
     private String summary;
     private Long coverImageFileId;

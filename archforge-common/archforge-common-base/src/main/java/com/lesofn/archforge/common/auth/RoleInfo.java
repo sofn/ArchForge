@@ -28,9 +28,9 @@ public class RoleInfo {
             Long roleId,
             String roleKey,
             @Nullable DataScopeEnum dataScope,
-            Set<Long> deptIdSet,
-            Set<String> menuPermissions,
-            Set<Long> menuIds) {
+            @Nullable Set<Long> deptIdSet,
+            @Nullable Set<String> menuPermissions,
+            @Nullable Set<Long> menuIds) {
         this.roleId = roleId;
         this.roleKey = roleKey;
         this.dataScope = dataScope;
@@ -39,15 +39,17 @@ public class RoleInfo {
         setMenuIds(menuIds);
     }
 
-    public void setDeptIdSet(Set<Long> deptIdSet) {
+    public void setDeptIdSet(@Nullable Set<Long> deptIdSet) {
         this.deptIdSet = deptIdSet == null ? new HashSet<>() : new HashSet<>(deptIdSet);
     }
 
-    public void setMenuPermissions(Set<String> menuPermissions) {
+    public void setMenuPermissions(@Nullable Set<String> menuPermissions) {
         this.menuPermissions = menuPermissions == null ? new HashSet<>() : new HashSet<>(menuPermissions);
     }
 
-    public void setMenuIds(Set<Long> menuIds) { this.menuIds = menuIds == null ? new HashSet<>() : new HashSet<>(menuIds); }
+    public void setMenuIds(@Nullable Set<Long> menuIds) {
+        this.menuIds = menuIds == null ? new HashSet<>() : new HashSet<>(menuIds);
+    }
 
     private Long roleId;
     private String roleName;
@@ -55,5 +57,5 @@ public class RoleInfo {
     private Set<Long> deptIdSet;
     private String roleKey;
     private Set<String> menuPermissions;
-    private Set<Long> menuIds;
+    private @Nullable Set<Long> menuIds;
 }

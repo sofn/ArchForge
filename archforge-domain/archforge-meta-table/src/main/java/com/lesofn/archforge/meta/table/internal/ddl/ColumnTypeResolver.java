@@ -1,6 +1,7 @@
 package com.lesofn.archforge.meta.table.internal.ddl;
 
 import com.lesofn.archforge.meta.table.api.domain.MetaColumn;
+import org.jspecify.annotations.Nullable;
 import com.lesofn.archforge.meta.table.api.domain.MetaColumnType;
 import com.lesofn.archforge.meta.table.api.errors.MetaTableErrorCode;
 import com.lesofn.archforge.meta.table.api.errors.MetaTableException;
@@ -50,6 +51,7 @@ public class ColumnTypeResolver {
 
     /** 根据字段类型格式化默认值。 */
     public String formatDefaultValue(MetaColumn column) {
+        @Nullable
         String value = column.getDefaultValue();
         if (value == null || value.isEmpty()) {
             return "NULL";
@@ -70,9 +72,8 @@ public class ColumnTypeResolver {
     }
 
     private int resolveVarcharLength(MetaColumn column) {
-        return (column.getLength() == null || column.getLength() <= 0)
-                ? DEFAULT_VARCHAR_LENGTH
-                : column.getLength();
+        Integer length = column.getLength();
+        return (length == null || length <= 0) ? DEFAULT_VARCHAR_LENGTH : length;
     }
 
     private int resolvePrecision(MetaColumn column) {
@@ -107,6 +108,7 @@ public class ColumnTypeResolver {
     }
 
     private String formatArrayDefaultValue(MetaColumn column) {
+        @Nullable
         String value = column.getDefaultValue();
         if (value == null || value.isEmpty()) {
             return "NULL";

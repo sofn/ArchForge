@@ -1,6 +1,7 @@
 package com.lesofn.archforge.server.admin.service.user.impl;
 
 import com.lesofn.archforge.common.utils.query.QueryHelp;
+import com.lesofn.archforge.common.auth.RoleInfo;
 import com.lesofn.archforge.common.auth.SystemLoginUser;
 import com.lesofn.archforge.infrastructure.db.redis.RedisUtil;
 import com.lesofn.archforge.infrastructure.security.datascope.DataPermission;
@@ -72,15 +73,16 @@ public class AdminUserServiceImpl implements AdminUserService {
         currentUserResponse.setUserInfo(userDTO);
 
         // 设置角色key
-        if (loginUser.getRoleInfo() != null) {
-            currentUserResponse.setRoleKey(loginUser.getRoleInfo().getRoleKey());
+        RoleInfo roleInfo = loginUser.getRoleInfo();
+        if (roleInfo != null) {
+            currentUserResponse.setRoleKey(roleInfo.getRoleKey());
         } else {
             currentUserResponse.setRoleKey("");
         }
 
         // 设置权限列表
-        if (loginUser.getRoleInfo() != null && loginUser.getRoleInfo().getMenuPermissions() != null) {
-            currentUserResponse.setPermissions(loginUser.getRoleInfo().getMenuPermissions());
+        if (roleInfo != null && roleInfo.getMenuPermissions() != null) {
+            currentUserResponse.setPermissions(roleInfo.getMenuPermissions());
         } else {
             currentUserResponse.setPermissions(new HashSet<>());
         }

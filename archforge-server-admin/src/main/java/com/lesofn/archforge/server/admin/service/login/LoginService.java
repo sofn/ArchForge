@@ -252,7 +252,8 @@ public class LoginService {
      */
     public String decryptPassword(String encryptedPassword) {
         try {
-            return RsaEncrypter.decrypt(encryptedPassword, appForgeConfig.getRsaPrivateKey());
+            return RsaEncrypter.decrypt(encryptedPassword, java.util.Objects.requireNonNull(appForgeConfig.getRsaPrivateKey(),
+                    "arch-forge.rsa-private-key not configured"));
         } catch (Exception e) {
             if (environment.matchesProfiles("prod")) {
                 log.warn("RSA密码解密失败，拒绝明文回退: {}", e.getMessage());

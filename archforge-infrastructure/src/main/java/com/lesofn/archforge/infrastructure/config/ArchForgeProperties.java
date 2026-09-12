@@ -1,6 +1,7 @@
 package com.lesofn.archforge.infrastructure.config;
 
 import java.util.List;
+import org.jspecify.annotations.Nullable;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -31,7 +32,7 @@ public class ArchForgeProperties {
     private CaptchaType captchaType;
 
     /** RSA私钥，用户前后端交互加解密隐私信息 */
-    private String rsaPrivateKey;
+    private @Nullable String rsaPrivateKey;
 
     /** 上传路径 */
     private String fileBaseDir;

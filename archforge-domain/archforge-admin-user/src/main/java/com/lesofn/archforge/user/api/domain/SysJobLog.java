@@ -1,6 +1,7 @@
 package com.lesofn.archforge.user.api.domain;
 
 import jakarta.persistence.Column;
+import org.jspecify.annotations.Nullable;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -51,7 +52,7 @@ public class SysJobLog {
     private String methodName;
 
     @Column(columnDefinition = "TEXT")
-    private String methodParams;
+    private @Nullable String methodParams;
 
     /** 0 = success, 1 = failure. */
     private Short status;
@@ -65,7 +66,7 @@ public class SysJobLog {
 
     private LocalDateTime finishedAt;
 
-    public static SysJobLog success(SysScheduledJob job, String methodParams, long durationMs,
+    public static SysJobLog success(SysScheduledJob job, @Nullable String methodParams, long durationMs,
             LocalDateTime startedAt, LocalDateTime finishedAt) {
         return new SysJobLog()
                 .setJobId(job.getId())
@@ -80,7 +81,7 @@ public class SysJobLog {
                 .setFinishedAt(finishedAt);
     }
 
-    public static SysJobLog failure(SysScheduledJob job, String methodParams, String errorMessage,
+    public static SysJobLog failure(SysScheduledJob job, @Nullable String methodParams, String errorMessage,
             long durationMs, LocalDateTime startedAt, LocalDateTime finishedAt) {
         return new SysJobLog()
                 .setJobId(job.getId())
