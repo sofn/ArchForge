@@ -17,13 +17,13 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "arch-forge.flyway")
 public class FlywayProperties {
 
-    /** Master switch. {@link FlywayConfig} is conditional on it; keep explicit per profile. */
+    /** Master switch. <code>FlywayConfig</code> is conditional on it; keep explicit per profile. */
     private boolean enabled = false;
 
     /** Classpath locations scanned for migrations. */
     private List<String> locations = List.of("classpath:db/migration");
 
-    /** Default schema managed by Flyway (PostgreSQL: {@code public}). */
+    /** Default schema managed by Flyway (PostgreSQL: <code>public</code>). */
     private @Nullable String defaultSchema;
 
     /** Baseline a non-empty schema instead of failing on first migrate. */
@@ -42,8 +42,9 @@ public class FlywayProperties {
     private boolean outOfOrder = false;
 
     /**
-     * Flyway {@code type:state} ignore patterns (e.g. {@code *:missing} tolerates migrations
-     * recorded in an existing {@code flyway_schema_history} but deleted from the repository).
+     * Flyway <code>type:state</code> ignore patterns (e.g. <code>*:missing</code> tolerates
+     * migrations recorded in an existing <code>flyway_schema_history</code> but deleted from the
+     * repository).
      */
     private List<String> ignoreMigrationPatterns = List.of();
 }

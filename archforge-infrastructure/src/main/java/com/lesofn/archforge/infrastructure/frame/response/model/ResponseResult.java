@@ -7,6 +7,8 @@ import com.lesofn.archforge.common.error.SystemErrorCode;
 import lombok.Getter;
 
 /**
+ * 统一 API 响应包装。
+ *
  * @author sofn
  * @version 1.0 Created at: 2022-03-09 18:34
  */

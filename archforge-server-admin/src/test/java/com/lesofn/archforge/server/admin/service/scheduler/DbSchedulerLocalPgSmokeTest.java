@@ -15,6 +15,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.time.Duration;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.sql.DataSource;
@@ -77,6 +78,7 @@ class DbSchedulerLocalPgSmokeTest {
         }
     }
 
+    @SuppressWarnings("StringSplitter") // 取首段即可，split() 语义最贴合
     private static DataSource ds(String db) {
         String base = URL.split("\\?")[0];
         String query = URL.contains("?") ? URL.substring(URL.indexOf('?')) : "";
@@ -86,7 +88,7 @@ class DbSchedulerLocalPgSmokeTest {
     }
 
     private static boolean tableExists(Connection c, String table) throws Exception {
-        try (ResultSet rs = c.getMetaData().getTables(null, "public", table.toLowerCase(), null)) {
+        try (ResultSet rs = c.getMetaData().getTables(null, "public", table.toLowerCase(Locale.ROOT), null)) {
             return rs.next();
         }
     }

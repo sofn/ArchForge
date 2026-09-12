@@ -19,14 +19,15 @@ import com.lesofn.archforge.server.web.service.WebRefreshTokenService;
 import com.lesofn.archforge.user.api.domain.SysUser;
 import com.lesofn.archforge.user.api.errors.AdminUserException;
 import com.lesofn.archforge.user.api.service.SysUserService;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import jakarta.validation.Valid;
 import java.security.SecureRandom;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -164,7 +165,7 @@ public class WebAuthController {
             throw new WebAuthException("验证码用途错误");
         }
         try {
-            return VerificationCodePurpose.valueOf(purpose.trim().toUpperCase());
+            return VerificationCodePurpose.valueOf(purpose.trim().toUpperCase(Locale.ROOT));
         } catch (IllegalArgumentException e) {
             throw new WebAuthException("验证码用途错误");
         }

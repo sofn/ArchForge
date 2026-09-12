@@ -99,21 +99,6 @@ class RestClientIntegrationTest extends AbstractIntegrationTest {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    private Map<String, Object> get(String path) {
-        String response = restClient
-                .get()
-                .uri(path)
-                .header("Authorization", "Bearer " + accessToken)
-                .retrieve()
-                .body(String.class);
-        try {
-            return objectMapper.readValue(response, Map.class);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to parse response: " + response, e);
-        }
-    }
-
     // ==================== 1. 认证 ====================
 
     @Test

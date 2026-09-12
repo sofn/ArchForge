@@ -1,15 +1,16 @@
 package com.lesofn.archforge.server.admin.config;
 
 import com.lesofn.archforge.common.utils.jackson.JsonUtil;
-import org.jspecify.annotations.Nullable;
 import com.lesofn.archforge.meta.table.api.domain.OptionItem;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -68,7 +69,7 @@ public class EnumOptionsMigrationRunner implements ApplicationRunner {
             dictCode = dictCode.substring(0, 64);
         }
 
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
         String insertType = """
                 INSERT INTO sys_dict_type (dict_code, dict_name, description, status, sort, deleted, create_time, update_time)
                 VALUES (:dictCode, :dictName, :description, :status, :sort, :deleted, :createTime, :updateTime)

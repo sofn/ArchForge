@@ -7,6 +7,8 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.jspecify.annotations.Nullable;
 
 /**
+ * 基础枚举工具类。
+ *
  * @author sofn
  */
 public class BasicEnumUtil {

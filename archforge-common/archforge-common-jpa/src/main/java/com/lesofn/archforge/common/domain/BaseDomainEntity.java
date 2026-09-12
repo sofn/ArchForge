@@ -57,6 +57,7 @@ public abstract class BaseDomainEntity<ID> implements Serializable {
     }
 
     @Override
+    @SuppressWarnings("EqualsGetClass") // 实体用 getClass 严格判等 —— instanceof 会把 Hibernate 代理子类误判为相等
     public boolean equals(Object o) {
         if (this == o) {
             return true;

@@ -5,6 +5,7 @@ import com.lesofn.archforge.meta.table.api.domain.MetaTable;
 import com.lesofn.archforge.meta.table.internal.ddl.SqlIdentifier;
 import com.lesofn.archforge.meta.table.internal.validator.MetaTableValidator;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +30,7 @@ public class MetaTableDataInserter {
     public Long insert(MetaTable table, List<MetaColumn> columns, Map<String, Object> row, Long currentUid) {
         String physicalName = SqlIdentifier.quote(table.physicalTableName());
         MapSqlParameterSource params = new MapSqlParameterSource();
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
         params.addValue("creatorId", currentUid);
         params.addValue("createTime", now);
         params.addValue("updaterId", currentUid);

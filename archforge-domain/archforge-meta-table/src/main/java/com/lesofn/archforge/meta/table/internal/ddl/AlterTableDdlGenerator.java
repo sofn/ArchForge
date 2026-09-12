@@ -6,6 +6,7 @@ import com.lesofn.archforge.meta.table.internal.schema.SchemaChange;
 import com.lesofn.archforge.meta.table.internal.schema.SchemaChangeType;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -171,10 +172,6 @@ public class AlterTableDdlGenerator {
         return List.of(new SchemaDdl(change, statements));
     }
 
-    private boolean isIndexEnabled(MetaColumn column) {
-        return Boolean.TRUE.equals(column.getUnique()) || Boolean.TRUE.equals(column.getIndex());
-    }
-
     private String buildDropIndex(String physicalTableCode, List<MetaColumn> members, String indexNameOrGroup,
             String indexType) {
         String indexName = buildIndexName(physicalTableCode, indexNameOrGroup, members);
@@ -199,7 +196,7 @@ public class AlterTableDdlGenerator {
         sb.append("INDEX IF NOT EXISTS ").append(SqlIdentifier.quote(indexName))
                 .append(" ON ").append(physicalName);
         if ("GIN".equalsIgnoreCase(indexType) || "GIST".equalsIgnoreCase(indexType) || "FULLTEXT".equalsIgnoreCase(indexType)) {
-            String pgType = "FULLTEXT".equalsIgnoreCase(indexType) ? "GIN" : indexType.toUpperCase();
+            String pgType = "FULLTEXT".equalsIgnoreCase(indexType) ? "GIN" : indexType.toUpperCase(Locale.ROOT);
             sb.append(" USING ").append(pgType);
         }
         sb.append(" (").append(columnsPart).append(")");
@@ -232,6 +229,7 @@ public class AlterTableDdlGenerator {
     }
 
     private static boolean needsTextRelay(String type) {
-        return type != null && (type.toUpperCase().startsWith("JSONB") || type.toUpperCase().endsWith("[]"));
+        return type != null && (type.toUpperCase(Locale.ROOT).startsWith("JSONB") || type.toUpperCase(Locale.ROOT).endsWith(
+                "[]"));
     }
 }

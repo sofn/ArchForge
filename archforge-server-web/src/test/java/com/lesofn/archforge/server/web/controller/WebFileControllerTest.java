@@ -122,7 +122,7 @@ class WebFileControllerTest {
 
         ArgumentCaptor<SysFile> captor = ArgumentCaptor.forClass(SysFile.class);
         verify(sysFileService).create(captor.capture());
-        assertEquals(Boolean.TRUE, captor.getValue().getPublicVisible());
+        assertEquals(true, captor.getValue().getPublicVisible());
         assertEquals(7L, captor.getValue().getCreatorId());
         assertTrue(captor.getValue().getStoragePath().endsWith(".png"));
     }

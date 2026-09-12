@@ -119,6 +119,7 @@ class RateLimitAspectTest {
         aspect.around(point, rateLimit(limitType));
     }
 
+    @SuppressWarnings("BadAnnotationImplementation") // 测试桩只需成员值，不实现注解相等语义
     private RateLimit rateLimit(RateLimit.LimitType limitType) {
         return new RateLimit() {
             @Override

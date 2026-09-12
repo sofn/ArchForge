@@ -1,13 +1,14 @@
 package com.lesofn.archforge.meta.table.api.codegen.handler;
 
-import com.lesofn.archforge.meta.table.api.domain.MetaColumn;
-import org.jspecify.annotations.Nullable;
-import com.lesofn.archforge.meta.table.api.domain.MetaColumnType;
-import com.lesofn.archforge.meta.table.api.domain.OptionItem;
 import com.lesofn.archforge.meta.table.api.codegen.CodeGenColumn;
 import com.lesofn.archforge.meta.table.api.codegen.CodeGenTypeHandler;
+import com.lesofn.archforge.meta.table.api.domain.MetaColumn;
+import com.lesofn.archforge.meta.table.api.domain.MetaColumnType;
+import com.lesofn.archforge.meta.table.api.domain.OptionItem;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import org.jspecify.annotations.Nullable;
 
 public class DefaultCodeGenTypeHandler implements CodeGenTypeHandler {
 
@@ -308,7 +309,8 @@ public class DefaultCodeGenTypeHandler implements CodeGenTypeHandler {
     }
 
     private void handleArray(CodeGenColumn col, MetaColumn meta) {
-        String elementType = meta.getArrayElementType() == null ? "STRING" : meta.getArrayElementType().toUpperCase();
+        String elementType = meta.getArrayElementType() == null ? "STRING"
+                : meta.getArrayElementType().toUpperCase(Locale.ROOT);
         col.setArrayElementType(elementType);
         col.setTsType("string[]");
         col.setComponentType("select");
@@ -494,7 +496,7 @@ public class DefaultCodeGenTypeHandler implements CodeGenTypeHandler {
 
     private String resolveSearchType(MetaColumn meta, String defaultType) {
         if (meta.getSearchType() != null && !meta.getSearchType().isEmpty()) {
-            return meta.getSearchType().toUpperCase();
+            return meta.getSearchType().toUpperCase(Locale.ROOT);
         }
         return defaultType;
     }

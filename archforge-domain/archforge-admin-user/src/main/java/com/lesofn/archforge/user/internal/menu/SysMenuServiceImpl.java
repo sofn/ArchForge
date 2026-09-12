@@ -1,18 +1,19 @@
 package com.lesofn.archforge.user.internal.menu;
 
-import com.lesofn.archforge.user.api.menu.SysMenuService;
-import com.lesofn.archforge.common.enums.common.StatusEnum;
 import com.lesofn.archforge.common.auth.SystemLoginUser;
+import com.lesofn.archforge.common.enums.common.StatusEnum;
 import com.lesofn.archforge.user.api.dao.SysRoleMenuRepository;
 import com.lesofn.archforge.user.api.domain.SysMenu;
+import com.lesofn.archforge.user.api.menu.SysMenuService;
 import com.lesofn.archforge.user.api.menu.dto.MetaDTO;
 import com.lesofn.archforge.user.api.menu.dto.RouterDTO;
 import com.lesofn.archforge.user.api.menu.repository.SysMenuRepository;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayDeque;
-import java.util.Deque;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Deque;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -45,47 +46,56 @@ public class SysMenuServiceImpl implements SysMenuService {
             (SysMenu it) -> Optional.ofNullable(it.getMetaInfo()).map(MetaDTO::getRank).orElse(null),
             Comparator.nullsLast(Comparator.naturalOrder()));
 
+    @Override
     public Optional<SysMenu> findById(Long id) {
         return sysMenuRepository.findById(id);
     }
 
+    @Override
     public List<SysMenu> findByParentId(Long parentId) {
         return sysMenuRepository.findByParentId(parentId);
     }
 
+    @Override
     public List<SysMenu> findMenusByRoleId(Long roleId) {
         return sysMenuRepository.findMenusByRoleId(roleId);
     }
 
+    @Override
     public List<SysMenu> findAllActiveMenus() {
         List<SysMenu> menus = sysMenuRepository.findAllActiveMenus();
         menus.sort(SYS_MENU_RANK_COMPARATOR);
         return menus;
     }
 
+    @Override
     public List<SysMenu> findByPermission(String permission) {
         return sysMenuRepository.findByPermission(permission);
     }
 
+    @Override
     @Transactional
     public SysMenu create(SysMenu menu) {
-        menu.setCreateTime(LocalDateTime.now());
+        menu.setCreateTime(LocalDateTime.now(ZoneId.systemDefault()));
         menu.setDeleted(false);
         return sysMenuRepository.save(menu);
     }
 
+    @Override
     @Transactional
     public SysMenu update(SysMenu menu) {
-        menu.setUpdateTime(LocalDateTime.now());
+        menu.setUpdateTime(LocalDateTime.now(ZoneId.systemDefault()));
         return sysMenuRepository.save(menu);
     }
 
+    @Override
     @Transactional
     public void deleteById(Long id) {
         sysMenuRepository.deleteById(id);
         roleMenuRepository.deleteByMenuId(id);
     }
 
+    @Override
     @Transactional
     public void softDeleteById(Long id) {
         sysMenuRepository
@@ -93,11 +103,12 @@ public class SysMenuServiceImpl implements SysMenuService {
                 .ifPresent(
                         menu -> {
                             menu.setDeleted(true);
-                            menu.setUpdateTime(LocalDateTime.now());
+                            menu.setUpdateTime(LocalDateTime.now(ZoneId.systemDefault()));
                             sysMenuRepository.save(menu);
                         });
     }
 
+    @Override
     public List<SysMenu> buildMenuTree(List<SysMenu> menus) {
         return buildMenuTree(menus, 0L);
     }
@@ -110,6 +121,7 @@ public class SysMenuServiceImpl implements SysMenuService {
                 .toList();
     }
 
+    @Override
     public List<RouterDTO> getRouterTree(SystemLoginUser loginUser) {
 
         List<SysMenu> allMenus;

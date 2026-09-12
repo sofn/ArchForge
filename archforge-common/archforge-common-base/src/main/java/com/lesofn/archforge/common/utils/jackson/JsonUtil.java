@@ -1,16 +1,21 @@
 package com.lesofn.archforge.common.utils.jackson;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.nio.file.StandardOpenOption.APPEND;
+import static java.nio.file.StandardOpenOption.CREATE;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.google.common.collect.ImmutableSet;
 import com.lesofn.archforge.common.sensitive.jackson.SensitiveJacksonModule;
-import java.io.FileWriter;
-import java.io.InputStream;
 import java.io.File;
+import java.io.InputStream;
 import java.io.Writer;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -23,27 +28,26 @@ import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.Nullable;
 import tools.jackson.core.StreamWriteFeature;
 import tools.jackson.core.json.JsonReadFeature;
 import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.DeserializationFeature;
 import tools.jackson.databind.JavaType;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
-
-import tools.jackson.databind.json.JsonMapper;
 import tools.jackson.databind.SerializationFeature;
-import tools.jackson.databind.DeserializationFeature;
 import tools.jackson.databind.cfg.DateTimeFeature;
 import tools.jackson.databind.ext.javatime.deser.LocalDateDeserializer;
 import tools.jackson.databind.ext.javatime.deser.LocalDateTimeDeserializer;
 import tools.jackson.databind.ext.javatime.ser.LocalDateSerializer;
 import tools.jackson.databind.ext.javatime.ser.LocalDateTimeSerializer;
+import tools.jackson.databind.json.JsonMapper;
 import tools.jackson.databind.module.SimpleModule;
 import tools.jackson.databind.node.JsonNodeType;
 import tools.jackson.databind.node.ObjectNode;
 import tools.jackson.databind.type.CollectionType;
 import tools.jackson.databind.type.MapType;
-import org.jspecify.annotations.Nullable;
 
 /**
  * Jackson工具类 优势： 数据量高于百万的时候，速度和FastJson相差极小 API和注解支持最完善，可定制性最强 支持的数据源最广泛（字符串，对象，文件、流、URL）
@@ -206,6 +210,7 @@ public class JsonUtil {
     }
 
     /** JSON反序列化 */
+    @SuppressWarnings("TypeParameterUnusedInFormals") // 泛型仅用于返回类型：call-site 目标类型化的 cast 辅助
     public static <V> @Nullable V from(@Nullable String json, Type type) {
         if (StringUtils.isEmpty(json)) {
             return null;
@@ -265,7 +270,7 @@ public class JsonUtil {
 
     /** 序列化为JSON */
     public static <V> void toFile(String path, List<V> list) {
-        try (Writer writer = new FileWriter(path, true)) {
+        try (Writer writer = Files.newBufferedWriter(Paths.get(path), UTF_8, CREATE, APPEND)) {
             mapper.writer().writeValues(writer).writeAll(list);
         } catch (Exception e) {
             throw new RuntimeException(String.format("jackson to file error, path: %s, list: %s", path, list), e);
@@ -274,7 +279,7 @@ public class JsonUtil {
 
     /** 序列化为JSON */
     public static <V> void toFile(String path, V v) {
-        try (Writer writer = new FileWriter(path, true)) {
+        try (Writer writer = Files.newBufferedWriter(Paths.get(path), UTF_8, CREATE, APPEND)) {
             mapper.writer().writeValues(writer).write(v);
         } catch (Exception e) {
             throw new RuntimeException(String.format("jackson to file error, path: %s, data: %s", path, v), e);
@@ -453,7 +458,7 @@ public class JsonUtil {
             if (null == jsonNode) {
                 return new byte[0];
             }
-            return jsonNode.isBinary() ? jsonNode.binaryValue() : getAsString(jsonNode).getBytes();
+            return jsonNode.isBinary() ? jsonNode.binaryValue() : getAsString(jsonNode).getBytes(UTF_8);
         } catch (Exception e) {
             throw new RuntimeException(String.format("jackson get byte error, json: %s, key: %s", json, key), e);
         }

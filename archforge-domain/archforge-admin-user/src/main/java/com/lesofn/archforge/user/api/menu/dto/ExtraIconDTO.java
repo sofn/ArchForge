@@ -3,6 +3,8 @@ package com.lesofn.archforge.user.api.menu.dto;
 import lombok.Data;
 
 /**
+ * 菜单附加图标配置 DTO。
+ *
  * @author sofn
  */
 @Data

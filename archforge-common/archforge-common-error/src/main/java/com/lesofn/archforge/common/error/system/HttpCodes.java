@@ -34,9 +34,6 @@ public enum HttpCodes implements ErrorCode {
     // MOVED_TEMPORARILY(302, "Moved Temporarily"),
     SEE_OTHER(303, "See Other"),
     NOT_MODIFIED(304, "Not Modified"),
-    /**
-     * @deprecated
-     */
     @Deprecated
     USE_PROXY(305, "Use Proxy"),
     TEMPORARY_REDIRECT(307, "Temporary Redirect"),
@@ -64,19 +61,10 @@ public enum HttpCodes implements ErrorCode {
     REQUESTED_RANGE_NOT_SATISFIABLE(416, "Requested range not satisfiable"),
     EXPECTATION_FAILED(417, "Expectation Failed"),
     I_AM_A_TEAPOT(418, "I'm a teapot"),
-    /**
-     * @deprecated
-     */
     @Deprecated
     INSUFFICIENT_SPACE_ON_RESOURCE(419, "Insufficient Space On Resource"),
-    /**
-     * @deprecated
-     */
     @Deprecated
     METHOD_FAILURE(420, "Method Failure"),
-    /**
-     * @deprecated
-     */
     @Deprecated
     DESTINATION_LOCKED(421, "Destination Locked"),
     UNPROCESSABLE_ENTITY(422, "Unprocessable Entity"),
@@ -135,6 +123,7 @@ public enum HttpCodes implements ErrorCode {
 
     public boolean isError() { return this.is4xxClientError() || this.is5xxServerError(); }
 
+    @Override
     public String toString() {
         return Integer.toString(this.status);
     }

@@ -17,12 +17,10 @@ public class RequextContextTest {
         public boolean equals(Object o) {
             if (this == o)
                 return true;
-            if (o == null || getClass() != o.getClass())
+            if (!(o instanceof MockContext other))
                 return false;
 
-            MockContext context = (MockContext) o;
-
-            return id == context.id;
+            return id == other.id;
         }
 
         @Override
@@ -32,6 +30,7 @@ public class RequextContextTest {
     }
 
     @Test
+    @SuppressWarnings("ReferenceEquality") // 打印恒等比较是本测试的观测点
     public void testOneObject() {
         MockContext context1 = new MockContext();
         System.out.println(context1);

@@ -8,6 +8,8 @@ import lombok.ToString;
 import org.jspecify.annotations.Nullable;
 
 /**
+ * IP 归属地信息载体。
+ *
  * @author sofn
  */
 @Data

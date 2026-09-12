@@ -6,6 +6,8 @@ import com.lesofn.archforge.common.error.manager.ErrorInfo;
 import lombok.Getter;
 
 /**
+ * 业务运行时异常基类。
+ *
  * @author sofn
  * @version 1.0 Created at: 2021-05-27 11:34
  */

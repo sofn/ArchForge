@@ -130,11 +130,11 @@ class SchedulerJobIntegrationTest extends AbstractIntegrationTest {
     void validateCron() {
         Map<String, Object> good = post("/admin/scheduler-job/validate-cron", Map.of("cron", "0/30 * * * * ?"));
         assertEquals(0, good.get("code"));
-        assertEquals(Boolean.TRUE, good.get("data"));
+        assertEquals(true, good.get("data"));
 
         Map<String, Object> bad = post("/admin/scheduler-job/validate-cron", Map.of("cron", "not-a-cron"));
         assertEquals(0, bad.get("code"));
-        assertEquals(Boolean.FALSE, bad.get("data"));
+        assertEquals(false, bad.get("data"));
     }
 
     @Test

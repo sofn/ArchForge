@@ -15,6 +15,7 @@ import com.lesofn.archforge.infrastructure.config.ArchForgeProperties;
 import com.lesofn.archforge.server.web.errors.WebAuthException;
 import com.lesofn.archforge.server.web.mail.MailSender;
 import java.time.Duration;
+import java.time.ZoneId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -51,7 +52,7 @@ class VerificationCodeServiceTest {
     void sendStoresCodeLockAndDailyCountThenMailsIt() {
         assertTrue(service.send(EMAIL, VerificationCodePurpose.REGISTER));
 
-        verify(valueOps).set(eq("verification:code:register:" + EMAIL), anyString(), eq(Duration.ofSeconds(300)));
+        verify(valueOps).set(eq("verification:code:register:" + EMAIL), anyString(), eq(Duration.ofMinutes(5)));
         verify(valueOps).set(eq("verification:send:lock:register:" + EMAIL), eq("1"), eq(Duration.ofSeconds(60)));
         verify(valueOps).increment(dailyKey("register"));
         verify(mailSender).sendVerificationCode(eq(EMAIL), anyString(), eq(VerificationCodePurpose.REGISTER));
@@ -124,7 +125,8 @@ class VerificationCodeServiceTest {
     }
 
     private static String dailyKey(String purpose) {
-        return "verification:send:daily:" + purpose + ":" + java.time.LocalDate.now().format(java.time.format.DateTimeFormatter
-                .ofPattern("yyyyMMdd")) + ":" + EMAIL;
+        return "verification:send:daily:" + purpose + ":" + java.time.LocalDate.now(ZoneId.systemDefault()).format(
+                java.time.format.DateTimeFormatter
+                        .ofPattern("yyyyMMdd")) + ":" + EMAIL;
     }
 }

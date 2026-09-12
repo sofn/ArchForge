@@ -11,6 +11,8 @@ import java.util.Map;
 import org.jspecify.annotations.Nullable;
 
 /**
+ * 请求上下文载体。
+ *
  * @author sofn
  */
 public class RequestContext implements Serializable {
@@ -100,6 +102,7 @@ public class RequestContext implements Serializable {
     }
 
     @Override
+    @SuppressWarnings("EqualsGetClass") // 请求上下文按精确类型判等
     public boolean equals(Object obj) {
         if (this == obj)
             return true;

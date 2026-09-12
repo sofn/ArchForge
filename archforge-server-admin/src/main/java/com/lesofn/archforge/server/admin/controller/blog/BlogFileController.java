@@ -1,23 +1,25 @@
 package com.lesofn.archforge.server.admin.controller.blog;
 
+import cn.dev33.satoken.annotation.SaCheckLogin;
+import cn.dev33.satoken.annotation.SaCheckPermission;
+import cn.dev33.satoken.annotation.SaCheckRole;
+import com.lesofn.archforge.infrastructure.auth.stp.StpAdminUtil;
 import com.lesofn.archforge.infrastructure.file.FileStorageService;
-import org.jspecify.annotations.Nullable;
 import com.lesofn.archforge.user.api.domain.SysFile;
 import com.lesofn.archforge.user.api.service.SysFileService;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
-import cn.dev33.satoken.annotation.SaCheckLogin;
-import cn.dev33.satoken.annotation.SaCheckPermission;
-import cn.dev33.satoken.annotation.SaCheckRole;
-import com.lesofn.archforge.infrastructure.auth.stp.StpAdminUtil;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -57,8 +59,9 @@ public class BlogFileController {
                     errFiles.add(originalName);
                     continue;
                 }
-                String storagePath = "blog/" + LocalDate.now().getYear() + "/" + LocalDate.now().getMonthValue() + "/" + UUID
-                        .randomUUID().toString().replace("-", "") + "." + extension;
+                String storagePath = "blog/" + LocalDate.now(ZoneId.systemDefault()).getYear() + "/" + LocalDate.now(ZoneId
+                        .systemDefault()).getMonthValue() + "/" + UUID
+                                .randomUUID().toString().replace("-", "") + "." + extension;
                 try (InputStream inputStream = file.getInputStream()) {
                     fileStorageService.upload(storagePath, inputStream, file.getContentType(), file.getSize());
                 }
@@ -91,7 +94,7 @@ public class BlogFileController {
         if (!StringUtils.hasText(extension)) {
             return false;
         }
-        String lower = extension.toLowerCase();
+        String lower = extension.toLowerCase(Locale.ROOT);
         return lower.equals("jpg") || lower.equals("jpeg") || lower.equals("png") || lower.equals("gif") || lower.equals(
                 "webp") || lower.equals("svg");
     }

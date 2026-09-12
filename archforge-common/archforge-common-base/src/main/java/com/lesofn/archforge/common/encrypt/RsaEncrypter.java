@@ -1,5 +1,7 @@
 package com.lesofn.archforge.common.encrypt;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -89,7 +91,7 @@ public class RsaEncrypter {
         PublicKey publicKey = getPublicKey(publicKeyStr);
         Cipher cipher = Cipher.getInstance("RSA");
         cipher.init(Cipher.ENCRYPT_MODE, publicKey);
-        byte[] encryptedData = cipher.doFinal(data.getBytes());
+        byte[] encryptedData = cipher.doFinal(data.getBytes(UTF_8));
         return Base64.encodeBase64String(encryptedData);
     }
 
@@ -106,6 +108,6 @@ public class RsaEncrypter {
         Cipher cipher = Cipher.getInstance("RSA");
         cipher.init(Cipher.DECRYPT_MODE, privateKey);
         byte[] decryptedData = cipher.doFinal(Base64.decodeBase64(encryptedDataStr));
-        return new String(decryptedData);
+        return new String(decryptedData, UTF_8);
     }
 }

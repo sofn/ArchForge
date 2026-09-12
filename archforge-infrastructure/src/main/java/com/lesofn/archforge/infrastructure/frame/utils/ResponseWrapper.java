@@ -1,19 +1,23 @@
 package com.lesofn.archforge.infrastructure.frame.utils;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.WriteListener;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpServletResponseWrapper;
+import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import org.apache.commons.io.output.TeeOutputStream;
 
 public class ResponseWrapper extends HttpServletResponseWrapper {
 
     private final ByteArrayOutputStream bos = new ByteArrayOutputStream();
-    private final PrintWriter writer = new PrintWriter(bos);
+    private final PrintWriter writer = new PrintWriter(new BufferedWriter(new OutputStreamWriter(bos, UTF_8)));
 
     public ResponseWrapper(HttpServletResponse response) {
         super(response);
@@ -52,11 +56,12 @@ public class ResponseWrapper extends HttpServletResponseWrapper {
 
         PrintWriter branch;
 
-        public TeePrintWriter(PrintWriter main, PrintWriter branch) {
+        TeePrintWriter(PrintWriter main, PrintWriter branch) {
             super(main, true);
             this.branch = branch;
         }
 
+        @Override
         public void write(char[] buf, int off, int len) {
             super.write(buf, off, len);
             super.flush();
@@ -64,6 +69,7 @@ public class ResponseWrapper extends HttpServletResponseWrapper {
             branch.flush();
         }
 
+        @Override
         public void write(String s, int off, int len) {
             super.write(s, off, len);
             super.flush();
@@ -71,6 +77,7 @@ public class ResponseWrapper extends HttpServletResponseWrapper {
             branch.flush();
         }
 
+        @Override
         public void write(int c) {
             super.write(c);
             super.flush();
@@ -78,6 +85,7 @@ public class ResponseWrapper extends HttpServletResponseWrapper {
             branch.flush();
         }
 
+        @Override
         public void flush() {
             super.flush();
             branch.flush();

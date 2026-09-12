@@ -1,17 +1,22 @@
 package com.lesofn.archforge.infrastructure.auth.spi;
 
+import com.google.common.base.Splitter;
+import com.lesofn.archforge.common.auth.AuthRequest;
 import com.lesofn.archforge.common.encrypt.AESEncrypter;
 import com.lesofn.archforge.common.encrypt.EncrypterException;
 import com.lesofn.archforge.infrastructure.auth.errors.AdminAuthErrorCode;
 import com.lesofn.archforge.infrastructure.auth.errors.AdminAuthException;
-import com.lesofn.archforge.common.auth.AuthRequest;
 import com.lesofn.archforge.infrastructure.frame.utils.log.ApiLogger;
+import java.util.List;
+import java.util.Locale;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.stereotype.Component;
 
 /**
+ * MAuth 认证 SPI 实现。
+ *
  * @author sofn
  */
 @Component("MAuthSpi")
@@ -39,7 +44,8 @@ public class MAuthSpi extends AbstractAuthSpi {
         String authHeader = StringUtils.isBlank(request.getHeader(AUTH_HEADER))
                 ? request.getHeader(AUTH_HEADER_OTHER)
                 : request.getHeader(AUTH_HEADER);
-        if (!StringUtils.isBlank(authHeader) && authHeader.toLowerCase().startsWith(SPI_NAME.toLowerCase() + " ")) {
+        if (!StringUtils.isBlank(authHeader) && authHeader.toLowerCase(Locale.ROOT).startsWith(SPI_NAME.toLowerCase(
+                Locale.ROOT) + " ")) {
             if (ApiLogger.isDebugEnabled()) {
                 ApiLogger.debug("find mauth parameter in header:" + authHeader);
             }
@@ -57,6 +63,7 @@ public class MAuthSpi extends AbstractAuthSpi {
     }
 
     @Override
+    @SuppressWarnings("StringSplitter") // "token "（尾空格）必须判 size!=2 失败，split() 丢弃尾空段正是所需语义
     public long auth(AuthRequest request) throws AdminAuthException {
         String authHeader = StringUtils.isBlank(request.getHeader(AUTH_HEADER))
                 ? request.getHeader(AUTH_HEADER_OTHER)
@@ -73,13 +80,13 @@ public class MAuthSpi extends AbstractAuthSpi {
         String aesHeader = ss[1];
         try {
             String decryptedString = encrypter.decryptAsString(aesHeader);
-            String[] timeAndUid = decryptedString.split(":");
-            long time = NumberUtils.toLong(timeAndUid[0], 0);
+            List<String> timeAndUid = Splitter.on(':').splitToList(decryptedString);
+            long time = NumberUtils.toLong(timeAndUid.get(0), 0);
             long now = System.currentTimeMillis();
             if (now - time > EXPIRES_TIME) {
                 throw new AdminAuthException(AdminAuthErrorCode.USER_AUTHFAIL, "token expires.");
             }
-            long uid = NumberUtils.toLong(timeAndUid[1], 0);
+            long uid = NumberUtils.toLong(timeAndUid.get(1), 0);
             if (uid <= 0) {
                 throw new AdminAuthException(AdminAuthErrorCode.USER_AUTHFAIL, "invalid uid.");
             }

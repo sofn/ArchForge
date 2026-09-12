@@ -12,6 +12,7 @@ import java.time.Duration;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -120,7 +121,7 @@ public class ChatAiService {
     }
 
     String callModel(ArchForgeProperties.Llm llm, List<Map<String, String>> history) throws Exception {
-        String provider = llm.getProvider() == null ? "openai" : llm.getProvider().toLowerCase();
+        String provider = llm.getProvider() == null ? "openai" : llm.getProvider().toLowerCase(Locale.ROOT);
         String body = "anthropic".equals(provider) ? anthropicBody(llm, history) : openAiBody(llm, history);
         HttpRequest.Builder builder = HttpRequest.newBuilder()
                 .uri(URI.create(LlmClientFactory.chatUrl(llm)))

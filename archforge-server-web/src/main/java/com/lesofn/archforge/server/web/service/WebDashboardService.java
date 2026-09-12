@@ -8,6 +8,7 @@ import com.lesofn.archforge.user.api.dao.SysUserRepository;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +22,7 @@ public class WebDashboardService {
     private final SysOperLogRepository sysOperLogRepository;
 
     public WebDashboardMetricsResponse metrics() {
-        LocalDateTime todayStart = LocalDateTime.of(LocalDate.now(), LocalTime.MIN);
+        LocalDateTime todayStart = LocalDateTime.of(LocalDate.now(ZoneId.systemDefault()), LocalTime.MIN);
         long userTotal = userRepository.countByDeletedFalseAndStatus(UserStatusEnum.NORMAL.getValue());
         long onlineNow = userRepository.countByDeletedFalseAndStatus(UserStatusEnum.NORMAL.getValue());
         long todayLogin = sysLoginLogRepository.count(

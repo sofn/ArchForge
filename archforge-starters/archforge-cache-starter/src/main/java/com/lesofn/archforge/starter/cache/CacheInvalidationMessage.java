@@ -30,9 +30,9 @@ public class CacheInvalidationMessage implements Serializable {
     /** Logical cache name (matches Spring cache name). */
     private String cacheName;
 
-    /** Key to evict; ignored when {@link #clear} is {@code true}. */
+    /** Key to evict; ignored when <code>clear</code> is true. */
     private @Nullable Object key;
 
-    /** When {@code true}, clear the entire named cache instead of a single key. */
+    /** When true, clear the entire named cache instead of a single key. */
     private boolean clear;
 }

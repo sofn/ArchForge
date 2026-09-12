@@ -4,6 +4,8 @@ import com.lesofn.archforge.common.error.api.ProjectModule;
 import com.lesofn.archforge.common.error.manager.ErrorInfo;
 
 /**
+ * 携带错误码的异常契约。
+ *
  * @author lishaofeng02
  * @version 1.0 Created at: 2022-03-24 15:35
  */

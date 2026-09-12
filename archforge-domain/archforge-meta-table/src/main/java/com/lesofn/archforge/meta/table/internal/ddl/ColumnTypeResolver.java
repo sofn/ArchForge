@@ -1,13 +1,14 @@
 package com.lesofn.archforge.meta.table.internal.ddl;
 
 import com.lesofn.archforge.meta.table.api.domain.MetaColumn;
-import org.jspecify.annotations.Nullable;
 import com.lesofn.archforge.meta.table.api.domain.MetaColumnType;
 import com.lesofn.archforge.meta.table.api.errors.MetaTableErrorCode;
 import com.lesofn.archforge.meta.table.api.errors.MetaTableException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
 
 /**
@@ -91,7 +92,7 @@ public class ColumnTypeResolver {
         if (elementType == null || elementType.isEmpty()) {
             elementType = "STRING";
         }
-        return switch (elementType.toUpperCase()) {
+        return switch (elementType.toUpperCase(Locale.ROOT)) {
             case "STRING" -> {
                 int length = resolveVarcharLength(column);
                 yield "VARCHAR(" + length + ")[]";
@@ -118,7 +119,7 @@ public class ColumnTypeResolver {
         if (elementType == null || elementType.isEmpty()) {
             elementType = "STRING";
         }
-        return switch (elementType.toUpperCase()) {
+        return switch (elementType.toUpperCase(Locale.ROOT)) {
             case "STRING" -> "ARRAY[" + elements.stream().map(e -> "'" + e.replace("'", "''") + "'").reduce((a, b) -> a + ", " +
                     b).orElse("") + "]";
             case "INTEGER" -> "ARRAY[" + elements.stream().reduce((a, b) -> a + ", " + b).orElse("") + "]::bigint[]";

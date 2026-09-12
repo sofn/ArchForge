@@ -1,17 +1,18 @@
 package com.lesofn.archforge.common.utils.ip;
 
+import com.google.common.base.Splitter;
 import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.net.Inet4Address;
 import java.net.DatagramSocket;
+import java.net.Inet4Address;
 import java.net.InetAddress;
-import java.net.ServerSocket;
 import java.net.NetworkInterface;
+import java.net.ServerSocket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
-import java.util.Enumeration;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -111,7 +112,7 @@ public class IpUtil {
             return result;
         } catch (SocketException e) {
             log.error("getLocalIP error", e);
-            return Collections.emptyMap();
+            return new HashMap<>();
         }
     }
 
@@ -222,7 +223,7 @@ public class IpUtil {
             // 为了解决移动网关的问题。移动网关过来的请求，第二个ip是真实ip
             int idx = ip.indexOf(",");
             if (idx > 0 && idx < ip.length()) {
-                ip = (ip.substring(ip.indexOf(",") + 1)).trim();
+                ip = ip.substring(ip.indexOf(",") + 1).trim();
             }
         }
         return ip != null ? ip.trim() : "127.0.0.1";
@@ -253,14 +254,14 @@ public class IpUtil {
 
         String forwarded = request.getHeader("X-Forwarded-For");
         if (StringUtils.isNotBlank(forwarded)) {
-            String[] ips = forwarded.split(",");
-            for (int i = ips.length - 1; i >= 0; i--) {
-                String candidate = ips[i].trim();
+            List<String> ips = Splitter.on(',').splitToList(forwarded);
+            for (int i = ips.size() - 1; i >= 0; i--) {
+                String candidate = ips.get(i).trim();
                 if (StringUtils.isNotBlank(candidate) && !isTrustedProxy(candidate, trustedProxies)) {
                     return candidate;
                 }
             }
-            return ips[0].trim();
+            return ips.get(0).trim();
         }
 
         String proxyClientIp = request.getHeader("Proxy-Client-IP");
@@ -314,18 +315,18 @@ public class IpUtil {
      * @return 数字
      */
     public static int ipToInt(final String address, final boolean isSegment) {
-        final String[] addressBytes = address.split("\\.");
-        int length = addressBytes.length;
+        final List<String> addressBytes = Splitter.on('.').splitToList(address);
+        int length = addressBytes.size();
         int ip = 0;
         if (length >= 3) {
             try {
                 for (int i = 0; i < 3; i++) {
                     ip <<= 8;
-                    ip |= Integer.parseInt(addressBytes[i]);
+                    ip |= Integer.parseInt(addressBytes.get(i));
                 }
                 ip <<= 8;
                 if (!isSegment && length != 3) {
-                    ip |= Integer.parseInt(addressBytes[3]);
+                    ip |= Integer.parseInt(addressBytes.get(3));
                 }
             } catch (Exception e) {
                 log.warn("Warn ipToInt address is wrong: address=" + address);

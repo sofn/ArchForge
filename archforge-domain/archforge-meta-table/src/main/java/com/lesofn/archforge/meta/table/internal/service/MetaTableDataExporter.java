@@ -205,8 +205,8 @@ public class MetaTableDataExporter {
         if (value instanceof Array sqlArray) {
             try {
                 Object array = sqlArray.getArray();
-                if (array instanceof Object[]) {
-                    return Arrays.asList((Object[]) array);
+                if (array instanceof Object[] array2) {
+                    return Arrays.asList(array2);
                 }
                 return array.toString();
             } catch (SQLException e) {

@@ -16,24 +16,29 @@ public class SysLoginLogServiceImpl implements SysLoginLogService {
 
     private final SysLoginLogRepository loginLogRepository;
 
+    @Override
     public Optional<SysLoginLog> findById(Long infoId) {
         return loginLogRepository.findById(infoId);
     }
 
+    @Override
     public Page<SysLoginLog> findAll(Pageable pageable) {
         return loginLogRepository.findAll(pageable);
     }
 
+    @Override
     @Transactional
     public SysLoginLog create(SysLoginLog loginLog) {
         return loginLogRepository.save(loginLog);
     }
 
+    @Override
     @Transactional
     public void deleteById(Long infoId) {
         loginLogRepository.deleteById(infoId);
     }
 
+    @Override
     @Transactional
     public void clearAll() {
         loginLogRepository.clearAll();

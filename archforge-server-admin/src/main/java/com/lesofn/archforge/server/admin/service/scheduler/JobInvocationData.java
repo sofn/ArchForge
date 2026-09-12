@@ -12,7 +12,7 @@ import java.io.Serializable;
  * <p>
  * The whole record — including the {@link Schedule} — is persisted in the {@code
  * scheduled_tasks.task_data} column, so changing a cron expression or pausing a job is a single
- * {@code reschedule} that writes a new schedule. Executions resolve the target Spring bean by
+ * reschedule that writes a new schedule. Executions resolve the target Spring bean by
  * reflection: {@code beanName#methodName(methodParams)}.
  *
  * <p>

@@ -7,28 +7,29 @@ import static com.lesofn.archforge.meta.table.api.errors.MetaTableErrorCode.META
 import static com.lesofn.archforge.meta.table.api.errors.MetaTableErrorCode.META_TABLE_NOT_EXISTS;
 
 import com.lesofn.archforge.meta.table.api.dao.MetaColumnRepository;
-import org.jspecify.annotations.Nullable;
 import com.lesofn.archforge.meta.table.api.dao.MetaTableRepository;
-import com.lesofn.archforge.meta.table.api.service.MetaTableMigrationService;
 import com.lesofn.archforge.meta.table.api.domain.MetaColumn;
 import com.lesofn.archforge.meta.table.api.domain.MetaTable;
 import com.lesofn.archforge.meta.table.api.domain.MetaTableMigration;
+import com.lesofn.archforge.meta.table.api.errors.MetaTableException;
 import com.lesofn.archforge.meta.table.api.service.MetaTableAdminService;
+import com.lesofn.archforge.meta.table.api.service.MetaTableMigrationService;
 import com.lesofn.archforge.meta.table.internal.ddl.AlterTableDdlGenerator;
 import com.lesofn.archforge.meta.table.internal.ddl.MetaTableDdlGenerator;
 import com.lesofn.archforge.meta.table.internal.ddl.SchemaDdl;
-import com.lesofn.archforge.meta.table.api.errors.MetaTableException;
 import com.lesofn.archforge.meta.table.internal.schema.SchemaChange;
 import com.lesofn.archforge.meta.table.internal.schema.SchemaChangeType;
 import com.lesofn.archforge.meta.table.internal.schema.SchemaDiffEngine;
 import com.lesofn.archforge.meta.table.internal.validator.MetaTableValidator;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.Nullable;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Page;
@@ -71,7 +72,7 @@ public class MetaTableAdminServiceImpl implements MetaTableAdminService {
             table.setUpdaterId(table.getCreatorId());
         }
         if (table.getUpdateTime() == null) {
-            table.setUpdateTime(LocalDateTime.now());
+            table.setUpdateTime(LocalDateTime.now(ZoneId.systemDefault()));
         }
         MetaTable saved = metaTableRepository.save(table);
 
@@ -153,7 +154,7 @@ public class MetaTableAdminServiceImpl implements MetaTableAdminService {
         }
         metaColumnRepository.saveAll(columns);
 
-        LocalDateTime executedAt = LocalDateTime.now();
+        LocalDateTime executedAt = LocalDateTime.now(ZoneId.systemDefault());
         records.forEach(r -> {
             r.setStatus("APPLIED");
             r.setExecutedAt(executedAt);
@@ -329,7 +330,7 @@ public class MetaTableAdminServiceImpl implements MetaTableAdminService {
 
     private List<MetaTableMigration> buildPendingMigrations(MetaTable table, int version, List<SchemaDdl> ddlList,
             Long operatorId) {
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
         List<MetaTableMigration> records = new ArrayList<>();
         for (SchemaDdl ddl : ddlList) {
             MetaTableMigration record = new MetaTableMigration();

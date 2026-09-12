@@ -7,6 +7,8 @@ import com.lesofn.archforge.common.error.manager.ErrorInfo;
 import com.lesofn.archforge.common.error.ArchForgeProjectModule;
 
 /**
+ * task 示例域业务异常。
+ *
  * @author sofn
  * @version 1.0 Created at: 2022-03-09 16:41
  */

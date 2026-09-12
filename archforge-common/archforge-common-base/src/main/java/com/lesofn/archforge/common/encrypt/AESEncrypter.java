@@ -1,16 +1,16 @@
 package com.lesofn.archforge.common.encrypt;
 
-import java.security.NoSuchAlgorithmException;
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.crypto.Cipher;
-import org.jspecify.annotations.Nullable;
-import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
+import org.jspecify.annotations.Nullable;
 
 /**
  * AES工具类，提供加密解密、生成Key等方法
@@ -60,7 +60,7 @@ public class AESEncrypter {
         try {
             Cipher ecipher = Cipher.getInstance("AES");
             ecipher.init(Cipher.ENCRYPT_MODE, aesKey);
-            return Hex.encodeHexString(ecipher.doFinal(msg.getBytes()));
+            return Hex.encodeHexString(ecipher.doFinal(msg.getBytes(UTF_8)));
         } catch (Exception e) {
             String errMsg = "decrypt error, data:" + msg;
             throw new EncrypterException(errMsg, e);
@@ -79,7 +79,7 @@ public class AESEncrypter {
     }
 
     public String decryptAsString(String msg) {
-        return new String(this.decrypt(msg));
+        return new String(this.decrypt(msg), UTF_8);
     }
 
     private static SecretKey loadAesKey() {
@@ -87,7 +87,7 @@ public class AESEncrypter {
     }
 
     private static SecretKey loadAesKey(String aesKeyStr) {
-        String buffer = new String(Base64.decodeBase64(aesKeyStr));
+        String buffer = new String(Base64.decodeBase64(aesKeyStr), UTF_8);
         byte[] keyStr;
         try {
             keyStr = Hex.decodeHex(buffer.toCharArray());
@@ -97,17 +97,4 @@ public class AESEncrypter {
         return new SecretKeySpec(keyStr, "AES");
     }
 
-    private static String generateAesKey() {
-        try {
-            KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
-            keyGenerator.init(128);
-            // 产生密钥
-            SecretKey secretKey = keyGenerator.generateKey();
-            // 获取密钥
-            byte[] keyBytes = secretKey.getEncoded();
-            return Base64.encodeBase64String(Hex.encodeHexString(keyBytes).getBytes());
-        } catch (NoSuchAlgorithmException e) {
-            throw new EncrypterException(e);
-        }
-    }
 }

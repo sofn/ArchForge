@@ -6,6 +6,8 @@ import com.lesofn.archforge.common.error.exception.BaseRuntimeException;
 import com.lesofn.archforge.common.error.manager.ErrorInfo;
 
 /**
+ * 系统级异常。
+ *
  * @author sofn
  * @version 1.0 Created at: 2022-03-09 16:41
  */

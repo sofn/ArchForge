@@ -1,6 +1,7 @@
 package com.lesofn.archforge.server.admin.service.chat;
 
 import com.lesofn.archforge.infrastructure.config.ArchForgeProperties;
+import java.util.Locale;
 
 public final class LlmClientFactory {
 
@@ -9,7 +10,7 @@ public final class LlmClientFactory {
 
     public static String chatUrl(ArchForgeProperties.Llm llm) {
         String base = llm.getBaseUrl() == null ? "" : llm.getBaseUrl().replaceAll("/+$", "");
-        String provider = llm.getProvider() == null ? "openai" : llm.getProvider().toLowerCase();
+        String provider = llm.getProvider() == null ? "openai" : llm.getProvider().toLowerCase(Locale.ROOT);
         if ("anthropic".equals(provider)) {
             return base.endsWith("/v1/messages") ? base : base + "/v1/messages";
         }

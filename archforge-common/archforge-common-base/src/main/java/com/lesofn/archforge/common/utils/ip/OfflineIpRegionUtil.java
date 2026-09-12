@@ -5,9 +5,9 @@ import java.nio.file.Path;
 import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.Nullable;
 import org.lionsoul.ip2region.xdb.Searcher;
 import org.lionsoul.ip2region.xdb.Version;
-import org.jspecify.annotations.Nullable;
 
 /**
  * Offline IP region lookup backed by ip2region's xdb data files.
@@ -43,6 +43,7 @@ public class OfflineIpRegionUtil {
     private OfflineIpRegionUtil() {
     }
 
+    @SuppressWarnings("StringSplitter") // 依赖 split() 丢弃尾部空段：xdb 尾段缺失时应抛异常进 catch 返回 null
     public static @Nullable IpRegion getIpRegion(@Nullable String ip) {
         if (StringUtils.isBlank(ip) || !XdbManager.isOfflineEnabled()) {
             return null;

@@ -9,6 +9,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
+ * 登录用户的角色与权限信息。
+ *
  * @author sofn
  */
 @Data

@@ -17,5 +17,5 @@ public class MetaTableGenerateResponse {
     private @Nullable String frontendDir;
 
     /** 生成文件数量 */
-    private @Nullable int files;
+    private int files;
 }

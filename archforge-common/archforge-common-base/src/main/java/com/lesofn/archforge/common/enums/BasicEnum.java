@@ -1,6 +1,8 @@
 package com.lesofn.archforge.common.enums;
 
 /**
+ * 带值与描述的基础枚举接口。
+ *
  * @author sofn 普通的枚举 接口
  */
 public interface BasicEnum {

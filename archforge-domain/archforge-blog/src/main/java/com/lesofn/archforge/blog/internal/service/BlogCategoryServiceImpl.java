@@ -8,6 +8,7 @@ import com.lesofn.archforge.blog.api.errors.BlogErrorCode;
 import com.lesofn.archforge.blog.api.errors.BlogException;
 import com.lesofn.archforge.blog.api.service.BlogCategoryService;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -35,7 +36,7 @@ public class BlogCategoryServiceImpl implements BlogCategoryService {
             if (!StringUtils.hasText(name)) {
                 return cb.conjunction();
             }
-            return cb.like(cb.lower(root.get("name")), "%" + name.toLowerCase() + "%");
+            return cb.like(cb.lower(root.get("name")), "%" + name.toLowerCase(Locale.ROOT) + "%");
         };
         return categoryRepository.findAll(spec, pageable);
     }

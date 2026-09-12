@@ -6,6 +6,7 @@ import com.lesofn.archforge.user.api.service.SysFileService;
 import jakarta.persistence.criteria.Predicate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -23,23 +24,26 @@ public class SysFileServiceImpl implements SysFileService {
 
     private final SysFileRepository fileRepository;
 
+    @Override
     @Transactional
     public SysFile create(SysFile sysFile) {
         return fileRepository.save(sysFile);
     }
 
+    @Override
     @Transactional(readOnly = true)
     public Optional<SysFile> findById(Long id) {
         return fileRepository.findById(id);
     }
 
+    @Override
     @Transactional(readOnly = true)
     public Page<SysFile> findFiles(String originalName, String storageType, Pageable pageable) {
         Specification<SysFile> spec = (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
             predicates.add(cb.equal(root.get("deleted"), false));
             if (originalName != null && !originalName.isBlank()) {
-                predicates.add(cb.like(cb.lower(root.get("originalName")), "%" + originalName.toLowerCase() + "%"));
+                predicates.add(cb.like(cb.lower(root.get("originalName")), "%" + originalName.toLowerCase(Locale.ROOT) + "%"));
             }
             if (storageType != null && !storageType.isBlank()) {
                 predicates.add(cb.equal(root.get("storageType"), storageType));
@@ -49,6 +53,7 @@ public class SysFileServiceImpl implements SysFileService {
         return fileRepository.findAll(spec, pageable);
     }
 
+    @Override
     @Transactional
     public void deleteById(Long id) {
         fileRepository.deleteById(id);

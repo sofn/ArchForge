@@ -146,7 +146,7 @@ public class RequestLogFilter implements Filter {
     private static boolean isStaticOrSwagger(String path) {
         return Strings.CS.startsWithAny(path, "/webjars", "/static", "/js", "/css", "/libs", "/WEB-INF") || Strings.CS
                 .startsWithAny(path, "/swagger-", "/v3/api-docs") || Strings.CS.startsWithAny(path,
-                        GlobalConstants.STATIC_RESOURCE_ARRAY);
+                        GlobalConstants.STATIC_RESOURCE_EXTENSIONS.toArray(String[]::new));
     }
 
     private static boolean isBinaryResponsePath(String path) {

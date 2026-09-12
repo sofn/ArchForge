@@ -7,23 +7,22 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 /**
+ * URL 编解码工具类。
+ *
  * @author sofn
  */
 @Slf4j
 public class URLUtils {
 
-    @SneakyThrows
     public static String encode(String src) {
-        return URLEncoder.encode(src, StandardCharsets.UTF_8.name());
+        return URLEncoder.encode(src, StandardCharsets.UTF_8);
     }
 
-    @SneakyThrows
     public static String decode(String src) {
-        return URLDecoder.decode(src, StandardCharsets.UTF_8.name());
+        return URLDecoder.decode(src, StandardCharsets.UTF_8);
     }
 
     public static Map<String, List<String>> parseQuery(String uri) {

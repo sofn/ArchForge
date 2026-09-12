@@ -7,6 +7,8 @@ import lombok.ToString;
 import org.jspecify.annotations.Nullable;
 
 /**
+ * 通用树节点模型。
+ *
  * @author sofn
  * @version 1.0 Created at: 2022-03-10 11:46
  */

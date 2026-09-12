@@ -15,13 +15,14 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import org.jspecify.annotations.Nullable;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.Type;
+import org.jspecify.annotations.Nullable;
 
 @Setter
 @Getter
@@ -162,7 +163,7 @@ public class SysUser extends BaseEntity<SysUser> {
     /** 记录登录信息 */
     public void recordLogin(String loginIp) {
         this.loginIp = loginIp;
-        this.loginDate = LocalDateTime.now();
+        this.loginDate = LocalDateTime.now(ZoneId.systemDefault());
     }
 
     /** 标记删除（逻辑删除） */

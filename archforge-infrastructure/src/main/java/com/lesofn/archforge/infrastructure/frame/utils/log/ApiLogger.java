@@ -67,6 +67,8 @@ public class ApiLogger {
     }
 
     /**
+     * 记录慢请求日志。
+     *
      * @param resourceType 资源类型
      * @param resourceId 资源id 如 服务器ip端口，接口的 url地址等
      * @param useTime 耗费时间
@@ -97,6 +99,8 @@ public class ApiLogger {
     }
 
     /**
+     * 记录错误日志。
+     *
      * @param resourceType 资源类型
      * @param resourceId 资源id
      * @param msg 错误消息
@@ -137,8 +141,8 @@ public class ApiLogger {
     }
 
     public static void error(Object msg) {
-        if (msg instanceof Throwable) {
-            errorLog.error(formatMsg(((Throwable) msg).getMessage()), (Throwable) msg);
+        if (msg instanceof Throwable throwable) {
+            errorLog.error(formatMsg(throwable.getMessage()), throwable);
         } else {
             errorLog.error(formatMsg(msg));
         }

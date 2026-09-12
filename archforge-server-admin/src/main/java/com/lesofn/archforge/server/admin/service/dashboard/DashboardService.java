@@ -4,6 +4,7 @@ import com.lesofn.archforge.blog.api.dao.BlogArticleRepository;
 import com.lesofn.archforge.meta.table.api.dao.MetaTableRepository;
 import com.lesofn.archforge.user.api.dao.SysUserRepository;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +31,7 @@ public class DashboardService {
         long users = userRepository.countByDeletedFalse();
         long articles = articleRepository.countByDeletedFalse();
         for (int i = window - 1; i >= 0; i--) {
-            LocalDate date = LocalDate.now().minusDays(i);
+            LocalDate date = LocalDate.now(ZoneId.systemDefault()).minusDays(i);
             points.add(new DashboardTrendPoint(date.toString(), users, articles));
         }
         return points;

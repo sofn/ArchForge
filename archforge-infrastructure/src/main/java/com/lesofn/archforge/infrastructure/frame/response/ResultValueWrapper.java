@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
 /**
+ * 响应结果值包装器。
+ *
  * @author sofn
  * @version 2019-07-11 16:44
  */

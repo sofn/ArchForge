@@ -1,12 +1,15 @@
 package com.lesofn.archforge.server.admin.controller.file;
 
+import cn.dev33.satoken.annotation.SaCheckLogin;
+import cn.dev33.satoken.annotation.SaCheckPermission;
+import cn.dev33.satoken.annotation.SaCheckRole;
 import com.lesofn.archforge.common.error.system.SystemException;
 import com.lesofn.archforge.infrastructure.annotation.Log;
 import com.lesofn.archforge.infrastructure.annotation.RepeatSubmit;
+import com.lesofn.archforge.infrastructure.auth.stp.StpAdminUtil;
 import com.lesofn.archforge.infrastructure.config.ArchForgeProperties;
 import com.lesofn.archforge.infrastructure.file.FileStorageService;
 import com.lesofn.archforge.infrastructure.file.FileUploadValidator;
-import java.nio.charset.StandardCharsets;
 import com.lesofn.archforge.server.admin.controller.ControllerHelper;
 import com.lesofn.archforge.server.admin.dto.AdminPageResponse;
 import com.lesofn.archforge.server.admin.dto.request.FileListRequest;
@@ -17,7 +20,9 @@ import com.lesofn.archforge.user.api.service.SysFileService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,10 +38,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import cn.dev33.satoken.annotation.SaCheckLogin;
-import cn.dev33.satoken.annotation.SaCheckPermission;
-import cn.dev33.satoken.annotation.SaCheckRole;
-import com.lesofn.archforge.infrastructure.auth.stp.StpAdminUtil;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -93,7 +94,7 @@ public class FileController {
         String originalName = java.util.Objects.requireNonNullElse(file.getOriginalFilename(), "");
         String extension = FileUploadValidator.extension(originalName);
         String storageName = UUID.randomUUID().toString().replace("-", "") + "." + extension;
-        String datePath = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd"));
+        String datePath = LocalDate.now(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("yyyy/MM/dd"));
         String storagePath = datePath + "/" + storageName;
 
         try (InputStream inputStream = file.getInputStream()) {

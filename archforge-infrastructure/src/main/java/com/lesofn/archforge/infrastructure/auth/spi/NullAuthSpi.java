@@ -6,6 +6,8 @@ import com.lesofn.archforge.common.auth.AuthRequest;
 import org.springframework.stereotype.Component;
 
 /**
+ * 空实现认证 SPI（放行）。
+ *
  * @author sofn
  */
 @Component("NullSpi")

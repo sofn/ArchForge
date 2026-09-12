@@ -32,7 +32,9 @@ public class ApplicationContextHolder implements ApplicationContextAware {
         }
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({
+            "unchecked", "TypeParameterUnusedInFormals"
+    })
     public static <T> @Nullable T getBean(String name) {
         return (T) java.util.Objects.requireNonNull(context).getBean(name);
     }

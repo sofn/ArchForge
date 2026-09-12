@@ -23,14 +23,16 @@ public interface ProjectModule {
     /** 模块名称 */
     String getModuleName();
 
+    @SuppressWarnings("ReferenceEquality") // INSTANCE 是标记单例、required/input 为注册枚举 —— 恒等语义即所需语义
     static void check(ProjectModule required, ProjectModule input) {
         Preconditions.checkNotNull(required);
         if (input != SystemProjectModule.INSTANCE) {
             Preconditions.checkState(
                     required == input,
-                    "module not match, need: " + required.getProjectName() + "-" + required.getModuleName() + "(" + required
-                            .getProjectCode() + "-" + required.getModuleCode() + ")" + " but input: " + input.getProjectName() +
-                            "-" + input.getModuleName() + "(" + input.getProjectCode() + "-" + input.getModuleCode() + ")");
+                    "module not match, need: %s-%s(%s-%s)" + " but input: %s-%s(%s-%s)", required.getProjectName(), required
+                            .getModuleName(), required
+                                    .getProjectCode(), required.getModuleCode(), input.getProjectName(), input.getModuleName(),
+                    input.getProjectCode(), input.getModuleCode());
         }
     }
 }

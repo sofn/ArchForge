@@ -1,14 +1,15 @@
 package com.lesofn.archforge.server.admin.service.scheduler;
 
 import com.lesofn.archforge.user.api.dao.SysJobLogRepository;
-import org.jspecify.annotations.Nullable;
 import com.lesofn.archforge.user.api.domain.SysJobLog;
 import com.lesofn.archforge.user.api.domain.SysScheduledJob;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.Nullable;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
@@ -48,7 +49,7 @@ public class ReflectionJobHandler {
                 .setMethodName(methodName);
 
         long startMs = System.currentTimeMillis();
-        LocalDateTime startedAt = LocalDateTime.now();
+        LocalDateTime startedAt = LocalDateTime.now(ZoneId.systemDefault());
         try {
             Object bean = applicationContext.getBean(beanName);
             Object[] args = parseParams(methodParams);
@@ -56,7 +57,7 @@ public class ReflectionJobHandler {
             method.invoke(bean, args);
             long duration = System.currentTimeMillis() - startMs;
             logRepository.save(
-                    SysJobLog.success(snapshot, methodParams, duration, startedAt, LocalDateTime.now()));
+                    SysJobLog.success(snapshot, methodParams, duration, startedAt, LocalDateTime.now(ZoneId.systemDefault())));
         } catch (InvocationTargetException e) {
             long duration = System.currentTimeMillis() - startMs;
             Throwable cause = e.getCause() == null ? e : e.getCause();
@@ -73,7 +74,7 @@ public class ReflectionJobHandler {
                             String.valueOf(cause.getMessage()),
                             duration,
                             startedAt,
-                            LocalDateTime.now()));
+                            LocalDateTime.now(ZoneId.systemDefault())));
         } catch (Exception e) {
             long duration = System.currentTimeMillis() - startMs;
             log.error(
@@ -89,7 +90,7 @@ public class ReflectionJobHandler {
                             String.valueOf(e.getMessage()),
                             duration,
                             startedAt,
-                            LocalDateTime.now()));
+                            LocalDateTime.now(ZoneId.systemDefault())));
         }
     }
 

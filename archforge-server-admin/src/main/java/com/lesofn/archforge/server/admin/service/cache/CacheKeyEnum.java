@@ -3,6 +3,8 @@ package com.lesofn.archforge.server.admin.service.cache;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * 缓存 key 枚举。
+ *
  * @author sofn
  */
 public enum CacheKeyEnum {

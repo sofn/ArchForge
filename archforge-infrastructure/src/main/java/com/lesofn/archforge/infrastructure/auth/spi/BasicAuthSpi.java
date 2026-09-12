@@ -1,9 +1,11 @@
 package com.lesofn.archforge.infrastructure.auth.spi;
 
-import com.lesofn.archforge.infrastructure.auth.errors.AdminAuthErrorCode;
-import com.lesofn.archforge.infrastructure.auth.errors.AdminAuthException;
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import com.lesofn.archforge.common.auth.AuthRequest;
 import com.lesofn.archforge.common.auth.UserProvider;
+import com.lesofn.archforge.infrastructure.auth.errors.AdminAuthErrorCode;
+import com.lesofn.archforge.infrastructure.auth.errors.AdminAuthException;
 import com.lesofn.archforge.infrastructure.auth.service.DefaultAuthService;
 import com.lesofn.archforge.infrastructure.frame.utils.log.ApiLogger;
 import java.util.Optional;
@@ -13,6 +15,8 @@ import org.apache.commons.lang3.Strings;
 import org.springframework.stereotype.Component;
 
 /**
+ * HTTP Basic 认证 SPI。
+ *
  * @author sofn
  */
 @Component("BasicAuthSpi")
@@ -24,7 +28,7 @@ public class BasicAuthSpi extends AbstractAuthSpi {
     public String getName() { return SPI_NAME; }
 
     public static String generateBasicAuthHeader(String username, String password) {
-        return "Basic " + new String(Base64.encodeBase64((username + ":" + password).getBytes(), false));
+        return "Basic " + new String(Base64.encodeBase64((username + ":" + password).getBytes(UTF_8), false), UTF_8);
     }
 
     @Override
@@ -46,7 +50,7 @@ public class BasicAuthSpi extends AbstractAuthSpi {
         if (StringUtils.isBlank(base64)) {
             throw new AdminAuthException(AdminAuthErrorCode.USER_AUTHFAIL);
         }
-        String nameAndPasswd = new String(Base64.decodeBase64(base64.getBytes()));
+        String nameAndPasswd = new String(Base64.decodeBase64(base64.getBytes(UTF_8)), UTF_8);
 
         int pos = nameAndPasswd.indexOf(":");
         if (pos < 1 || pos == (nameAndPasswd.length() - 1)) {

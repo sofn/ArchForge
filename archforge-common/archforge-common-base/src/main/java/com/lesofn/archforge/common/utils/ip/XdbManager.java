@@ -40,7 +40,7 @@ import org.jspecify.annotations.Nullable;
 @Slf4j
 public final class XdbManager {
 
-    /** Default CDN templates; overridable via {@link #configure(String, String, String)}. */
+    /** Default CDN templates; overridable via {@link #configure(String, String, String, boolean)}. */
     static final String DEFAULT_V4_URL = "https://cdn.jsdelivr.net/gh/lionsoul2014/ip2region@{version}/data/ip2region_v4.xdb";
 
     /**
@@ -181,7 +181,7 @@ public final class XdbManager {
         }
         Path tmp = target.resolveSibling(target.getFileName() + ".tmp");
         HttpRequest request = HttpRequest.newBuilder(URI.create(url))
-                .timeout(Duration.ofSeconds(300))
+                .timeout(Duration.ofMinutes(5))
                 .GET()
                 .build();
         HttpResponse<InputStream> resp = HTTP.send(request, HttpResponse.BodyHandlers.ofInputStream());

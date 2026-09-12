@@ -122,6 +122,10 @@ subprojects {
         }
         // 5.x DSL: the options extension lives on CompileOptions (options.errorprone { … })
         tasks.withType<JavaCompile>().configureEach {
+            // 警告零基线已达成（2026-09）：-Werror 把所有 javac 诊断 + Error Prone
+            // WARN 级检查（MissingSummary、EmptyBlockTag、UnrecognisedJavadocTag 等
+            // 上游默认 WARN 的检查）一并提升为编译错误 —— 任何警告回归直接 fail。
+            options.compilerArgs.add("-Werror")
             (options as org.gradle.api.plugins.ExtensionAware).extensions
                 .configure<net.ltgt.gradle.errorprone.ErrorProneOptions>("errorprone") {
                     // Baseline severity strategy: default (ERROR) blocks compile for genuine bug
@@ -155,15 +159,6 @@ subprojects {
                                 .joinToString(","))
                     // Generated code (MapStruct impls etc.) is not hand-written — exclude from all checks.
                     excludedPaths.set(".*/build/generated/sources/.*")
-                }
-        }
-
-        // Hand-written annotation stubs are an accepted test idiom; the equals/hashCode
-        // contract they technically violate is irrelevant for read-only stubs.
-        tasks.named<JavaCompile>("compileTestJava") {
-            (options as org.gradle.api.plugins.ExtensionAware).extensions
-                .configure<net.ltgt.gradle.errorprone.ErrorProneOptions>("errorprone") {
-                    check("BadAnnotationImplementation", net.ltgt.gradle.errorprone.CheckSeverity.WARN)
                 }
         }
 

@@ -19,7 +19,7 @@ class UserAndRoleBuilderTest {
         SysUser user = UserTestBuilder.aUser().build();
 
         assertTrue(user.canLogin());
-        assertEquals(Boolean.FALSE, user.getIsAdmin());
+        assertEquals(false, user.getIsAdmin());
         assertNotNull(user.getUsername(), "username must be set for unique constraints");
         assertNotNull(user.getPassword());
     }

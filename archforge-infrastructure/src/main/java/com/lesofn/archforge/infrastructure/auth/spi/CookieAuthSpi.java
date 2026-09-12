@@ -1,17 +1,21 @@
 package com.lesofn.archforge.infrastructure.auth.spi;
 
+import com.google.common.base.Splitter;
+import com.lesofn.archforge.common.auth.AuthRequest;
 import com.lesofn.archforge.common.encrypt.AESEncrypter;
 import com.lesofn.archforge.common.encrypt.EncrypterException;
 import com.lesofn.archforge.infrastructure.auth.errors.AdminAuthErrorCode;
 import com.lesofn.archforge.infrastructure.auth.errors.AdminAuthException;
-import com.lesofn.archforge.common.auth.AuthRequest;
 import com.lesofn.archforge.infrastructure.frame.utils.log.ApiLogger;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.stereotype.Component;
 
 /**
+ * Cookie 会话认证 SPI。
+ *
  * @author sofn 11/24/14.
  */
 @Component("CookieAuthSpi")
@@ -47,13 +51,13 @@ public class CookieAuthSpi extends AbstractAuthSpi {
         String cookie = request.getCookie(COOKIE_NAME);
         try {
             String decryptedString = encrypter.decryptAsString(java.util.Objects.requireNonNull(cookie));
-            String[] timeAndUid = decryptedString.split(":");
-            long time = NumberUtils.toLong(timeAndUid[0], 0);
+            List<String> timeAndUid = Splitter.on(':').splitToList(decryptedString);
+            long time = NumberUtils.toLong(timeAndUid.get(0), 0);
             long now = System.currentTimeMillis();
             if (time > now || now - time > EXPIRES_TIME) {
                 throw new AdminAuthException(AdminAuthErrorCode.USER_AUTHFAIL, "cookie expires.");
             }
-            long uid = NumberUtils.toLong(timeAndUid[1], 0);
+            long uid = NumberUtils.toLong(timeAndUid.get(1), 0);
             if (uid <= 0) {
                 throw new AdminAuthException(AdminAuthErrorCode.USER_AUTHFAIL, "invalid uid.");
             }

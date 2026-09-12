@@ -5,7 +5,6 @@ import cn.dev33.satoken.session.SaSession;
 import cn.dev33.satoken.stp.StpInterface;
 import com.lesofn.archforge.common.auth.SystemLoginUser;
 import com.lesofn.archforge.common.auth.RoleInfo;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.springframework.stereotype.Component;
@@ -23,7 +22,7 @@ public class ArchForgeStpInterface implements StpInterface {
         if (roleInfo == null || roleInfo.getMenuPermissions() == null) {
             return Collections.emptyList();
         }
-        return new ArrayList<>(roleInfo.getMenuPermissions());
+        return List.copyOf(roleInfo.getMenuPermissions());
     }
 
     @Override

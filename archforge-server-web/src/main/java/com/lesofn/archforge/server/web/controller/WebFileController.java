@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import java.util.UUID;
@@ -82,7 +83,7 @@ public class WebFileController {
         String extension = FileUploadValidator.extension(originalName);
         String baseName = UUID.randomUUID().toString().replace("-", "");
         String storageName = extension.isEmpty() ? baseName : baseName + "." + extension;
-        String datePath = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd"));
+        String datePath = LocalDate.now(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("yyyy/MM/dd"));
         String storagePath = datePath + "/" + storageName;
 
         fileStorageService.upload(storagePath, file.getInputStream(), java.util.Objects.requireNonNullElse(file

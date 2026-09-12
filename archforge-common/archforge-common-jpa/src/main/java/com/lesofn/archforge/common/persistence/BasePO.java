@@ -10,6 +10,7 @@ import jakarta.persistence.PreUpdate;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import lombok.Getter;
 import lombok.Setter;
 import org.jspecify.annotations.Nullable;
@@ -51,7 +52,7 @@ public abstract class BasePO implements Serializable {
     @PrePersist
     public void prePersist() {
         if (this.createTime == null) {
-            this.createTime = LocalDateTime.now();
+            this.createTime = LocalDateTime.now(ZoneId.systemDefault());
         }
         if (this.deleted == null) {
             this.deleted = false;
@@ -60,6 +61,6 @@ public abstract class BasePO implements Serializable {
 
     @PreUpdate
     public void preUpdate() {
-        this.updateTime = LocalDateTime.now();
+        this.updateTime = LocalDateTime.now(ZoneId.systemDefault());
     }
 }

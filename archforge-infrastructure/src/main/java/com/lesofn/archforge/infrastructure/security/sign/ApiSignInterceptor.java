@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.HexFormat;
+import java.util.Locale;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import lombok.RequiredArgsConstructor;
@@ -110,7 +111,7 @@ public class ApiSignInterceptor implements HandlerInterceptor {
         SecretKeySpec keySpec = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), HMAC_ALGORITHM);
         mac.init(keySpec);
         byte[] bytes = mac.doFinal(payload.getBytes(StandardCharsets.UTF_8));
-        return HexFormat.of().formatHex(bytes).toLowerCase();
+        return HexFormat.of().formatHex(bytes).toLowerCase(Locale.ROOT);
     }
 
     private boolean constantTimeEquals(String a, String b) {

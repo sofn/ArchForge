@@ -16,7 +16,7 @@ import lombok.Data;
 @SuppressWarnings("NullAway.Init")
 public class SysUserQueryRequest {
 
-    /** Multi-field LIKE across {@code username,nickname,email}. */
+    /** Multi-field LIKE across <code>username,nickname,email</code>. */
     @Query(blurry = "username,nickname,email")
     private String blurry;
 
@@ -38,7 +38,7 @@ public class SysUserQueryRequest {
     @Query
     private Boolean deleted;
 
-    /** Two-element list {@code [start, end]} — ignored if size != 2. */
+    /** Two-element list <code>[start, end]</code> — ignored if size != 2. */
     @Query(type = Query.Type.BETWEEN)
     private List<LocalDateTime> createTime;
 }

@@ -1,7 +1,6 @@
 package com.lesofn.archforge.meta.table.internal.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.jspecify.annotations.Nullable;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.lesofn.archforge.meta.table.api.domain.MetaColumn;
@@ -22,6 +21,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,6 +32,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+import org.jspecify.annotations.Nullable;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -315,7 +316,7 @@ public class MetaTableDataImporter {
         final List<MetaColumn> columns;
         final List<MetaColumn> referenceColumns;
         final Long currentUid;
-        final LocalDateTime now = LocalDateTime.now();
+        final LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
         final long maxRows;
         final int maxErrors;
         final int batchSize;

@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -40,7 +41,7 @@ public class AuthRequest {
                 return defaultValue;
             }
             try {
-                return RequestFrom.valueOf(name.toUpperCase());
+                return RequestFrom.valueOf(name.toUpperCase(Locale.ROOT));
             } catch (Exception e) {
                 return defaultValue;
             }
@@ -114,7 +115,8 @@ public class AuthRequest {
 
     public boolean isMultiPart() {
         String contentType = request.getContentType();
-        return "POST".equals(request.getMethod()) && contentType != null && contentType.toLowerCase().startsWith(MULTIPART);
+        return "POST".equals(request.getMethod()) && contentType != null && contentType.toLowerCase(Locale.ROOT).startsWith(
+                MULTIPART);
     }
 
     public Object getAttribute(String name) {

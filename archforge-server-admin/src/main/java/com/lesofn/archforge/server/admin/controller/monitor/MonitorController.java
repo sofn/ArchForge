@@ -1,10 +1,14 @@
 package com.lesofn.archforge.server.admin.controller.monitor;
 
+import cn.dev33.satoken.annotation.SaCheckLogin;
+import cn.dev33.satoken.annotation.SaCheckPermission;
+import cn.dev33.satoken.annotation.SaCheckRole;
 import cn.dev33.satoken.session.SaSession;
+import com.lesofn.archforge.common.auth.LoginInfo;
 import com.lesofn.archforge.common.auth.SystemLoginUser;
 import com.lesofn.archforge.infrastructure.auth.stp.LoginSessionKeys;
+import com.lesofn.archforge.infrastructure.auth.stp.StpAdminUtil;
 import com.lesofn.archforge.infrastructure.db.redis.RedisUtil;
-import com.lesofn.archforge.common.auth.LoginInfo;
 import com.lesofn.archforge.server.admin.dto.AdminPageResponse;
 import com.lesofn.archforge.server.admin.dto.request.OnlineLogListRequest;
 import com.lesofn.archforge.server.admin.dto.response.CacheInfoResponse;
@@ -14,16 +18,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import cn.dev33.satoken.annotation.SaCheckLogin;
-import cn.dev33.satoken.annotation.SaCheckPermission;
-import cn.dev33.satoken.annotation.SaCheckRole;
-import com.lesofn.archforge.infrastructure.auth.stp.StpAdminUtil;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -114,7 +115,7 @@ public class MonitorController {
         if (str == null || search == null) {
             return false;
         }
-        return str.toLowerCase().contains(search.toLowerCase());
+        return str.toLowerCase(Locale.ROOT).contains(search.toLowerCase(Locale.ROOT));
     }
 
     private String buildInfoString(Properties info) {

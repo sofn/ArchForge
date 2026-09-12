@@ -1,6 +1,8 @@
 package com.lesofn.archforge.infrastructure.auth.annotation;
 
 /**
+ * API 状态枚举。
+ *
  * @author sofn
  */
 public enum ApiStatus {
@@ -10,9 +12,9 @@ public enum ApiStatus {
     COOPERATE(3, "已上线的合作方接口"),
     PUBLIC(4, "已上线的公开接口");
 
-    private int id;
+    private final int id;
 
-    private String desc;
+    private final String desc;
 
     ApiStatus(int id, String desc) {
         this.id = id;

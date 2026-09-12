@@ -12,6 +12,8 @@ import java.io.IOException;
 import jakarta.servlet.FilterConfig;
 
 /**
+ * 向响应写入标准头的过滤器。
+ *
  * @author sofn
  * @version 1.0 Created at: 2015-04-30 18:46
  */

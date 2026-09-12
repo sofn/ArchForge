@@ -14,34 +14,41 @@ public class SysRoleMenuServiceImpl implements SysRoleMenuService {
 
     private final SysRoleMenuRepository roleMenuRepository;
 
+    @Override
     public List<SysRoleMenu> findByRoleId(Long roleId) {
         return roleMenuRepository.findByRoleId(roleId);
     }
 
+    @Override
     public List<SysRoleMenu> findByMenuId(Long menuId) {
         return roleMenuRepository.findByMenuId(menuId);
     }
 
+    @Override
     @Transactional
     public SysRoleMenu create(SysRoleMenu roleMenu) {
         return roleMenuRepository.save(roleMenu);
     }
 
+    @Override
     @Transactional
     public void createBatch(List<SysRoleMenu> roleMenus) {
         roleMenuRepository.saveAll(roleMenus);
     }
 
+    @Override
     @Transactional
     public void deleteByRoleId(Long roleId) {
         roleMenuRepository.deleteByRoleId(roleId);
     }
 
+    @Override
     @Transactional
     public void deleteByMenuId(Long menuId) {
         roleMenuRepository.deleteByMenuId(menuId);
     }
 
+    @Override
     @Transactional
     public void deleteById(Long roleId, Long menuId) {
         SysRoleMenu.SysRoleMenuId id = new SysRoleMenu.SysRoleMenuId();
@@ -50,6 +57,7 @@ public class SysRoleMenuServiceImpl implements SysRoleMenuService {
         roleMenuRepository.deleteById(id);
     }
 
+    @Override
     @Transactional
     public void updateRoleMenus(Long roleId, List<Long> menuIds) {
         roleMenuRepository.deleteByRoleId(roleId);

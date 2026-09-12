@@ -36,6 +36,11 @@ public class RepeatableRequestWrapper extends HttpServletRequestWrapper {
             }
 
             @Override
+            public int read(byte[] b, int off, int len) throws IOException {
+                return bais.read(b, off, len);
+            }
+
+            @Override
             public boolean isFinished() { return bais.available() == 0; }
 
             @Override

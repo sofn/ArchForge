@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -142,7 +143,7 @@ public class MetaTableDdlGenerator {
         sb.append("INDEX IF NOT EXISTS ").append(SqlIdentifier.quote(indexName))
                 .append(" ON ").append(physicalName);
         if ("GIN".equalsIgnoreCase(indexType) || "GIST".equalsIgnoreCase(indexType) || "FULLTEXT".equalsIgnoreCase(indexType)) {
-            String pgType = "FULLTEXT".equalsIgnoreCase(indexType) ? "GIN" : indexType.toUpperCase();
+            String pgType = "FULLTEXT".equalsIgnoreCase(indexType) ? "GIN" : indexType.toUpperCase(Locale.ROOT);
             sb.append(" USING ").append(pgType);
         }
         sb.append(" (").append(columnsPart).append(")");

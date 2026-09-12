@@ -1,14 +1,17 @@
 package com.lesofn.archforge.common.repository;
 
 import jakarta.persistence.MappedSuperclass;
-import org.jspecify.annotations.Nullable;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import lombok.Getter;
 import lombok.Setter;
+import org.jspecify.annotations.Nullable;
 
 /**
+ * JPA 实体基类：主键与审计字段。
+ *
  * @author sofn
  * @version 1.0 Created at: 2025-09-14 23:06
  */
@@ -33,7 +36,7 @@ public class BaseEntity<T> {
     @PrePersist
     public void prePersist() {
         if (this.createTime == null) {
-            this.createTime = LocalDateTime.now();
+            this.createTime = LocalDateTime.now(ZoneId.systemDefault());
         }
         if (this.deleted == null) {
             this.deleted = false;
@@ -42,6 +45,6 @@ public class BaseEntity<T> {
 
     @PreUpdate
     public void preUpdate() {
-        this.updateTime = LocalDateTime.now();
+        this.updateTime = LocalDateTime.now(ZoneId.systemDefault());
     }
 }

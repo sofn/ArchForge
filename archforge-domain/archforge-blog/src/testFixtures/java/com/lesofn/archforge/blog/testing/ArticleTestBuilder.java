@@ -3,6 +3,7 @@ package com.lesofn.archforge.blog.testing;
 import com.lesofn.archforge.blog.api.domain.BlogArticle;
 import com.lesofn.archforge.blog.api.enums.BlogArticleStatus;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -64,7 +65,7 @@ public final class ArticleTestBuilder {
     /** Marks the article published without going through the domain state machine. */
     public ArticleTestBuilder published() {
         article.setStatus(BlogArticleStatus.PUBLISHED);
-        article.setPublishTime(LocalDateTime.now());
+        article.setPublishTime(LocalDateTime.now(ZoneId.systemDefault()));
         return this;
     }
 

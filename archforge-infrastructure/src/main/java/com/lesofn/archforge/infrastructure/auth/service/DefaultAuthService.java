@@ -2,29 +2,30 @@ package com.lesofn.archforge.infrastructure.auth.service;
 
 import static com.lesofn.archforge.infrastructure.auth.errors.AdminAuthErrorCode.USER_AUTHFAIL;
 
-import org.jspecify.annotations.Nullable;
-import java.util.Objects;
+import com.lesofn.archforge.common.auth.AuthRequest;
+import com.lesofn.archforge.common.auth.UserProvider;
 import com.lesofn.archforge.common.context.ClientVersion;
 import com.lesofn.archforge.infrastructure.auth.annotation.AuthType;
 import com.lesofn.archforge.infrastructure.auth.annotation.BaseInfo;
 import com.lesofn.archforge.infrastructure.auth.errors.AdminAuthException;
-import com.lesofn.archforge.common.auth.AuthRequest;
 import com.lesofn.archforge.infrastructure.auth.model.AuthResponse;
 import com.lesofn.archforge.infrastructure.auth.provider.DefaultUserProvider;
-import com.lesofn.archforge.common.auth.UserProvider;
 import com.lesofn.archforge.infrastructure.auth.spi.AuthSpi;
 import com.lesofn.archforge.infrastructure.auth.spi.BasicAuthSpi;
 import com.lesofn.archforge.infrastructure.auth.spi.GuestAuthSpi;
 import com.lesofn.archforge.infrastructure.auth.spi.NullAuthSpi;
 import com.lesofn.archforge.infrastructure.frame.spring.ApplicationContextHolder;
-import java.util.List;
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -132,9 +133,11 @@ public class DefaultAuthService implements AuthService, ApplicationContextAware,
         }
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({
+            "unchecked", "TypeParameterUnusedInFormals"
+    }) // 泛型仅作返回类型 cast 辅助
     public <T extends AuthSpi> @Nullable T getAuthSpi(String name) {
-        return (T) this.authSpiMap.get(name.toLowerCase());
+        return (T) this.authSpiMap.get(name.toLowerCase(Locale.ROOT));
     }
 
     public static Optional<UserProvider> getUserProvider() {

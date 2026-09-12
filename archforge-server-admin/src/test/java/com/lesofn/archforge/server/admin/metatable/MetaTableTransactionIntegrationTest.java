@@ -151,7 +151,7 @@ class MetaTableTransactionIntegrationTest extends AbstractIntegrationTest {
         Boolean tableGone = jdbc
                 .getJdbcOperations()
                 .queryForObject("SELECT to_regclass('" + PROBE_TABLE + "') IS NULL", Boolean.class);
-        assertEquals(Boolean.TRUE, tableGone, "physical table must roll back");
+        assertEquals(true, tableGone, "physical table must roll back");
     }
 
     @Test

@@ -13,6 +13,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
+ * 错误码注册与检索管理器。
+ *
  * @author sofn
  * @version 1.0 Created at: 2022-03-10 10:34
  */
@@ -31,7 +33,7 @@ public class ErrorManager {
         Preconditions.checkArgument(projectModule.getModuleCode() >= 0);
         Preconditions.checkArgument(errorCode.getNodeNum() >= 0);
         int code = genCode(projectModule, errorCode);
-        Preconditions.checkArgument(!GLOBAL_ERROR_CODE_MAP.containsKey(code), "错误码重复:" + code);
+        Preconditions.checkArgument(!GLOBAL_ERROR_CODE_MAP.containsKey(code), "错误码重复:%s", code);
         GLOBAL_ERROR_CODE_MAP.put(code, errorCode);
         ERROR_PROJECT_MODULE_MAP.put(errorCode, projectModule);
     }
@@ -87,7 +89,7 @@ public class ErrorManager {
 
     public static int genCode(ErrorCode errorCode) {
         Integer code = GLOBAL_ERROR_CODE_MAP.inverse().get(errorCode);
-        Preconditions.checkArgument(code != null, "unregistered ErrorCode: " + errorCode);
+        Preconditions.checkArgument(code != null, "unregistered ErrorCode: %s", errorCode);
         return code;
     }
 

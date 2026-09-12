@@ -16,24 +16,29 @@ public class SysNoticeServiceImpl implements SysNoticeService {
 
     private final SysNoticeRepository noticeRepository;
 
+    @Override
     public Optional<SysNotice> findById(Long noticeId) {
         return noticeRepository.findById(noticeId);
     }
 
+    @Override
     public Page<SysNotice> findAll(Pageable pageable) {
         return noticeRepository.findAll(pageable);
     }
 
+    @Override
     @Transactional
     public SysNotice create(SysNotice notice) {
         return noticeRepository.save(notice);
     }
 
+    @Override
     @Transactional
     public SysNotice update(SysNotice notice) {
         return noticeRepository.save(notice);
     }
 
+    @Override
     @Transactional
     public void deleteById(Long noticeId) {
         noticeRepository.deleteById(noticeId);

@@ -13,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 /**
+ * 基于 Redis 的缓存服务。
+ *
  * @author sofn
  */
 @Component

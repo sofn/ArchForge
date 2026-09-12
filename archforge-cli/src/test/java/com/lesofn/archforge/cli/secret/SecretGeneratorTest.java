@@ -5,10 +5,11 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.google.common.base.Splitter;
 import java.nio.file.Files;
-import org.jspecify.annotations.Nullable;
 import java.nio.file.Path;
 import java.util.Map;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -48,7 +49,7 @@ class SecretGeneratorTest {
     }
 
     private static @Nullable String readEnv(String content, String key) {
-        for (String line : content.split("\n")) {
+        for (String line : Splitter.on('\n').split(content)) {
             if (line.startsWith(key + "=")) {
                 return line.substring(key.length() + 1);
             }

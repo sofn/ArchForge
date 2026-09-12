@@ -2,6 +2,7 @@ package com.lesofn.archforge.server.admin.config;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +32,7 @@ public class SystemMenuInitializer implements ApplicationRunner {
                 return;
             }
 
-            LocalDateTime now = LocalDateTime.now();
+            LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
             Timestamp ts = Timestamp.valueOf(now);
 
             List<Map<String, Object>> parentRows = jdbcTemplate.queryForList(

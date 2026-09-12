@@ -18,6 +18,7 @@ import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.HexFormat;
+import java.util.Locale;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import org.junit.jupiter.api.BeforeEach;
@@ -156,7 +157,7 @@ class ApiSignInterceptorTest {
         Mac mac = Mac.getInstance("HmacSHA256");
         mac.init(new SecretKeySpec(APP_SECRET.getBytes(StandardCharsets.UTF_8), "HmacSHA256"));
         byte[] bytes = mac.doFinal(payload.getBytes(StandardCharsets.UTF_8));
-        return HexFormat.of().formatHex(bytes).toLowerCase();
+        return HexFormat.of().formatHex(bytes).toLowerCase(Locale.ROOT);
     }
 
     private HandlerMethod handlerMethod(String name) throws NoSuchMethodException {
@@ -164,6 +165,9 @@ class ApiSignInterceptorTest {
         return new HandlerMethod(new TestController(), method);
     }
 
+    @SuppressWarnings({
+            "UnusedMethod", "EffectivelyPrivate"
+    }) // 方法经 TestController.class.getMethod(name) 反射取用
     private static class TestController {
         @ApiSign
         public void signed() {

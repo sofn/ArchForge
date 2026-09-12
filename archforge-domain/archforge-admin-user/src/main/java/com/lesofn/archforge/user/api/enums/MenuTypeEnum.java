@@ -5,6 +5,8 @@ import com.lesofn.archforge.common.enums.dictionary.Dictionary;
 import lombok.Getter;
 
 /**
+ * 菜单类型枚举，对应 sys_menu.menu_type。
+ *
  * @author sofn 对应 sys_menu表的menu_type字段
  */
 @Getter

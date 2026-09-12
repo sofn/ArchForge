@@ -9,6 +9,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
+ * 菜单 DTO。
+ *
  * @author sofn
  */
 @Data

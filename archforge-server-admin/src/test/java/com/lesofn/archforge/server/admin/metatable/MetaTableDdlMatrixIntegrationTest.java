@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.jspecify.annotations.Nullable;
 import com.lesofn.archforge.common.persistence.testsupport.AbstractIntegrationTest;
 import com.lesofn.archforge.meta.table.api.domain.MetaColumn;
 import com.lesofn.archforge.meta.table.api.domain.MetaColumnType;
@@ -25,20 +24,22 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
-import org.junit.jupiter.api.Test;
+import org.postgresql.util.PGobject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.postgresql.util.PGobject;
 
 /**
  * DDL 回归矩阵：17 种字段类型 × 建表物理类型断言 + 数据写入读回 + 关键 ALTER 场景，
@@ -198,7 +199,7 @@ class MetaTableDdlMatrixIntegrationTest extends AbstractIntegrationTest {
 
     private void assertPhysicalType(String physicalName, MetaColumnType type) {
         String dataType = java.util.Objects.requireNonNull(physicalDataType(physicalName, "payload"));
-        assertEquals(expectedPgType(type), dataType.toLowerCase(), () -> type + " physical type mismatch");
+        assertEquals(expectedPgType(type), dataType.toLowerCase(Locale.ROOT), () -> type + " physical type mismatch");
 
         switch (type) {
             case STRING, ENUM -> assertEquals(255,
@@ -265,7 +266,7 @@ class MetaTableDdlMatrixIntegrationTest extends AbstractIntegrationTest {
             case INTEGER, FILE, IMAGE, REFERENCE -> assertEquals(((Number) expected).longValue(), ((Number) actual)
                     .longValue());
             case DECIMAL -> assertEquals(0, new BigDecimal(actual.toString()).compareTo((BigDecimal) expected));
-            case BOOLEAN -> assertEquals(Boolean.TRUE, actual);
+            case BOOLEAN -> assertEquals(true, actual);
             case DATE -> assertEquals(expected, ((java.sql.Date) actual).toLocalDate());
             case DATETIME -> assertEquals(LocalDateTime.parse(expected.toString().replace(' ', 'T')), ((Timestamp) actual)
                     .toLocalDateTime());

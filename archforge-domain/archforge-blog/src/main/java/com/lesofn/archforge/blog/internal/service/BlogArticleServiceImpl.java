@@ -1,15 +1,17 @@
 package com.lesofn.archforge.blog.internal.service;
 
 import com.lesofn.archforge.blog.api.dao.BlogArticleRepository;
-import org.jspecify.annotations.Nullable;
 import com.lesofn.archforge.blog.api.dao.BlogCategoryRepository;
 import com.lesofn.archforge.blog.api.domain.BlogArticle;
 import com.lesofn.archforge.blog.api.enums.BlogArticleStatus;
 import com.lesofn.archforge.blog.api.errors.BlogErrorCode;
 import com.lesofn.archforge.blog.api.errors.BlogException;
 import com.lesofn.archforge.blog.api.service.BlogArticleService;
+import java.time.ZoneId;
+import java.util.Locale;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.Nullable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -34,8 +36,8 @@ public class BlogArticleServiceImpl implements BlogArticleService {
             if (StringUtils.hasText(keyword)) {
                 predicate = cb.and(predicate,
                         cb.or(
-                                cb.like(cb.lower(root.get("title")), "%" + keyword.toLowerCase() + "%"),
-                                cb.like(cb.lower(root.get("summary")), "%" + keyword.toLowerCase() + "%")));
+                                cb.like(cb.lower(root.get("title")), "%" + keyword.toLowerCase(Locale.ROOT) + "%"),
+                                cb.like(cb.lower(root.get("summary")), "%" + keyword.toLowerCase(Locale.ROOT) + "%")));
             }
             if (status != null) {
                 predicate = cb.and(predicate, cb.equal(root.get("status"), status));
@@ -85,7 +87,7 @@ public class BlogArticleServiceImpl implements BlogArticleService {
             throw new BlogException(BlogErrorCode.SLUG_EXISTS);
         }
         if (article.getStatus() == BlogArticleStatus.PUBLISHED) {
-            article.setPublishTime(java.time.LocalDateTime.now());
+            article.setPublishTime(java.time.LocalDateTime.now(ZoneId.systemDefault()));
         }
         return articleRepository.save(article);
     }
@@ -105,7 +107,7 @@ public class BlogArticleServiceImpl implements BlogArticleService {
                 .setCoverImageFileId(article.getCoverImageFileId())
                 .setStatus(article.getStatus());
         if (article.getStatus() == BlogArticleStatus.PUBLISHED && existing.getPublishTime() == null) {
-            existing.setPublishTime(java.time.LocalDateTime.now());
+            existing.setPublishTime(java.time.LocalDateTime.now(ZoneId.systemDefault()));
         }
         return articleRepository.save(existing);
     }

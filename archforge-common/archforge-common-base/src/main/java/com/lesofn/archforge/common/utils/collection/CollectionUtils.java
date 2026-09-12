@@ -5,7 +5,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Gatherers;
 import org.apache.commons.lang3.StringUtils;
@@ -21,7 +20,7 @@ public class CollectionUtils {
 
     public static List<String> strListSplitter(String str) {
         if (StringUtils.isEmpty(str)) {
-            return Collections.emptyList();
+            return Lists.newArrayList();
         }
         return Lists.newArrayList(LIST_SPLITTER.split(str));
     }
@@ -37,7 +36,7 @@ public class CollectionUtils {
 
     public static List<String> strLineSplitter(String str) {
         if (StringUtils.isEmpty(str)) {
-            return Collections.emptyList();
+            return Lists.newArrayList();
         }
         return Lists.newArrayList(LINE_SPLITTER.split(str));
     }

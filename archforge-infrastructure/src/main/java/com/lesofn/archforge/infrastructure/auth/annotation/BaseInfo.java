@@ -6,6 +6,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * 认证注解公共属性。
+ *
  * @author sofn
  */
 @Retention(RetentionPolicy.RUNTIME)

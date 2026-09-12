@@ -7,7 +7,9 @@ import com.lesofn.archforge.server.web.mail.MailSender;
 import java.security.SecureRandom;
 import java.time.Duration;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -110,15 +112,15 @@ public class VerificationCodeService {
     }
 
     private String codeKey(String email, VerificationCodePurpose purpose) {
-        return CODE_KEY_PREFIX + purpose.name().toLowerCase() + ":" + email;
+        return CODE_KEY_PREFIX + purpose.name().toLowerCase(Locale.ROOT) + ":" + email;
     }
 
     private String lockKey(String email, VerificationCodePurpose purpose) {
-        return LOCK_KEY_PREFIX + purpose.name().toLowerCase() + ":" + email;
+        return LOCK_KEY_PREFIX + purpose.name().toLowerCase(Locale.ROOT) + ":" + email;
     }
 
     private String dailyCountKey(String email, VerificationCodePurpose purpose) {
-        String date = LocalDate.now().format(DATE_FORMATTER);
-        return DAILY_COUNT_KEY_PREFIX + purpose.name().toLowerCase() + ":" + date + ":" + email;
+        String date = LocalDate.now(ZoneId.systemDefault()).format(DATE_FORMATTER);
+        return DAILY_COUNT_KEY_PREFIX + purpose.name().toLowerCase(Locale.ROOT) + ":" + date + ":" + email;
     }
 }

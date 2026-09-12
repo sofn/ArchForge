@@ -3,6 +3,8 @@ package com.lesofn.archforge.common.error.system;
 import com.lesofn.archforge.common.error.api.ProjectModule;
 
 /**
+ * 系统级错误码所属的项目模块标识。
+ *
  * @author sofn
  * @version 1.0 Created at: 2022-03-09 18:05
  */

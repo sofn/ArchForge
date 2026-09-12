@@ -14,7 +14,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
-import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -43,15 +42,6 @@ public class WebConfig implements WebMvcConfigurer {
         converter.setSupportedMediaTypes(
                 Arrays.asList(MediaType.APPLICATION_JSON, MediaType.MULTIPART_FORM_DATA));
         return converter;
-    }
-
-    @Override
-    public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
-        boolean has = converters.stream()
-                .anyMatch(c -> c instanceof JacksonJsonHttpMessageConverter);
-        if (!has) {
-            converters.add(0, jacksonJsonHttpMessageConverter());
-        }
     }
 
     @Override

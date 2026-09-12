@@ -4,6 +4,8 @@ import com.lesofn.archforge.common.auth.AuthRequest;
 import com.lesofn.archforge.infrastructure.frame.utils.log.ApiLogger;
 
 /**
+ * AuthSpi 抽象基类。
+ *
  * @author sofn
  */
 public abstract class AbstractAuthSpi implements AuthSpi {

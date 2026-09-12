@@ -8,6 +8,8 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.stereotype.Component;
 
 /**
+ * 可信主机认证 SPI。
+ *
  * @author sofn
  */
 @Component("TrustHostSpi")

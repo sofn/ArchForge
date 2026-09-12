@@ -8,6 +8,7 @@ import com.lesofn.archforge.common.error.exception.BaseRuntimeException;
 /**
  * 安全模块运行时异常，保证 projectModule 与 {@link SecurityErrorCode} 注册模块一致。
  */
+@SuppressWarnings("AvoidCommonTypeNames") // 模块内 SecurityErrorCode 配套的专用异常名
 public class SecurityException extends BaseRuntimeException {
 
     public SecurityException(ErrorCode errorCode) {

@@ -3,6 +3,8 @@ package com.lesofn.archforge.common.auth;
 import lombok.Data;
 
 /**
+ * 登录信息载体。
+ *
  * @author sofn
  */
 @Data

@@ -82,7 +82,9 @@ public class RedisUtil {
      * @param key 缓存键值
      * @return 缓存键值对应的数据
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({
+            "unchecked", "TypeParameterUnusedInFormals"
+    }) // 泛型仅作返回类型 cast 辅助
     public <T> T getCacheObject(final String key) {
         return (T) redisTemplate.opsForValue().get(key);
     }
@@ -177,7 +179,9 @@ public class RedisUtil {
      * @param hKey Hash键
      * @return Hash中的对象
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({
+            "unchecked", "TypeParameterUnusedInFormals"
+    }) // 泛型仅作返回类型 cast 辅助
     public <T> T getCacheMapValue(final String key, final String hKey) {
         return (T) redisTemplate.opsForHash().get(key, hKey);
     }

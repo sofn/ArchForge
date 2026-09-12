@@ -4,6 +4,8 @@ import java.net.UnknownHostException;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
+ * 请求 ID 生成器。
+ *
  * @author sofn
  */
 public class RequestIDGenerator {

@@ -5,6 +5,8 @@ import com.lesofn.archforge.common.error.api.ProjectModule;
 import com.lesofn.archforge.common.error.manager.ErrorInfo;
 
 /**
+ * 业务受检异常基类。
+ *
  * @author sofn
  * @version 1.0 Created at: 2022-03-09 16:41
  */

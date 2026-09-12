@@ -5,6 +5,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
+ * 菜单详情 DTO。
+ *
  * @author sofn
  */
 @EqualsAndHashCode(callSuper = true)

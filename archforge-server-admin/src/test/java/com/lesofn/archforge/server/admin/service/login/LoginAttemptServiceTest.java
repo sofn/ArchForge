@@ -56,6 +56,6 @@ class LoginAttemptServiceTest {
         when(redisTemplate.opsForValue()).thenReturn(valueOperations);
         when(valueOperations.increment("login:attempts:admin")).thenReturn(1L);
         loginAttemptService.recordFailure("admin");
-        verify(redisTemplate).expire(eq("login:attempts:admin"), eq(Duration.ofSeconds(600)));
+        verify(redisTemplate).expire(eq("login:attempts:admin"), eq(Duration.ofMinutes(10)));
     }
 }

@@ -27,7 +27,7 @@ public final class DataScopeContextHolder {
             return null;
         }
         Object value = requestContext.getAttribute(KEY);
-        return value instanceof DataScopeContext ? (DataScopeContext) value : null;
+        return value instanceof DataScopeContext dataScopeContext ? dataScopeContext : null;
     }
 
     /**

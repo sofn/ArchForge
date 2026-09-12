@@ -41,10 +41,10 @@ public class ServletHolderUtil {
 
     public static @Nullable ServletRequestAttributes getRequestAttributes() {
         RequestAttributes attributes = RequestContextHolder.getRequestAttributes();
-        if (attributes == null || !(attributes instanceof ServletRequestAttributes)) {
+        if (attributes == null || !(attributes instanceof ServletRequestAttributes servletRequestAttributes)) {
             return null;
         }
-        return (ServletRequestAttributes) attributes;
+        return servletRequestAttributes;
     }
 
     /**

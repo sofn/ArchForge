@@ -46,6 +46,11 @@ class ChatSessionBuilderTest {
         first.clear();
 
         assertEquals(1, builder.buildMessages().size());
-        assertTrue(first != builder.buildMessages());
+        assertDistinctInstances(first, builder.buildMessages());
+    }
+
+    @SuppressWarnings("ReferenceEquality") // 断言的是"每次返回新实例"这一引用语义本身
+    private static void assertDistinctInstances(Object a, Object b) {
+        assertTrue(a != b);
     }
 }

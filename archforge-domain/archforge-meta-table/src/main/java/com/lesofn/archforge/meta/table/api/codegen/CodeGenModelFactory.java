@@ -1,11 +1,12 @@
 package com.lesofn.archforge.meta.table.api.codegen;
 
+import com.google.common.base.Splitter;
+import com.lesofn.archforge.meta.table.api.codegen.extension.CodeGenExtensionRegistry;
 import com.lesofn.archforge.meta.table.api.domain.MetaColumn;
 import com.lesofn.archforge.meta.table.api.domain.MetaColumnType;
 import com.lesofn.archforge.meta.table.api.domain.MetaTable;
 import com.lesofn.archforge.meta.table.api.domain.OptionItem;
 import com.lesofn.archforge.meta.table.api.service.DictionaryProvider;
-import com.lesofn.archforge.meta.table.api.codegen.extension.CodeGenExtensionRegistry;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -228,7 +229,7 @@ public final class CodeGenModelFactory {
     }
 
     public static String toClassName(String tableCode) {
-        String[] parts = NON_ALPHANUMERIC.split(tableCode);
+        Iterable<String> parts = Splitter.on(NON_ALPHANUMERIC).split(tableCode);
         StringBuilder sb = new StringBuilder();
         for (String part : parts) {
             if (part.isEmpty()) {
@@ -243,10 +244,10 @@ public final class CodeGenModelFactory {
     }
 
     public static String toCamelCase(String columnCode) {
-        String[] parts = NON_ALPHANUMERIC.split(columnCode);
+        List<String> parts = Splitter.on(NON_ALPHANUMERIC).splitToList(columnCode);
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < parts.length; i++) {
-            String part = parts[i];
+        for (int i = 0; i < parts.size(); i++) {
+            String part = parts.get(i);
             if (part.isEmpty()) {
                 continue;
             }

@@ -4,6 +4,8 @@ import lombok.Data;
 import org.jspecify.annotations.Nullable;
 
 /**
+ * 用户动态查询条件。
+ *
  * @author lesofn
  */
 @Data

@@ -4,8 +4,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.lesofn.archforge.common.utils.URLUtils;
 import java.io.Serializable;
 import org.apache.commons.lang3.StringUtils;
-import org.jspecify.annotations.Nullable;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.jspecify.annotations.Nullable;
 
 /**
  * 客户端版本号解析类
@@ -43,6 +43,7 @@ public class ClientVersion implements Serializable {
         }
 
         @JsonCreator
+        @SuppressWarnings("StringSplitter") // 依赖 split() 丢弃尾部空段的语义（缺失字段走默认值）
         public static Version valueOf(String version) {
             if (StringUtils.isBlank(version)) {
                 return NULL;
@@ -67,6 +68,7 @@ public class ClientVersion implements Serializable {
         }
 
         @Override
+        @SuppressWarnings("EqualsGetClass") // 值对象严格类型相等，无子类场景
         public boolean equals(Object obj) {
             if (this == obj)
                 return true;
@@ -86,6 +88,7 @@ public class ClientVersion implements Serializable {
             return true;
         }
 
+        @Override
         public String toString() {
             return this.major + SPLIT + this.minor + SPLIT + this.revision + SPLIT + build;
         }
@@ -134,6 +137,7 @@ public class ClientVersion implements Serializable {
     }
 
     @JsonCreator
+    @SuppressWarnings("StringSplitter") // 依赖 split() 丢弃尾部空段的语义（缺失字段走默认值；channel 取末段）
     public static @Nullable ClientVersion valueOf(@Nullable String versionHeader) {
         if (StringUtils.isBlank(versionHeader)) {
             return NULL;
@@ -158,6 +162,7 @@ public class ClientVersion implements Serializable {
         }
     }
 
+    @Override
     public String toString() {
         return sdkVersion + SPLIT + clientVersion + SPLIT + udid + SPLIT + device + SPLIT + channel;
     }
@@ -172,6 +177,7 @@ public class ClientVersion implements Serializable {
     }
 
     @Override
+    @SuppressWarnings("EqualsGetClass") // 值对象严格类型相等，无子类场景
     public boolean equals(Object obj) {
         if (this == obj)
             return true;

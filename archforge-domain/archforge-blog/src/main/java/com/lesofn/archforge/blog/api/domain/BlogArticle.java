@@ -1,24 +1,25 @@
 package com.lesofn.archforge.blog.api.domain;
 
 import com.lesofn.archforge.blog.api.enums.BlogArticleStatus;
-import org.jspecify.annotations.Nullable;
 import com.lesofn.archforge.blog.api.errors.BlogErrorCode;
 import com.lesofn.archforge.blog.api.errors.BlogException;
 import com.lesofn.archforge.common.repository.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import jakarta.persistence.EnumType;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+import org.jspecify.annotations.Nullable;
 
 @Setter
 @Getter
@@ -67,7 +68,7 @@ public class BlogArticle extends BaseEntity<BlogArticle> {
             throw new BlogException(BlogErrorCode.STATUS_TRANSITION_INVALID);
         }
         this.status = BlogArticleStatus.PUBLISHED;
-        this.publishTime = LocalDateTime.now();
+        this.publishTime = LocalDateTime.now(ZoneId.systemDefault());
         return this;
     }
 

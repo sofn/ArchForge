@@ -13,6 +13,8 @@ import org.hibernate.usertype.DynamicParameterizedType;
 import org.hibernate.usertype.UserType;
 
 /**
+ * 值枚举的 Hibernate UserType 映射。
+ *
  * @author sofn
  * @version 1.0 Created at: 2021-01-29 14:53 Updated for Hibernate 7.x compatibility
  */

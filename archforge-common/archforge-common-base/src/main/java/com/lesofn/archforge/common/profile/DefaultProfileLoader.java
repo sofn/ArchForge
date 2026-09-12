@@ -15,6 +15,8 @@ import org.springframework.core.io.support.PropertiesLoaderUtils;
 import org.yaml.snakeyaml.Yaml;
 
 /**
+ * 默认 profile 加载器。
+ *
  * @author sofn
  */
 @Slf4j

@@ -24,6 +24,8 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 
 /**
+ * 认证资源过滤器。
+ *
  * @author sofn
  */
 // @Service
@@ -45,8 +47,10 @@ public class AuthResourceFilter extends RequestMappingHandlerAdapter {
                 "/swagger-resources") || Strings.CS.startsWith(request.getRequestURI(), "/v3/api-docs") || Strings.CS
                         .startsWith(request.getRequestURI(), "/swagger-ui") || Strings.CS.equals(request.getRequestURI(),
                                 "/swagger-ui.html") || Strings.CS.endsWithAny(
-                                        request.getRequestURI(), GlobalConstants.STATIC_RESOURCE_ARRAY) || !Strings.CS.equals(
-                                                profile, "prod")) {
+                                        request.getRequestURI(),
+                                        GlobalConstants.STATIC_RESOURCE_EXTENSIONS.toArray(String[]::new)) || !Strings.CS
+                                                .equals(
+                                                        profile, "prod")) {
             return super.handleInternal(request, response, handlerMethod);
         }
 

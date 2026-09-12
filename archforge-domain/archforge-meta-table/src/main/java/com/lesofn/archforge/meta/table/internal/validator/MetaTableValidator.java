@@ -1,7 +1,6 @@
 package com.lesofn.archforge.meta.table.internal.validator;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.jspecify.annotations.Nullable;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lesofn.archforge.meta.table.api.dao.MetaColumnRepository;
 import com.lesofn.archforge.meta.table.api.dao.MetaTableRepository;
@@ -9,13 +8,10 @@ import com.lesofn.archforge.meta.table.api.domain.MetaColumn;
 import com.lesofn.archforge.meta.table.api.domain.MetaColumnType;
 import com.lesofn.archforge.meta.table.api.domain.MetaTable;
 import com.lesofn.archforge.meta.table.api.domain.OptionItem;
-import com.lesofn.archforge.meta.table.api.service.DictionaryProvider;
-import com.lesofn.archforge.meta.table.internal.ddl.SqlIdentifier;
 import com.lesofn.archforge.meta.table.api.errors.MetaTableErrorCode;
 import com.lesofn.archforge.meta.table.api.errors.MetaTableException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import com.lesofn.archforge.meta.table.api.service.DictionaryProvider;
+import com.lesofn.archforge.meta.table.internal.ddl.SqlIdentifier;
 import java.math.BigDecimal;
 import java.sql.Array;
 import java.sql.SQLException;
@@ -28,12 +24,17 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import org.jspecify.annotations.Nullable;
 import org.postgresql.util.PGobject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
 
 /**
@@ -143,14 +144,14 @@ public class MetaTableValidator {
         }
         if (column.getSearchType() != null && !column.getSearchType().isEmpty()) {
             Set<String> validSearchTypes = Set.of("EXACT", "LIKE", "RANGE");
-            if (!validSearchTypes.contains(column.getSearchType().toUpperCase())) {
+            if (!validSearchTypes.contains(column.getSearchType().toUpperCase(Locale.ROOT))) {
                 throw new MetaTableException(MetaTableErrorCode.META_COLUMN_TYPE_INVALID, "不支持的搜索方式: " + column
                         .getSearchType());
             }
         }
         if (column.getIndexType() != null && !column.getIndexType().isEmpty()) {
             Set<String> validTypes = Set.of("BTREE", "GIN", "GIST", "FULLTEXT");
-            if (!validTypes.contains(column.getIndexType().toUpperCase())) {
+            if (!validTypes.contains(column.getIndexType().toUpperCase(Locale.ROOT))) {
                 throw new MetaTableException(MetaTableErrorCode.META_COLUMN_TYPE_INVALID, "不支持的索引类型: " + column.getIndexType());
             }
         }
@@ -166,7 +167,7 @@ public class MetaTableValidator {
             return;
         }
         String noStrings = expression.replaceAll("'(?:''|[^'])*'", "''");
-        String upper = noStrings.toUpperCase();
+        String upper = noStrings.toUpperCase(Locale.ROOT);
         if (upper.contains("--") || upper.contains("/*") || upper.contains("*/") || upper.contains(";")) {
             throw new MetaTableException(MetaTableErrorCode.META_COLUMN_TYPE_INVALID, "显示表达式包含非法字符");
         }
@@ -368,10 +369,10 @@ public class MetaTableValidator {
     }
 
     private void validateJson(Object value) {
-        if (!(value instanceof String)) {
+        if (!(value instanceof String string)) {
             return;
         }
-        String str = ((String) value).trim();
+        String str = string.trim();
         if (str.isEmpty()) {
             throw new MetaTableException(MetaTableErrorCode.META_COLUMN_VALUE_INVALID, "JSON 不能为空");
         }
@@ -394,7 +395,8 @@ public class MetaTableValidator {
 
     private void validateArray(MetaColumn column, Object value) {
         List<String> elements = parseArrayElements(value);
-        String elementType = column.getArrayElementType() == null ? "STRING" : column.getArrayElementType().toUpperCase();
+        String elementType = column.getArrayElementType() == null ? "STRING"
+                : column.getArrayElementType().toUpperCase(Locale.ROOT);
         for (String element : elements) {
             switch (elementType) {
                 case "INTEGER" -> Long.parseLong(element);
@@ -411,8 +413,8 @@ public class MetaTableValidator {
 
     private JsonNode parseJsonNode(Object value) {
         try {
-            if (value instanceof String) {
-                return OBJECT_MAPPER.readTree((String) value);
+            if (value instanceof String string) {
+                return OBJECT_MAPPER.readTree(string);
             }
             return OBJECT_MAPPER.valueToTree(value);
         } catch (Exception e) {
@@ -528,7 +530,8 @@ public class MetaTableValidator {
 
     private PGobject toPgArray(MetaColumn column, Object value) {
         List<String> elements = parseArrayElements(value);
-        String elementType = column.getArrayElementType() == null ? "STRING" : column.getArrayElementType().toUpperCase();
+        String elementType = column.getArrayElementType() == null ? "STRING"
+                : column.getArrayElementType().toUpperCase(Locale.ROOT);
         String arrayType = switch (elementType) {
             case "INTEGER" -> "bigint[]";
             case "DECIMAL" -> "numeric[]";
@@ -605,8 +608,8 @@ public class MetaTableValidator {
         if (value instanceof Array sqlArray) {
             try {
                 Object array = sqlArray.getArray();
-                if (array instanceof Object[]) {
-                    return Arrays.toString((Object[]) array);
+                if (array instanceof Object[] array2) {
+                    return Arrays.toString(array2);
                 }
                 return array.toString();
             } catch (SQLException e) {

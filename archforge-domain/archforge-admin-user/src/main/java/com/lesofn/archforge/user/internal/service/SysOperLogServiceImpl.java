@@ -16,24 +16,29 @@ public class SysOperLogServiceImpl implements SysOperLogService {
 
     private final SysOperLogRepository operLogRepository;
 
+    @Override
     public Optional<SysOperLog> findById(Long operId) {
         return operLogRepository.findById(operId);
     }
 
+    @Override
     public Page<SysOperLog> findAll(Pageable pageable) {
         return operLogRepository.findAll(pageable);
     }
 
+    @Override
     @Transactional
     public SysOperLog create(SysOperLog operLog) {
         return operLogRepository.save(operLog);
     }
 
+    @Override
     @Transactional
     public void deleteById(Long operId) {
         operLogRepository.deleteById(operId);
     }
 
+    @Override
     @Transactional
     public void clearAll() {
         operLogRepository.clearAll();

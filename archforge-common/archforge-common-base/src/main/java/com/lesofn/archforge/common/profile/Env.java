@@ -3,6 +3,8 @@ package com.lesofn.archforge.common.profile;
 import org.jspecify.annotations.Nullable;
 
 /**
+ * 运行环境标识与判断工具。
+ *
  * @author sofn
  * @version 1.0 Created at: 2022-03-14 20:58
  */

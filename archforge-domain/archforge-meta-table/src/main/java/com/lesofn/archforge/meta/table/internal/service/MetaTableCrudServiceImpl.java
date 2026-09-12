@@ -3,17 +3,16 @@ package com.lesofn.archforge.meta.table.internal.service;
 import static com.lesofn.archforge.meta.table.api.errors.MetaTableErrorCode.META_QUERY_PARAM_INVALID;
 
 import com.lesofn.archforge.meta.table.api.domain.MetaColumn;
-import org.jspecify.annotations.Nullable;
-import com.lesofn.archforge.meta.table.api.errors.MetaTableErrorCode;
 import com.lesofn.archforge.meta.table.api.domain.MetaTable;
 import com.lesofn.archforge.meta.table.api.dto.ImportResponse;
 import com.lesofn.archforge.meta.table.api.dto.MetaDataQuery;
 import com.lesofn.archforge.meta.table.api.dto.MetaPageResponse;
 import com.lesofn.archforge.meta.table.api.enums.MetaDataFormat;
+import com.lesofn.archforge.meta.table.api.errors.MetaTableErrorCode;
+import com.lesofn.archforge.meta.table.api.errors.MetaTableException;
 import com.lesofn.archforge.meta.table.api.service.MetaTableAdminService;
 import com.lesofn.archforge.meta.table.api.service.MetaTableCrudService;
 import com.lesofn.archforge.meta.table.internal.ddl.SqlIdentifier;
-import com.lesofn.archforge.meta.table.api.errors.MetaTableException;
 import com.lesofn.archforge.meta.table.internal.validator.MetaTableValidator;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -22,6 +21,7 @@ import java.sql.Date;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -32,8 +32,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import org.postgresql.util.PGobject;
 import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.Nullable;
+import org.postgresql.util.PGobject;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -73,7 +74,7 @@ public class MetaTableCrudServiceImpl implements MetaTableCrudService {
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("id", dataId);
         params.addValue("updaterId", currentUid);
-        params.addValue("updateTime", java.time.LocalDateTime.now());
+        params.addValue("updateTime", java.time.LocalDateTime.now(ZoneId.systemDefault()));
 
         List<String> sets = new ArrayList<>();
         sets.add(SqlIdentifier.quote("updater_id") + " = :updaterId");
@@ -99,7 +100,7 @@ public class MetaTableCrudServiceImpl implements MetaTableCrudService {
         params.addValue("id", dataId);
         params.addValue("deleted", 1);
         params.addValue("updaterId", currentUid);
-        params.addValue("updateTime", java.time.LocalDateTime.now());
+        params.addValue("updateTime", java.time.LocalDateTime.now(ZoneId.systemDefault()));
 
         String sql = String.format(
                 "UPDATE %s SET deleted = :deleted, updater_id = :updaterId, update_time = :updateTime " +
@@ -248,8 +249,8 @@ public class MetaTableCrudServiceImpl implements MetaTableCrudService {
         if (!"RANGE".equalsIgnoreCase(resolveSearchType(column))) {
             return false;
         }
-        return value instanceof Map<?, ?> map && (map.containsKey("start") || map.containsKey("end")) ||
-                value instanceof List<?> list && list.size() == 2;
+        return (value instanceof Map<?, ?> map && (map.containsKey("start") || map.containsKey("end"))) ||
+                (value instanceof List<?> list && list.size() == 2);
     }
 
     private String resolveSearchType(MetaColumn column) {
@@ -338,8 +339,8 @@ public class MetaTableCrudServiceImpl implements MetaTableCrudService {
     private List<Object> convertSqlArray(Array sqlArray) {
         try {
             Object array = sqlArray.getArray();
-            if (array instanceof Object[]) {
-                return Arrays.asList((Object[]) array);
+            if (array instanceof Object[] array2) {
+                return Arrays.asList(array2);
             }
             return Collections.singletonList(array.toString());
         } catch (SQLException e) {

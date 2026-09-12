@@ -1,15 +1,19 @@
 package com.lesofn.archforge.infrastructure.frame.utils;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import com.lesofn.archforge.common.context.ClientVersion;
-import org.jspecify.annotations.Nullable;
 import com.lesofn.archforge.common.utils.jackson.JsonUtil;
-import tools.jackson.databind.node.ObjectNode;
 import java.util.Collections;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
+import org.jspecify.annotations.Nullable;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
+ * 请求日志记录模型。
+ *
  * @author sofn
  * @version 1.0 Created at: 2015-06-26 12:19
  */
@@ -121,7 +125,7 @@ public class RequestLogRecord {
 
     public long getResponseSize() {
         if (this.responseSize <= 0 && StringUtils.isNotBlank(this.response)) {
-            this.responseSize = this.response.getBytes().length;
+            this.responseSize = this.response.getBytes(UTF_8).length;
         }
         return this.responseSize;
     }
@@ -136,6 +140,7 @@ public class RequestLogRecord {
         return JsonUtil.getObjectMapper().createObjectNode();
     }
 
+    @Override
     public String toString() {
         StringBuilder buf = new StringBuilder();
         buf.append(this.requestId);

@@ -1,7 +1,6 @@
 package com.lesofn.archforge.user.internal.service.dict;
 
 import com.lesofn.archforge.common.dictionary.EnumDictionary;
-import org.jspecify.annotations.Nullable;
 import com.lesofn.archforge.common.dictionary.EnumDictionaryItem;
 import com.lesofn.archforge.common.dictionary.EnumDictionaryRegistry;
 import com.lesofn.archforge.user.api.dao.dict.SysDictItemRepository;
@@ -14,10 +13,12 @@ import com.lesofn.archforge.user.api.service.dict.SysDictService;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.Nullable;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Page;
@@ -92,9 +93,9 @@ public class SysDictServiceImpl implements SysDictService {
         if (!StringUtils.hasText(keyword)) {
             return true;
         }
-        String lower = keyword.toLowerCase();
-        return (dict.getDictCode() != null && dict.getDictCode().toLowerCase().contains(lower)) || (dict
-                .getDictName() != null && dict.getDictName().toLowerCase().contains(lower));
+        String lower = keyword.toLowerCase(Locale.ROOT);
+        return (dict.getDictCode() != null && dict.getDictCode().toLowerCase(Locale.ROOT).contains(lower)) || (dict
+                .getDictName() != null && dict.getDictName().toLowerCase(Locale.ROOT).contains(lower));
     }
 
     private Page<SysDictType> toPage(List<SysDictType> content, Pageable pageable) {

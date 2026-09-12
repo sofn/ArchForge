@@ -23,7 +23,9 @@ public class AdminBlogCategoryUpdateRequest {
     @NotBlank(message = "URL标识不能为空")
     private String slug;
 
+    @Builder.Default
     private Integer sortOrder = 0;
 
+    @Builder.Default
     private Integer status = 1;
 }

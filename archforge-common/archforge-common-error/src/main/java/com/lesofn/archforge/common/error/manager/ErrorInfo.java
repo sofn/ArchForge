@@ -8,6 +8,8 @@ import lombok.Getter;
 import org.slf4j.helpers.MessageFormatter;
 
 /**
+ * 错误信息载体：错误码与消息详情。
+ *
  * @author sofn
  * @version 1.0 Created at: 2021-05-27 11:51
  */

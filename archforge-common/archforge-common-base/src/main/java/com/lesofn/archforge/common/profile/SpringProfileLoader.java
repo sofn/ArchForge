@@ -6,6 +6,8 @@ import org.springframework.stereotype.Service;
 import org.jspecify.annotations.Nullable;
 
 /**
+ * 基于 Spring Environment 的 profile 加载器。
+ *
  * @author sofn
  */
 @Service

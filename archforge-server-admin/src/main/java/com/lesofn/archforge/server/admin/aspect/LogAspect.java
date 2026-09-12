@@ -1,23 +1,24 @@
 package com.lesofn.archforge.server.admin.aspect;
 
+import com.lesofn.archforge.common.utils.UserAgentUtil;
 import com.lesofn.archforge.common.utils.ip.IpRegionUtil;
 import com.lesofn.archforge.common.utils.ip.IpUtil;
 import com.lesofn.archforge.infrastructure.annotation.Log;
+import com.lesofn.archforge.infrastructure.auth.LoginContext;
 import com.lesofn.archforge.infrastructure.frame.context.ScopedValueContext;
-import com.lesofn.archforge.common.utils.UserAgentUtil;
 import com.lesofn.archforge.server.admin.event.LogEvent;
 import com.lesofn.archforge.user.api.domain.SysOperLog;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
-import com.lesofn.archforge.infrastructure.auth.LoginContext;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
@@ -52,7 +53,7 @@ public class LogAspect {
         operLog.setAddress(IpRegionUtil.getBriefLocationByIp(ip));
         operLog.setSystemName(userAgent.operatingSystem());
         operLog.setBrowser(userAgent.browser());
-        operLog.setOperatingTime(LocalDateTime.now());
+        operLog.setOperatingTime(LocalDateTime.now(ZoneId.systemDefault()));
 
         Integer status = 1;
         try {

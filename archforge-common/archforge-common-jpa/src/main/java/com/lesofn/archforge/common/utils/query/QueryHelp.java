@@ -1,5 +1,6 @@
 package com.lesofn.archforge.common.utils.query;
 
+import com.google.common.base.Splitter;
 import com.lesofn.archforge.common.annotation.Query;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Expression;
@@ -13,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
@@ -199,7 +201,7 @@ public final class QueryHelp {
             CriteriaBuilder cb, Path<?> path, String pattern, boolean ignoreCase) {
         Expression<String> expr = path.as(String.class);
         if (ignoreCase) {
-            return cb.like(cb.lower(expr), pattern.toLowerCase(), LIKE_ESCAPE_CHAR);
+            return cb.like(cb.lower(expr), pattern.toLowerCase(Locale.ROOT), LIKE_ESCAPE_CHAR);
         }
         return cb.like(expr, pattern, LIKE_ESCAPE_CHAR);
     }
@@ -216,10 +218,10 @@ public final class QueryHelp {
             case RIGHT -> JoinType.RIGHT;
             case INNER -> JoinType.INNER;
         };
-        String[] names = q.joinName().split(">");
-        Join<R, ?> join = root.join(names[0], jt);
-        for (int i = 1; i < names.length; i++) {
-            join = (Join<R, ?>) join.join(names[i], jt);
+        List<String> names = Splitter.on('>').splitToList(q.joinName());
+        Join<R, ?> join = root.join(names.get(0), jt);
+        for (int i = 1; i < names.size(); i++) {
+            join = (Join<R, ?>) join.join(names.get(i), jt);
         }
         cache.put(q.joinName(), join);
         return join;

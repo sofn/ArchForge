@@ -1,6 +1,8 @@
 package com.lesofn.archforge.infrastructure.auth.annotation;
 
 /**
+ * 认证类型枚举。
+ *
  * @author sofn
  */
 public enum AuthType {
@@ -14,7 +16,7 @@ public enum AuthType {
     GUEST(true);
 
     // 认证失败是否抛出异常
-    private boolean authFailThrowException;
+    private final boolean authFailThrowException;
 
     AuthType(boolean authFailThrowException) {
         this.authFailThrowException = authFailThrowException;

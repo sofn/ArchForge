@@ -3,6 +3,8 @@ package com.lesofn.archforge.common.error.api;
 import com.lesofn.archforge.common.error.manager.ErrorManager;
 
 /**
+ * 错误码契约：定义错误编码与描述。
+ *
  * @author sofn
  * @version 1.0 Created at: 2022-03-09 16:21
  */

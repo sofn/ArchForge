@@ -5,6 +5,8 @@ import com.lesofn.archforge.common.auth.UserProvider;
 import org.springframework.stereotype.Service;
 
 /**
+ * 默认 UserProvider 实现。
+ *
  * @author sofn
  * @version 1.0 Created at: 2017-07-26 14:54
  */

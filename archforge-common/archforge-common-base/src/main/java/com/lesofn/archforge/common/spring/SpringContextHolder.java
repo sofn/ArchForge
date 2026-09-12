@@ -14,6 +14,8 @@ import org.springframework.stereotype.Component;
 import org.jspecify.annotations.Nullable;
 
 /**
+ * Spring ApplicationContext 静态持有器。
+ *
  * @author sofn
  * @version 1.0 Created at: 2022-03-14 20:06
  */
@@ -49,7 +51,9 @@ public class SpringContextHolder implements ApplicationContextAware, DisposableB
         return getApplicationContext().getBeansOfType(clazz);
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({
+            "unchecked", "TypeParameterUnusedInFormals"
+    })
     public static <T> T getBean(String name) {
         return (T) getApplicationContext().getBean(name);
     }

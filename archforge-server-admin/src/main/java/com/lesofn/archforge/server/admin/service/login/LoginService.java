@@ -3,28 +3,31 @@ package com.lesofn.archforge.server.admin.service.login;
 import static com.lesofn.archforge.infrastructure.auth.errors.AdminAuthErrorCode.*;
 
 import com.google.code.kaptcha.Producer;
+import com.google.common.base.Splitter;
+import com.lesofn.archforge.common.auth.SystemLoginUser;
+import com.lesofn.archforge.common.dictionary.EnumDictionaryRegistry;
 import com.lesofn.archforge.common.encrypt.RsaEncrypter;
+import com.lesofn.archforge.common.utils.UserAgentUtil;
 import com.lesofn.archforge.common.utils.ip.IpRegionUtil;
 import com.lesofn.archforge.common.utils.ip.IpUtil;
 import com.lesofn.archforge.infrastructure.auth.errors.AdminAuthException;
 import com.lesofn.archforge.infrastructure.auth.service.LoginAttemptService;
-import com.lesofn.archforge.common.auth.SystemLoginUser;
 import com.lesofn.archforge.infrastructure.config.ArchForgeProperties;
 import com.lesofn.archforge.infrastructure.config.CaptchaType;
 import com.lesofn.archforge.infrastructure.frame.context.ScopedValueContext;
-import com.lesofn.archforge.common.dictionary.EnumDictionaryRegistry;
 import com.lesofn.archforge.server.admin.dto.CaptchaResponse;
 import com.lesofn.archforge.server.admin.dto.LoginConfigResponse;
 import com.lesofn.archforge.server.admin.dto.LoginRequest;
 import com.lesofn.archforge.server.admin.service.cache.RedisCacheService;
 import com.lesofn.archforge.user.api.domain.SysLoginLog;
 import com.lesofn.archforge.user.api.service.SysLoginLogService;
-import com.lesofn.archforge.common.utils.UserAgentUtil;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.List;
 import java.util.UUID;
 import javax.imageio.ImageIO;
 import lombok.RequiredArgsConstructor;
@@ -128,7 +131,7 @@ public class LoginService {
         } else {
             fillLoginLogFromRequest(loginLog);
         }
-        loginLog.setLoginTime(LocalDateTime.now());
+        loginLog.setLoginTime(LocalDateTime.now(ZoneId.systemDefault()));
         saveLoginLog(loginLog);
     }
 
@@ -138,7 +141,7 @@ public class LoginService {
         loginLog.setStatus(status);
         loginLog.setBehavior(behavior);
         fillLoginLogFromRequest(loginLog);
-        loginLog.setLoginTime(LocalDateTime.now());
+        loginLog.setLoginTime(LocalDateTime.now(ZoneId.systemDefault()));
         saveLoginLog(loginLog);
     }
 
@@ -206,9 +209,9 @@ public class LoginService {
         CaptchaType captchaType = appForgeConfig.getCaptchaType();
         if (captchaType == CaptchaType.MATH) {
             String capText = captchaProducerMath.createText();
-            String[] expressionAndAnswer = capText.split("@");
-            expression = expressionAndAnswer[0];
-            answer = expressionAndAnswer[1];
+            List<String> expressionAndAnswer = Splitter.on('@').splitToList(capText);
+            expression = expressionAndAnswer.get(0);
+            answer = expressionAndAnswer.get(1);
             image = captchaProducerMath.createImage(expression);
         } else {
             // 默认使用字符验证码
