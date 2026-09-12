@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.jspecify.annotations.Nullable;
 
 public interface SysRoleService {
     Optional<SysRole> findById(Long id);
@@ -32,7 +33,7 @@ public interface SysRoleService {
 
     boolean existsByRoleName(String roleName);
 
-    SysRole getById(Long roleId);
+    @Nullable SysRole getById(Long roleId);
 
     List<SysMenu> getMenuListByRoleId(Long roleId);
 }

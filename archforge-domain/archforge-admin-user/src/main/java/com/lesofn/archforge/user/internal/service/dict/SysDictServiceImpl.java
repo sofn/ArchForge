@@ -73,7 +73,6 @@ public class SysDictServiceImpl implements SysDictService {
             iterable = typeRepository.findAll(pageable.getSort());
         } else {
             SysDictType probe = new SysDictType();
-            probe.setDictCode(null);
             probe.setDictName(keyword);
             ExampleMatcher matcher = ExampleMatcher.matching()
                     .withMatcher("dictName", ExampleMatcher.GenericPropertyMatchers.contains())

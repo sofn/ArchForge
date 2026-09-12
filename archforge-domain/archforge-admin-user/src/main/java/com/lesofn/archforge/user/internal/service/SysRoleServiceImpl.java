@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.jspecify.annotations.Nullable;
 
 @Service
 @RequiredArgsConstructor
@@ -81,7 +82,7 @@ public class SysRoleServiceImpl implements SysRoleService {
         return roleRepository.existsByRoleName(roleName);
     }
 
-    public SysRole getById(Long roleId) {
+    public @Nullable SysRole getById(Long roleId) {
         return roleRepository.findById(roleId).orElse(null);
     }
 

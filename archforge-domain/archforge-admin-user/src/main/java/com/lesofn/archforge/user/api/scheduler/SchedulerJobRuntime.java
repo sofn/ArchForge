@@ -1,7 +1,6 @@
 package com.lesofn.archforge.user.api.scheduler;
 
 import com.lesofn.archforge.user.api.domain.SysScheduledJob;
-import org.jspecify.annotations.Nullable;
 
 /**
  * Port for the scheduler runtime that keeps {@code scheduled_tasks} instances in lockstep with
@@ -39,8 +38,7 @@ public interface SchedulerJobRuntime {
     boolean isValidCron(String cron);
 
     /** Quartz-style {@code ?} is accepted for backward compatibility, normalized to {@code *}. */
-    @Nullable
-    static String normalizeCron(@Nullable String cron) {
-        return cron == null ? null : cron.replace('?', '*');
+    static String normalizeCron(String cron) {
+        return cron.replace('?', '*');
     }
 }

@@ -17,6 +17,7 @@ import org.hibernate.annotations.DynamicUpdate;
 @DynamicInsert
 @DynamicUpdate
 @IdClass(SysRoleMenu.SysRoleMenuId.class)
+@SuppressWarnings("NullAway.Init") // fields populated via setters (Jackson/JPA)
 public class SysRoleMenu {
 
     @Id

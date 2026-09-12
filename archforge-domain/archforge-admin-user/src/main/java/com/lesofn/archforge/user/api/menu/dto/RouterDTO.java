@@ -11,6 +11,7 @@ import lombok.Data;
  * @author sofn
  */
 @Data
+@SuppressWarnings("NullAway.Init") // fields populated via setters (Jackson/JPA)
 public class RouterDTO {
 
     public RouterDTO(SysMenu entity) {

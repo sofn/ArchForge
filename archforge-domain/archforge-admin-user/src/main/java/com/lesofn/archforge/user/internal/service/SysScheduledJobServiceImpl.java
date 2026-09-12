@@ -212,7 +212,7 @@ public class SysScheduledJobServiceImpl implements SysScheduledJobService {
         return parsed == null ? 0 : parsed.size();
     }
 
-    private static Method findPublicDeclaredMethod(Class<?> type, String name, int arity) {
+    private static @Nullable Method findPublicDeclaredMethod(Class<?> type, String name, int arity) {
         for (Method m : type.getMethods()) {
             boolean matches = m.getName().equals(name) && m.getParameterCount() == arity && Modifier.isPublic(m
                     .getModifiers()) && !m.isSynthetic() && m.getDeclaringClass() != Object.class && m.getDeclaringClass()

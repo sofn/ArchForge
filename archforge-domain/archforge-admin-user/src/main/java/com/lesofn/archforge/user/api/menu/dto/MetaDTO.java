@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
  */
 @Data
 @NoArgsConstructor
+@SuppressWarnings("NullAway.Init") // fields populated via setters (Jackson/JPA)
 public class MetaDTO {
     // 菜单名称（兼容国际化、非国际化，如果用国际化的写法就必须在根目录的locales文件夹下对应添加）
     private String title;

@@ -34,7 +34,7 @@ public class UserDbConfig {
     @Bean
     @Primary
     PlatformTransactionManager userTransactionManager() {
-        return new JpaTransactionManager(userEntityManagerFactory().getObject());
+        return new JpaTransactionManager(java.util.Objects.requireNonNull(userEntityManagerFactory().getObject()));
     }
 
     @Bean

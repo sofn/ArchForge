@@ -6,6 +6,7 @@ import lombok.Data;
  * @author sofn
  */
 @Data
+@SuppressWarnings("NullAway.Init") // fields populated via setters (Jackson/JPA)
 public class TransitionDTO {
 
     // 当前页面动画，这里是第一种模式，比如 name: "fade" 更具体看后面链接

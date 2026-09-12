@@ -22,6 +22,7 @@ val errorproneToolVersion = "2.50.0"
 // the default severity to ERROR and delete these lists.
 val nullAwayCleanMain =
     setOf(
+            "archforge-admin-user",
             "archforge-blog",
             "archforge-cache-starter",
             "archforge-cli",

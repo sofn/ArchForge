@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
  */
 @Data
 @NoArgsConstructor
+@SuppressWarnings("NullAway.Init") // fields populated via setters (Jackson)
 public class MenuDTO {
 
     public MenuDTO(SysMenu entity) {

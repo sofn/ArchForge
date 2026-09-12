@@ -311,14 +311,17 @@ public class SysUserServiceImpl implements SysUserService {
         return (root, criteriaQuery, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
             if (query != null) {
-                if (isNotBlank(query.getUsername())) {
-                    predicates.add(like(cb, root, "username", query.getUsername()));
+                String username = query.getUsername();
+                if (username != null && !username.isBlank()) {
+                    predicates.add(like(cb, root, "username", username));
                 }
-                if (isNotBlank(query.getEmail())) {
-                    predicates.add(like(cb, root, "email", query.getEmail()));
+                String email = query.getEmail();
+                if (email != null && !email.isBlank()) {
+                    predicates.add(like(cb, root, "email", email));
                 }
-                if (isNotBlank(query.getPhoneNumber())) {
-                    predicates.add(like(cb, root, "phoneNumber", query.getPhoneNumber()));
+                String phoneNumber = query.getPhoneNumber();
+                if (phoneNumber != null && !phoneNumber.isBlank()) {
+                    predicates.add(like(cb, root, "phoneNumber", phoneNumber));
                 }
                 if (query.getEnabled() != null) {
                     if (Boolean.TRUE.equals(query.getEnabled())) {
@@ -351,7 +354,4 @@ public class SysUserServiceImpl implements SysUserService {
                 .replace("_", escape + "_");
     }
 
-    private static boolean isNotBlank(String value) {
-        return value != null && !value.isBlank();
-    }
 }

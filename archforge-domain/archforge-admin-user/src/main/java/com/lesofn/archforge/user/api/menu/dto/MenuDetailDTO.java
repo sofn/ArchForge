@@ -9,6 +9,7 @@ import lombok.EqualsAndHashCode;
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
+@SuppressWarnings("NullAway.Init") // fields populated via setters (Jackson)
 public class MenuDetailDTO extends MenuDTO {
 
     public MenuDetailDTO(SysMenu entity) {

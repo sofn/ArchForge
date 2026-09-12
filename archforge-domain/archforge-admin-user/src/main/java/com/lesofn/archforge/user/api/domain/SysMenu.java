@@ -17,6 +17,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+import org.jspecify.annotations.Nullable;
 
 @Setter
 @Getter
@@ -54,7 +55,7 @@ public class SysMenu extends BaseEntity<SysMenu> {
     private String remark;
 
     @Transient
-    private List<SysMenu> children;
+    private @Nullable List<SysMenu> children;
 
     /** 是否可见 */
     public boolean isVisible() { return this.status != null && this.status == 1; }

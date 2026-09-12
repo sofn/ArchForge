@@ -6,6 +6,7 @@ import lombok.Data;
  * @author sofn
  */
 @Data
+@SuppressWarnings("NullAway.Init") // fields populated via setters (Jackson/JPA)
 public class ExtraIconDTO {
 
     // 是否是svg
