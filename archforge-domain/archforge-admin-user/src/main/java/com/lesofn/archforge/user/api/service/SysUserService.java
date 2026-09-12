@@ -4,6 +4,7 @@ import com.lesofn.archforge.user.api.domain.SysUser;
 import com.lesofn.archforge.user.api.domain.query.SysUserQuery;
 import java.util.List;
 import java.util.Optional;
+import org.jspecify.annotations.Nullable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -47,8 +48,9 @@ public interface SysUserService {
 
     void updatePassword(Long userId, String newPassword);
 
-    void updateProfile(Long userId, String username, String nickname, String phoneNumber, String email, Integer sex,
-            String remark, Long deptId);
+    void updateProfile(Long userId, @Nullable String username, @Nullable String nickname,
+            @Nullable String phoneNumber, @Nullable String email, @Nullable Integer sex,
+            @Nullable String remark, @Nullable Long deptId);
 
     void assignRole(Long userId, Long roleId);
 
@@ -56,5 +58,6 @@ public interface SysUserService {
 
     List<SysUser> findByDeptId(Long deptId);
 
+    @Nullable
     SysUser getUserByUserName(String username);
 }

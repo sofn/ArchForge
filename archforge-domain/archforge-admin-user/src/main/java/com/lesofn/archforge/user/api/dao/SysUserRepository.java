@@ -21,4 +21,6 @@ public interface SysUserRepository extends JpaRepository<SysUser, Long>, JpaSpec
     boolean existsByPhoneNumber(String phoneNumber);
 
     long countByDeletedFalse();
+
+    long countByDeletedFalseAndStatus(Integer status);
 }

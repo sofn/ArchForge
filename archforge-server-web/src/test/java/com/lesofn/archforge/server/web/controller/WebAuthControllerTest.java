@@ -13,7 +13,7 @@ import com.lesofn.archforge.server.web.service.WebRefreshTokenService;
 import com.lesofn.archforge.user.api.domain.SysUser;
 import com.lesofn.archforge.user.api.errors.AdminUserException;
 import com.lesofn.archforge.user.api.service.SysUserService;
-import com.lesofn.archforge.user.domain.adapter.port.PasswordEncoderPort;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import java.lang.reflect.Method;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,7 +32,7 @@ class WebAuthControllerTest {
     private SysUserService sysUserService;
 
     @Mock
-    private PasswordEncoderPort passwordEncoderPort;
+    private PasswordEncoder passwordEncoderPort;
 
     @Mock
     private WebRefreshTokenService webRefreshTokenService;

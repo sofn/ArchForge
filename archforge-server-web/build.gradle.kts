@@ -87,7 +87,7 @@ dependencies {
         exclude(group = "org.apache.logging.log4j", module = "log4j-to-slf4j")
     }
 
-    // 密码加密（复用 domain:admin-user 的 PasswordEncoderPort）
+    // 密码加密（web 端直接使用 BCryptPasswordEncoder，见 PasswordConfig）
     api("org.springframework.security:spring-security-crypto")
 
     // 邮件发送（真实 SMTP 配置通过 spring.mail.* 在 yml 中开启）

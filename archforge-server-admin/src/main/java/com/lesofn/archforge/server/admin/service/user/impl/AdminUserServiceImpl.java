@@ -106,7 +106,7 @@ public class AdminUserServiceImpl implements AdminUserService {
             criteria.setCreateTime(request.getCreateTime());
         }
 
-        Pageable pageable = PageRequest.of(currentPage - 1, pageSize, Sort.by(Sort.Direction.DESC, "id"));
+        Pageable pageable = PageRequest.of(currentPage - 1, pageSize, Sort.by(Sort.Direction.DESC, "userId"));
         Specification<SysUser> spec = (root, q, cb) -> QueryHelp.getPredicate(root, criteria, cb);
         spec = dataScopeSpecification.apply(spec, DataScopeContextHolder.get());
         Page<SysUser> userPage = sysUserService.findAll(spec, pageable);
@@ -119,7 +119,7 @@ public class AdminUserServiceImpl implements AdminUserService {
     }
 
     @Override
-    @Transactional("userDomainTransactionManager")
+    @Transactional("userTransactionManager")
     public Long createUser(UserCreateRequest request) {
         SysUser user = adminUserMapper.fromCreateRequest(request);
         if (user.getPhoneNumber() == null) {
@@ -137,7 +137,7 @@ public class AdminUserServiceImpl implements AdminUserService {
     }
 
     @Override
-    @Transactional("userDomainTransactionManager")
+    @Transactional("userTransactionManager")
     public Boolean updateUser(UserUpdateRequest request) {
         if (sysUserService.findById(request.getId()).isEmpty()) {
             return false;

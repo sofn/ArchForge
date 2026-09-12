@@ -11,10 +11,6 @@ dependencies {
     // 不再依赖 infrastructure：auth/dictionary SPI 类型已下沉 common-base
     //（common.auth / common.dictionary），消除 domain→infra 倒挂
 
-    // 密码编码 port 适配器（user.infrastructure.adapter.port.BCryptPasswordEncoderPort）
-    //——原先由 infrastructure 的 api() 传递，现在直接声明
-    implementation("org.springframework.security:spring-security-crypto")
-
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
     annotationProcessor("org.hibernate.orm:hibernate-processor")

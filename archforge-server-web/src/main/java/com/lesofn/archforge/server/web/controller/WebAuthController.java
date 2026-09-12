@@ -19,7 +19,7 @@ import com.lesofn.archforge.server.web.service.WebRefreshTokenService;
 import com.lesofn.archforge.user.api.domain.SysUser;
 import com.lesofn.archforge.user.api.errors.AdminUserException;
 import com.lesofn.archforge.user.api.service.SysUserService;
-import com.lesofn.archforge.user.domain.adapter.port.PasswordEncoderPort;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import jakarta.validation.Valid;
 import java.security.SecureRandom;
 import java.time.Instant;
@@ -46,7 +46,7 @@ public class WebAuthController {
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
     private final SysUserService sysUserService;
-    private final PasswordEncoderPort passwordEncoderPort;
+    private final PasswordEncoder passwordEncoderPort;
     private final WebRefreshTokenService webRefreshTokenService;
     private final VerificationCodeService verificationCodeService;
     private final ArchForgeProperties archForgeConfig;

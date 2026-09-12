@@ -49,7 +49,7 @@ public class UserDbConfig {
         factoryBean.setDataSource(new GroupDataSourceProxy(dataSource, "user"));
         factoryBean.setJpaVendorAdapter(jpaVendorAdapter);
         factoryBean.setPersistenceUnitName("user");
-        // 扫描旧领域实体与 JPA 转换器
+        // 扫描实体与 JPA 转换器
         factoryBean.setPackagesToScan(
                 "com.lesofn.archforge.user.api.domain",
                 "com.lesofn.archforge.user.api.domain.convert",

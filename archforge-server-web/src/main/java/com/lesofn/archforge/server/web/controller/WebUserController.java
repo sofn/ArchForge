@@ -5,7 +5,7 @@ import com.lesofn.archforge.server.web.dto.WebChangePasswordRequest;
 import com.lesofn.archforge.server.web.dto.WebUserProfileResponse;
 import com.lesofn.archforge.user.api.domain.SysUser;
 import com.lesofn.archforge.user.api.service.SysUserService;
-import com.lesofn.archforge.user.domain.adapter.port.PasswordEncoderPort;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class WebUserController {
 
     private final SysUserService sysUserService;
-    private final PasswordEncoderPort passwordEncoderPort;
+    private final PasswordEncoder passwordEncoderPort;
 
     @GetMapping("/profile")
     public WebUserProfileResponse profile() {

@@ -18,6 +18,7 @@ import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import org.jspecify.annotations.Nullable;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.Type;
@@ -102,12 +103,12 @@ public class SysUser extends BaseEntity<SysUser> {
 
     /** 更新基础资料 */
     public void updateProfile(
-            String nickname,
-            String phoneNumber,
-            String email,
-            GenderEnum sex,
-            String remark,
-            Long deptId) {
+            @Nullable String nickname,
+            @Nullable String phoneNumber,
+            @Nullable String email,
+            @Nullable GenderEnum sex,
+            @Nullable String remark,
+            @Nullable Long deptId) {
         if (nickname != null) {
             this.nickname = nickname;
         }

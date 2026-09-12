@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
 public class FlywayDependencyBeanFactoryPostProcessor implements BeanFactoryPostProcessor, Ordered {
 
     private static final String[] EMF_CONFIG_BEANS = {
-            "userDbConfig", "blogDbConfig", "userDomainDbConfig", "metaTableDbConfig"
+            "userDbConfig", "blogDbConfig", "metaTableDbConfig"
     };
 
     @Override

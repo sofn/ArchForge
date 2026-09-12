@@ -8,7 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.lesofn.archforge.infrastructure.auth.LoginContext;
 import com.lesofn.archforge.user.api.domain.SysUser;
 import com.lesofn.archforge.user.api.service.SysUserService;
-import com.lesofn.archforge.user.domain.adapter.port.PasswordEncoderPort;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,7 +26,7 @@ class WebUserControllerTest {
     private SysUserService sysUserService;
 
     @Mock
-    private PasswordEncoderPort passwordEncoderPort;
+    private PasswordEncoder passwordEncoderPort;
 
     private MockMvc mockMvc;
 
