@@ -1,6 +1,7 @@
 package com.lesofn.archforge.meta.table.internal.service;
 
 import com.fasterxml.jackson.core.JsonEncoding;
+import org.jspecify.annotations.Nullable;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lesofn.archforge.meta.table.api.domain.MetaColumn;
@@ -87,8 +88,9 @@ public class MetaTableDataExporter {
             forEachRow(table, columns, row -> {
                 int r = rowIndex[0]++;
                 for (int c = 0; c < visibleColumns.size(); c++) {
-                    String value = sanitizeCell(validator.formatValue(visibleColumns.get(c),
-                            getExportValue(visibleColumns.get(c), row)));
+                    String value = java.util.Objects.requireNonNullElse(sanitizeCell(validator.formatValue(visibleColumns.get(
+                            c),
+                            getExportValue(visibleColumns.get(c), row))), "");
                     if (!value.isEmpty()) {
                         worksheet.value(r, c, value);
                     }
@@ -113,7 +115,8 @@ public class MetaTableDataExporter {
                         new String[0])).build())) {
             forEachRow(table, columns, row -> {
                 List<String> values = visibleColumns.stream()
-                        .map(c -> sanitizeCell(validator.formatValue(c, getExportValue(c, row))))
+                        .map(c -> java.util.Objects.requireNonNullElse(sanitizeCell(validator.formatValue(c, getExportValue(c,
+                                row))), ""))
                         .toList();
                 printer.printRecord(values);
             });
@@ -161,14 +164,14 @@ public class MetaTableDataExporter {
             for (Map<String, Object> row : rows) {
                 consumer.accept(row);
             }
-            lastId = ((Number) rows.get(rows.size() - 1).get("id")).longValue();
+            lastId = ((Number) java.util.Objects.requireNonNull(rows.get(rows.size() - 1).get("id"))).longValue();
             if (rows.size() < chunkSize) {
                 break;
             }
         }
     }
 
-    private Object getExportValue(MetaColumn column, Map<String, Object> row) {
+    private @Nullable Object getExportValue(MetaColumn column, Map<String, Object> row) {
         if (column.getDataType() == MetaColumnType.REFERENCE) {
             Object display = row.get(column.getColumnCode() + "_display");
             if (display != null) {
@@ -178,7 +181,7 @@ public class MetaTableDataExporter {
         return row.get(column.getColumnCode());
     }
 
-    private String sanitizeCell(String value) {
+    private @Nullable String sanitizeCell(@Nullable String value) {
         if (value == null || value.isEmpty()) {
             return value;
         }
@@ -189,7 +192,7 @@ public class MetaTableDataExporter {
         return value;
     }
 
-    private Object toJsonValue(Object value) {
+    private @Nullable Object toJsonValue(@Nullable Object value) {
         if (value == null) {
             return null;
         }

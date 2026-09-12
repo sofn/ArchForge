@@ -9,6 +9,7 @@ import lombok.Data;
  * @param <T> 数据类型
  */
 @Data
+@SuppressWarnings("NullAway.Init")
 public class MetaPageResponse<T> {
 
     private List<T> list;

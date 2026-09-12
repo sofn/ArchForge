@@ -1,6 +1,7 @@
 package com.lesofn.archforge.meta.table.api.dto;
 
 import java.util.Map;
+import org.jspecify.annotations.Nullable;
 
 /**
  * 元表格数据行查询请求。
@@ -16,8 +17,8 @@ public record MetaDataQuery(
         Map<String, Object> filters,
         int currentPage,
         int pageSize,
-        String orderBy,
-        String orderDir,
+        @Nullable String orderBy,
+        @Nullable String orderDir,
         boolean skipCount) {
 
     public static MetaDataQuery of(Map<String, Object> filters, int currentPage, int pageSize) {

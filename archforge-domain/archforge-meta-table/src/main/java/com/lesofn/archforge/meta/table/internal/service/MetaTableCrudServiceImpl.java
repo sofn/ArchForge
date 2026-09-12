@@ -3,6 +3,7 @@ package com.lesofn.archforge.meta.table.internal.service;
 import static com.lesofn.archforge.meta.table.api.errors.MetaTableErrorCode.META_QUERY_PARAM_INVALID;
 
 import com.lesofn.archforge.meta.table.api.domain.MetaColumn;
+import org.jspecify.annotations.Nullable;
 import com.lesofn.archforge.meta.table.api.errors.MetaTableErrorCode;
 import com.lesofn.archforge.meta.table.api.domain.MetaTable;
 import com.lesofn.archforge.meta.table.api.dto.ImportResponse;
@@ -149,7 +150,8 @@ public class MetaTableCrudServiceImpl implements MetaTableCrudService {
     private static final Set<String> AUDIT_ORDER_COLUMNS = Set.of("id", "creator_id", "create_time", "updater_id",
             "update_time");
 
-    private String buildOrderClause(List<MetaColumn> columns, String mainAlias, String orderBy, String orderDir) {
+    private String buildOrderClause(List<MetaColumn> columns, String mainAlias, @Nullable String orderBy,
+            @Nullable String orderDir) {
         String direction = resolveOrderDirection(orderDir);
         String column = orderBy == null || orderBy.isBlank() ? "id" : orderBy;
         Set<String> allowed = new HashSet<>(AUDIT_ORDER_COLUMNS);
@@ -162,7 +164,7 @@ public class MetaTableCrudServiceImpl implements MetaTableCrudService {
         return mainAlias + "." + SqlIdentifier.quote(column) + " " + direction;
     }
 
-    private String resolveOrderDirection(String orderDir) {
+    private String resolveOrderDirection(@Nullable String orderDir) {
         if (orderDir == null || orderDir.isBlank()) {
             return "DESC";
         }
@@ -224,7 +226,7 @@ public class MetaTableCrudServiceImpl implements MetaTableCrudService {
         return sb.toString();
     }
 
-    private FilterPath parseFilterKey(Map<String, MetaColumn> columnMap, String key) {
+    private @Nullable FilterPath parseFilterKey(Map<String, MetaColumn> columnMap, String key) {
         int dot = key.indexOf('.');
         if (dot > 0) {
             String columnCode = key.substring(0, dot);
@@ -306,7 +308,7 @@ public class MetaTableCrudServiceImpl implements MetaTableCrudService {
                 .collect(Collectors.joining(", ")) + "] LIKE :" + paramName;
     }
 
-    private record FilterPath(MetaColumn column, String jsonPath) {
+    private record FilterPath(MetaColumn column, @Nullable String jsonPath) {
     }
 
     private Map<String, Object> convertRow(Map<String, Object> row) {

@@ -4,6 +4,7 @@ import java.nio.file.Path;
 import lombok.Data;
 
 @Data
+@SuppressWarnings("NullAway.Init")
 public class CodeGenOptions {
     private Path projectRoot;
     private Path backendOutputDir;

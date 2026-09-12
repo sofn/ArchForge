@@ -75,7 +75,7 @@ public class MetaTableAdminServiceImpl implements MetaTableAdminService {
         MetaTable saved = metaTableRepository.save(table);
 
         for (MetaColumn column : columns) {
-            column.setTableId(saved.getId());
+            column.setTableId(java.util.Objects.requireNonNull(saved.getId()));
         }
         metaColumnRepository.saveAll(columns);
 
@@ -83,7 +83,7 @@ public class MetaTableAdminServiceImpl implements MetaTableAdminService {
         jdbcTemplate.getJdbcOperations().execute(ddl.createTableSql());
         ddl.indexSqls().forEach(sql -> jdbcTemplate.getJdbcOperations().execute(sql));
 
-        return saved.getId();
+        return java.util.Objects.requireNonNull(saved.getId());
     }
 
     @Override
@@ -332,7 +332,7 @@ public class MetaTableAdminServiceImpl implements MetaTableAdminService {
         List<MetaTableMigration> records = new ArrayList<>();
         for (SchemaDdl ddl : ddlList) {
             MetaTableMigration record = new MetaTableMigration();
-            record.setTableId(table.getId());
+            record.setTableId(java.util.Objects.requireNonNull(table.getId()));
             record.setVersion(version);
             record.setChangeType(ddl.change().getType().name());
             record.setDdlSql(String.join(";\n", ddl.sqls()));

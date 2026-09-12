@@ -1,6 +1,7 @@
 package com.lesofn.archforge.meta.table.internal.service;
 
 import com.lesofn.archforge.meta.table.api.domain.MetaColumn;
+import org.jspecify.annotations.Nullable;
 import com.lesofn.archforge.meta.table.api.domain.MetaColumnType;
 import com.lesofn.archforge.meta.table.internal.ddl.SqlIdentifier;
 import java.util.ArrayList;
@@ -56,7 +57,7 @@ public final class ReferenceDisplayBuilder {
     /**
      * 构建 REFERENCE 字段显示表达式（含 join 别名）。
      */
-    public static String buildDisplayExpression(MetaColumn column, String mainAlias) {
+    public static @Nullable String buildDisplayExpression(MetaColumn column, String mainAlias) {
         if (!isReference(column)) {
             return null;
         }

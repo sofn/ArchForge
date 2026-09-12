@@ -5,6 +5,7 @@ import java.util.List;
 import lombok.Data;
 
 @Data
+@SuppressWarnings("NullAway.Init")
 public class GeneratedResult {
     private Path backendDir;
     private Path frontendDir;

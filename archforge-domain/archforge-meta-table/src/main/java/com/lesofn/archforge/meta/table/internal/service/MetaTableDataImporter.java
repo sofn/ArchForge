@@ -1,6 +1,7 @@
 package com.lesofn.archforge.meta.table.internal.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.jspecify.annotations.Nullable;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.lesofn.archforge.meta.table.api.domain.MetaColumn;
@@ -186,7 +187,7 @@ public class MetaTableDataImporter {
         return count != null && count > 0;
     }
 
-    private void recordError(ImportContext ctx, int rowNum, String message) {
+    private void recordError(ImportContext ctx, int rowNum, @Nullable String message) {
         ctx.failed++;
         if (ctx.errors.size() < ctx.maxErrors) {
             ctx.errors.add("第 " + rowNum + " 行: " + message);
@@ -265,7 +266,7 @@ public class MetaTableDataImporter {
         return params;
     }
 
-    private Object jsonNodeToValue(JsonNode node) {
+    private @Nullable Object jsonNodeToValue(JsonNode node) {
         if (node.isNull()) {
             return null;
         }

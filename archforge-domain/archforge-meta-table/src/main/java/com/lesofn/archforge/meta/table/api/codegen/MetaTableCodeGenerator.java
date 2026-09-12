@@ -1,6 +1,7 @@
 package com.lesofn.archforge.meta.table.api.codegen;
 
 import com.lesofn.archforge.meta.table.api.domain.MetaColumn;
+import org.jspecify.annotations.Nullable;
 import com.lesofn.archforge.meta.table.api.domain.MetaTable;
 import com.lesofn.archforge.meta.table.api.service.DictionaryProvider;
 import com.lesofn.archforge.meta.table.api.errors.MetaTableException;
@@ -131,7 +132,7 @@ public class MetaTableCodeGenerator {
         return normalized;
     }
 
-    private boolean isPathSegment(Path path, String segment) {
+    private boolean isPathSegment(@Nullable Path path, String segment) {
         if (path == null) {
             return false;
         }

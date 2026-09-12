@@ -1,6 +1,7 @@
 package com.lesofn.archforge.meta.table.internal.config;
 
 import com.lesofn.archforge.common.persistence.GroupDataSourceProxy;
+import org.jspecify.annotations.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 import javax.sql.DataSource;
@@ -40,7 +41,7 @@ public class MetaTableDbConfig {
 
     private final DataSource dataSource;
 
-    private DataSource metaDataSource;
+    private @Nullable DataSource metaDataSource;
 
     private synchronized DataSource metaDataSource() {
         if (metaDataSource == null) {
@@ -51,7 +52,8 @@ public class MetaTableDbConfig {
 
     @Bean
     PlatformTransactionManager metaTableTransactionManager() {
-        JpaTransactionManager transactionManager = new JpaTransactionManager(metaTableEntityManagerFactory().getObject());
+        JpaTransactionManager transactionManager = new JpaTransactionManager(java.util.Objects.requireNonNull(
+                metaTableEntityManagerFactory().getObject()));
         transactionManager.setDataSource(metaDataSource());
         return transactionManager;
     }

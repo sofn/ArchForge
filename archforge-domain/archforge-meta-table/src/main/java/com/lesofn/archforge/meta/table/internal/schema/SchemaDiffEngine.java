@@ -3,6 +3,7 @@ package com.lesofn.archforge.meta.table.internal.schema;
 import static com.lesofn.archforge.meta.table.api.errors.MetaTableErrorCode.META_COLUMN_CODE_INVALID;
 
 import com.lesofn.archforge.meta.table.api.domain.MetaColumn;
+import org.jspecify.annotations.Nullable;
 import com.lesofn.archforge.meta.table.api.domain.MetaTable;
 import com.lesofn.archforge.meta.table.internal.ddl.ColumnTypeResolver;
 import com.lesofn.archforge.meta.table.api.errors.MetaTableException;
@@ -244,7 +245,7 @@ public class SchemaDiffEngine {
         return Boolean.TRUE.equals(column.getUnique()) || Boolean.TRUE.equals(column.getIndex());
     }
 
-    private SchemaChange buildIndexChange(IndexDef oldDef, IndexDef newDef) {
+    private SchemaChange buildIndexChange(@Nullable IndexDef oldDef, @Nullable IndexDef newDef) {
         SchemaChange change = new SchemaChange();
         change.setType(SchemaChangeType.ALTER_INDEX);
         if (oldDef != null) {

@@ -8,6 +8,7 @@ import lombok.Data;
  * 一次 Schema 变更。
  */
 @Data
+@SuppressWarnings("NullAway.Init")
 public class SchemaChange {
 
     private SchemaChangeType type;

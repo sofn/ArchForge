@@ -1,6 +1,7 @@
 package com.lesofn.archforge.meta.table.api.domain.convert;
 
 import com.lesofn.archforge.common.utils.jackson.JsonUtil;
+import org.jspecify.annotations.Nullable;
 import com.lesofn.archforge.meta.table.api.domain.OptionItem;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
@@ -15,7 +16,7 @@ import org.springframework.util.StringUtils;
 public class OptionListConverter implements AttributeConverter<List<OptionItem>, String> {
 
     @Override
-    public String convertToDatabaseColumn(List<OptionItem> attribute) {
+    public @Nullable String convertToDatabaseColumn(@Nullable List<OptionItem> attribute) {
         if (attribute == null) {
             return null;
         }
@@ -23,7 +24,7 @@ public class OptionListConverter implements AttributeConverter<List<OptionItem>,
     }
 
     @Override
-    public List<OptionItem> convertToEntityAttribute(String dbData) {
+    public @Nullable List<OptionItem> convertToEntityAttribute(@Nullable String dbData) {
         if (!StringUtils.hasText(dbData)) {
             return Collections.emptyList();
         }

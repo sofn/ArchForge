@@ -1,6 +1,7 @@
 package com.lesofn.archforge.meta.table.api.codegen.handler;
 
 import com.lesofn.archforge.meta.table.api.domain.MetaColumn;
+import org.jspecify.annotations.Nullable;
 import com.lesofn.archforge.meta.table.api.domain.MetaColumnType;
 import com.lesofn.archforge.meta.table.api.domain.OptionItem;
 import com.lesofn.archforge.meta.table.api.codegen.CodeGenColumn;
@@ -397,7 +398,7 @@ public class DefaultCodeGenTypeHandler implements CodeGenTypeHandler {
         }
     }
 
-    private String buildColumnAnnotation(CodeGenColumn col) {
+    private @Nullable String buildColumnAnnotation(CodeGenColumn col) {
         List<String> attrs = new ArrayList<>();
         if (col.isRequired()) {
             attrs.add("nullable = false");
@@ -447,7 +448,7 @@ public class DefaultCodeGenTypeHandler implements CodeGenTypeHandler {
         return getter + " != null";
     }
 
-    private String buildSearchPredicate(CodeGenColumn col) {
+    private @Nullable String buildSearchPredicate(CodeGenColumn col) {
         String field = col.getFieldName();
         String getter = "request.get" + cap(field) + "()";
         String rootGet = "root.get(\"" + field + "\")";
@@ -464,7 +465,7 @@ public class DefaultCodeGenTypeHandler implements CodeGenTypeHandler {
         return "cb.equal(" + rootGet + ", " + getter + ")";
     }
 
-    private String buildKeywordPredicate(CodeGenColumn col) {
+    private @Nullable String buildKeywordPredicate(CodeGenColumn col) {
         if (!col.isKeywordSearchable()) {
             return null;
         }

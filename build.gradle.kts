@@ -31,7 +31,10 @@ val nullAwayCleanMain =
             "archforge-common-jpa",
             "archforge-example-task",
             "archforge-infrastructure",
-            "archforge-lock-starter")
+            "archforge-lock-starter",
+            "archforge-meta-table",
+            "archforge-redisson-starter",
+            "archforge-trace-starter")
 val nullAwayCleanTest = setOf<String>()
 // Checkstyle: semantic style gate — runs before `test` and as part of `check`/`build`
 // (division of labor: formatting stays with Spotless, see config/checkstyle/checkstyle.xml)

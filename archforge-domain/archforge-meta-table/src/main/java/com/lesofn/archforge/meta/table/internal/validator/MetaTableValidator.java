@@ -1,6 +1,7 @@
 package com.lesofn.archforge.meta.table.internal.validator;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.jspecify.annotations.Nullable;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lesofn.archforge.meta.table.api.dao.MetaColumnRepository;
 import com.lesofn.archforge.meta.table.api.dao.MetaTableRepository;
@@ -203,7 +204,8 @@ public class MetaTableValidator {
                 target = metaTableRepository.findAllByDeletedFalse().stream()
                         .filter(t -> refTable.equals(t.physicalTableName()))
                         .findFirst()
-                        .flatMap(t -> metaColumnRepository.findByTableIdAndDeletedFalseOrderBySortAsc(t.getId()).stream()
+                        .flatMap(t -> metaColumnRepository.findByTableIdAndDeletedFalseOrderBySortAsc(java.util.Objects
+                                .requireNonNull(t.getId())).stream()
                                 .filter(c -> c.getColumnCode().equals(refColumn))
                                 .findFirst())
                         .orElse(null);
@@ -236,15 +238,13 @@ public class MetaTableValidator {
                 .filter(c -> group.equals(c.getIndexGroup()))
                 .toList();
         String indexType = null;
-        boolean first = true;
         for (MetaColumn member : members) {
             String memberType = member.getIndexType();
             if (memberType == null || memberType.isEmpty()) {
                 memberType = "BTREE";
             }
-            if (first) {
+            if (indexType == null) {
                 indexType = memberType;
-                first = false;
             } else if (!indexType.equalsIgnoreCase(memberType)) {
                 throw new MetaTableException(MetaTableErrorCode.META_COLUMN_TYPE_INVALID, "索引组 " + group + " 内的字段索引类型必须一致");
             }
@@ -478,12 +478,12 @@ public class MetaTableValidator {
         throw new IllegalArgumentException("Invalid boolean value: " + value);
     }
 
-    private boolean isEmpty(Object value) {
+    private boolean isEmpty(@Nullable Object value) {
         return value == null || (value instanceof String string && string.isEmpty());
     }
 
     /** 根据字段类型转换值为适合数据库存储的类型。 */
-    public Object convertValue(MetaColumn column, Object value) {
+    public @Nullable Object convertValue(MetaColumn column, @Nullable Object value) {
         if (value == null) {
             return null;
         }
@@ -558,7 +558,7 @@ public class MetaTableValidator {
     }
 
     /** 解析日期/时间字符串为显示文本。 */
-    public String formatValue(MetaColumn column, Object value) {
+    public String formatValue(MetaColumn column, @Nullable Object value) {
         if (value == null) {
             return "";
         }

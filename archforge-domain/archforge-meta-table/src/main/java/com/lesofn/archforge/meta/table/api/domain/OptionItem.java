@@ -8,6 +8,7 @@ import org.jspecify.annotations.Nullable;
  * 枚举类型字段的选项项。
  */
 @Data
+@SuppressWarnings("NullAway.Init")
 public class OptionItem implements Serializable {
 
     private static final long serialVersionUID = 1L;

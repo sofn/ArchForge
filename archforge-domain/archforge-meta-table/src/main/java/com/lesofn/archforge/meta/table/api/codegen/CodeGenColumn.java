@@ -1,6 +1,7 @@
 package com.lesofn.archforge.meta.table.api.codegen;
 
 import com.lesofn.archforge.meta.table.api.domain.MetaColumnType;
+import org.jspecify.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -9,6 +10,7 @@ import java.util.Set;
 import lombok.Data;
 
 @Data
+@SuppressWarnings("NullAway.Init")
 public class CodeGenColumn {
 
     private String columnCode;
@@ -26,9 +28,9 @@ public class CodeGenColumn {
     private String javaDefaultValue;
     private String tsDefaultValue;
 
-    private String searchCondition;
-    private String searchPredicate;
-    private String keywordPredicate;
+    private @Nullable String searchCondition;
+    private @Nullable String searchPredicate;
+    private @Nullable String keywordPredicate;
 
     private List<String> jpaAnnotations = new ArrayList<>();
     private List<String> validatorAnnotations = new ArrayList<>();
