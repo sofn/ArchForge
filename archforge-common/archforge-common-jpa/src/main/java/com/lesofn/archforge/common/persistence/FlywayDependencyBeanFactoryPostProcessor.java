@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
  * 保证 Flyway 在各 domain 模块的 JPA EntityManagerFactory 构建之前执行迁移。
  *
  * <p>
- * user / blog / user-domain / meta-table 的 EMF 配置类分布在 domain 模块中，看不见 Flyway bean。本
+ * user / blog / meta-table 的 EMF 配置类分布在 domain 模块中，看不见 Flyway bean。本
  * post-processor 在 Flyway 存在时给这些配置类 bean 追加 dependsOn——@Bean 方法产出的 EMF 依赖其配置类实例，
  * 从而传递性地保证"先 migrate、再 validate"。server-admin 与 server-web 共用本类（common-jpa 包被两个
  * 应用的组件扫描覆盖）。

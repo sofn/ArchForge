@@ -23,7 +23,7 @@ so `spring.flyway.*` keys bind to nothing in this project. Migration is wired by
 `arch-forge.flyway.enabled` and configured via `arch-forge.flyway.*`
 (`FlywayProperties`). EMF ordering is enforced by
 `FlywayDependencyBeanFactoryPostProcessor` (covers `userDbConfig`, `blogDbConfig`,
-`userDomainDbConfig`, `metaTableDbConfig`).
+`metaTableDbConfig`).
 
 `application-prod.yaml` / `application-staging.yaml` (both servers) set:
 
