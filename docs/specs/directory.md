@@ -28,6 +28,7 @@ ArchForge/
 ├── spec/                   # OpenAPI + enums + JSON Schema — the HTTP contract
 ├── docs/
 │   ├── architecture.md     # three-repo runtime map
+│   ├── adr/                # architecture decision records (see docs/adr/README.md)
 │   └── specs/              # CI-gated standards (paths, naming, security, …)
 ├── skills/                 # tutorial-style backend standard (AI-consumed)
 ├── config/                 # checkstyle / spotbugs / forbiddenapis / OWASP

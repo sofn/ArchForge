@@ -4,6 +4,7 @@ import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 
 import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
+import com.tngtech.archunit.library.freeze.FreezingArchRule;
 import com.tngtech.archunit.core.importer.ImportOption;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Tag;
@@ -110,6 +111,51 @@ class ArchitectureTest {
                 .should()
                 .dependOnClassesThat()
                 .resideInAnyPackage("..archforge.domain..", "..archforge.server..")
+                .check(classes);
+    }
+
+    /**
+     * ADR-0001: domain modules contain exactly {@code api} + {@code internal} top-level
+     * packages. The collapsed {@code domain/}/{@code infrastructure/} trees must not
+     * regrow — a class placed there fails the build.
+     */
+    @Test
+    void domainModulesOnlyContainApiAndInternal() {
+        noClasses()
+                .should()
+                .resideInAnyPackage(
+                        "com.lesofn.archforge.user.domain..",
+                        "com.lesofn.archforge.user.infrastructure..",
+                        "com.lesofn.archforge.blog.domain..",
+                        "com.lesofn.archforge.blog.infrastructure..",
+                        "com.lesofn.archforge.meta.table.domain..",
+                        "com.lesofn.archforge.meta.table.infrastructure..")
+                .check(classes);
+    }
+
+    /** Naming: MapStruct converters are {@code *Convertor}, never {@code *Mapper}. */
+    @Test
+    void noMapperNamedClasses() {
+        noClasses().should().haveSimpleNameEndingWith("Mapper").check(classes);
+    }
+
+    /**
+     * Naming: request/response types use {@code *Request}/{@code *Response}. The 11
+     * legacy {@code *DTO} classes are frozen — this rule only fails on NEW ones.
+     * The frozen violations live in {@code archunit_store/} (committed); refreezing
+     * is a deliberate act: run with {@code -Darchunit.freeze.refreeze=true} and
+     * commit the updated store.
+     */
+    @Test
+    void noNewDtoSuffixedTypes() {
+        FreezingArchRule.freeze(
+                noClasses()
+                        .that()
+                        .resideInAPackage("..dto..")
+                        .should()
+                        .haveSimpleNameEndingWith("DTO")
+                        .orShould()
+                        .haveSimpleNameEndingWith("ItemDTO"))
                 .check(classes);
     }
 }

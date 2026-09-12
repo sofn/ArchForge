@@ -15,6 +15,12 @@ For every new requirement:
 5. **Verify before push** — run `./gradlew :archforge-server-admin:bootRun` to confirm startup
 6. **Push codeplans repo** after completion
 
+## Architecture Decisions
+
+Structural decisions (module boundaries, persistence topology, new CI/analysis
+gates, cross-module contracts) must be recorded in `docs/adr/` — see
+`docs/adr/README.md` for when and how.
+
 ## Agent Loop Files
 
 - Do NOT create or keep `.agent-loop/` inside this repository.

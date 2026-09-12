@@ -46,4 +46,10 @@ class ArchitectureTest {
                 .areAssignableTo(org.springframework.data.jpa.repository.JpaRepository.class)
                 .check(classes);
     }
+
+    /** Naming: MapStruct converters are {@code *Convertor}, never {@code *Mapper}. */
+    @Test
+    void noMapperNamedClasses() {
+        noClasses().should().haveSimpleNameEndingWith("Mapper").check(classes);
+    }
 }
