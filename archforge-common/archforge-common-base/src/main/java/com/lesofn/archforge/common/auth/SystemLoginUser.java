@@ -15,6 +15,7 @@ import lombok.Setter;
 @Setter
 @Getter
 @NoArgsConstructor
+@SuppressWarnings("NullAway.Init") // fields populated via setters/builders
 public class SystemLoginUser extends BaseLoginUser {
 
     private boolean isAdmin;

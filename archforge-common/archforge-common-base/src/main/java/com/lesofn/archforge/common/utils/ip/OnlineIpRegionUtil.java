@@ -8,6 +8,7 @@ import java.net.http.HttpResponse;
 import java.time.Duration;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.Nullable;
 
 /**
  * query geography address from ip
@@ -25,7 +26,7 @@ public class OnlineIpRegionUtil {
 
     private static final HttpClient HTTP_CLIENT = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5)).build();
 
-    public static IpRegion getIpRegion(String ip) {
+    public static @Nullable IpRegion getIpRegion(@Nullable String ip) {
         if (StringUtils.isBlank(ip) || IpUtil.isValidIpv6(ip) || !IpUtil.isValidIpv4(ip)) {
             return null;
         }

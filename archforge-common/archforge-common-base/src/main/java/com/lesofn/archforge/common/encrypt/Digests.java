@@ -21,12 +21,13 @@ public class Digests {
 
     private static final String SHA1 = "SHA-1";
     private static final String MD5 = "MD5";
+    private static final byte[] NO_SALT = new byte[0];
 
     private static SecureRandom random = new SecureRandom();
 
     /** 对输入字符串进行sha1散列. */
     public static byte[] sha1(byte[] input) {
-        return digest(input, SHA1, null, 1);
+        return digest(input, SHA1, NO_SALT, 1);
     }
 
     public static byte[] sha1(byte[] input, byte[] salt) {
@@ -42,7 +43,7 @@ public class Digests {
         try {
             MessageDigest digest = MessageDigest.getInstance(algorithm);
 
-            if (salt != null) {
+            if (salt.length > 0) {
                 digest.update(salt);
             }
 

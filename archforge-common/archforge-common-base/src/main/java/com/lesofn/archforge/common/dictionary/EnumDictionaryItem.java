@@ -1,6 +1,7 @@
 package com.lesofn.archforge.common.dictionary;
 
 import lombok.Value;
+import org.jspecify.annotations.Nullable;
 
 @Value
 public class EnumDictionaryItem {
@@ -11,5 +12,5 @@ public class EnumDictionaryItem {
     String label;
     Integer sort;
     Integer status;
-    String cssTag;
+    @Nullable String cssTag;
 }

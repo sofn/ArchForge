@@ -6,6 +6,7 @@ import lombok.Data;
  * @author sofn
  */
 @Data
+@SuppressWarnings("NullAway.Init") // fields populated via setters/builders
 public class LoginInfo {
 
     /** 登录IP地址 */

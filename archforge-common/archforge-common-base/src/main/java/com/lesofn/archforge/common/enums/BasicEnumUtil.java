@@ -4,6 +4,7 @@ import com.lesofn.archforge.common.error.system.SystemException;
 import com.lesofn.archforge.common.error.SystemErrorCode;
 import java.util.Objects;
 import org.apache.commons.lang3.BooleanUtils;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author sofn
@@ -15,7 +16,7 @@ public class BasicEnumUtil {
 
     public static final String UNKNOWN = "未知";
 
-    public static <E extends Enum<E>> E fromValueSafely(Class<E> enumClass, Object value) {
+    public static <E extends Enum<E>> @Nullable E fromValueSafely(Class<E> enumClass, @Nullable Object value) {
         E target = null;
 
         for (E enumConstant : enumClass.getEnumConstants()) {
@@ -28,7 +29,7 @@ public class BasicEnumUtil {
         return target;
     }
 
-    public static <E extends Enum<E>> E fromValue(Class<E> enumClass, Object value) {
+    public static <E extends Enum<E>> @Nullable E fromValue(Class<E> enumClass, @Nullable Object value) {
         E target = null;
 
         for (E enumConstant : enumClass.getEnumConstants()) {

@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@SuppressWarnings("NullAway.Init") // fields populated via setters/builders
 public class RoleInfo {
 
     public static final RoleInfo EMPTY_ROLE = new RoleInfo();

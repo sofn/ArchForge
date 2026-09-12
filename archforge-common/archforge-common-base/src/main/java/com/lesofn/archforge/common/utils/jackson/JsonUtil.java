@@ -43,6 +43,7 @@ import tools.jackson.databind.node.JsonNodeType;
 import tools.jackson.databind.node.ObjectNode;
 import tools.jackson.databind.type.CollectionType;
 import tools.jackson.databind.type.MapType;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Jackson工具类 优势： 数据量高于百万的时候，速度和FastJson相差极小 API和注解支持最完善，可定制性最强 支持的数据源最广泛（字符串，对象，文件、流、URL）
@@ -80,7 +81,7 @@ public class JsonUtil {
             // 初始化
             mapper = initMapper();
         } catch (Exception e) {
-            log.error("jackson config error", e);
+            throw new ExceptionInInitializerError(e);
         }
     }
 
@@ -205,7 +206,7 @@ public class JsonUtil {
     }
 
     /** JSON反序列化 */
-    public static <V> V from(String json, Type type) {
+    public static <V> @Nullable V from(@Nullable String json, Type type) {
         if (StringUtils.isEmpty(json)) {
             return null;
         }
@@ -285,7 +286,7 @@ public class JsonUtil {
      *
      * @return String，默认为 null
      */
-    public static String getAsString(String json, String key) {
+    public static @Nullable String getAsString(@Nullable String json, String key) {
         if (StringUtils.isEmpty(json)) {
             return null;
         }
@@ -463,7 +464,7 @@ public class JsonUtil {
      *
      * @return object, 默认为 null
      */
-    public static <V> V getAsObject(String json, String key, Class<V> type) {
+    public static <V> @Nullable V getAsObject(@Nullable String json, String key, Class<V> type) {
         if (StringUtils.isEmpty(json)) {
             return null;
         }
@@ -495,7 +496,8 @@ public class JsonUtil {
                 return Collections.emptyList();
             }
             CollectionType collectionType = mapper.getTypeFactory().constructCollectionType(ArrayList.class, type);
-            return from(getAsString(jsonNode), collectionType);
+            List<V> result = from(getAsString(jsonNode), collectionType);
+            return result != null ? result : Collections.emptyList();
         } catch (Exception e) {
             throw new RuntimeException(String.format(
                     "jackson get list error, json: %s, key: %s, type: %s", json, key, type), e);
@@ -507,7 +509,7 @@ public class JsonUtil {
      *
      * @return JsonNode, 默认为 null
      */
-    public static JsonNode getAsJsonObject(String json, String key) {
+    public static @Nullable JsonNode getAsJsonObject(@Nullable String json, String key) {
         try {
             JsonNode node = mapper.readTree(json);
             if (null == node) {

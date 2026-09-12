@@ -3,6 +3,7 @@ package com.lesofn.archforge.common.utils.i18n;
 import com.lesofn.archforge.common.spring.SpringContextHolder;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.jspecify.annotations.Nullable;
 
 /**
  * 获取i18n资源文件
@@ -34,7 +35,7 @@ public class MessageUtils {
      * @param args 参数
      * @return 国际化翻译值
      */
-    public static String messageOrDefault(String code, String defaultMessage, Object... args) {
+    public static @Nullable String messageOrDefault(String code, @Nullable String defaultMessage, Object... args) {
         MessageSource messageSource = SpringContextHolder.getBean(MessageSource.class);
         return messageSource.getMessage(code, args, defaultMessage, LocaleContextHolder.getLocale());
     }

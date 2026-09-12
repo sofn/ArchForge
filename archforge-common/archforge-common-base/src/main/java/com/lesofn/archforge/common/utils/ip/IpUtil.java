@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.Nullable;
 
 /**
  * IP工具类
@@ -133,7 +134,7 @@ public class IpUtil {
         return "127.0.0.1";
     }
 
-    private static String localIp = null;
+    private static @Nullable String localIp = null;
 
     /** 只获取一次ip */
     public static String getSingleLocalIp() {

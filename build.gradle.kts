@@ -26,6 +26,7 @@ val nullAwayCleanMain =
             "archforge-blog",
             "archforge-cache-starter",
             "archforge-cli",
+            "archforge-common-base",
             "archforge-common-error",
             "archforge-common-jpa",
             "archforge-example-task",

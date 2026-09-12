@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author sofn
@@ -15,13 +16,13 @@ import lombok.ToString;
 @ToString
 public class IpRegion {
     private static final String UNKNOWN = "未知";
-    private String country;
-    private String region;
-    private String province;
-    private String city;
-    private String isp;
+    private @Nullable String country;
+    private @Nullable String region;
+    private @Nullable String province;
+    private @Nullable String city;
+    private @Nullable String isp;
 
-    public IpRegion(String province, String city) {
+    public IpRegion(@Nullable String province, @Nullable String city) {
         this.province = province;
         this.city = city;
     }

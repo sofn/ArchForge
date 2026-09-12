@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.lionsoul.ip2region.xdb.Searcher;
 import org.lionsoul.ip2region.xdb.Version;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Offline IP region lookup backed by ip2region's xdb data files.
@@ -34,15 +35,15 @@ public class OfflineIpRegionUtil {
 
     private static final long RETRY_BACKOFF_MS = TimeUnit.SECONDS.toMillis(60);
 
-    private static volatile Searcher v4Searcher;
-    private static volatile Searcher v6Searcher;
+    private static volatile @Nullable Searcher v4Searcher;
+    private static volatile @Nullable Searcher v6Searcher;
     private static volatile long v4NextRetryAt;
     private static volatile long v6NextRetryAt;
 
     private OfflineIpRegionUtil() {
     }
 
-    public static IpRegion getIpRegion(String ip) {
+    public static @Nullable IpRegion getIpRegion(@Nullable String ip) {
         if (StringUtils.isBlank(ip) || !XdbManager.isOfflineEnabled()) {
             return null;
         }
@@ -71,7 +72,7 @@ public class OfflineIpRegionUtil {
         return null;
     }
 
-    private static Searcher v4Searcher() {
+    private static @Nullable Searcher v4Searcher() {
         Searcher s = v4Searcher;
         if (s == null) {
             s = initSearcher(Version.IPv4, false);
@@ -80,7 +81,7 @@ public class OfflineIpRegionUtil {
         return s;
     }
 
-    private static Searcher v6Searcher() {
+    private static @Nullable Searcher v6Searcher() {
         Searcher s = v6Searcher;
         if (s == null) {
             s = initSearcher(Version.IPv6, true);
@@ -90,7 +91,7 @@ public class OfflineIpRegionUtil {
     }
 
     /** Lazy initialisation with a retry backoff; returns null when the xdb is unavailable. */
-    private static synchronized Searcher initSearcher(Version version, boolean ipv6) {
+    private static synchronized @Nullable Searcher initSearcher(Version version, boolean ipv6) {
         long now = System.currentTimeMillis();
         long nextRetryAt = ipv6 ? v6NextRetryAt : v4NextRetryAt;
         if (now < nextRetryAt) {

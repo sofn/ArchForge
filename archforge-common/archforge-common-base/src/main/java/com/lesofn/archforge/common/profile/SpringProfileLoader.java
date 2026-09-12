@@ -3,6 +3,7 @@ package com.lesofn.archforge.common.profile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author sofn
@@ -13,7 +14,7 @@ public class SpringProfileLoader {
     @Autowired
     private Environment env;
 
-    private Env envVar;
+    private @Nullable Env envVar;
 
     public Env getEnv() {
         if (envVar == null) {

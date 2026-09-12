@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.jspecify.annotations.Nullable;
 
 /** Authors: sofn Version: 1.0 Created at 2015-09-17 22:05. */
 public class AuthRequest {
@@ -19,7 +20,7 @@ public class AuthRequest {
     public static final String FROM_HEADER = "X-Engine-From"; // 用于判断内网外网（Nginx配置添加Header）
     public static final String SSL_HEADER = "X-Engine-SSL";
     private HttpServletRequest request;
-    private List<Map.Entry<String, String>> cacheCookies;
+    private @Nullable List<Map.Entry<String, String>> cacheCookies;
 
     public AuthRequest(HttpServletRequest request) {
         if (request == null) {
@@ -34,7 +35,7 @@ public class AuthRequest {
         // 外网
         OUTER;
 
-        public static final RequestFrom valueOf(String name, RequestFrom defaultValue) {
+        public static final RequestFrom valueOf(@Nullable String name, RequestFrom defaultValue) {
             if (name == null) {
                 return defaultValue;
             }
@@ -95,7 +96,7 @@ public class AuthRequest {
         return cacheCookies;
     }
 
-    public String getCookie(String name) {
+    public @Nullable String getCookie(@Nullable String name) {
         if (name == null) {
             return null;
         }

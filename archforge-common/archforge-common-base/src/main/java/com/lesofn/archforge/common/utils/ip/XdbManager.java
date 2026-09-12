@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.Properties;
 import lombok.extern.slf4j.Slf4j;
 import org.lionsoul.ip2region.xdb.Header;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Manages the local cache of ip2region xdb data files.
@@ -83,7 +84,7 @@ public final class XdbManager {
     }
 
     /** The data-file version injected from the gradle build (ip2regionXdbVersion). */
-    static String xdbVersion() {
+    static @Nullable String xdbVersion() {
         try (InputStream in = XdbManager.class.getResourceAsStream("/ip2region-xdb.properties")) {
             Properties props = new Properties();
             if (in == null) {
@@ -111,7 +112,7 @@ public final class XdbManager {
      * Returns a ready-to-use xdb file for the requested family, downloading or re-validating as
      * needed. Returns null when the file cannot be obtained (offline, bad url, ...).
      */
-    public static Path ensureXdb(boolean ipv6) {
+    public static @Nullable Path ensureXdb(boolean ipv6) {
         String url = resolveUrl(ipv6);
         Path target = cacheDir.resolve(ipv6 ? V6_FILE : V4_FILE);
         try {

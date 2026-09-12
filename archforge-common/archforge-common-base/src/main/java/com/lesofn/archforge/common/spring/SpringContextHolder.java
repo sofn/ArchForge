@@ -11,6 +11,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.env.EnvironmentCapable;
 import org.springframework.stereotype.Component;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author sofn
@@ -20,7 +21,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class SpringContextHolder implements ApplicationContextAware, DisposableBean {
 
-    private static ApplicationContext applicationContext;
+    private static @Nullable ApplicationContext applicationContext;
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
@@ -59,7 +60,7 @@ public class SpringContextHolder implements ApplicationContextAware, DisposableB
      * @param property 属性key
      * @return value
      */
-    public static String getProperty(String property) {
+    public static @Nullable String getProperty(String property) {
         return getProperty(property, String.class, null);
     }
 
@@ -73,10 +74,10 @@ public class SpringContextHolder implements ApplicationContextAware, DisposableB
      * @return 值
      */
     @SuppressWarnings("unchecked")
-    public static <T> T getProperty(String property, Class<T> clazz, T defaultValue) {
+    public static <T> @Nullable T getProperty(String property, Class<T> clazz, @Nullable T defaultValue) {
         return Optional.ofNullable(applicationContext)
                 .map(EnvironmentCapable::getEnvironment)
-                .map(it -> it.getProperty(property, clazz, defaultValue))
+                .map(it -> it.getProperty(property, clazz))
                 .orElse(
                         Optional.ofNullable(applicationContext)
                                 .map(

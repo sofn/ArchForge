@@ -4,19 +4,21 @@ import com.lesofn.archforge.common.enums.BasicEnum;
 import com.lesofn.archforge.common.enums.DictionaryEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.jspecify.annotations.Nullable;
 
 /**
  * 字典模型类
  */
 @Data
 @AllArgsConstructor
+@SuppressWarnings("NullAway.Init") // partial-init ctor tolerates a null enum
 public class DictionaryData {
 
     private String label;
     private Integer value;
-    private String cssTag;
+    private @Nullable String cssTag;
 
-    public DictionaryData(BasicEnum enumType) {
+    public DictionaryData(@Nullable BasicEnum enumType) {
         if (enumType != null) {
             this.label = enumType.getDescription();
             this.value = enumType.getValue();

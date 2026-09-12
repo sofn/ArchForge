@@ -18,6 +18,7 @@ import lombok.NoArgsConstructor;
  */
 @Data
 @NoArgsConstructor
+@SuppressWarnings("NullAway.Init") // fields populated via setters/builders
 public class BaseLoginUser implements java.io.Serializable {
 
     private static final long serialVersionUID = 1L;

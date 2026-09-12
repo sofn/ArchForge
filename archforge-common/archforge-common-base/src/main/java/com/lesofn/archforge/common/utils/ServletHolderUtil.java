@@ -8,6 +8,7 @@ import org.apache.commons.lang3.Strings;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import org.jspecify.annotations.Nullable;
 
 /**
  * 客户端工具类
@@ -21,7 +22,7 @@ public class ServletHolderUtil {
     }
 
     /** 获取request */
-    public static HttpServletRequest getRequest() {
+    public static @Nullable HttpServletRequest getRequest() {
         ServletRequestAttributes attributes = getRequestAttributes();
         if (attributes == null) {
             return null;
@@ -30,7 +31,7 @@ public class ServletHolderUtil {
     }
 
     /** 获取response */
-    public static HttpServletResponse getResponse() {
+    public static @Nullable HttpServletResponse getResponse() {
         ServletRequestAttributes attributes = getRequestAttributes();
         if (attributes == null) {
             return null;
@@ -38,7 +39,7 @@ public class ServletHolderUtil {
         return attributes.getResponse();
     }
 
-    public static ServletRequestAttributes getRequestAttributes() {
+    public static @Nullable ServletRequestAttributes getRequestAttributes() {
         RequestAttributes attributes = RequestContextHolder.getRequestAttributes();
         if (attributes == null || !(attributes instanceof ServletRequestAttributes)) {
             return null;
