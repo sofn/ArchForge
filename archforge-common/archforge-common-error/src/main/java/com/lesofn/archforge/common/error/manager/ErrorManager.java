@@ -86,10 +86,13 @@ public class ErrorManager {
     }
 
     public static int genCode(ErrorCode errorCode) {
-        return GLOBAL_ERROR_CODE_MAP.inverse().get(errorCode);
+        Integer code = GLOBAL_ERROR_CODE_MAP.inverse().get(errorCode);
+        Preconditions.checkArgument(code != null, "unregistered ErrorCode: " + errorCode);
+        return code;
     }
 
     public static ProjectModule projectModule(ErrorCode errorCode) {
-        return ERROR_PROJECT_MODULE_MAP.get(errorCode);
+        return Preconditions.checkNotNull(
+                ERROR_PROJECT_MODULE_MAP.get(errorCode), "unregistered ErrorCode: %s", errorCode);
     }
 }

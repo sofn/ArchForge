@@ -4,6 +4,7 @@ import java.util.List;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author sofn
@@ -15,7 +16,7 @@ import lombok.ToString;
 public class TreeNode {
     int code;
     String name;
-    List<TreeNode> nodes;
+    @Nullable List<TreeNode> nodes;
 
     public TreeNode(int code, String name) {
         this.code = code;

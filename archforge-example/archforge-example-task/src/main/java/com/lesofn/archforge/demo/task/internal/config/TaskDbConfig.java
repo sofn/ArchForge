@@ -25,7 +25,7 @@ public class TaskDbConfig {
 
     @Bean
     PlatformTransactionManager taskTransactionManager() {
-        return new JpaTransactionManager(taskEntityManagerFactory().getObject());
+        return new JpaTransactionManager(java.util.Objects.requireNonNull(taskEntityManagerFactory().getObject()));
     }
 
     @Bean

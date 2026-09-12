@@ -26,7 +26,8 @@ public abstract class BaseRuntimeException extends RuntimeException implements I
 
     protected BaseRuntimeException(Throwable cause) {
         super(cause);
-        this.errorInfo = ErrorInfo.parse(cause.getMessage());
+        String message = cause.getMessage();
+        this.errorInfo = ErrorInfo.parse(message != null ? message : cause.toString());
     }
 
     protected BaseRuntimeException(ErrorInfo errorInfo) {

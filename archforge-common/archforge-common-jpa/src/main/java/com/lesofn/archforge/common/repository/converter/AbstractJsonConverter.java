@@ -2,6 +2,7 @@ package com.lesofn.archforge.common.repository.converter;
 
 import com.lesofn.archforge.common.utils.jackson.JsonUtil;
 import jakarta.persistence.AttributeConverter;
+import org.jspecify.annotations.Nullable;
 import org.springframework.util.StringUtils;
 
 /**
@@ -15,7 +16,7 @@ import org.springframework.util.StringUtils;
 public abstract class AbstractJsonConverter<T> implements AttributeConverter<T, String> {
 
     @Override
-    public String convertToDatabaseColumn(T attribute) {
+    public @Nullable String convertToDatabaseColumn(@Nullable T attribute) {
         if (attribute == null) {
             return null;
         }
@@ -23,7 +24,7 @@ public abstract class AbstractJsonConverter<T> implements AttributeConverter<T, 
     }
 
     @Override
-    public T convertToEntityAttribute(String dbData) {
+    public @Nullable T convertToEntityAttribute(@Nullable String dbData) {
         if (!StringUtils.hasText(dbData)) {
             return null;
         }

@@ -1,6 +1,7 @@
 package com.lesofn.archforge.starter.cache;
 
 import java.util.concurrent.Callable;
+import org.jspecify.annotations.Nullable;
 import org.springframework.cache.Cache;
 
 /**
@@ -14,11 +15,12 @@ import org.springframework.cache.Cache;
 public class CompositeCache implements Cache {
 
     private final String name;
-    private final Cache l1Cache;
-    private final Cache l2Cache;
-    private final CacheSyncBroadcaster broadcaster;
+    private final @Nullable Cache l1Cache;
+    private final @Nullable Cache l2Cache;
+    private final @Nullable CacheSyncBroadcaster broadcaster;
 
-    public CompositeCache(String name, Cache l1Cache, Cache l2Cache, CacheSyncBroadcaster broadcaster) {
+    public CompositeCache(String name, @Nullable Cache l1Cache, @Nullable Cache l2Cache,
+            @Nullable CacheSyncBroadcaster broadcaster) {
         this.name = name;
         this.l1Cache = l1Cache;
         this.l2Cache = l2Cache;
@@ -44,7 +46,7 @@ public class CompositeCache implements Cache {
     public Object getNativeCache() { return this; }
 
     @Override
-    public ValueWrapper get(Object key) {
+    public @Nullable ValueWrapper get(Object key) {
         if (l1Cache != null) {
             ValueWrapper wrapper = l1Cache.get(key);
             if (wrapper != null) {
@@ -64,7 +66,7 @@ public class CompositeCache implements Cache {
     }
 
     @Override
-    public <T> T get(Object key, Class<T> type) {
+    public <T> @Nullable T get(Object key, @Nullable Class<T> type) {
         if (l1Cache != null) {
             T value = l1Cache.get(key, type);
             if (value != null) {
@@ -84,7 +86,7 @@ public class CompositeCache implements Cache {
     }
 
     @Override
-    public <T> T get(Object key, Callable<T> valueLoader) {
+    public <T> @Nullable T get(Object key, Callable<T> valueLoader) {
         if (l1Cache != null) {
             ValueWrapper wrapper = l1Cache.get(key);
             if (wrapper != null) {
@@ -108,7 +110,7 @@ public class CompositeCache implements Cache {
     }
 
     @Override
-    public void put(Object key, Object value) {
+    public void put(Object key, @Nullable Object value) {
         // Write the shared L2 first, then the local L1, so a concurrent reader on this
         // instance never promotes a value newer than what L2 holds.
         if (l2Cache != null) {
@@ -121,7 +123,7 @@ public class CompositeCache implements Cache {
     }
 
     @Override
-    public ValueWrapper putIfAbsent(Object key, Object value) {
+    public @Nullable ValueWrapper putIfAbsent(Object key, @Nullable Object value) {
         ValueWrapper existing = get(key);
         if (existing != null) {
             return existing;

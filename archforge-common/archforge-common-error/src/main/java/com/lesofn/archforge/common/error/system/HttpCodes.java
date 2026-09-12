@@ -3,6 +3,7 @@ package com.lesofn.archforge.common.error.system;
 import com.lesofn.archforge.common.error.api.ErrorCode;
 import com.lesofn.archforge.common.error.manager.ErrorManager;
 import lombok.Getter;
+import org.jspecify.annotations.Nullable;
 
 /**
  * copy from org.springframework.http.HttpStatus
@@ -147,7 +148,7 @@ public enum HttpCodes implements ErrorCode {
         }
     }
 
-    public static HttpCodes resolve(int statusCode) {
+    public static @Nullable HttpCodes resolve(int statusCode) {
         HttpCodes[] var1 = values();
         int var2 = var1.length;
 

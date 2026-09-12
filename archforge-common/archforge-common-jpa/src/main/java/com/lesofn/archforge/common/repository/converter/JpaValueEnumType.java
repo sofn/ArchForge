@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.Properties;
 import org.hibernate.type.descriptor.WrapperOptions;
+import org.jspecify.annotations.Nullable;
 import org.hibernate.usertype.DynamicParameterizedType;
 import org.hibernate.usertype.UserType;
 
@@ -15,8 +16,10 @@ import org.hibernate.usertype.UserType;
  * @author sofn
  * @version 1.0 Created at: 2021-01-29 14:53 Updated for Hibernate 7.x compatibility
  */
+// enumClass is populated by Hibernate via setParameterValues (DynamicParameterizedType),
+// not by any constructor javac can see.
 @SuppressWarnings({
-        "rawtypes", "unchecked", "removal"
+        "rawtypes", "unchecked", "removal", "NullAway.Init"
 })
 public class JpaValueEnumType implements DynamicParameterizedType, UserType<Enum> {
 
@@ -41,7 +44,7 @@ public class JpaValueEnumType implements DynamicParameterizedType, UserType<Enum
     }
 
     @Override
-    public Enum nullSafeGet(ResultSet rs, int position, WrapperOptions options)
+    public @Nullable Enum nullSafeGet(ResultSet rs, int position, WrapperOptions options)
             throws SQLException {
         Integer value = rs.getObject(position, Integer.class);
         if (value == null) {
@@ -95,6 +98,10 @@ public class JpaValueEnumType implements DynamicParameterizedType, UserType<Enum
     @SuppressWarnings("unchecked")
     public void setParameterValues(Properties parameters) {
         ParameterType params = (ParameterType) parameters.get(DynamicParameterizedType.PARAMETER_TYPE);
+        if (params == null) {
+            throw new IllegalStateException(
+                    "JpaValueEnumType requires @TypeRegistration / DynamicParameterizedType metadata");
+        }
         enumClass = (Class<Enum>) params.getReturnedClass();
     }
 }

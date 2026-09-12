@@ -24,7 +24,8 @@ public abstract class BaseException extends Exception implements IErrorCodeExcep
 
     protected BaseException(Throwable cause) {
         super(cause);
-        this.errorInfo = ErrorInfo.parse(cause.getMessage());
+        String message = cause.getMessage();
+        this.errorInfo = ErrorInfo.parse(message != null ? message : cause.toString());
     }
 
     protected BaseException(ErrorInfo errorInfo) {

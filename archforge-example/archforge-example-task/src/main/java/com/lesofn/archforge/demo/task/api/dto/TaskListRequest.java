@@ -1,18 +1,20 @@
 package com.lesofn.archforge.demo.task.api.dto;
 
 import lombok.Data;
+import org.jspecify.annotations.Nullable;
 
 /** Task list query request */
 @Data
+@SuppressWarnings("NullAway.Init") // Jackson/JPA-populated DTO
 public class TaskListRequest {
 
     private Integer currentPage = 1;
 
     private Integer pageSize = 10;
 
-    private String title;
+    private @Nullable String title;
 
-    private String status;
+    private @Nullable String status;
 
-    private Long uid;
+    private @Nullable Long uid;
 }

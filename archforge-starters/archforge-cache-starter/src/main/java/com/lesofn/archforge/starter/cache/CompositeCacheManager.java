@@ -3,6 +3,7 @@ package com.lesofn.archforge.starter.cache;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import org.jspecify.annotations.Nullable;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.caffeine.CaffeineCacheManager;
@@ -26,7 +27,7 @@ public class CompositeCacheManager implements CacheManager {
     }
 
     @Override
-    public Cache getCache(String name) {
+    public @Nullable Cache getCache(String name) {
         Cache caffeineCache = caffeineCacheManager != null ? caffeineCacheManager.getCache(name) : null;
         Cache redisCache = redisCacheManager != null ? redisCacheManager.getCache(name) : null;
         if (caffeineCache == null && redisCache == null) {

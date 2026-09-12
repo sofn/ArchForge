@@ -70,7 +70,10 @@ public class CacheSyncBroadcaster {
         if (msg.isClear()) {
             l1.clear();
         } else {
-            l1.evict(msg.getKey());
+            Object key = msg.getKey();
+            if (key != null) {
+                l1.evict(key);
+            }
         }
     }
 }

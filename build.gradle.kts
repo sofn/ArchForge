@@ -20,7 +20,15 @@ val errorproneToolVersion = "2.50.0"
 // NullAway ratchet — modules whose sources are already NullAway-clean are enforced
 // at ERROR for that source set. Drive both lists to cover every module, then flip
 // the default severity to ERROR and delete these lists.
-val nullAwayCleanMain = setOf("archforge-blog", "archforge-cli", "archforge-lock-starter")
+val nullAwayCleanMain =
+    setOf(
+            "archforge-blog",
+            "archforge-cache-starter",
+            "archforge-cli",
+            "archforge-common-error",
+            "archforge-common-jpa",
+            "archforge-example-task",
+            "archforge-lock-starter")
 val nullAwayCleanTest = setOf<String>()
 // Checkstyle: semantic style gate — runs before `test` and as part of `check`/`build`
 // (division of labor: formatting stays with Spotless, see config/checkstyle/checkstyle.xml)

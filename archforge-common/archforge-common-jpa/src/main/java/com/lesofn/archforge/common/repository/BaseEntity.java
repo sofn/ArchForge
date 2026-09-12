@@ -11,9 +11,11 @@ import lombok.Setter;
  * @author sofn
  * @version 1.0 Created at: 2025-09-14 23:06
  */
+// Audit fields are populated by JPA lifecycle callbacks / listeners, not the ctor.
 @Setter
 @Getter
 @MappedSuperclass
+@SuppressWarnings("NullAway.Init")
 public class BaseEntity<T> {
 
     private Long creatorId;

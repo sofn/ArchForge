@@ -216,9 +216,10 @@ public final class QueryHelp {
             case RIGHT -> JoinType.RIGHT;
             case INNER -> JoinType.INNER;
         };
-        Join<R, ?> join = null;
-        for (String name : q.joinName().split(">")) {
-            join = (join == null) ? root.join(name, jt) : (Join<R, ?>) join.join(name, jt);
+        String[] names = q.joinName().split(">");
+        Join<R, ?> join = root.join(names[0], jt);
+        for (int i = 1; i < names.length; i++) {
+            join = (Join<R, ?>) join.join(names[i], jt);
         }
         cache.put(q.joinName(), join);
         return join;

@@ -14,6 +14,7 @@ import jakarta.persistence.Table;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.jspecify.annotations.Nullable;
 import lombok.Setter;
 import lombok.ToString;
 
@@ -25,6 +26,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @Entity
 @Table(name = "task")
+@SuppressWarnings("NullAway.Init") // JPA assigns @Id
 public class Task extends BaseEntity<Task> {
 
     @Id
@@ -33,7 +35,7 @@ public class Task extends BaseEntity<Task> {
 
     private String title;
 
-    private String description;
+    private @Nullable String description;
 
     @Column(name = "uid", nullable = false)
     private long uid;
@@ -41,19 +43,19 @@ public class Task extends BaseEntity<Task> {
     @Enumerated(EnumType.STRING)
     private TaskStatus status = TaskStatus.CREATED;
 
-    public Task(String title, String description, long uid) {
+    public Task(String title, @Nullable String description, long uid) {
         this.title = title;
         this.description = description;
         this.uid = uid;
     }
 
-    public static Task create(String title, String description, long uid) {
+    public static Task create(String title, @Nullable String description, long uid) {
         Task task = new Task(title, description, uid);
         task.setDeleted(false);
         return task;
     }
 
-    public void updateInfo(String title, String description) {
+    public void updateInfo(String title, @Nullable String description) {
         if (this.status == TaskStatus.COMPLETED || this.status == TaskStatus.CANCELLED) {
             throw new TaskException(TaskErrorCode.TASK_ALREADY_DONE);
         }

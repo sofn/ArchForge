@@ -23,6 +23,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.jspecify.annotations.Nullable;
 import org.springframework.util.StringUtils;
 
 /** Task application service */
@@ -143,14 +144,14 @@ public class TaskService {
         return response;
     }
 
-    private Long toEpochMilli(java.time.LocalDateTime dateTime) {
+    private @Nullable Long toEpochMilli(java.time.@Nullable LocalDateTime dateTime) {
         if (dateTime == null) {
             return null;
         }
         return dateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
     }
 
-    private TaskStatus parseStatus(String status) {
+    private @Nullable TaskStatus parseStatus(@Nullable String status) {
         if (!StringUtils.hasText(status)) {
             return null;
         }

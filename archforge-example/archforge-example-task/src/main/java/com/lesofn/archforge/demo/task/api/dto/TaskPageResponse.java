@@ -5,6 +5,7 @@ import lombok.Data;
 
 /** Task paged result matching vue-pure-admin table format */
 @Data
+@SuppressWarnings("NullAway.Init") // Jackson/JPA-populated DTO
 public class TaskPageResponse<T> {
 
     private List<T> list;
