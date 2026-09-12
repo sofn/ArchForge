@@ -140,18 +140,16 @@ class ArchitectureTest {
     }
 
     /**
-     * Naming: request/response types use {@code *Request}/{@code *Response}. The 11
-     * legacy {@code *DTO} classes are frozen — this rule only fails on NEW ones.
-     * The frozen violations live in {@code archunit_store/} (committed); refreezing
-     * is a deliberate act: run with {@code -Darchunit.freeze.refreeze=true} and
-     * commit the updated store.
+     * Naming: request/response types use {@code *Request}/{@code *Response}. The 12
+     * legacy {@code *DTO} classes are frozen — this rule fails on NEW ones anywhere,
+     * not just inside {@code dto} packages. The frozen violations live in
+     * {@code archunit_store/} (committed); refreezing is a deliberate act: run with
+     * {@code -Darchunit.freeze.refreeze=true} and commit the updated store.
      */
     @Test
     void noNewDtoSuffixedTypes() {
         FreezingArchRule.freeze(
                 noClasses()
-                        .that()
-                        .resideInAPackage("..dto..")
                         .should()
                         .haveSimpleNameEndingWith("DTO")
                         .orShould()
