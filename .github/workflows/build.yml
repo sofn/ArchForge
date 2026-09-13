@@ -9,6 +9,9 @@ jobs:
   build:
     name: Build and analyze
     runs-on: ubuntu-latest
+    env:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -26,8 +29,10 @@ jobs:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
-      - name: Build and analyze
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-        run: ./gradlew build sonar --info
+      - name: Build
+        run: ./gradlew build
+      - name: SonarQube analysis
+        # Runs only when the Sonar secrets are configured; forks / repos
+        # without them skip instead of failing on scanner bootstrap.
+        if: ${{ env.SONAR_TOKEN != '' && env.SONAR_HOST_URL != '' }}
+        run: ./gradlew sonar --info

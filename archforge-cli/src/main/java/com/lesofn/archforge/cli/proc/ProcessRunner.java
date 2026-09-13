@@ -75,7 +75,7 @@ public class ProcessRunner {
             Process process = builder.start();
             String output = new String(process.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
             // drain stderr so it cannot block the process
-            new String(process.getErrorStream().readAllBytes(), StandardCharsets.UTF_8);
+            process.getErrorStream().transferTo(java.io.OutputStream.nullOutputStream());
             return new RunResult(process.waitFor(), output);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
