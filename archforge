@@ -4,8 +4,14 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 JAR="${ROOT}/archforge-cli/build/libs/archforge-cli.jar"
 
-if [[ ! -f "${JAR}" ]]; then
-  echo "archforge-cli.jar not found, building..."
+needs_rebuild() {
+  [[ ! -f "${JAR}" ]] && return 0
+  # rebuild when any cli source or build file is newer than the jar
+  find "${ROOT}/archforge-cli/src" "${ROOT}/archforge-cli/build.gradle.kts" -newer "${JAR}" -print -quit 2>/dev/null | grep -q .
+}
+
+if needs_rebuild; then
+  echo "archforge-cli sources changed — rebuilding jar..."
   (cd "${ROOT}" && ./gradlew :archforge-cli:shadowJar -x test)
 fi
 

@@ -51,6 +51,26 @@ public class ComposeSupport {
         return processRunner.run(command, ProjectPaths.dockerDir(repoRoot));
     }
 
+    /** {@code down -v --remove-orphans}: containers + named volumes (destroys data). */
+    public int downVolumes(String profile) {
+        List<String> command = base(profile);
+        command.add("down");
+        command.add("-v");
+        command.add("--remove-orphans");
+        return processRunner.run(command, ProjectPaths.dockerDir(repoRoot));
+    }
+
+    /** True when any service of the profile has a running container. */
+    public boolean hasRunningServices(String profile) {
+        List<String> command = base(profile);
+        command.add("ps");
+        command.add("--status");
+        command.add("running");
+        command.add("-q");
+        ProcessRunner.RunResult result = processRunner.runCapture(command, ProjectPaths.dockerDir(repoRoot));
+        return result.exitCode() == 0 && !result.stdout().isBlank();
+    }
+
     public int stop(String profile) {
         List<String> command = base(profile);
         command.add("stop");

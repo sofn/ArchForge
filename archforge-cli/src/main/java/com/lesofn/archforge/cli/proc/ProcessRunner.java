@@ -62,6 +62,29 @@ public class ProcessRunner {
         }
     }
 
+    public record RunResult(int exitCode, String stdout) {
+    }
+
+    /** Runs silently and captures stdout — for checks like {@code compose ps -q}. */
+    public RunResult runCapture(List<String> command, Path workingDir) {
+        try {
+            ProcessBuilder builder = new ProcessBuilder(new ArrayList<>(command));
+            if (workingDir != null) {
+                builder.directory(workingDir.toFile());
+            }
+            Process process = builder.start();
+            String output = new String(process.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+            // drain stderr so it cannot block the process
+            new String(process.getErrorStream().readAllBytes(), StandardCharsets.UTF_8);
+            return new RunResult(process.waitFor(), output);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new IllegalStateException("Interrupted while running: " + command, e);
+        } catch (IOException e) {
+            throw new IllegalStateException("Failed to run: " + command, e);
+        }
+    }
+
     public Process startDetached(List<String> command, Path workingDir, File logFile) {
         try {
             ProcessBuilder builder = new ProcessBuilder(new ArrayList<>(command));

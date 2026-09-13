@@ -4,6 +4,10 @@ import com.lesofn.archforge.cli.config.DbPasswordResolver;
 import com.lesofn.archforge.cli.config.ProjectPaths;
 import com.lesofn.archforge.cli.docker.ComposeSupport;
 import com.lesofn.archforge.cli.proc.ProcessRunner;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
@@ -17,7 +21,7 @@ import picocli.CommandLine.Option;
         name = "infra",
         description = "Manage dependency containers via docker compose",
         subcommands = {
-                InfraCommand.Up.class, InfraCommand.Down.class, InfraCommand.Stop.class
+                InfraCommand.Up.class, InfraCommand.Down.class, InfraCommand.Stop.class, InfraCommand.Clean.class
         })
 public class InfraCommand {
 
@@ -56,6 +60,42 @@ public class InfraCommand {
         @Override
         public Integer call() {
             return new ComposeSupport(new ProcessRunner(), ProjectPaths.repoRoot()).down(profile);
+        }
+    }
+
+    @Command(
+            mixinStandardHelpOptions = true,
+            name = "clean",
+            description = "Remove dependency containers AND named volumes (destroys local dev data)")
+    static class Clean implements Callable<Integer> {
+        @Option(names = "--profile", defaultValue = "dev")
+        String profile;
+
+        @Option(names = "--yes", description = "Skip the confirmation prompt (for scripts)")
+        boolean yes;
+
+        @Override
+        public Integer call() throws IOException {
+            Path repoRoot = ProjectPaths.repoRoot();
+            ComposeSupport compose = new ComposeSupport(new ProcessRunner(), repoRoot);
+            if (!yes) {
+                System.out.println(
+                        "This removes the containers and the postgres-data volume — all local dev data is lost.");
+                System.out.print("Type YES to continue: ");
+                String answer = new BufferedReader(new InputStreamReader(System.in, StandardCharsets.UTF_8)).readLine();
+                if (!"YES".equals(answer)) {
+                    System.out.println("Aborted.");
+                    return 1;
+                }
+            }
+            if (compose.hasRunningServices(profile)) {
+                System.out.println("Containers are still running — bringing them down first...");
+                int code = compose.down(profile);
+                if (code != 0) {
+                    return code;
+                }
+            }
+            return compose.downVolumes(profile);
         }
     }
 

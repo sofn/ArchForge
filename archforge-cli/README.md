@@ -36,6 +36,7 @@ Does three things for `dev`:
 ./archforge infra up --db-password xxx   # explicit password override
 ./archforge infra stop                   # pause
 ./archforge infra down                   # remove containers
+./archforge infra clean                  # remove containers AND volumes (asks YES, or --yes)
 ```
 
 Password resolution order: `--db-password` > `DB_PASSWORD` env > `.env` >
