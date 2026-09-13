@@ -40,6 +40,7 @@ class ArchitectureTest {
                 .should()
                 .dependOnClassesThat()
                 .resideInAPackage("..archforge.infrastructure..")
+                .because("ARCH-001: domain modules (meta.table) must not depend on infrastructure")
                 .check(classes);
     }
 
@@ -51,6 +52,7 @@ class ArchitectureTest {
                 .should()
                 .dependOnClassesThat()
                 .resideInAPackage("..archforge.infrastructure..")
+                .because("ARCH-002: domain modules (blog) must not depend on infrastructure")
                 .check(classes);
     }
 
@@ -62,6 +64,7 @@ class ArchitectureTest {
                 .should()
                 .dependOnClassesThat()
                 .resideInAPackage("..internal..")
+                .because("ARCH-003: api packages expose contracts only — never depend on internal")
                 .check(classes);
     }
 
@@ -73,6 +76,7 @@ class ArchitectureTest {
                 .should()
                 .dependOnClassesThat()
                 .areAssignableTo(JpaRepository.class)
+                .because("ARCH-004: controllers must go through service, never touch repositories")
                 .check(classes);
     }
 
@@ -85,6 +89,7 @@ class ArchitectureTest {
                 .should()
                 .dependOnClassesThat()
                 .resideInAPackage("..archforge.server..")
+                .because("ARCH-005: domain modules must not depend on server applications")
                 .check(classes);
     }
 
@@ -100,6 +105,7 @@ class ArchitectureTest {
                         "..archforge.server..",
                         "..archforge.infrastructure..",
                         "..archforge.starter..")
+                .because("ARCH-006: common modules must not depend on business layers")
                 .check(classes);
     }
 
@@ -111,6 +117,7 @@ class ArchitectureTest {
                 .should()
                 .dependOnClassesThat()
                 .resideInAnyPackage("..archforge.domain..", "..archforge.server..")
+                .because("ARCH-007: starters must not depend on business modules")
                 .check(classes);
     }
 
@@ -130,13 +137,15 @@ class ArchitectureTest {
                         "com.lesofn.archforge.blog.infrastructure..",
                         "com.lesofn.archforge.meta.table.domain..",
                         "com.lesofn.archforge.meta.table.infrastructure..")
+                .because("ARCH-008: domain modules contain exactly api+internal (ADR-0001)")
                 .check(classes);
     }
 
     /** Naming: MapStruct converters are {@code *Convertor}, never {@code *Mapper}. */
     @Test
     void noMapperNamedClasses() {
-        noClasses().should().haveSimpleNameEndingWith("Mapper").check(classes);
+        noClasses().should().haveSimpleNameEndingWith("Mapper").because(
+                "ARCH-009: MapStruct converters are *Convertor, never *Mapper").check(classes);
     }
 
     /**
@@ -153,7 +162,8 @@ class ArchitectureTest {
                         .should()
                         .haveSimpleNameEndingWith("DTO")
                         .orShould()
-                        .haveSimpleNameEndingWith("ItemDTO"))
+                        .haveSimpleNameEndingWith("ItemDTO")
+                        .because("ARCH-010: request/response types use *Request/*Response (frozen legacy *DTO set)"))
                 .check(classes);
     }
 }

@@ -1,6 +1,6 @@
 # Spec: AI-harness P0 — anti-bypass, coverage floor, CI startup smoke
 
-Date: 2026-09-13 · Status: approved (user-selected from audit report)
+Date: 2026-09-13 · Status: done (incl. P1 verify task + rule IDs)
 
 ## Background & Goals
 

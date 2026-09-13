@@ -33,6 +33,7 @@ class ArchitectureTest {
                 .should()
                 .dependOnClassesThat()
                 .resideInAPackage("..archforge.server.admin..")
+                .because("ARCH-101: server-web must not depend on server-admin")
                 .check(classes);
     }
 
@@ -44,12 +45,14 @@ class ArchitectureTest {
                 .should()
                 .dependOnClassesThat()
                 .areAssignableTo(org.springframework.data.jpa.repository.JpaRepository.class)
+                .because("ARCH-004: controllers must go through service, never touch repositories")
                 .check(classes);
     }
 
     /** Naming: MapStruct converters are {@code *Convertor}, never {@code *Mapper}. */
     @Test
     void noMapperNamedClasses() {
-        noClasses().should().haveSimpleNameEndingWith("Mapper").check(classes);
+        noClasses().should().haveSimpleNameEndingWith("Mapper").because(
+                "ARCH-009: MapStruct converters are *Convertor, never *Mapper").check(classes);
     }
 }

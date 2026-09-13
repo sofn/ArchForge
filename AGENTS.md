@@ -120,7 +120,10 @@ Every code edit must be verified BEFORE moving on — "configured" is not
 6. **Before claiming the task complete**:
    `./gradlew spotlessApply compileJava compileTestJava checkstyleMain checkstyleTest forbiddenApisMain spotbugsMain`
    then the targeted tests. For the full gate including all tests:
-   `./gradlew build`.
+   `./gradlew build` — or the single agent-facing entry **`./gradlew verify`**
+   (runs every gate across all modules and prints a normalized PASS/FAIL
+   banner; Docker-less environments: `./gradlew verify -PexcludeTags=slow`
+   skips Testcontainers ITs while pure contract tests still run).
 5. **Never batch unverified edits** — fix loop violations immediately while
    the context is small; do not park them for a "final pass".
 

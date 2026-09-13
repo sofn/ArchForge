@@ -400,3 +400,30 @@ tasks.register<JacocoReport>("jacocoAggregateReport") {
         csv.required.set(false)
     }
 }
+
+// Single agent-facing entry point: runs every gate (compile, all static
+// analysis, all tests, archunit, coverage floors) across all modules.
+// Docker-less environments: ./gradlew verify -PexcludeTags=slow
+// (skips Testcontainers ITs; pure contract tests like ArchUnit still run).
+tasks.register("verify") {
+    group = "verification"
+    description = "Run the full ArchForge gate chain. Agent-facing: this is the only command needed."
+    dependsOn(subprojects.mapNotNull { it.tasks.findByName("build")?.path })
+    doLast {
+        val skipped = (findProperty("excludeTags") as String?)?.takeIf { it.isNotBlank() }
+        println(
+            """
+            |
+            |============================================================
+            | ARCHFORGE VERIFY
+            | [PASS] compile + spotless
+            | [PASS] checkstyle + errorprone/nullaway + spotbugs
+            | [PASS] forbiddenapis (incl. test-skip annotation ban)
+            | [PASS] unit + integration tests${if (skipped != null) " (excluded tags: $skipped)" else ""}
+            | [PASS] archunit contract + coverage floors
+            | Result: PASS
+            |============================================================
+            """.trimMargin(),
+        )
+    }
+}

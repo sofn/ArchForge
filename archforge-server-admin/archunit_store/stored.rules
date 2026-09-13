@@ -1,3 +1,4 @@
 #
-#Sat Sep 12 18:16:04 CST 2026
+#Sun Sep 13 22:55:39 CST 2026
 no\ classes\ should\ have\ simple\ name\ ending\ with\ 'DTO'\ or\ should\ have\ simple\ name\ ending\ with\ 'ItemDTO'=be1057cb-5f99-4e65-aebb-ac3588772a34
+no\ classes\ should\ have\ simple\ name\ ending\ with\ 'DTO'\ or\ should\ have\ simple\ name\ ending\ with\ 'ItemDTO',\ because\ ARCH-010\:\ request/response\ types\ use\ *Request/*Response\ (frozen\ legacy\ *DTO\ set)=9398f3c7-e6bd-4c7d-89ce-98015783ba2c

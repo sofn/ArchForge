@@ -63,3 +63,36 @@ $ ./gradlew spotlessApply build --no-daemon
   → BUILD SUCCESSFUL in 3m 47s — jacocoTestCoverageVerification executed on
     all 15 floored modules inside `check`; example-task SKIPPED (no exec data)
 ```
+
+## 2026-09-13 — round 2 (P1: unified verify + rule IDs)
+
+**Changed**: `build.gradle.kts` (verify task), both `ArchitectureTest.java`
+(rule IDs via `.because("ARCH-0xx")`), `AGENTS.md` (verify documented in
+per-edit protocol)
+
+**Commands**:
+
+```
+$ ./gradlew :server-admin:test :server-web:test --tests '*ArchitectureTest*'
+  → PASS (because() DSL valid)
+
+$ ./gradlew verify --no-daemon
+  → BUILD SUCCESSFUL in 3m41s, normalized banner printed:
+    ARCHFORGE VERIFY
+    [PASS] compile + spotless
+    [PASS] checkstyle + errorprone/nullaway + spotbugs
+    [PASS] forbiddenapis (incl. test-skip annotation ban)
+    [PASS] unit + integration tests
+    [PASS] archunit contract + coverage floors
+    Result: PASS
+```
+
+**Findings**:
+- `-Ptags` / `-PexcludeTags` machinery already existed — `verify -PexcludeTags=slow`
+  covers Docker-less mode with no new property (all Docker-dependent tests are
+  @Tag("slow"); contract tests like ArchUnit stay in)
+- First verify run caught a real spotless violation in my because() lines —
+  the harness eating its own cooking; spotlessApply fixed
+- Rule IDs: ARCH-001..010 (admin shared space), ARCH-101+ (server-web own);
+  shared rules reuse the same ID across modules (ARCH-004 controllers,
+  ARCH-009 *Mapper naming appear in both)

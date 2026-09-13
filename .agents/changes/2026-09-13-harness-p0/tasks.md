@@ -6,4 +6,5 @@
 | T2 | Anti-bypass policy in AGENTS.md | `AGENTS.md` | clause added under Static Analysis | done |
 | T3 | JaCoCo per-module coverage floors | `build.gradle.kts` | measured aggregate 61.8%; floors wired into `check`; example-task SKIPPED non-blocking | done |
 | T4 | CI startup-smoke job | `.github/workflows/ci.yml` | yaml lint OK; job = needs(build) → compose infra → jar → poll /actuator/health | done |
-| T5 | Full build green + execution-log + commit/push | — | `./gradlew build` running | in_progress |
+| T5 | Full build green + execution-log + commit/push | — | `./gradlew verify` PASS 3m41s | done |
+| T6 | P1: `verify` task + arch-rule IDs | `build.gradle.kts`, `ArchitectureTest.java` ×2, `AGENTS.md` | verify banner + BUILD SUCCESSFUL | done |
