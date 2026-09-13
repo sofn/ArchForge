@@ -1,7 +1,7 @@
 # Machine-readable ArchForge project map.
 # Sibling clones, no Git submodules. Read this file first from any repo.
 #
-# ArchForgeSpec was merged into this repository (spec/, docs/specs/, skills/).
+# ArchForgeSpec was merged into this repository (spec/, docs/specs/, .agents/skills/).
 # The contract now lives in spec/openapi.yaml — see AGENTS.md.
 
 project: ArchForge
@@ -44,10 +44,10 @@ repos:
       - spec/schemas/
       - docs/specs/
       - docs/architecture.md
-      - skills/
+      - .agents/skills/
       - repos.yaml
     notes:
-      - Canonical backend standard: skills/archforge-project-standard/standard.md
+      - Canonical backend standard: .agents/skills/archforge-project-standard/standard.md
       - Auth: sa-token (StpAdminUtil / StpWebUtil), not Spring Security JWT
       - Contract sync: API changes must update spec/openapi.yaml in the same change
 
@@ -79,7 +79,7 @@ repos:
       errors: RFC 9457 ProblemDetail
 
 # ArchForgeSpec and ArchForgeDocs are retired: ArchForgeSpec's contents moved
-# into spec/ + docs/specs/ + skills/ here; ArchForgeDocs never existed.
+# into spec/ + docs/specs/ + .agents/skills/ here; ArchForgeDocs never existed.
 
 ports:
   server-admin: 8080

@@ -8,12 +8,42 @@
 
 For every new requirement:
 
-1. **Write a plan first** — save to `../codeplans/ArchForge/<date>-<topic>.md`
+1. **Write a plan first** — create `.agents/changes/<date>-<topic>/` with
+   `spec.md` + `tasks.md` (templates in `.agents/changes/_templates/`; workflow
+   in `.agents/changes/README.md`)
 2. **Wait for user review** — do NOT start implementation until approved
-3. **Track progress** — update plan file status after each step (pending / in_progress / done)
-4. **Verify each step** — run `./gradlew build` after each change
-5. **Verify before push** — run `./gradlew :archforge-server-admin:bootRun` to confirm startup
-6. **Push codeplans repo** after completion
+3. **Track progress** — update tasks.md status after each step
+   (pending / in_progress / done)
+4. **Verify each step** — per the verification matrix in
+   `.agents/changes/README.md`
+5. **Verify before push** — run `./gradlew :archforge-server-admin:bootRun`
+   (or `bootJar` + `java -jar`) to confirm startup
+6. **Evidence** — append `execution-log.md` entries with real commands and
+   outputs; never claim "passed" without evidence
+
+## AI Asset Map
+
+All AI-facing assets live in **`.agents/`** — the single canonical location.
+Tool-specific adapters are thin pointers only; never maintain two copies.
+
+| Asset | Path |
+|---|---|
+| Skills (task-triggered deep knowledge) | `.agents/skills/<name>/` — index: `.agents/skills/index.yaml` |
+| Commands (workflow prompts) | `.agents/commands/` — propose/apply/review/test/archive |
+| Sub-agent personas | `.agents/agents/` — spec-reviewer, code-quality-reviewer |
+| Memory | `.agents/memory/` — `decisions.md`, `preferences.md`, `pitfalls.md` index + `pitfalls/<topic>.md` |
+| Topic knowledge | `.agents/knowledge/` — `index.md` one-liner index → `tech-*.md` |
+| Change archives | `.agents/changes/<name>/` — spec/tasks/test-spec/execution-log/verification |
+
+Reading order at session start: this file → `memory/preferences.md` →
+`memory/pitfalls.md` index (open only the relevant topic file) → matching
+skill's SKILL.md. Do NOT bulk-read everything.
+
+Write-back rules:
+- Real failure + root cause + fix → `memory/pitfalls/<topic>.md` (+index line)
+- Long-term decision → `memory/decisions.md`; structural ones also `docs/adr/`
+- Coding standard → this file or `docs/specs/` (never into pitfalls)
+- Reusable technique → `knowledge/tech-<topic>.md` (+index line)
 
 ## Architecture Decisions
 
@@ -24,7 +54,8 @@ gates, cross-module contracts) must be recorded in `docs/adr/` — see
 ## Agent Loop Files
 
 - Do NOT create or keep `.agent-loop/` inside this repository.
-- Place all agent-loop related files in `../codeplans/ArchForge/.agent-loop/`.
+- Place all agent-loop related files in `.agents/changes/_agent-loop/`
+  (kept out of the per-change archive flow).
 
 ## Static Analysis Layer (auto-enforced)
 
@@ -108,7 +139,7 @@ archforge/
 │   ├── spec/           # openapi.yaml, enums.yaml, schemas/
 │   ├── docs/specs/     # API / naming / error-code / security standards
 │   ├── docs/architecture.md
-│   └── skills/         # agent skills + backend standard
+│   └── .agents/skills/ # agent skills + backend standard
 ├── ArchForgeWeb/       # C-end web client (Next.js)  — consumes server-web :8081
 └── ArchForgeAdmin/     # admin client (vue-pure-admin) — consumes server-admin :8080
 ```
@@ -116,7 +147,7 @@ archforge/
 - **This repo owns the contract**: `spec/openapi.yaml` (OpenAPI 3.1) and
   `spec/enums.yaml`. `spec/schemas/` holds JSON Schema 2020-12 definitions.
   The old `ArchForgeSpec` repository is retired — its contents live here now.
-- Canonical backend standard: `skills/archforge-project-standard/standard.md`
+- Canonical backend standard: `.agents/skills/archforge-project-standard/standard.md`
   (pointer: `docs/specs/backend-standard.md`).
 - Cross-repository behavior: read `repos.yaml`, then `docs/architecture.md`
   before changing anything that affects the Web / Admin clients or the contract.
@@ -137,4 +168,4 @@ archforge/
   — schema belongs to Flyway.
 - **Scheduler is db-scheduler**, not Quartz. HTTP lives at `/admin/scheduler-job`.
   Do not reintroduce `/quartz` or document `sys_quartz_job` / `QuartzReflectionJob`
-  as current. See `skills/archforge-project-standard/standard.md` §3.8.
+  as current. See `.agents/skills/archforge-project-standard/standard.md` §3.8.

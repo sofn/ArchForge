@@ -7,7 +7,7 @@ archforge/
 ├── ArchForge/          # backend + contracts (this repo)
 │   ├── spec/                     # openapi.yaml, enums.yaml, schemas/
 │   ├── docs/specs/               # API / naming / error-code / security standards
-│   ├── skills/                   # agent skills + backend standard
+│   ├── .agents/skills/           # agent skills + backend standard
 │   ├── archforge-server-admin    :8080
 │   └── archforge-server-web      :8081
 ├── ArchForgeAdmin/     # admin UI (Vite)         :8848
@@ -15,7 +15,7 @@ archforge/
 ```
 
 The retired `ArchForgeSpec` repository was merged into `ArchForge`: its contract,
-specs and skills now live in `spec/`, `docs/specs/` and `skills/`.
+specs and skills now live in `spec/`, `docs/specs/` and `.agents/skills/`.
 
 Machine-readable map: [`repos.yaml`](../repos.yaml).
 
@@ -79,8 +79,8 @@ Related:
 
 - [spec/openapi.yaml](../spec/openapi.yaml) — HTTP contract (stub; do not reintroduce deleted paths)
 - [spec/enums.yaml](../spec/enums.yaml) — shared enumerations
-- [skills/index.yaml](../skills/index.yaml) — agent skills
+- [skills index](../.agents/skills/index.yaml) — agent skills
 
 ## Change rule
 
-Cross-repo work: read `repos.yaml` → this file → the relevant spec → the matching skill in [`skills/`](../skills/index.yaml). Raise contract changes here before hacking a client.
+Cross-repo work: read `repos.yaml` → this file → the relevant spec → the matching skill in [`.agents/skills/`](../.agents/skills/index.yaml). Raise contract changes here before hacking a client.
