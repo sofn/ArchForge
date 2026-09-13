@@ -1,8 +1,8 @@
 package com.lesofn.archforge.server.admin.controller.metatable;
 
 import com.lesofn.archforge.infrastructure.annotation.Log;
+import com.lesofn.archforge.infrastructure.auth.LoginContext;
 import com.lesofn.archforge.infrastructure.config.ArchForgeProperties;
-import com.lesofn.archforge.infrastructure.frame.context.RequestContext;
 import com.lesofn.archforge.infrastructure.security.datascope.DataPermission;
 import com.lesofn.archforge.meta.table.api.domain.MetaColumn;
 import com.lesofn.archforge.meta.table.api.domain.MetaTable;
@@ -138,12 +138,12 @@ public class MetaTableController {
     @Operation(summary = "创建元表格")
     @SaCheckPermission(value = "meta-table:add", type = StpAdminUtil.TYPE)
     @PostMapping("/create")
-    public Long create(RequestContext rc, @RequestBody @Valid MetaTableCreateRequest request) {
+    public Long create(@RequestBody @Valid MetaTableCreateRequest request) {
         MetaTable table = request.toTable();
-        table.setCreatorId(rc.getCurrentUid());
+        table.setCreatorId(LoginContext.getAdminUserId());
         List<MetaColumn> columns = request.toColumns();
         for (MetaColumn column : columns) {
-            column.setCreatorId(rc.getCurrentUid());
+            column.setCreatorId(LoginContext.getAdminUserId());
         }
         return metaTableAdminService.create(table, columns);
     }
@@ -152,11 +152,11 @@ public class MetaTableController {
     @Operation(summary = "更新元表格")
     @SaCheckPermission(value = "meta-table:edit", type = StpAdminUtil.TYPE)
     @PutMapping("/{id}")
-    public Boolean update(RequestContext rc, @PathVariable Long id, @RequestBody @Valid MetaTableUpdateRequest request) {
+    public Boolean update(@PathVariable Long id, @RequestBody @Valid MetaTableUpdateRequest request) {
         MetaTable table = request.toTable();
-        table.setUpdaterId(rc.getCurrentUid());
+        table.setUpdaterId(LoginContext.getAdminUserId());
         List<MetaColumn> columns = request.toColumns();
-        metaTableAdminService.update(id, table, columns, rc.getCurrentUid());
+        metaTableAdminService.update(id, table, columns, LoginContext.getAdminUserId());
         return true;
     }
 
@@ -178,9 +178,10 @@ public class MetaTableController {
     @Operation(summary = "导入已有物理表")
     @SaCheckPermission(value = "meta-table:add", type = StpAdminUtil.TYPE)
     @PostMapping("/import")
-    public Long importTable(RequestContext rc, @RequestBody @Valid MetaTableImportRequest request) {
+    public Long importTable(@RequestBody @Valid MetaTableImportRequest request) {
         return metaTableImportService.importTable(
-                request.getTableName(), request.getDisplayName(), request.getDescription(), rc.getCurrentUid());
+                request.getTableName(), request.getDisplayName(), request.getDescription(),
+                LoginContext.getAdminUserId());
     }
 
     @Log
@@ -286,8 +287,8 @@ public class MetaTableController {
     @SaCheckPermission(value = "meta-table:add", type = StpAdminUtil.TYPE)
     @DataPermission
     @PostMapping("/{id}/data/create")
-    public Long createData(RequestContext rc, @PathVariable Long id, @RequestBody Map<String, Object> row) {
-        return metaTableCrudService.insert(id, row, rc.getCurrentUid());
+    public Long createData(@PathVariable Long id, @RequestBody Map<String, Object> row) {
+        return metaTableCrudService.insert(id, row, LoginContext.getAdminUserId());
     }
 
     @Log
@@ -296,11 +297,10 @@ public class MetaTableController {
     @DataPermission
     @PutMapping("/{id}/data/{dataId}")
     public Boolean updateData(
-            RequestContext rc,
             @PathVariable Long id,
             @PathVariable Long dataId,
             @RequestBody Map<String, Object> row) {
-        return metaTableCrudService.update(id, dataId, row, rc.getCurrentUid());
+        return metaTableCrudService.update(id, dataId, row, LoginContext.getAdminUserId());
     }
 
     @Log
@@ -308,8 +308,8 @@ public class MetaTableController {
     @SaCheckPermission(value = "meta-table:remove", type = StpAdminUtil.TYPE)
     @DataPermission
     @PostMapping("/{id}/data/{dataId}/delete")
-    public Boolean deleteData(RequestContext rc, @PathVariable Long id, @PathVariable Long dataId) {
-        return metaTableCrudService.softDelete(id, dataId, rc.getCurrentUid());
+    public Boolean deleteData(@PathVariable Long id, @PathVariable Long dataId) {
+        return metaTableCrudService.softDelete(id, dataId, LoginContext.getAdminUserId());
     }
 
     @Operation(summary = "导出元表格数据")
@@ -342,11 +342,10 @@ public class MetaTableController {
     @DataPermission
     @PostMapping("/{id}/import")
     public ImportResponse importData(
-            RequestContext rc,
             @PathVariable Long id,
             @RequestParam(defaultValue = "CSV") String format,
             @RequestPart("file") MultipartFile file) throws IOException {
         MetaDataFormat dataFormat = MetaDataFormat.of(format);
-        return metaTableCrudService.importData(id, dataFormat, file.getInputStream(), rc.getCurrentUid());
+        return metaTableCrudService.importData(id, dataFormat, file.getInputStream(), LoginContext.getAdminUserId());
     }
 }
