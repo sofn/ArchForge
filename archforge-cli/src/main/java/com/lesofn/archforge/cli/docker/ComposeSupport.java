@@ -33,11 +33,16 @@ public class ComposeSupport {
     }
 
     public int up(String profile, List<String> services) {
+        return up(profile, services, Map.of());
+    }
+
+    public int up(String profile, List<String> services, Map<String, String> extraEnv) {
         List<String> command = base(profile);
         command.add("up");
         command.add("-d");
+        command.add("--wait");
         command.addAll(services);
-        return processRunner.run(command, ProjectPaths.dockerDir(repoRoot));
+        return processRunner.run(command, ProjectPaths.dockerDir(repoRoot), extraEnv, false);
     }
 
     public int down(String profile) {

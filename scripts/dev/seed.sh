@@ -9,11 +9,11 @@ REPO_ROOT="$(cd "${DIR}/../.." && pwd)"
 
 DB_USERNAME="${DB_USERNAME:-archforge}"
 DB_PASSWORD="${DB_PASSWORD:-archforge}"
-DB_NAME_USER="${DB_NAME_USER:-archforge_user}"
+DB_NAME="${DB_NAME:-archforge}"
 
 POSTGRES_CONTAINER="archforge-postgres-dev"
 
-echo "Importing seed data into ${DB_NAME_USER}..."
+echo "Importing seed data into ${DB_NAME}..."
 for sql in "${REPO_ROOT}/archforge-domain/archforge-admin-user/src/main/resources/sql/data-admin-user.sql" \
            "${REPO_ROOT}/archforge-domain/archforge-admin-user/src/main/resources/sql/data-admin-dept.sql" \
            "${REPO_ROOT}/archforge-domain/archforge-admin-user/src/main/resources/sql/data-admin-config.sql" \
@@ -22,7 +22,7 @@ for sql in "${REPO_ROOT}/archforge-domain/archforge-admin-user/src/main/resource
            "${REPO_ROOT}/archforge-domain/archforge-admin-user/src/main/resources/sql/reset-sequences.sql"; do
     filename=$(basename "${sql}")
     docker cp "${sql}" "${POSTGRES_CONTAINER}:/tmp/${filename}"
-    docker exec "${POSTGRES_CONTAINER}" psql -U "${DB_USERNAME}" -d "${DB_NAME_USER}" -v ON_ERROR_STOP=0 -f "/tmp/${filename}"
+    docker exec "${POSTGRES_CONTAINER}" psql -U "${DB_USERNAME}" -d "${DB_NAME}" -v ON_ERROR_STOP=0 -f "/tmp/${filename}"
 done
 
 echo "Seed import complete."

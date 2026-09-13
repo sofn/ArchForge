@@ -94,6 +94,11 @@ public final class SecretGenerator {
         return values;
     }
 
+    /** 16-char strong password for the local dev DB (used when the user provides none). */
+    public static String generateDbPassword() {
+        return randomPassword(16);
+    }
+
     static String randomBase64(int byteCount) {
         byte[] bytes = new byte[byteCount];
         RANDOM.nextBytes(bytes);

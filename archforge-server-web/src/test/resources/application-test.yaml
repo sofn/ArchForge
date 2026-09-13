@@ -15,11 +15,11 @@ spring:
   sql:
     init:
       mode: never
-  # 数据源连接信息由 AbstractIntegrationTest 经 @DynamicPropertySource 注入（user_master/user_slave）；
+  # 数据源连接信息由 AbstractIntegrationTest 经 @DynamicPropertySource 注入（master/slave）；
   # 这里只需声明分组骨架 —— 主 application.yaml 不含 datasource 块（dev/prod 各自完整声明）。
   datasource:
     dynamic:
-      primary: user_master
+      primary: master
       strict: false
   data:
     redis:

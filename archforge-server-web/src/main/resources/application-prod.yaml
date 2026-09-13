@@ -13,21 +13,23 @@ spring:
       ddl-auto: validate
   datasource:
     dynamic:
-      primary: user_master
+      primary: master
       strict: false
       datasource:
-        user_master:
+        master:
           type: com.alibaba.druid.pool.DruidDataSource
           driver-class-name: org.postgresql.Driver
-          url: ${DB_USER_MASTER_URL}
+          url: ${DB_MASTER_URL}
           username: ${DB_USERNAME}
           password: ${DB_PASSWORD}
-        user_slave:
-          type: com.alibaba.druid.pool.DruidDataSource
-          driver-class-name: org.postgresql.Driver
-          url: ${DB_USER_SLAVE_URL}
-          username: ${DB_USERNAME}
-          password: ${DB_PASSWORD}
+        # Optional read-replica — uncomment to enable master/slave routing.
+        # primary stays `master`; @DS("slave") routes reads once present.
+        # slave:
+        #   type: com.alibaba.druid.pool.DruidDataSource
+        #   driver-class-name: org.postgresql.Driver
+        #   url: ${DB_SLAVE_URL}
+        #   username: ${DB_USERNAME}
+        #   password: ${DB_PASSWORD}
   data:
     redis:
       host: ${REDIS_HOST:redis}
@@ -54,7 +56,7 @@ springdoc:
     enabled: false
 
 arch-forge:
-  # 与 server-admin 共享 archforge_user 库与 flyway_schema_history；双写安全（DB 锁串行化）
+  # 与 server-admin 共享 archforge 库与 flyway_schema_history；双写安全（DB 锁串行化）
   flyway:
     enabled: true
     baseline-on-migrate: true

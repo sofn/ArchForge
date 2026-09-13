@@ -23,7 +23,7 @@ import org.springframework.context.annotation.Configuration;
  * call (no delete/recreate dance like Quartz JobKey).
  *
  * <p>
- * The scheduler talks to the primary (user_master) datasource — same database that holds the
+ * The scheduler talks to the primary (master) datasource — same database that holds the
  * {@code sys_scheduled_job} metadata, so one transaction can touch both. Executes via {@link
  * ReflectionJobHandler}.
  *

@@ -25,16 +25,16 @@ spring:
       druid:
         filters: stat
       datasource:
-        user_master:
+        master:
           type: com.alibaba.druid.pool.DruidDataSource
           driver-class-name: org.postgresql.Driver
-          url: jdbc:postgresql://localhost:5432/archforge_user_test
+          url: jdbc:postgresql://localhost:5432/archforge_test
           username: <your-db-username>
           password: <your-db-password>
-        user_slave:
+        slave:
           type: com.alibaba.druid.pool.DruidDataSource
           driver-class-name: org.postgresql.Driver
-          url: jdbc:postgresql://localhost:5432/archforge_user_test
+          url: jdbc:postgresql://localhost:5432/archforge_test
           username: <your-db-username>
           password: <your-db-password>
 

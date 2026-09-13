@@ -27,11 +27,11 @@ class ${entityName}IntegrationTest {
 
     @DynamicPropertySource
     static void configureProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.dynamic.primary", () -> "user_master");
-        registry.add("spring.datasource.dynamic.datasource.user_master.driver-class-name", () -> "org.postgresql.Driver");
-        registry.add("spring.datasource.dynamic.datasource.user_master.url", postgres::getJdbcUrl);
-        registry.add("spring.datasource.dynamic.datasource.user_master.username", postgres::getUsername);
-        registry.add("spring.datasource.dynamic.datasource.user_master.password", postgres::getPassword);
+        registry.add("spring.datasource.dynamic.primary", () -> "master");
+        registry.add("spring.datasource.dynamic.datasource.master.driver-class-name", () -> "org.postgresql.Driver");
+        registry.add("spring.datasource.dynamic.datasource.master.url", postgres::getJdbcUrl);
+        registry.add("spring.datasource.dynamic.datasource.master.username", postgres::getUsername);
+        registry.add("spring.datasource.dynamic.datasource.master.password", postgres::getPassword);
         registry.add("spring.jpa.hibernate.ddl-auto", () -> "create-drop");
     }
 

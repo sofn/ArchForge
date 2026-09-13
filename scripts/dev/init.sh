@@ -9,7 +9,7 @@ REPO_ROOT="$(cd "${DIR}/../.." && pwd)"
 
 DB_USERNAME="${DB_USERNAME:-archforge}"
 DB_PASSWORD="${DB_PASSWORD:-archforge}"
-DB_NAME_USER="${DB_NAME_USER:-archforge_user}"
+DB_NAME="${DB_NAME:-archforge}"
 RUSTFS_ROOT_USER="${RUSTFS_ROOT_USER:-minioadmin}"
 RUSTFS_ROOT_PASSWORD="${RUSTFS_ROOT_PASSWORD:-minioadmin}"
 S3_BUCKET="${S3_BUCKET:-archforge}"
@@ -27,7 +27,7 @@ start_postgres() {
         docker run -d --name "${POSTGRES_CONTAINER}" \
             -e POSTGRES_USER="${DB_USERNAME}" \
             -e POSTGRES_PASSWORD="${DB_PASSWORD}" \
-            -e POSTGRES_DB="${DB_NAME_USER}" \
+            -e POSTGRES_DB="${DB_NAME}" \
             -p 5432:5432 \
             --health-cmd "pg_isready -U ${DB_USERNAME}" \
             --health-interval 5s \
@@ -96,14 +96,14 @@ start_s3() {
 
 init_databases() {
     echo "Ensuring databases exist..."
-    exists=$(docker exec "${POSTGRES_CONTAINER}" psql -U "${DB_USERNAME}" -d postgres -Atc "SELECT 1 FROM pg_database WHERE datname = '${DB_NAME_USER}';" || true)
+    exists=$(docker exec "${POSTGRES_CONTAINER}" psql -U "${DB_USERNAME}" -d postgres -Atc "SELECT 1 FROM pg_database WHERE datname = '${DB_NAME}';" || true)
     if [ "${exists}" != "1" ]; then
-        docker exec "${POSTGRES_CONTAINER}" psql -U "${DB_USERNAME}" -d postgres -c "CREATE DATABASE ${DB_NAME_USER};"
+        docker exec "${POSTGRES_CONTAINER}" psql -U "${DB_USERNAME}" -d postgres -c "CREATE DATABASE ${DB_NAME};"
     fi
 }
 
 import_seed() {
-    echo "Importing seed data into ${DB_NAME_USER}..."
+    echo "Importing seed data into ${DB_NAME}..."
     for sql in "${REPO_ROOT}/archforge-domain/archforge-admin-user/src/main/resources/sql/data-admin-user.sql" \
                "${REPO_ROOT}/archforge-domain/archforge-admin-user/src/main/resources/sql/data-admin-dept.sql" \
                "${REPO_ROOT}/archforge-domain/archforge-admin-user/src/main/resources/sql/data-admin-config.sql" \
@@ -112,7 +112,7 @@ import_seed() {
                "${REPO_ROOT}/archforge-domain/archforge-admin-user/src/main/resources/sql/reset-sequences.sql"; do
         filename=$(basename "${sql}")
         docker cp "${sql}" "${POSTGRES_CONTAINER}:/tmp/${filename}"
-        docker exec "${POSTGRES_CONTAINER}" psql -U "${DB_USERNAME}" -d "${DB_NAME_USER}" -v ON_ERROR_STOP=0 -f "/tmp/${filename}"
+        docker exec "${POSTGRES_CONTAINER}" psql -U "${DB_USERNAME}" -d "${DB_NAME}" -v ON_ERROR_STOP=0 -f "/tmp/${filename}"
     done
 
     echo "Creating S3 bucket if needed..."

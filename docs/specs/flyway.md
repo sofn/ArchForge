@@ -4,7 +4,7 @@
 **V1–V4, V6–V18, V20–V25**. There is **no V5 and no V19** in the repository.
 
 Migrations live in `common-jpa` so `server-admin` and `server-web` share the same
-`classpath:db/migration` — both apps migrate the shared `archforge_user` database
+`classpath:db/migration` — both apps migrate the shared `archforge` database
 (Flyway serialises concurrent runs via `flyway_schema_history`).
 
 ## Why

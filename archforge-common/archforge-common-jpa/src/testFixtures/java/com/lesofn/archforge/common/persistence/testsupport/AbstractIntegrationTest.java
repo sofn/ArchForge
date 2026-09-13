@@ -19,7 +19,7 @@ import org.testcontainers.utility.DockerImageName;
  *
  * <p>
  * 本类位于 common-jpa 的 {@code testFixtures} 源集，server-admin 与 server-web 的集成测试共用 —— 两者使用同一组
- * 数据源（{@code user_master}/{@code user_slave}），schema 由本模块 {@code classpath:db/migration} 的 Flyway 迁移建立。
+ * 数据源（{@code master}/{@code slave}），schema 由本模块 {@code classpath:db/migration} 的 Flyway 迁移建立。
  *
  * <p>
  * 对象存储默认不做任何处理 —— 应用本身默认使用本地文件存储（{@code arch-forge.file-storage.type=local}）， 因此没有 S3 也能正常跑。需要覆盖真实 S3 路径时，用
@@ -53,7 +53,7 @@ public abstract class AbstractIntegrationTest {
 
     private static final String DB_USER = "archforge";
     private static final String DB_PASSWORD = "archforge";
-    private static final String USER_DATABASE = "archforge_user";
+    private static final String USER_DATABASE = "archforge";
 
     private static final int POSTGRES_PORT = 5432;
     private static final int REDIS_PORT = 6379;
@@ -128,7 +128,7 @@ public abstract class AbstractIntegrationTest {
         String userUrl = jdbcUrl(USER_DATABASE);
 
         for (String name : new String[] {
-                "user_master", "user_slave"
+                "master", "slave"
         }) {
             registerDataSource(registry, name, userUrl);
         }

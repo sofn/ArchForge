@@ -35,18 +35,20 @@ spring:
         min-idle: 2
         max-wait: 60000
       datasource:
-        user_master:
+        master:
           type: com.alibaba.druid.pool.DruidDataSource
           driver-class-name: org.postgresql.Driver
-          url: ${DB_USER_MASTER_URL:jdbc:postgresql://postgres:5432/archforge_user}
+          url: ${DB_MASTER_URL:jdbc:postgresql://postgres:5432/archforge}
           username: ${DB_USERNAME:archforge}
           password: ${DB_PASSWORD}
-        user_slave:
-          type: com.alibaba.druid.pool.DruidDataSource
-          driver-class-name: org.postgresql.Driver
-          url: ${DB_USER_SLAVE_URL:jdbc:postgresql://postgres:5432/archforge_user}
-          username: ${DB_USERNAME:archforge}
-          password: ${DB_PASSWORD}
+        # Optional read-replica — uncomment to enable master/slave routing.
+        # primary stays `master`; @DS("slave") routes reads once present.
+        # slave:
+        #   type: com.alibaba.druid.pool.DruidDataSource
+        #   driver-class-name: org.postgresql.Driver
+        #   url: ${DB_SLAVE_URL:jdbc:postgresql://postgres:5432/archforge}
+        #   username: ${DB_USERNAME:archforge}
+        #   password: ${DB_PASSWORD}
 
 management:
   tracing:

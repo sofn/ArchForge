@@ -40,7 +40,7 @@ spring:
         implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyJpaCompliantImpl
   datasource:
     dynamic:
-      primary: user_master
+      primary: master
       strict: false
       druid:
         initial-size: 0

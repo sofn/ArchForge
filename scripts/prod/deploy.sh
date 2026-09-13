@@ -53,10 +53,10 @@ echo "=== Importing seed data ==="
 docker cp "${REPO_ROOT}/archforge-domain/archforge-admin-user/src/main/resources/sql" "$(docker compose -f docker-compose.prod.yml ps -q postgres):/tmp/seed"
 for sql in data-admin-user.sql data-admin-dept.sql data-admin-config.sql data-admin-scheduler.sql; do
     docker compose -f docker-compose.prod.yml exec -T postgres \
-        psql -v ON_ERROR_STOP=0 -U "${DB_USERNAME:-archforge}" -d archforge_user -f "/tmp/seed/sql/${sql}"
+        psql -v ON_ERROR_STOP=0 -U "${DB_USERNAME:-archforge}" -d archforge -f "/tmp/seed/sql/${sql}"
 done
 docker compose -f docker-compose.prod.yml exec -T postgres \
-    psql -U "${DB_USERNAME:-archforge}" -d archforge_user -f /tmp/seed/sql/reset-sequences.sql
+    psql -U "${DB_USERNAME:-archforge}" -d archforge -f /tmp/seed/sql/reset-sequences.sql
 
 echo "=== Starting frontend ==="
 docker compose -f docker-compose.prod.yml up -d frontend

@@ -207,8 +207,8 @@ val buildMinimalJre by tasks.registering(Exec::class) {
 // 迁移 SQL 位于 common-jpa 资源目录（server-admin 与 server-web 共享 classpath:db/migration）。
 flyway {
     driver = "org.postgresql.Driver"
-    url = providers.environmentVariable("DB_USER_MASTER_URL")
-        .getOrElse("jdbc:postgresql://localhost:5432/archforge_user")
+    url = providers.environmentVariable("DB_MASTER_URL")
+        .getOrElse("jdbc:postgresql://localhost:5432/archforge")
     user = providers.environmentVariable("DB_USERNAME").getOrElse("archforge")
     password = providers.environmentVariable("DB_PASSWORD").getOrElse("archforge")
     schemas = arrayOf("public")

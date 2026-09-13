@@ -23,14 +23,14 @@ spring:
   datasource:
     dynamic:
       datasource:
-        user_master:
+        master:
           driver-class-name: org.postgresql.Driver
-          url: jdbc:postgresql://<db-master-host>:5432/archforge_user?sslmode=require
+          url: jdbc:postgresql://<db-master-host>:5432/archforge?sslmode=require
           username: ${DB_USERNAME}
           password: ${DB_PASSWORD}
-        user_slave:
+        slave:
           driver-class-name: org.postgresql.Driver
-          url: jdbc:postgresql://<db-slave-host>:5432/archforge_user?sslmode=require
+          url: jdbc:postgresql://<db-slave-host>:5432/archforge?sslmode=require
           username: ${DB_USERNAME}
           password: ${DB_PASSWORD}
 

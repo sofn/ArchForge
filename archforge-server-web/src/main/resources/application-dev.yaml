@@ -14,21 +14,23 @@ spring:
     open-in-view: false
   datasource:
     dynamic:
-      primary: user_master
+      primary: master
       strict: false
       datasource:
-        user_master:
+        master:
           type: com.alibaba.druid.pool.DruidDataSource
           driver-class-name: org.postgresql.Driver
-          url: ${DB_USER_MASTER_URL:jdbc:postgresql://localhost:5432/archforge_user}
+          url: ${DB_MASTER_URL:jdbc:postgresql://localhost:5432/archforge}
           username: ${DB_USERNAME:archforge}
           password: ${DB_PASSWORD:archforge}
-        user_slave:
-          type: com.alibaba.druid.pool.DruidDataSource
-          driver-class-name: org.postgresql.Driver
-          url: ${DB_USER_SLAVE_URL:jdbc:postgresql://localhost:5432/archforge_user}
-          username: ${DB_USERNAME:archforge}
-          password: ${DB_PASSWORD:archforge}
+        # Optional read-replica — uncomment to enable master/slave routing.
+        # primary stays `master`; @DS("slave") routes reads once present.
+        # slave:
+        #   type: com.alibaba.druid.pool.DruidDataSource
+        #   driver-class-name: org.postgresql.Driver
+        #   url: ${DB_SLAVE_URL:jdbc:postgresql://localhost:5432/archforge}
+        #   username: ${DB_USERNAME:archforge}
+        #   password: ${DB_PASSWORD:archforge}
   data:
     redis:
       host: ${REDIS_HOST:127.0.0.1}
@@ -43,7 +45,7 @@ spring:
           max-wait: -1ms
 
 arch-forge:
-  # 与 server-admin 共享 archforge_user 库；schema 由 Flyway 迁移（common.persistence.FlywayConfig）独占管理
+  # 与 server-admin 共享 archforge 库；schema 由 Flyway 迁移（common.persistence.FlywayConfig）独占管理
   flyway:
     enabled: true
     baseline-on-migrate: true

@@ -24,7 +24,7 @@ import javax.sql.DataSource;
  * <ul>
  * <li>{@code enabled=true} 的 profile（dev/test/staging/prod）启动即执行 classpath:db/migration 迁移；
  * <li>JPA 侧一律 {@code ddl-auto: validate}——schema 归 Flyway 独占管理；
- * <li>server-web 与 server-admin 共享同一 archforge_user 库与 migration 目录，并发迁移由 flyway_schema_history
+ * <li>server-web 与 server-admin 共享同一 archforge 库与 migration 目录，并发迁移由 flyway_schema_history
  * 锁串行化，天然安全。
  * </ul>
  *

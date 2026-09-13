@@ -64,7 +64,7 @@ public class DbCommand {
             ComposeSupport compose = new ComposeSupport(new ProcessRunner(), root);
             int code = compose.exec(
                     "dev",
-                    List.of("postgres", "pg_dump", "-U", "archforge", "-d", "archforge_user"),
+                    List.of("postgres", "pg_dump", "-U", "archforge", "-d", "archforge"),
                     file);
             if (code != 0) {
                 try {

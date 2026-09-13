@@ -253,7 +253,7 @@ public void export(HttpServletResponse response) throws IOException {
 ### 3.8 Scheduling (db-scheduler)
 
 - **Library**: `com.github.kagkarlsson:db-scheduler` via `SchedulerConfig` in `server-admin`. Not Quartz — the Quartz JDBC store (`qrtz_*`, `sys_quartz_job`, `V4__quartz_schema.sql`, `QuartzReflectionJob`) was removed in `V23__replace_quartz_with_db_scheduler.sql`.
-- **Tables**: `scheduled_tasks` (db-scheduler runtime, optimistic-lock clustering) + ArchForge metadata `sys_scheduled_job` / audit `sys_job_log`. All three live on the primary (`user_master`) PostgreSQL database so one transaction can touch metadata and runtime rows.
+- **Tables**: `scheduled_tasks` (db-scheduler runtime, optimistic-lock clustering) + ArchForge metadata `sys_scheduled_job` / audit `sys_job_log`. All three live on the primary (`master`) PostgreSQL database so one transaction can touch metadata and runtime rows.
 - **Reflective dispatch pattern**: a single handler — `ReflectionJobHandler` — reads `beanName` / `methodName` / `methodParams` from `JobInvocationData`, resolves the Spring bean via `ApplicationContext`, invokes the method by reflection (arity-matched), and persists a `SysJobLog` row capturing duration and any error. New scheduled tasks therefore require only a metadata row and an allow-listed Spring bean — **no new Job class per task**. Bean names must appear in `arch-forge.scheduler.allowed-job-beans`.
 - **Method params**: stored as a JSON array of primitives (`["foo", 42, true]`) for transparency.
 - **REST surface** (`server-admin`):
@@ -402,17 +402,17 @@ Multi-datasource via `dynamic-datasource-spring-boot4-starter`:
 spring:
   datasource:
     dynamic:
-      primary: user_master
+      primary: master
       strict: false
       datasource:
-        user_master:
+        master:
           driver-class-name: org.postgresql.Driver
-          url: jdbc:postgresql://${DB_HOST}:5432/archforge_user
+          url: jdbc:postgresql://${DB_HOST}:5432/archforge
           username: ${DB_USER}
           password: ${DB_PASSWORD}
-        user_slave:
+        slave:
           driver-class-name: org.postgresql.Driver
-          url: jdbc:postgresql://${DB_SLAVE_HOST}:5432/archforge_user
+          url: jdbc:postgresql://${DB_SLAVE_HOST}:5432/archforge
           username: ${DB_USER}
           password: ${DB_PASSWORD}
 ```
@@ -516,7 +516,7 @@ PostgreSQL and one Redis container **once per JVM** and publishes them via
 ```java
 @SpringBootTest(classes = Application.class, webEnvironment = RANDOM_PORT)
 class UserRepositoryIntegrationTest extends AbstractIntegrationTest {
-    // archforge_user on PostgreSQL, and Redis, are already wired up
+    // archforge on PostgreSQL, and Redis, are already wired up
 }
 ```
 
@@ -586,7 +586,7 @@ Full stack includes: PostgreSQL + Redis + Application + Nginx reverse proxy.
 - Flyway manages all schema changes; JPA `ddl-auto` is `validate` everywhere (no `update`).
 - Migration files: `V<version>__<description>.sql` (e.g., `V1__create_user_table.sql`)
 - Location: `archforge-common/archforge-common-jpa/src/main/resources/db/migration/` —
-  shared classpath so `server-admin` and `server-web` migrate the same `archforge_user` DB.
+  shared classpath so `server-admin` and `server-web` migrate the same `archforge` DB.
 - Wiring: `FlywayConfig` + `FlywayDependencyBeanFactoryPostProcessor` in
   `common.persistence`, gated on `arch-forge.flyway.enabled` (see `docs/specs/flyway.md`).
 - CLI: `archforge db init` / `archforge db update` run `./gradlew :archforge-server-admin:flywayMigrate`.
