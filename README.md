@@ -136,7 +136,7 @@ Default admin login is `admin / admin123` (captcha is on in `dev`). C-end API:
 | `archforge-example/archforge-example-task` | unlinked example module (not in server-admin; `/task` is not in OpenAPI) |
 | `archforge-dependencies` | version platform (BOM) |
 
-Non-Gradle dirs stay unprefixed: `docker/`, `config/`, `scripts/`, `skills/`.
+Non-Gradle dirs stay unprefixed: `docker/`, `config/`, `scripts/`, `.agents/`.
 
 ## 🧪 Build, test, quality gates
 
@@ -183,7 +183,7 @@ Windows: run `archforge.bat` instead — same commands (`archforge --help`, `arc
 | Storage | Local dir or AWS S3 SDK 2.46.x |
 | Style | Spotless + Eclipse formatter, JSpecify `@NullMarked` |
 
-Canonical conventions: `skills/archforge-project-standard/standard.md`.
+Canonical conventions: `.agents/skills/archforge-project-standard/standard.md`.
 
 ## License
 

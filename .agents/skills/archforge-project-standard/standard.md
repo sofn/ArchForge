@@ -260,7 +260,7 @@ public void export(HttpServletResponse response) throws IOException {
   - `GET /admin/scheduler-job` paged query · `POST /admin/scheduler-job/add` · `PUT /admin/scheduler-job/update/{id}` · `DELETE /admin/scheduler-job/{id}`
   - `POST /admin/scheduler-job/pause/{id}` · `POST /admin/scheduler-job/resume/{id}` · `POST /admin/scheduler-job/run/{id}` (one-shot)
   - `GET /admin/scheduler-job/log` · `POST /admin/scheduler-job/validate-cron`
-- **UI**: ArchForgeAdmin → System → 定时任务 (`/system/scheduler-job/index`, `src/api/scheduler.ts`).
+- **UI**: ArchForgeAdmin → System → Scheduled Jobs (`/system/scheduler-job/index`, `src/api/scheduler.ts`).
 
 ```java
 @Component("demoSchedulerJob")

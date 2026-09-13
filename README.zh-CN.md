@@ -143,7 +143,7 @@ FILE_STORAGE_TYPE=local ./gradlew :archforge-server-admin:bootRun
 | `archforge-example/archforge-example-task` | 未接入 server-admin 的示例模块（`/task` 不入 OpenAPI 契约） |
 | `archforge-dependencies` | 版本平台（BOM） |
 
-非 Gradle 目录不加前缀：`docker/`、`config/`、`scripts/`、`skills/`。
+非 Gradle 目录不加前缀：`docker/`、`config/`、`scripts/`、`.agents/`。
 
 ## 🧪 构建、测试与质量门禁
 
@@ -164,7 +164,7 @@ FILE_STORAGE_TYPE=local ./gradlew :archforge-server-admin:bootRun
 | 前端 SDK 同步 | 重新生成 `schema.d.ts` 后 `git diff --exit-code`（Web/Admin 仓库） |
 | 架构规则 | ArchUnit，`failOnEmptyShould=true` |
 
-约定见 `skills/archforge-project-standard/standard.md`。每个 `src/main/java` 包必须有 `@NullMarked` 的 `package-info.java`。
+约定见 `.agents/skills/archforge-project-standard/standard.md`。每个 `src/main/java` 包必须有 `@NullMarked` 的 `package-info.java`。
 
 ## 🛠 开发者 CLI
 
