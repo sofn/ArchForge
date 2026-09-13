@@ -157,7 +157,8 @@ public class MetaTableImportServiceImpl implements MetaTableImportService {
             String tableName, List<ColumnInfo> columns, List<String> pkColumns, boolean registered) {
         List<String> reasons = new ArrayList<>();
         if (isPlatformTable(tableName)) {
-            reasons.add("平台保留表（" + PLATFORM_TABLE_PREFIXES + " 前缀），禁止导入");
+            reasons.add("平台保留表（" + String.join("/", PLATFORM_TABLE_PREFIXES.stream().sorted().toList())
+                    + " 前缀），禁止导入");
         }
         if (registered) {
             reasons.add("已注册为元表格");
