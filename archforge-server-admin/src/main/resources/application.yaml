@@ -42,23 +42,6 @@ spring:
     dynamic:
       primary: master
       strict: false
-      druid:
-        initial-size: 0
-        max-active: 5
-        min-idle: 1
-        max-wait: 60000
-        time-between-eviction-runs-millis: 60000
-        min-evictable-idle-time-millis: 300000
-        validation-query: SELECT 1
-        test-while-idle: true
-        test-on-borrow: false
-        test-on-return: false
-        pool-prepared-statements: true
-        max-pool-prepared-statement-per-connection-size: 20
-        stat:
-          merge-sql: true
-          slow-sql-millis: 500
-          log-slow-sql: true
   mvc:
     problemdetails:
       enabled: true

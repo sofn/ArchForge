@@ -37,11 +37,8 @@ spring:
   # Database - PostgreSQL via local Docker containers (script-initialized)
   datasource:
     dynamic:
-      druid:
-        filters: stat
       datasource:
         master:
-          type: com.alibaba.druid.pool.DruidDataSource
           driver-class-name: org.postgresql.Driver
           url: ${DB_MASTER_URL:jdbc:postgresql://localhost:5432/archforge}
           username: ${DB_USERNAME:archforge}
@@ -49,7 +46,6 @@ spring:
         # Optional read-replica — uncomment to enable master/slave routing.
         # primary stays `master`; @DS("slave") routes reads once present.
         # slave:
-        #   type: com.alibaba.druid.pool.DruidDataSource
         #   driver-class-name: org.postgresql.Driver
         #   url: ${DB_SLAVE_URL:jdbc:postgresql://localhost:5432/archforge}
         #   username: ${DB_USERNAME:archforge}
@@ -69,9 +65,6 @@ management:
         url: http://localhost:4318/v1/metrics
 
 arch-forge:
-  druid:
-    login-username: admin
-    login-password: ${DRUID_PASSWORD:}
   flyway:
     enabled: true
   monitor:

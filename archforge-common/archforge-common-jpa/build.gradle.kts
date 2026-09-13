@@ -21,7 +21,6 @@ dependencies {
         exclude(group = "org.springframework.boot", module = "spring-boot-starter-logging")
     }
     api("com.baomidou:dynamic-datasource-spring-boot4-starter")
-    api("com.alibaba:druid")
     api("org.postgresql:postgresql")
 
     // Flyway：schema 迁移由 common.persistence.FlywayConfig 手工装配

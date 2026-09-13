@@ -29,8 +29,8 @@ public class MetaDTO {
     private String frameSrc;
 
     /**
-     * 是否是内部页面 使用frameSrc来嵌入页面时，当isFrameSrcInternal=true的时候, 前端需要做特殊处理 比如链接是 /druid/login.html
-     * 前端需要处理成 http://localhost:8080/druid/login.html
+     * 是否是内部页面。使用 frameSrc 嵌入页面时，isFrameSrcInternal=true 表示链接指向后端内部地址，
+     * 前端需要拼接后端 origin 处理。
      */
     private Boolean isFrameSrcInternal;
 

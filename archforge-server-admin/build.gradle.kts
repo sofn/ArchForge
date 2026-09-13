@@ -6,6 +6,15 @@ plugins {
     id("org.flywaydb.flyway") version "12.4.0"
 }
 
+// Flyway 10+ 把各数据库支持拆成独立 artifact —— Gradle 插件需要在自己的
+// classpath 上看到 flyway-database-postgresql，否则 flywayMigrate 报
+// "No Flyway database plugin found to handle jdbc:postgresql://...".
+buildscript {
+    dependencies {
+        classpath("org.flywaydb:flyway-database-postgresql:12.4.0")
+    }
+}
+
 // 构建可执行jar/war包
 configurations {
     create("providedRuntime")
@@ -117,9 +126,6 @@ dependencies {
     // Flyway 依赖经 common-jpa api() 传递（FlywayConfig 与 db/migration 均已下沉）
     // Oshi (系统监控)
     api("com.github.oshi:oshi-core")
-
-    // Druid monitoring
-    api("com.alibaba:druid")
 
     // Testcontainers 经 common-jpa testFixtures（testsupport.AbstractIntegrationTest）传入，
     // testFixtures 变体不进入生产包，无需在本模块重复声明。

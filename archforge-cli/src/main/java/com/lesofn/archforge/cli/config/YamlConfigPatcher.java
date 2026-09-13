@@ -35,7 +35,6 @@ public final class YamlConfigPatcher {
             String updated = original;
             updated = replaceJwtSecret(updated);
             updated = replaceEnvDefault(updated, "DB_PASSWORD", "archforge");
-            updated = replaceDruidPassword(updated);
             if (includeDevFixes) {
                 if (!updated.contains("open-in-view:")) {
                     updated = updated.replace("  jpa:\n", "  jpa:\n    open-in-view: false\n");
@@ -75,10 +74,6 @@ public final class YamlConfigPatcher {
             lineEnd = yaml.length();
         }
         return yaml.substring(0, secretLine) + "secret: ${JWT_SECRET:}" + yaml.substring(lineEnd);
-    }
-
-    static String replaceDruidPassword(String yaml) {
-        return yaml.replace("login-password: admin", "login-password: ${DRUID_PASSWORD:}");
     }
 
     static String replaceEnvDefault(String yaml, String envKey, String defaultValue) {

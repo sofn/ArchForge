@@ -2,7 +2,6 @@ package com.lesofn.archforge.cli.secret;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.google.common.base.Splitter;
@@ -23,7 +22,6 @@ class SecretGeneratorTest {
         Map<String, String> secrets = SecretGenerator.generate();
         assertTrue(secrets.containsKey("JWT_SECRET"));
         assertTrue(secrets.containsKey("DB_PASSWORD"));
-        assertTrue(secrets.containsKey("DRUID_PASSWORD"));
         assertTrue(secrets.containsKey("RSA_PUBLIC_KEY"));
         assertTrue(secrets.containsKey("RSA_PRIVATE_KEY"));
         assertTrue(secrets.containsKey("ARCH_FORGE_RSA_PRIVATE_KEY"));
@@ -31,7 +29,6 @@ class SecretGeneratorTest {
         assertTrue(secrets.containsKey("AES_KEY"));
         assertTrue(secrets.get("JWT_SECRET").length() >= 32);
         assertTrue(secrets.get("DB_PASSWORD").length() >= 16);
-        assertNotEquals(secrets.get("DB_PASSWORD"), secrets.get("DRUID_PASSWORD"));
     }
 
     @Test

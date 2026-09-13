@@ -22,7 +22,6 @@ public final class SecretGenerator {
     static final String[] KEYS = {
             "JWT_SECRET",
             "DB_PASSWORD",
-            "DRUID_PASSWORD",
             "RSA_PUBLIC_KEY",
             "RSA_PRIVATE_KEY",
             "ARCH_FORGE_RSA_PRIVATE_KEY",
@@ -39,7 +38,6 @@ public final class SecretGenerator {
         Map<String, String> secrets = new LinkedHashMap<>();
         secrets.put("JWT_SECRET", randomBase64(48));
         secrets.put("DB_PASSWORD", randomPassword(20));
-        secrets.put("DRUID_PASSWORD", randomPassword(20));
         try {
             Map<String, String> rsa = RsaEncrypter.generateKeyPair();
             secrets.put("RSA_PUBLIC_KEY", rsa.get("publicKey"));

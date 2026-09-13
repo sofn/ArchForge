@@ -390,7 +390,7 @@ server-<name>/src/test/resources/
 ### 4.3 Secrets Management
 
 - **Never** store secrets in source control.
-- Use environment variables for sensitive values: `${DB_PASSWORD}`, `${DRUID_PASSWORD}`, sa-token secrets, etc.
+- Use environment variables for sensitive values: `${DB_PASSWORD}`, sa-token secrets, etc.
 - Dev profile may use hardcoded values for local convenience (Testcontainers auto-generates credentials).
 - Production uses environment injection from orchestrator (Docker Compose, Kubernetes, etc.).
 

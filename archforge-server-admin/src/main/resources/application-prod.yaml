@@ -28,15 +28,8 @@ spring:
           max-wait: 1s
   datasource:
     dynamic:
-      druid:
-        filters: stat
-        initial-size: 2
-        max-active: 20
-        min-idle: 2
-        max-wait: 60000
       datasource:
         master:
-          type: com.alibaba.druid.pool.DruidDataSource
           driver-class-name: org.postgresql.Driver
           url: ${DB_MASTER_URL:jdbc:postgresql://postgres:5432/archforge}
           username: ${DB_USERNAME:archforge}
@@ -44,7 +37,6 @@ spring:
         # Optional read-replica — uncomment to enable master/slave routing.
         # primary stays `master`; @DS("slave") routes reads once present.
         # slave:
-        #   type: com.alibaba.druid.pool.DruidDataSource
         #   driver-class-name: org.postgresql.Driver
         #   url: ${DB_SLAVE_URL:jdbc:postgresql://postgres:5432/archforge}
         #   username: ${DB_USERNAME:archforge}

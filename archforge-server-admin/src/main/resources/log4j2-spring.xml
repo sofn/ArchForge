@@ -114,7 +114,6 @@
     <Loggers>
         <Logger name="org.springframework" level="WARN"/>
         <Logger name="org.hibernate" level="ERROR"/>
-        <Logger name="druid" level="ERROR"/>
         <Logger name="org.apache.catalina" level="OFF"/>
         <Logger name="io.lettuce" level="INFO"/>
         <Logger name="io.netty" level="INFO"/>

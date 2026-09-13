@@ -21,8 +21,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
-import org.springframework.core.env.Environment;
-import org.springframework.core.env.Profiles;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,11 +28,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class SysMenuServiceImpl implements SysMenuService {
 
-    private static final String DRUID_MENU_PATH = "/monitor/druid/index";
-
     private final SysMenuRepository sysMenuRepository;
     private final SysRoleMenuRepository roleMenuRepository;
-    private final Environment environment;
 
     /** 路由按 meta.rank 排序，未设置 rank 的排在最后 */
     private static final Comparator<RouterDTO> ROUTER_RANK_COMPARATOR = Comparator.comparing(
@@ -131,13 +126,10 @@ public class SysMenuServiceImpl implements SysMenuService {
             allMenus = sysMenuRepository.selectMenuListByUserId(loginUser.getUserId());
         }
 
-        boolean isProd = environment.acceptsProfiles(Profiles.of("prod"));
-
-        // 传给前端的路由排除掉按钮和停用的菜单，prod 环境再额外隐藏数据监控入口
+        // 传给前端的路由排除掉按钮和停用的菜单
         List<SysMenu> noButtonMenus = allMenus.stream()
                 .filter(menu -> !menu.getIsButton())
                 .filter(menu -> StatusEnum.ENABLE.getValue() == menu.getStatus())
-                .filter(menu -> !isProd || !DRUID_MENU_PATH.equals(menu.getPath()))
                 .toList();
 
         Map<Long, SysMenu> parentMap = noButtonMenus.stream()
