@@ -39,8 +39,9 @@ class MetaTableControllerListDataTest {
         controller = new MetaTableController(mock(MetaTableAdminService.class), metaTableCrudService, mock(
                 MetaTableCodeGenerator.class), mock(CodeGenWorkspaceResolver.class), mock(
                         MetaTableMigrationService.class), mock(
-                                com.lesofn.archforge.meta.table.api.service.MetaTableMigrationExporter.class), mock(
-                                        SysUserService.class), new ArchForgeProperties());
+                                com.lesofn.archforge.meta.table.api.service.MetaTableImportService.class), mock(
+                                        com.lesofn.archforge.meta.table.api.service.MetaTableMigrationExporter.class), mock(
+                                                SysUserService.class), new ArchForgeProperties());
         when(metaTableCrudService.list(any(), any()))
                 .thenReturn(MetaPageResponse.of(List.of(), 0, 10, 1));
     }

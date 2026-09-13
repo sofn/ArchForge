@@ -623,6 +623,32 @@ paths:
       responses:
         "200":
           $ref: "#/components/responses/AdminOk"
+  /meta-table/importable-tables:
+    get:
+      tags: [admin-legacy]
+      summary: List physical tables importable into meta-table
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+  /meta-table/import-preview/{tableName}:
+    get:
+      tags: [admin-legacy]
+      summary: Preview column mapping for importing a physical table
+      parameters:
+        - in: path
+          name: tableName
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
+  /meta-table/import:
+    post:
+      tags: [admin-legacy]
+      summary: Import an existing physical table into meta-table
+      responses:
+        "200":
+          $ref: "#/components/responses/AdminOk"
 
   /file:
     get:

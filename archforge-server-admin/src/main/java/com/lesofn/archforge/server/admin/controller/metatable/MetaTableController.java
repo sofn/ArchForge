@@ -8,10 +8,13 @@ import com.lesofn.archforge.meta.table.api.domain.MetaColumn;
 import com.lesofn.archforge.meta.table.api.domain.MetaTable;
 import com.lesofn.archforge.meta.table.api.domain.MetaTableMigration;
 import com.lesofn.archforge.meta.table.api.dto.ImportResponse;
+import com.lesofn.archforge.meta.table.api.dto.ImportableTableInfo;
 import com.lesofn.archforge.meta.table.api.dto.MetaDataQuery;
 import com.lesofn.archforge.meta.table.api.dto.MetaPageResponse;
+import com.lesofn.archforge.meta.table.api.dto.TableImportPreview;
 import com.lesofn.archforge.meta.table.api.enums.MetaDataFormat;
 import com.lesofn.archforge.meta.table.api.service.MetaTableAdminService;
+import com.lesofn.archforge.meta.table.api.service.MetaTableImportService;
 import com.lesofn.archforge.meta.table.api.service.MetaTableCrudService;
 import com.lesofn.archforge.meta.table.api.codegen.CodeGenOptions;
 import com.lesofn.archforge.meta.table.api.codegen.GeneratedResult;
@@ -24,6 +27,7 @@ import com.lesofn.archforge.server.admin.dto.MetaTableResponse;
 import com.lesofn.archforge.server.admin.dto.request.MetaDataListRequest;
 import com.lesofn.archforge.server.admin.dto.request.MetaTableCreateRequest;
 import com.lesofn.archforge.server.admin.dto.request.MetaTableGenerateRequest;
+import com.lesofn.archforge.server.admin.dto.request.MetaTableImportRequest;
 import com.lesofn.archforge.server.admin.dto.request.MetaTableListRequest;
 import com.lesofn.archforge.server.admin.dto.request.MetaTableUpdateRequest;
 import com.lesofn.archforge.server.admin.dto.response.MetaTableGenerateResponse;
@@ -76,6 +80,7 @@ public class MetaTableController {
     private final MetaTableCodeGenerator metaTableCodeGenerator;
     private final CodeGenWorkspaceResolver codeGenWorkspaceResolver;
     private final MetaTableMigrationService metaTableMigrationService;
+    private final MetaTableImportService metaTableImportService;
     private final MetaTableMigrationExporter metaTableMigrationExporter;
     private final SysUserService sysUserService;
     private final ArchForgeProperties archForgeProperties;
@@ -153,6 +158,29 @@ public class MetaTableController {
         List<MetaColumn> columns = request.toColumns();
         metaTableAdminService.update(id, table, columns, rc.getCurrentUid());
         return true;
+    }
+
+    @Operation(summary = "列出可导入的物理表")
+    @SaCheckPermission(value = "meta-table:list", type = StpAdminUtil.TYPE)
+    @GetMapping("/importable-tables")
+    public List<ImportableTableInfo> importableTables() {
+        return metaTableImportService.listImportable();
+    }
+
+    @Operation(summary = "预览物理表导入映射")
+    @SaCheckPermission(value = "meta-table:list", type = StpAdminUtil.TYPE)
+    @GetMapping("/import-preview/{tableName}")
+    public TableImportPreview importPreview(@PathVariable String tableName) {
+        return metaTableImportService.preview(tableName);
+    }
+
+    @Log
+    @Operation(summary = "导入已有物理表")
+    @SaCheckPermission(value = "meta-table:add", type = StpAdminUtil.TYPE)
+    @PostMapping("/import")
+    public Long importTable(RequestContext rc, @RequestBody @Valid MetaTableImportRequest request) {
+        return metaTableImportService.importTable(
+                request.getTableName(), request.getDisplayName(), request.getDescription(), rc.getCurrentUid());
     }
 
     @Log
