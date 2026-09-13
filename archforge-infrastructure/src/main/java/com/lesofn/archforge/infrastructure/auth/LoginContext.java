@@ -1,5 +1,6 @@
 package com.lesofn.archforge.infrastructure.auth;
 
+import cn.dev33.satoken.exception.SaTokenContextException;
 import com.lesofn.archforge.infrastructure.auth.errors.AdminAuthErrorCode;
 import org.jspecify.annotations.Nullable;
 import com.lesofn.archforge.infrastructure.auth.errors.AdminAuthException;
@@ -23,7 +24,13 @@ public final class LoginContext {
     }
 
     public static Optional<SystemLoginUser> findAdminUser() {
-        if (!StpAdminUtil.isLogin()) {
+        try {
+            if (!StpAdminUtil.isLogin()) {
+                return Optional.empty();
+            }
+        } catch (SaTokenContextException e) {
+            // sa-token context is bound by its own filter; callers earlier in the chain
+            // (e.g. request-log enricher) must degrade to "no admin user" instead of 500.
             return Optional.empty();
         }
         Object value = StpAdminUtil.getSession().get(LoginSessionKeys.LOGIN_USER);
