@@ -82,6 +82,25 @@ Five layers run automatically — you never invoke them separately:
 - **Spotless** rewrites formatting via `spotlessApply`; `spotlessCheck`
   fails the build on unformatted code.
 
+### Anti-bypass rules (MANDATORY)
+
+The gates above are only as strong as their resistance to being silenced.
+Forbidden without an ADR (`docs/adr/`) plus explicit human approval:
+
+- Skipping or deleting failing tests (`@Disabled`, `@Ignore`,
+  `spock.lang.Ignore*` — bytecode-banned via `forbiddenApisTest`)
+- `git commit --no-verify` / bypassing pre-commit or CI hooks
+- Lowering thresholds (coverage floors, checkstyle/spotbugs exclusions,
+  error-prone downgrades) or editing `config/*/suppressions`/`excludes`
+  to accommodate bad code
+- Modifying ArchUnit/architecture rules to fit a violation
+- Adding `continue-on-error`, retry-until-green loops, or equivalent
+  mechanisms in CI to mask a failure
+
+`spock.lang.PendingFeature` stays legal — it is self-verifying (the build
+fails once the feature starts passing). Everything else that converts a
+red gate into a green one without fixing the cause is a violation.
+
 ## Per-Edit Verification Protocol (MANDATORY for AI agents)
 
 Every code edit must be verified BEFORE moving on — "configured" is not

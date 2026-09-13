@@ -1,5 +1,16 @@
-# Test-source signature set — intentionally empty.
-# Rationale: tests legitimately use Thread.sleep (waiting for schedulers),
-# System.out (debug output) and java.util.Date (fixtures). Production bans
-# stay in forbidden-signatures.txt; bundled deprecated/internal signatures
-# still apply here.
+# Test-source signature set.
+# Bundled deprecated/internal signatures still apply; production bans
+# (Runtime.exec, Thread.sleep, java.util.Date, System.out) are relaxed here
+# because tests legitimately use them (fixtures, scheduler waits, debug output).
+#
+# Anti-bypass additions: permanent test-skip annotations are forbidden.
+# A skipped test is a silent hole in the harness — fix the test or delete it.
+# Deliberately allowed: spock.lang.PendingFeature / PendingFeatureIf — they are
+# self-verifying (the build fails once the feature starts passing), so they
+# cannot hide a regression forever.
+
+@defaultMessage Permanent test skips are forbidden — fix the test or delete it; conditional skips need an ADR (see AGENTS.md anti-bypass rules)
+org.junit.jupiter.api.Disabled
+spock.lang.Ignore
+spock.lang.IgnoreRest
+spock.lang.IgnoreIf

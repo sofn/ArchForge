@@ -156,6 +156,73 @@ jobs:
           path: '**/build/reports/tests/'
           retention-days: 7
 
+      - name: Upload server-admin jar (for smoke job)
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: server-admin-jar
+          path: ArchForge/archforge-server-admin/build/libs/*.jar
+          retention-days: 1
+
+  # Startup smoke: a green build does not prove the app boots (missing env,
+  # Flyway failure, bad config all surface only at runtime). Boot the real jar
+  # against the compose infra and require /actuator/health = UP.
+  startup-smoke:
+    name: Startup Smoke (server-admin)
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: ArchForge
+    env:
+      DB_PASSWORD: ci-smoke-pw
+      SPRING_PROFILES_ACTIVE: dev
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: ArchForge
+
+      - name: Set up JDK 25
+        uses: actions/setup-java@v4
+        with:
+          distribution: zulu
+          java-version: 25
+
+      - name: Download server-admin jar
+        uses: actions/download-artifact@v4
+        with:
+          name: server-admin-jar
+          path: ArchForge/archforge-server-admin/build/libs
+
+      - name: Start infra (PostgreSQL + Redis)
+        run: docker compose -f docker/docker-compose.infra.yml up -d --wait
+
+      - name: Boot and poll health
+        run: |
+          java --enable-preview --enable-native-access=ALL-UNNAMED \
+            -jar archforge-server-admin/build/libs/*.jar > /tmp/app.log 2>&1 &
+          APP_PID=$!
+          for i in $(seq 1 60); do
+            if curl -sf http://localhost:8080/actuator/health | grep -q '"status":"UP"'; then
+              echo "startup smoke: UP after ~$((i * 2))s"
+              kill "$APP_PID" || true
+              exit 0
+            fi
+            if ! kill -0 "$APP_PID" 2>/dev/null; then
+              echo "app process exited — log tail:"; tail -120 /tmp/app.log; exit 1
+            fi
+            sleep 2
+          done
+          echo "startup smoke FAILED (120s timeout) — app log tail:"
+          tail -120 /tmp/app.log
+          exit 1
+
+      - name: Dump app log on failure
+        if: failure()
+        run: tail -200 /tmp/app.log || true
+
   # OWASP Dependency Check: CVE scan of the runtime classpath (transitives included).
   # Split into a dedicated job because the NVD data sync is heavy; keyed by the
   # OWASP_NVD_API_KEY secret (NVD API requires a key since dependency-check 13).

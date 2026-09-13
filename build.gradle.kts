@@ -85,6 +85,46 @@ subprojects {
             }
         }
 
+        // ---- JaCoCo coverage floor (ratchet) ----
+        // Floors measured from the 2026-09-13 baseline run (aggregate 61.8%),
+        // each set ~2-3pp below the measured value. A floor may only move UP —
+        // lowering one is a gate-weakening change (see AGENTS.md anti-bypass).
+        // New modules: add an entry here; unmapped modules have no floor yet.
+        val coverageFloors = mapOf(
+            "archforge-cli" to "0.14",
+            "archforge-common-base" to "0.45",
+            "archforge-common-error" to "0.42",
+            "archforge-common-jpa" to "0.49",
+            "archforge-admin-user" to "0.04",
+            "archforge-blog" to "0.28",
+            "archforge-meta-table" to "0.64",
+            "archforge-infrastructure" to "0.20",
+            "archforge-server-admin" to "0.51",
+            "archforge-server-web" to "0.61",
+            "archforge-cache-starter" to "0.49",
+            "archforge-lock-starter" to "0.32",
+            "archforge-redisson-starter" to "0.85",
+            "archforge-request-log-starter" to "0.54",
+            "archforge-trace-starter" to "0.92",
+            "archforge-example-task" to "0.0", // unlinked example — no floor yet
+        )
+        coverageFloors[name]?.let { floor ->
+            tasks.named<org.gradle.testing.jacoco.tasks.JacocoCoverageVerification>(
+                "jacocoTestCoverageVerification",
+            ) {
+                dependsOn(tasks.named("test"))
+                violationRules {
+                    rule {
+                        limit {
+                            counter = "LINE"
+                            minimum = floor.toBigDecimal()
+                        }
+                    }
+                }
+            }
+            tasks.named("check") { dependsOn("jacocoTestCoverageVerification") }
+        }
+
         // 让 IDEA 自动识别 annotation processor 生成的源码目录 (Hibernate Metamodel 等)
         configure<org.gradle.plugins.ide.idea.model.IdeaModel> {
             module {
