@@ -43,6 +43,9 @@ public class MetaTableImportServiceImpl implements MetaTableImportService {
     private static final Set<String> AUDIT_COLUMNS = Set.of(
             "id", "creator_id", "create_time", "updater_id", "update_time", "deleted");
 
+    /** 平台保留表前缀 —— 与命名规则解耦的独立安全边界（meta_ 是自家前缀，validateTableCode 不拦） */
+    private static final Set<String> PLATFORM_TABLE_PREFIXES = Set.of("sys_", "meta_", "qrtz_", "flyway_");
+
     private static final Set<String> INTEGER_UDTS = Set.of("int4", "int8");
     private static final Set<String> DELETED_UDTS = Set.of("int2", "int4", "int8");
     private static final Set<String> TIME_UDTS = Set.of("timestamp", "timestamptz");
@@ -108,6 +111,10 @@ public class MetaTableImportServiceImpl implements MetaTableImportService {
     @Transactional("metaTableTransactionManager")
     public Long importTable(String tableName, @Nullable String displayName, @Nullable String description,
             Long operatorId) {
+        // 独立 fail-fast 守卫：不依赖兼容判定链，防后续重构绕过
+        if (isPlatformTable(tableName)) {
+            throw new MetaTableException(META_TABLE_IMPORT_INCOMPATIBLE, "平台保留表，禁止导入: " + tableName);
+        }
         TableImportPreview preview = preview(tableName);
         if (!preview.isCompatible()) {
             throw new MetaTableException(META_TABLE_IMPORT_INCOMPATIBLE, String.join("；", preview.getReasons()));
@@ -149,6 +156,9 @@ public class MetaTableImportServiceImpl implements MetaTableImportService {
     private List<String> compatibilityReasons(
             String tableName, List<ColumnInfo> columns, List<String> pkColumns, boolean registered) {
         List<String> reasons = new ArrayList<>();
+        if (isPlatformTable(tableName)) {
+            reasons.add("平台保留表（" + PLATFORM_TABLE_PREFIXES + " 前缀），禁止导入");
+        }
         if (registered) {
             reasons.add("已注册为元表格");
         }
@@ -275,6 +285,15 @@ public class MetaTableImportServiceImpl implements MetaTableImportService {
     }
 
     // ---- 辅助 ----
+
+    private static boolean isPlatformTable(String tableName) {
+        for (String prefix : PLATFORM_TABLE_PREFIXES) {
+            if (tableName.startsWith(prefix)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     private void requireTableExists(String tableName) {
         if (!introspector.tableExists(tableName)) {

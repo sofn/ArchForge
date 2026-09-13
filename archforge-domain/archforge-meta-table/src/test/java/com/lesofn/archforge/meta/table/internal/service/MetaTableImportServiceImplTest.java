@@ -162,7 +162,27 @@ class MetaTableImportServiceImplTest {
         TableImportPreview preview = service.preview("sys_thing");
 
         assertFalse(preview.isCompatible());
-        assertTrue(preview.getReasons().stream().anyMatch(r -> r.contains("表名")));
+        assertTrue(preview.getReasons().stream().anyMatch(r -> r.contains("平台保留")));
+    }
+
+    @Test
+    void platformPrefixedTableRejected() {
+        // meta_ 是 meta-table 自家前缀，validateTableCode 放行 —— 黑名单是唯一防线
+        stubTable("meta_trap", compatibleColumns(), List.of("id"));
+
+        TableImportPreview preview = service.preview("meta_trap");
+
+        assertFalse(preview.isCompatible());
+        assertTrue(preview.getReasons().stream().anyMatch(r -> r.contains("平台保留")));
+    }
+
+    @Test
+    void importTableGuardRejectsPlatformTable() {
+        // 结构完全合规但命中黑名单 —— importTable 的独立守卫必须 fail-fast
+        stubTable("flyway_x", compatibleColumns(), List.of("id"));
+
+        assertThrows(MetaTableException.class,
+                () -> service.importTable("flyway_x", null, null, 1L));
     }
 
     @Test
