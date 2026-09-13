@@ -6,6 +6,7 @@ dependencies {
     api(project(":archforge-common:archforge-common-jpa"))
     api(project(":archforge-starters:archforge-redisson-starter"))
     api(project(":archforge-starters:archforge-trace-starter"))
+    api(project(":archforge-starters:archforge-request-log-starter"))
 
     // 核心框架依赖 (Spring Boot BOM 管理的版本)
     // Excluding spring-boot-starter-logging to avoid SLF4J multiple providers issue

@@ -1,29 +1,25 @@
-package com.lesofn.archforge.infrastructure.frame.utils;
+package com.lesofn.archforge.starter.requestlog;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-import com.lesofn.archforge.common.context.ClientVersion;
-import com.lesofn.archforge.common.utils.jackson.JsonUtil;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Strings;
 import org.jspecify.annotations.Nullable;
-import tools.jackson.databind.node.ObjectNode;
 
 /**
- * 请求日志记录模型。
- *
- * @author sofn
- * @version 1.0 Created at: 2015-06-26 12:19
+ * 请求日志记录模型（tab 分隔单行输出）。由
+ * {@code infrastructure} 迁入 starter 化；字段顺序保持既有日志契约。
  */
-@SuppressWarnings("NullAway.Init")
 public class RequestLogRecord {
+
     static final String SPLIT = "\t";
 
     private @Nullable String requestId;
 
-    private final transient java.time.Instant date = java.time.Instant.now();
+    private final transient Instant date = Instant.now();
 
     private @Nullable String api;
 
@@ -40,7 +36,11 @@ public class RequestLogRecord {
 
     private long uid;
 
+    /** 已脱敏的 query/form 参数（掩码由过滤器按 mask-fields 配置完成） */
     private Map<String, String[]> parameters = Collections.emptyMap();
+
+    /** 已脱敏的请求体（JSON 等可文本化载荷） */
+    private @Nullable String payload;
 
     private @Nullable String parameterString;
 
@@ -48,12 +48,7 @@ public class RequestLogRecord {
 
     private @Nullable String userAgent;
 
-    private @Nullable ClientVersion clientVersion = ClientVersion.NULL;
-
-    // /**
-    // * 调用方ip，如果是 内网服务端调用，该ip是服务器ip， 否则该ip与用户ip一致
-    // */
-    // private String clientIp;
+    private @Nullable String clientVersion;
 
     /** 用户ip,如果是内网服务器端调用，该ip是调用方通过 Api-RemoteIP机制传递的用户ip */
     private @Nullable String ip;
@@ -65,9 +60,6 @@ public class RequestLogRecord {
     private long responseSize;
 
     private boolean writeBody = true;
-
-    public RequestLogRecord() {
-    }
 
     public @Nullable String getApi() { return api; }
 
@@ -83,7 +75,7 @@ public class RequestLogRecord {
 
     public String getSource() { return source; }
 
-    public void setSource(String source) {
+    public void setSource(@Nullable String source) {
         if (source != null) {
             this.source = source;
         }
@@ -105,7 +97,9 @@ public class RequestLogRecord {
 
     public void setParameters(Map<String, String[]> parameters) { this.parameters = parameters; }
 
-    public void setParameterString(@Nullable String parameterString) { this.parameterString = parameterString; }
+    public @Nullable String getPayload() { return payload; }
+
+    public void setPayload(@Nullable String payload) { this.payload = payload; }
 
     public long getUseTime() { return useTime; }
 
@@ -115,13 +109,13 @@ public class RequestLogRecord {
 
     public void setResponse(@Nullable String response) { this.response = response; }
 
-    public @Nullable ClientVersion getClientVersion() { return clientVersion; }
+    public @Nullable String getClientVersion() { return clientVersion; }
 
-    public void setClientVersion(@Nullable ClientVersion clientVersion) {
-        if (clientVersion != null) {
-            this.clientVersion = clientVersion;
-        }
-    }
+    public void setClientVersion(@Nullable String clientVersion) { this.clientVersion = clientVersion; }
+
+    public @Nullable String getPlatform() { return platform; }
+
+    public void setPlatform(@Nullable String platform) { this.platform = platform; }
 
     public long getResponseSize() {
         if (this.responseSize <= 0 && StringUtils.isNotBlank(this.response)) {
@@ -136,9 +130,9 @@ public class RequestLogRecord {
 
     public void setWriteBody(boolean writeBody) { this.writeBody = writeBody; }
 
-    public ObjectNode toJSONObject() {
-        return JsonUtil.getObjectMapper().createObjectNode();
-    }
+    public @Nullable String getRequestId() { return requestId; }
+
+    public void setRequestId(@Nullable String requestId) { this.requestId = requestId; }
 
     @Override
     public String toString() {
@@ -156,7 +150,7 @@ public class RequestLogRecord {
         buf.append(this.responseStatus);
         buf.append(SPLIT);
         if (this.useTime <= 0) {
-            this.useTime = java.time.temporal.ChronoUnit.MILLIS.between(this.date, java.time.Instant.now());
+            this.useTime = ChronoUnit.MILLIS.between(this.date, Instant.now());
         }
         buf.append(this.useTime);
         buf.append(SPLIT);
@@ -166,11 +160,7 @@ public class RequestLogRecord {
         buf.append(SPLIT);
         buf.append(this.ip);
         buf.append(SPLIT);
-        if (this.clientVersion != null) {
-            buf.append(this.clientVersion);
-        } else {
-            buf.append(ClientVersion.NULL);
-        }
+        buf.append(this.clientVersion != null ? this.clientVersion : "unknow");
         buf.append(SPLIT);
         buf.append(this.userAgent);
         buf.append(SPLIT);
@@ -178,46 +168,26 @@ public class RequestLogRecord {
         return buf.toString();
     }
 
-    public String toJsonString() {
-        return JsonUtil.to(this);
-    }
-
     private String getParameterString() {
         if (this.parameterString == null) {
-            if (this.parameters != null) {
-                StringBuilder paramBuf = new StringBuilder();
-                for (Map.Entry<String, String[]> e : this.parameters.entrySet()) {
-                    String key = e.getKey();
-                    String[] values = e.getValue();
-                    for (String value : values) {
-                        value = passwordEscape(key, value);
-                        paramBuf.append(key).append("=").append(value);
-                        paramBuf.append("&");
-                    }
+            StringBuilder paramBuf = new StringBuilder();
+            for (Map.Entry<String, String[]> e : this.parameters.entrySet()) {
+                String key = e.getKey();
+                for (String value : e.getValue()) {
+                    paramBuf.append(key).append("=").append(value).append("&");
                 }
-                if (paramBuf.length() > 0 && paramBuf.charAt(paramBuf.length() - 1) == '&') {
-                    paramBuf.deleteCharAt(paramBuf.length() - 1);
-                }
-                this.parameterString = paramBuf.toString();
-            } else {
-                this.parameterString = "";
             }
+            if (!paramBuf.isEmpty() && paramBuf.charAt(paramBuf.length() - 1) == '&') {
+                paramBuf.deleteCharAt(paramBuf.length() - 1);
+            }
+            if (StringUtils.isNotBlank(this.payload)) {
+                if (!paramBuf.isEmpty()) {
+                    paramBuf.append("&");
+                }
+                paramBuf.append("body=").append(this.payload);
+            }
+            this.parameterString = paramBuf.toString();
         }
         return parameterString;
     }
-
-    private String passwordEscape(String key, String value) {
-        if (Strings.CS.equals("password", key) || Strings.CS.equals("old_password", key)) {
-            return "***";
-        }
-        return value;
-    }
-
-    public @Nullable String getRequestId() { return requestId; }
-
-    public void setRequestId(@Nullable String requestId) { this.requestId = requestId; }
-
-    public @Nullable String getPlatform() { return platform; }
-
-    public void setPlatform(@Nullable String platform) { this.platform = platform; }
 }

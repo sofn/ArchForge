@@ -6,8 +6,6 @@ import com.lesofn.archforge.common.utils.ip.IpUtil;
 import com.lesofn.archforge.infrastructure.frame.context.RequestContext;
 import com.lesofn.archforge.infrastructure.frame.context.RequestIDGenerator;
 import com.lesofn.archforge.infrastructure.frame.context.ScopedValueContext;
-import com.lesofn.archforge.infrastructure.frame.utils.RequestLogRecord;
-import com.lesofn.archforge.infrastructure.frame.utils.ResponseWrapper;
 import io.micrometer.observation.Observation;
 import io.micrometer.observation.ObservationRegistry;
 import jakarta.servlet.Filter;
@@ -18,7 +16,6 @@ import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.Strings;
@@ -71,14 +68,11 @@ public class RequestLogFilter implements Filter {
             return;
         }
 
-        boolean binaryResponse = isBinaryResponsePath(path);
-        HttpServletResponse responseToUse = binaryResponse ? response : new ResponseWrapper(response);
         Observation observation = Observation.start("http.server.requests", observationRegistry);
-        long startTime = System.currentTimeMillis();
         try {
             observation.lowCardinalityKeyValue("http.method", request.getMethod());
             observation.lowCardinalityKeyValue("http.path", path);
-            filterChain.doFilter(request, responseToUse);
+            filterChain.doFilter(request, response);
         } catch (Exception e) {
             observation.error(e);
             // 此处拦截也必须抛出，否则不执行ErrorHandlerResource
@@ -95,51 +89,9 @@ public class RequestLogFilter implements Filter {
             }
             throw e;
         } finally {
-            // 如果是错误页面 或 没有错误的第一次执行
-            if (Strings.CS.equals("/error", path) || request.getAttribute(
-                    "org.springframework.boot.autoconfigure.web.DefaultErrorAttributes.ERROR") == null) {
-                long endTime = System.currentTimeMillis();
-                RequestLogRecord record = new RequestLogRecord();
-                record.setRequestId(context.getRequestId());
-                record.setIp(context.getIp());
-                record.setUid(context.getCurrentUid());
-                record.setSource(context.getAppId() + "");
-                record.setUseTime(endTime - startTime);
-                Object requestUri = request.getAttribute("jakarta.servlet.error.request_uri");
-                record.setApi(requestUri != null ? (String) requestUri : path);
-                record.setMethod(request.getMethod());
-                record.setParameters(request.getParameterMap());
-                record.setResponseStatus(responseToUse.getStatus());
-                record.setClientVersion(context.getClientVersion());
-                if (responseToUse instanceof ResponseWrapper wrapper) {
-                    record.setResponse(
-                            new String(wrapper.toByteArray(), StandardCharsets.UTF_8));
-                } else {
-                    record.setResponse("");
-                    record.setWriteBody(false);
-                }
-                // text/html不打印body
-                if (!Strings.CS.contains(responseToUse.getContentType(), "application/json")) {
-                    record.setWriteBody(false);
-                }
-                MDC.put("CUSTOM_LOG", "request");
-                String recordString = record.toString();
-                if (recordString.length() > 1024) {
-                    log.info(
-                            "Output too long, ignoring detailed log output. RequestId: {}, API: {}, Method: {}, Status: {}, UseTime: {}ms",
-                            record.getRequestId(),
-                            record.getApi(),
-                            record.getMethod(),
-                            record.getResponseStatus(),
-                            record.getUseTime());
-                } else {
-                    log.info(recordString);
-                }
-                MDC.remove("CUSTOM_LOG");
-                observation.lowCardinalityKeyValue(
-                        "http.status", String.valueOf(responseToUse.getStatus()));
-                observation.stop();
-            }
+            observation.lowCardinalityKeyValue(
+                    "http.status", String.valueOf(response.getStatus()));
+            observation.stop();
         }
     }
 
@@ -147,10 +99,6 @@ public class RequestLogFilter implements Filter {
         return Strings.CS.startsWithAny(path, "/webjars", "/static", "/js", "/css", "/libs", "/WEB-INF") || Strings.CS
                 .startsWithAny(path, "/swagger-", "/v3/api-docs") || Strings.CS.startsWithAny(path,
                         GlobalConstants.STATIC_RESOURCE_EXTENSIONS.toArray(String[]::new));
-    }
-
-    private static boolean isBinaryResponsePath(String path) {
-        return Strings.CS.startsWithAny(path, "/file/download/", "/user/export");
     }
 
     @Override

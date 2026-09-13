@@ -1,4 +1,4 @@
-package com.lesofn.archforge.infrastructure.frame.utils;
+package com.lesofn.archforge.starter.requestlog;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -14,12 +14,15 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import org.apache.commons.io.output.TeeOutputStream;
 
-public class ResponseWrapper extends HttpServletResponseWrapper {
+/**
+ * 响应体 tee 捕获：写往客户端的同时镜像一份到内存，无需 copyBodyToResponse。
+ */
+public class RequestLogResponseWrapper extends HttpServletResponseWrapper {
 
     private final ByteArrayOutputStream bos = new ByteArrayOutputStream();
     private final PrintWriter writer = new PrintWriter(new BufferedWriter(new OutputStreamWriter(bos, UTF_8)));
 
-    public ResponseWrapper(HttpServletResponse response) {
+    public RequestLogResponseWrapper(HttpServletResponse response) {
         super(response);
     }
 
@@ -29,7 +32,7 @@ public class ResponseWrapper extends HttpServletResponseWrapper {
     @Override
     public ServletOutputStream getOutputStream() throws IOException {
         return new ServletOutputStream() {
-            private final TeeOutputStream tee = new TeeOutputStream(ResponseWrapper.super.getOutputStream(), bos);
+            private final TeeOutputStream tee = new TeeOutputStream(RequestLogResponseWrapper.super.getOutputStream(), bos);
 
             @Override
             public boolean isReady() { return true; }
@@ -49,24 +52,17 @@ public class ResponseWrapper extends HttpServletResponseWrapper {
     public PrintWriter getWriter() throws IOException { return new TeePrintWriter(super.getWriter(), writer); }
 
     public byte[] toByteArray() {
+        writer.flush();
         return bos.toByteArray();
     }
 
     private static class TeePrintWriter extends PrintWriter {
 
-        PrintWriter branch;
+        final PrintWriter branch;
 
         TeePrintWriter(PrintWriter main, PrintWriter branch) {
             super(main, true);
             this.branch = branch;
-        }
-
-        @Override
-        public void write(char[] buf, int off, int len) {
-            super.write(buf, off, len);
-            super.flush();
-            branch.write(buf, off, len);
-            branch.flush();
         }
 
         @Override
