@@ -1,6 +1,8 @@
 package com.lesofn.archforge.infrastructure.frame.filter;
 
+import com.lesofn.archforge.common.auth.SystemLoginUser;
 import com.lesofn.archforge.common.context.ClientVersion;
+import com.lesofn.archforge.infrastructure.auth.LoginContext;
 import com.lesofn.archforge.infrastructure.frame.context.RequestContext;
 import com.lesofn.archforge.infrastructure.frame.context.ScopedValueContext;
 import com.lesofn.archforge.starter.requestlog.RequestLogEnricher;
@@ -22,7 +24,11 @@ public class RequestContextEnricher implements RequestLogEnricher {
         if (context == null) {
             return;
         }
-        record.setUid(context.getCurrentUid());
+        // RequestContext.currentUid was bound by the retired legacy auth filter; the
+        // sa-token session (admin first, then C-end) is the live uid source.
+        Long uid =
+                LoginContext.findAdminUser().map(SystemLoginUser::getUserId).orElseGet(LoginContext::getWebUserId);
+        record.setUid(uid == null ? context.getCurrentUid() : uid);
         record.setSource(context.getAppId() + "");
         record.setIp(context.getIp());
         ClientVersion clientVersion = context.getClientVersion();
