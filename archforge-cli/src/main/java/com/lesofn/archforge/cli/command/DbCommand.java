@@ -1,5 +1,6 @@
 package com.lesofn.archforge.cli.command;
 
+import com.lesofn.archforge.cli.config.DbPasswordResolver;
 import com.lesofn.archforge.cli.config.ProjectPaths;
 import com.lesofn.archforge.cli.docker.ComposeSupport;
 import com.lesofn.archforge.cli.proc.ProcessRunner;
@@ -8,6 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
@@ -27,11 +29,13 @@ public class DbCommand {
         public Integer call() {
             Path root = ProjectPaths.repoRoot();
             ProcessRunner runner = new ProcessRunner();
+            DbPasswordResolver.Result password = DbPasswordResolver.resolve(root, null);
             ComposeSupport compose = new ComposeSupport(runner, root);
-            int up = compose.up("dev", List.of("postgres"));
+            int up = compose.up("dev", List.of("postgres"), Map.of("DB_PASSWORD", password.value()));
             if (up != 0) {
                 return up;
             }
+            compose.syncDbPassword("dev", DbPasswordResolver.resolveDbUsername(root), password.value());
             return runner.run(List.of("./gradlew", ":archforge-server-admin:flywayMigrate", "-x", "test"), root);
         }
     }

@@ -1,13 +1,15 @@
 package com.lesofn.archforge.infrastructure.frame.utils.log;
 
 import org.jspecify.annotations.Nullable;
-import com.lesofn.archforge.common.profile.DefaultProfileLoader;
+import com.lesofn.archforge.common.spring.SpringContextHolder;
 import com.lesofn.archforge.common.utils.jackson.JsonUtil;
 import tools.jackson.databind.node.ObjectNode;
 import com.lesofn.archforge.infrastructure.frame.context.RequestContext;
 import com.lesofn.archforge.infrastructure.frame.context.ScopedValueContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.Profiles;
 
 /** Authors: sofn Version: 1.0 Created at 15-6-7 21:00. */
 public class ApiLogger {
@@ -23,9 +25,19 @@ public class ApiLogger {
         return ctx == null ? "-" : ctx.getRequestId();
     }
 
-    public static boolean isTraceEnabled() { return log.isTraceEnabled() && !DefaultProfileLoader.isProd(); }
+    /**
+     * Prod check via the live Spring {@link Environment}. Before the context is
+     * injected (early startup) we conservatively report prod — debug output is
+     * suppressed until the real profile is known.
+     */
+    private static boolean isProd() {
+        return !SpringContextHolder.isInjectedApplicationContext() || SpringContextHolder.getBean(Environment.class)
+                .acceptsProfiles(Profiles.of("prod"));
+    }
 
-    public static boolean isDebugEnabled() { return log.isDebugEnabled() && !DefaultProfileLoader.isProd(); }
+    public static boolean isTraceEnabled() { return log.isTraceEnabled() && !isProd(); }
+
+    public static boolean isDebugEnabled() { return log.isDebugEnabled() && !isProd(); }
 
     public static void trace(Object msg) {
         log.trace(formatMsg(msg));
@@ -36,7 +48,7 @@ public class ApiLogger {
     }
 
     public static void debug(Object msg) {
-        if (log.isDebugEnabled() && !DefaultProfileLoader.isProd()) {
+        if (log.isDebugEnabled() && !isProd()) {
             log.debug(formatMsg(msg));
         }
     }
@@ -61,7 +73,7 @@ public class ApiLogger {
             return;
         }
         // 非生产环境打印debug日志
-        if (log.isDebugEnabled() && !DefaultProfileLoader.isProd()) {
+        if (log.isDebugEnabled() && !isProd()) {
             log.debug(formatMsg(tag, msg));
         }
     }

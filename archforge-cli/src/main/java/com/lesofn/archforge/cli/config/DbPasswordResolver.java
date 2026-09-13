@@ -73,6 +73,23 @@ public final class DbPasswordResolver {
         }
     }
 
+    /** DB_USERNAME resolution: env → .env → {@code archforge}. */
+    public static String resolveDbUsername(Path repoRoot) {
+        String env = System.getenv("DB_USERNAME");
+        if (env != null && !env.isBlank()) {
+            return env;
+        }
+        try {
+            String fromFile = SecretGenerator.readEnv(ProjectPaths.envFile(repoRoot)).get("DB_USERNAME");
+            if (fromFile != null && !fromFile.isBlank()) {
+                return fromFile;
+            }
+        } catch (IOException ignored) {
+            // fall through to default
+        }
+        return "archforge";
+    }
+
     /** Prints the app-startup env vars, Windows and Linux syntax. */
     public static void printEnvHint(Result result) {
         System.out.println();

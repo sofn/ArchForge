@@ -99,10 +99,13 @@ Prerequisites: **Java 25**, Docker.
 
 ```bash
 git clone git@github.com:sofn/ArchForge.git && cd ArchForge
-./archforge init --write            # idempotent .env secrets
-./archforge infra up                # postgres + redis via docker compose
-set -a; source .env; set +a         # export DB_PASSWORD, sa-token secrets
-FILE_STORAGE_TYPE=local ./gradlew :archforge-server-admin:bootRun
+./archforge init --write            # .env secrets + postgres/redis containers + Flyway migrate
+
+# Load .env into your shell, then start the admin app:
+set -a; source .env; set +a         # Linux/macOS
+# Windows cmd:  for /f "usebackq tokens=1,2 delims==" %a in (".env") do set "%a=%b"
+# Windows pwsh: Get-Content .env | ? { $_ -match '^([^#=]+)=(.*)$' } | % { [Environment]::SetEnvironmentVariable($Matches[1], $Matches[2]) }
+./gradlew :archforge-server-admin:bootRun
 ```
 
 Default admin login is `admin / admin123` (captcha is on in `dev`). C-end API:
@@ -161,12 +164,14 @@ What CI enforces on every PR ([ci.yml](.github/workflows/ci.yml)):
 
 ```bash
 ./archforge --help
-./archforge init --write          # idempotent .env secrets
-./archforge infra up              # postgres + redis via docker/docker-compose.infra.yml
+./archforge init --write          # .env secrets + postgres/redis + Flyway migrate (dev)
+./archforge infra up              # just postgres + redis via docker/docker-compose.infra.yml
 ./archforge db backup
 ./archforge skills install --tool claude
 ./archforge --mcp                 # Phase-1 MCP stdio server
 ```
+
+See [archforge-cli/README.md](archforge-cli/README.md) for the full command reference.
 
 If the fat jar is missing, `./archforge` builds `:archforge-cli:shadowJar` first.
 

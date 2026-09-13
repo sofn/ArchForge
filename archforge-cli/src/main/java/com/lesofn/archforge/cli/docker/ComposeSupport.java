@@ -69,6 +69,22 @@ public class ComposeSupport {
         return processRunner.run(command, ProjectPaths.dockerDir(repoRoot), Map.of(), false, stdoutFile);
     }
 
+    /**
+     * The postgres data volume keeps the password it was initialized with —
+     * {@code POSTGRES_PASSWORD} only applies on first init. Align the live
+     * role with the resolved password so a stale volume cannot silently
+     * desync (local connections inside the container are trust-authenticated).
+     */
+    public int syncDbPassword(String profile, String user, String password) {
+        String sql = "ALTER USER \"" + user.replace("\"", "\"\"") + "\" WITH PASSWORD '" + password.replace("'", "''") + "'";
+        int code = exec(profile, List.of("postgres", "psql", "-U", user, "-d", "postgres", "-c", sql));
+        if (code != 0) {
+            System.out.println(
+                    "WARN: could not sync DB_PASSWORD into postgres — the app may fail to connect.");
+        }
+        return code;
+    }
+
     public boolean fileExists(String profile) {
         return Files.exists(composeFile(profile));
     }

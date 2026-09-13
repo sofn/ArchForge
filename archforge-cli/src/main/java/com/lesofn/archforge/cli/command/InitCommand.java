@@ -1,5 +1,6 @@
 package com.lesofn.archforge.cli.command;
 
+import com.lesofn.archforge.cli.config.DbPasswordResolver;
 import com.lesofn.archforge.cli.config.ProjectPaths;
 import com.lesofn.archforge.cli.config.YamlConfigPatcher;
 import com.lesofn.archforge.cli.docker.ComposeSupport;
@@ -48,11 +49,16 @@ public class InitCommand implements Callable<Integer> {
         System.out.println("Patched application-dev/test yaml placeholders where needed.");
 
         if ("dev".equals(profile)) {
+            DbPasswordResolver.Result password = DbPasswordResolver.resolve(repoRoot, null);
+            DbPasswordResolver.printEnvHint(password);
             ComposeSupport compose = new ComposeSupport(processRunner, repoRoot);
-            int infra = compose.up("dev", List.of("postgres", "redis"));
+            int infra = compose.up(
+                    "dev", List.of("postgres", "redis"), Map.of("DB_PASSWORD", password.value()));
             if (infra != 0) {
                 return infra;
             }
+            compose.syncDbPassword(
+                    "dev", DbPasswordResolver.resolveDbUsername(repoRoot), password.value());
             int migrate = processRunner.run(
                     List.of("./gradlew", ":archforge-server-admin:flywayMigrate", "-x", "test"), repoRoot);
             if (migrate != 0) {

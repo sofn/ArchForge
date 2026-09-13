@@ -4,8 +4,6 @@ import com.lesofn.archforge.cli.config.DbPasswordResolver;
 import com.lesofn.archforge.cli.config.ProjectPaths;
 import com.lesofn.archforge.cli.docker.ComposeSupport;
 import com.lesofn.archforge.cli.proc.ProcessRunner;
-import com.lesofn.archforge.cli.secret.SecretGenerator;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
@@ -45,42 +43,8 @@ public class InfraCommand {
             if (code != 0) {
                 return code;
             }
-            return syncDbPassword(compose, repoRoot, password.value());
-        }
-
-        /**
-         * The postgres data volume keeps the password it was initialized with —
-         * {@code POSTGRES_PASSWORD} only applies on first init. Align the live
-         * role with the resolved password so a stale volume cannot silently
-         * desync (local connections inside the container are trust-authenticated).
-         */
-        private int syncDbPassword(ComposeSupport compose, Path repoRoot, String password) {
-            String user = dbUsername(repoRoot);
-            String sql = "ALTER USER \"" + user.replace("\"", "\"\"") + "\" WITH PASSWORD '" + password.replace("'", "''") +
-                    "'";
-            int code = compose.exec(
-                    profile, List.of("postgres", "psql", "-U", user, "-d", "postgres", "-c", sql));
-            if (code != 0) {
-                System.out.println(
-                        "WARN: could not sync DB_PASSWORD into postgres — the app may fail to connect.");
-            }
-            return code;
-        }
-
-        private String dbUsername(Path repoRoot) {
-            String env = System.getenv("DB_USERNAME");
-            if (env != null && !env.isBlank()) {
-                return env;
-            }
-            try {
-                String fromFile = SecretGenerator.readEnv(ProjectPaths.envFile(repoRoot)).get("DB_USERNAME");
-                if (fromFile != null && !fromFile.isBlank()) {
-                    return fromFile;
-                }
-            } catch (IOException ignored) {
-                // fall through to default
-            }
-            return "archforge";
+            return compose.syncDbPassword(
+                    profile, DbPasswordResolver.resolveDbUsername(repoRoot), password.value());
         }
     }
 
