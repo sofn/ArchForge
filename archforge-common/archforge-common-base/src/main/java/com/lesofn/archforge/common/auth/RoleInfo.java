@@ -22,7 +22,9 @@ public class RoleInfo {
     public static final RoleInfo EMPTY_ROLE = new RoleInfo();
     public static final long ADMIN_ROLE_ID = -1;
     public static final String ADMIN_ROLE_KEY = "admin";
-    public static final String ALL_PERMISSIONS = "*:*:*";
+    // sa-token vagueMatch treats each '*' segment literally; "*:*:*" only matches two-colon
+    // permissions like "system:user:list", not one-colon ones like "meta-table:list".
+    public static final String ALL_PERMISSIONS = "*";
 
     public static final Set<String> ADMIN_PERMISSIONS = new HashSet<>(Collections.singleton(ALL_PERMISSIONS));
 
