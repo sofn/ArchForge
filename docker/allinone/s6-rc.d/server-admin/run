@@ -1,0 +1,7 @@
+#!/command/with-contenv sh
+# server-admin (:8080) — admin API, prod profile by default via container env.
+exec java \
+    --enable-preview \
+    --enable-native-access=ALL-UNNAMED \
+    ${JAVA_ADMIN_OPTS:--XX:MaxRAMPercentage=40.0} \
+    -jar /app/server-admin.jar

@@ -1,0 +1,11 @@
+#!/command/with-contenv sh
+# next.js standalone (:3000) — C-end pages. BFF /api/proxy/* forwards to
+# server-web over the container loopback, so NEXT_PUBLIC_API_BASE_URL stays
+# internal; the browser only ever talks to nginx :80.
+cd /srv/web
+exec env NODE_ENV=production \
+    HOSTNAME=0.0.0.0 \
+    PORT=${WEB_PORT:-3000} \
+    NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL:-http://localhost:8081} \
+    NEXT_PUBLIC_SITE_URL=${NEXT_PUBLIC_SITE_URL:-http://localhost} \
+    node apps/web/server.js

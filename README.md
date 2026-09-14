@@ -167,6 +167,7 @@ What CI enforces on every PR ([ci.yml](.github/workflows/ci.yml)):
 ./archforge init --write          # one-time: .env secrets + deps + Flyway migrate
 ./archforge dev                   # local dev stack (detached; logs/ + run/*.pid)
 ./archforge up                    # containerized full stack
+./archforge up -p allinone        # one container: nginx + both servers + next.js
 ./archforge status | doctor       # what's running / env health check
 ./archforge db backup | db restore <file>
 ./archforge skills install claude

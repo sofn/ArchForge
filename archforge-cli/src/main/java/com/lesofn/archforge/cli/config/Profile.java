@@ -10,6 +10,8 @@ import picocli.CommandLine.ITypeConverter;
 public enum Profile {
     /** Local dev full stack — docker-compose.yml (postgres + redis + app image). */
     dev,
+    /** Single-image product stack — docker-compose.allinone.yml (nginx + 2 JVM + next.js in one container). */
+    allinone,
     /** Full stack on the full JRE image variant. */
     fulljre,
     /** Full stack on the jlink image variant. */
@@ -32,7 +34,7 @@ public enum Profile {
                 return Profile.valueOf(value);
             } catch (IllegalArgumentException e) {
                 throw new IllegalArgumentException("Unknown profile '" + value +
-                        "' — expected one of: dev, fulljre, jlink, native, staging, prod");
+                        "' — expected one of: dev, allinone, fulljre, jlink, native, staging, prod");
             }
         }
     }

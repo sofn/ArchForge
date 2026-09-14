@@ -1,0 +1,3 @@
+#!/command/with-contenv sh
+# nginx — single entry: :80 → next.js, :8088 → admin SPA + /api → :8080.
+exec nginx -g 'daemon off;'

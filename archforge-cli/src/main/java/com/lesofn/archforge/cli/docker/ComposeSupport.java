@@ -33,6 +33,7 @@ public class ComposeSupport {
         Path dockerDir = ProjectPaths.dockerDir(repoRoot);
         return switch (profile) {
             case dev -> dockerDir.resolve("docker-compose.yml");
+            case allinone -> dockerDir.resolve("docker-compose.allinone.yml");
             case fulljre -> dockerDir.resolve("docker-compose.fulljre.yml");
             case jlink -> dockerDir.resolve("docker-compose.jlink.yml");
             case nativeImage -> dockerDir.resolve("docker-compose.native.yml");
@@ -145,11 +146,15 @@ public class ComposeSupport {
     // ---- stack layer (per-profile compose file) ----
 
     public int upStack(Profile profile) {
+        return upStack(profile, Map.of());
+    }
+
+    public int upStack(Profile profile, Map<String, String> extraEnv) {
         List<String> command = stackBase(profile);
         command.add("up");
         command.add("-d");
         command.add("--wait");
-        return processRunner.run(command, ProjectPaths.dockerDir(repoRoot));
+        return processRunner.run(command, ProjectPaths.dockerDir(repoRoot), extraEnv, false);
     }
 
     public int downStack(Profile profile, boolean volumes) {

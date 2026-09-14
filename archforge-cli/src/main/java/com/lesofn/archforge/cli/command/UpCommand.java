@@ -33,6 +33,14 @@ public class UpCommand implements Callable<Integer> {
         ComposeSupport compose = new ComposeSupport(new ProcessRunner(), root);
         ProcessRunner runner = new ProcessRunner();
         DbPasswordResolver.Result password = DbPasswordResolver.resolve(root, null);
+        Map<String, String> env = Map.of(
+                "DB_PASSWORD", password.value(),
+                "DB_USERNAME", DbPasswordResolver.resolveDbUsername(root));
+        if (profile == Profile.allinone) {
+            // The all-in-one stack carries its own postgres/redis — skip the
+            // shared infra compose to avoid a duplicate database.
+            return compose.upStack(profile, env);
+        }
         int infra = compose.upInfra(List.of("postgres", "redis"), Map.of("DB_PASSWORD", password.value()));
         if (infra != 0) {
             return infra;
@@ -46,6 +54,6 @@ public class UpCommand implements Callable<Integer> {
         if (migrate != 0) {
             System.err.println("flywayMigrate returned " + migrate);
         }
-        return compose.upStack(profile);
+        return compose.upStack(profile, env);
     }
 }

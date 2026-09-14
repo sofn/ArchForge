@@ -1,0 +1,7 @@
+#!/command/with-contenv sh
+# server-web (:8081) — C-end API.
+exec java \
+    --enable-preview \
+    --enable-native-access=ALL-UNNAMED \
+    ${JAVA_WEB_OPTS:--XX:MaxRAMPercentage=30.0} \
+    -jar /app/server-web.jar

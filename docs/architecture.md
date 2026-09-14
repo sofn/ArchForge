@@ -35,6 +35,29 @@ Browser :3000 ─────────► server-web  :8081     errors as Pro
 
 Do not point Admin at `:8081` or Web at `:8080`.
 
+## Deployment topology
+
+Two shapes (see [ADR-0006](adr/0006-dual-process-topology.md) — packaging unites, processes do not):
+
+**All-in-one** (`archforge:allinone`, `./archforge build --allinone` + `up -p allinone`) —
+one container, s6-overlay supervises four processes; postgres/redis stay external:
+
+```
+                    ┌──────────────── archforge:allinone ───────────────┐
+Browser ──:80─────►│ nginx ──► next.js :3000 ──BFF──► server-web :8081 │
+Browser ──:8088───►│ nginx ──► admin SPA (static)                     │
+        :8088/api─►│ nginx ──► server-admin :8080                     │
+                    └──────────────────────────────────────────────────┘
+```
+
+- `:80` → C-end web; the browser never sees `:8081` (same-origin BFF proxy).
+- `:8088` → admin console; `:8088/api/*` strips prefix → `server-admin` (vite-parity).
+- `:8080` / `:8081` / `:3000` are container-internal only.
+
+**Split** (`docker-compose.prod.yml` / `staging`): `backend` (:8080) +
+`backend-web` (:8081) + `frontend` (admin SPA) as separate services —
+independent scale/release; the C-end web deploys its own Next.js.
+
 ## Backend modules
 
 See `repos.yaml` for the full list. Grouping:

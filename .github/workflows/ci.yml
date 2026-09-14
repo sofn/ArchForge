@@ -164,14 +164,30 @@ jobs:
           path: ArchForge/archforge-server-admin/build/libs/archforge-server-admin.jar
           retention-days: 1
 
+      - name: Upload server-web jar (for smoke job)
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: server-web-jar
+          path: ArchForge/archforge-server-web/build/libs/archforge-server-web.jar
+          retention-days: 1
+
   # Startup smoke: a green build does not prove the app boots (missing env,
   # Flyway failure, bad config all surface only at runtime). Boot the real jar
   # against the compose infra and require /actuator/health = UP.
   startup-smoke:
-    name: Startup Smoke (server-admin)
+    name: Startup Smoke (${{ matrix.module }})
     runs-on: ubuntu-latest
     needs: build-and-test
     timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - module: server-admin
+            port: 8080
+          - module: server-web
+            port: 8081
     defaults:
       run:
         working-directory: ArchForge
@@ -190,11 +206,11 @@ jobs:
           distribution: zulu
           java-version: 25
 
-      - name: Download server-admin jar
+      - name: Download ${{ matrix.module }} jar
         uses: actions/download-artifact@v4
         with:
-          name: server-admin-jar
-          path: ArchForge/archforge-server-admin/build/libs
+          name: ${{ matrix.module }}-jar
+          path: ArchForge/archforge-${{ matrix.module }}/build/libs
 
       - name: Start infra (PostgreSQL + Redis)
         run: docker compose -f docker/docker-compose.infra.yml up -d --wait
@@ -202,10 +218,10 @@ jobs:
       - name: Boot and poll health
         run: |
           java --enable-preview --enable-native-access=ALL-UNNAMED \
-            -jar archforge-server-admin/build/libs/archforge-server-admin.jar > /tmp/app.log 2>&1 &
+            -jar archforge-${{ matrix.module }}/build/libs/archforge-${{ matrix.module }}.jar > /tmp/app.log 2>&1 &
           APP_PID=$!
           for i in $(seq 1 60); do
-            if curl -sf http://localhost:8080/actuator/health | grep -q '"status":"UP"'; then
+            if curl -sf http://localhost:${{ matrix.port }}/actuator/health | grep -q '"status":"UP"'; then
               echo "startup smoke: UP after ~$((i * 2))s"
               kill "$APP_PID" || true
               exit 0

@@ -16,15 +16,28 @@ Global flags: `--verbose` echoes every external command; `-h/--help` and
 ./archforge dev                 # infra deps + detached bootRun ×2 + pnpm dev ×2
                                 # (pids in run/*.pid, logs in logs/)
 ./archforge up                  # containerized full stack: deps + migrate + app
-                                # (-p dev|fulljre|jlink|native|staging|prod)
+                                # (-p dev|allinone|fulljre|jlink|native|staging|prod)
 ./archforge down [-v]           # kill dev processes + stop containers
                                 # (-v also drops named volumes → data loss)
 ./archforge status              # dev pid liveness + compose ps (infra + stack)
 ./archforge logs [-f] [name]    # tail logs/*.log; --infra / --stack for containers
 ./archforge restart             # stop + start the dev stack
-./archforge doctor              # check JDK/docker/compose/pnpm/node/ports/.env
+./archforge doctor              # check JDK/docker/compose/pnpm/node/ports/repos/.env
 ./archforge build [-p tag]      # bootBuildImage backend + docker build frontends
+./archforge build --allinone    # single-image build → archforge:allinone
 ```
+
+### All-in-one image (`archforge:allinone`)
+
+`build --allinone` stages `docker/allinone/context/` (both bootJars +
+ArchForgeAdmin `dist` + ArchForgeWeb `.next/standalone`) then builds one image
+running **nginx + server-admin + server-web + next.js** under s6-overlay.
+`up -p allinone` starts it with external postgres/redis
+(`docker/docker-compose.allinone.yml`).
+
+Ports: `:80` → C-end web (nginx → next.js), `:8088` → admin console
+(nginx → SPA; `/api/*` → `server-admin:8080`). Browser never sees `:8081`
+— web API calls stay on the same-origin BFF proxy inside next.js.
 
 ### `db` — dev database (postgres container)
 

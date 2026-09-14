@@ -36,3 +36,4 @@ test additions.
 | 0003 | [Shared contracts live in common-base, never infrastructure](0003-contracts-in-common-base.md) | accepted |
 | 0004 | [NullAway enforced at ERROR on all source sets](0004-nullaway-error.md) | accepted |
 | 0005 | [Service placement: api.service + internal.service, runtime via ports](0005-service-placement.md) | accepted |
+| 0006 | [Dual-process topology + all-in-one packaging](0006-dual-process-topology.md) | accepted |

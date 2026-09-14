@@ -60,3 +60,4 @@ backup/
 scripts/node_modules/
 # ip2region xdb runtime cache (downloaded on demand, see arch-forge.ip-region)
 data/
+docker/allinone/context/

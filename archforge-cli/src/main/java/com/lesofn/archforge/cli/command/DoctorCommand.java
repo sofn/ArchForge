@@ -26,11 +26,15 @@ public class DoctorCommand implements Callable<Integer> {
         checkJava(runner);
         checkTool(runner, List.of("docker", "version", "--format", "{{.Server.Version}}"), "docker daemon");
         checkTool(runner, List.of("docker", "compose", "version", "--short"), "docker compose plugin");
-        checkTool(runner, List.of("pnpm", "--version"), "pnpm");
-        checkTool(runner, List.of("node", "--version"), "node");
+        checkToolVersion(runner, List.of("pnpm", "--version"), "pnpm", 9);
+        checkToolVersion(runner, List.of("node", "--version"), "node", 22);
         checkFile(root.resolve(".env"), ".env (run `archforge init --write` to create)");
+        checkFile(ProjectPaths.adminRepo(root), "ArchForgeAdmin repo (sibling checkout, admin-ui)");
+        checkFile(ProjectPaths.webRepo(root), "ArchForgeWeb repo (sibling checkout, next.js)");
         checkPort(8080, "server-admin");
         checkPort(8081, "server-web");
+        checkPort(8848, "admin-ui dev");
+        checkPort(3000, "web-ui next.js dev");
 
         System.out.println();
         if (failures == 0) {
@@ -82,6 +86,44 @@ public class DoctorCommand implements Callable<Integer> {
             }
         } catch (IllegalStateException e) {
             fail(label + " not found on PATH");
+        }
+    }
+
+    /** Like {@link #checkTool} plus a minimum major-version check (node>=22, pnpm>=9). */
+    private void checkToolVersion(ProcessRunner runner, List<String> command, String label, int minMajor) {
+        try {
+            ProcessRunner.RunResult result = runner.runCapture(command, Path.of("."));
+            if (result.exitCode() != 0) {
+                fail(label + " not runnable (exit " + result.exitCode() + ")");
+                return;
+            }
+            int major = parseLeadingInt(result.stdout().trim());
+            if (major >= minMajor) {
+                ok(label + " " + result.stdout().trim());
+            } else {
+                fail(label + " " + result.stdout().trim() + " — need >= " + minMajor);
+            }
+        } catch (IllegalStateException e) {
+            fail(label + " not found on PATH");
+        }
+    }
+
+    private static int parseLeadingInt(String version) {
+        StringBuilder digits = new StringBuilder();
+        for (int i = 0; i < version.length(); i++) {
+            char c = version.charAt(i);
+            if (!Character.isDigit(c)) {
+                if (digits.length() > 0) {
+                    break;
+                }
+                continue;
+            }
+            digits.append(c);
+        }
+        try {
+            return Integer.parseInt(digits.toString());
+        } catch (NumberFormatException e) {
+            return 0;
         }
     }
 

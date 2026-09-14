@@ -1,0 +1,76 @@
+# Separate project name: this stack owns its own postgres/redis and must not
+# adopt (or be adopted by) the shared `docker` project used by infra/dev files.
+name: archforge-allinone
+
+# docker-compose.allinone.yml — single-container product delivery.
+# One `app` container runs nginx + server-admin + server-web + next.js (s6-overlay).
+# postgres/redis stay external here so data lifecycles independent of app image.
+#
+# Build the image first:  ./archforge build --allinone
+# Then:                   ./archforge up -p allinone   (or: docker compose -f docker-compose.allinone.yml up -d)
+#
+#   :80   → C-end web (next.js)
+#   :8088 → admin console (SPA + /api → server-admin)
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: ${DB_USERNAME:-archforge}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-archforge}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  app:
+    image: archforge:allinone
+    build:
+      context: ./allinone
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "${WEB_PORT:-80}:80"
+      - "${ADMIN_PORT:-8088}:8088"
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      REDIS_HOST: redis
+      DB_MASTER_URL: jdbc:postgresql://postgres:5432/archforge
+      DB_USERNAME: ${DB_USERNAME:-archforge}
+      DB_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      ARCH_FORGE_RSA_PRIVATE_KEY: ${ARCH_FORGE_RSA_PRIVATE_KEY:?Set ARCH_FORGE_RSA_PRIVATE_KEY (archforge init --write)}
+      WEB_PUBLIC_URL: ${NEXT_PUBLIC_SITE_URL:-http://localhost}
+      # prod rejects '*' — the admin console origin. Remap ADMIN_PORT? set this too.
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:8088}
+      NEXT_PUBLIC_API_BASE_URL: http://localhost:8081
+      NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-http://localhost}
+      FILE_STORAGE_TYPE: ${FILE_STORAGE_TYPE:-local}
+      # S3 placeholders resolve eagerly even when type=local — keep them parseable.
+      S3_ENDPOINT: ${S3_ENDPOINT:-http://localhost:9000}
+      S3_ACCESS_KEY: ${S3_ACCESS_KEY:-unused}
+      S3_SECRET_KEY: ${S3_SECRET_KEY:-unused}
+      S3_BUCKET: ${S3_BUCKET:-archforge}
+    volumes:
+      - ./logs:/app/logs
+    restart: unless-stopped
+
+volumes:
+  postgres-data:
