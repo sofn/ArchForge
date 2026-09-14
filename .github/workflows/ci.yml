@@ -161,7 +161,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: server-admin-jar
-          path: ArchForge/archforge-server-admin/build/libs/*.jar
+          path: ArchForge/archforge-server-admin/build/libs/archforge-server-admin.jar
           retention-days: 1
 
   # Startup smoke: a green build does not prove the app boots (missing env,
@@ -202,7 +202,7 @@ jobs:
       - name: Boot and poll health
         run: |
           java --enable-preview --enable-native-access=ALL-UNNAMED \
-            -jar archforge-server-admin/build/libs/*.jar > /tmp/app.log 2>&1 &
+            -jar archforge-server-admin/build/libs/archforge-server-admin.jar > /tmp/app.log 2>&1 &
           APP_PID=$!
           for i in $(seq 1 60); do
             if curl -sf http://localhost:8080/actuator/health | grep -q '"status":"UP"'; then
