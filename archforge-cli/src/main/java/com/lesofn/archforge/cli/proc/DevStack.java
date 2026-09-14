@@ -60,10 +60,11 @@ public final class DevStack {
         } catch (IOException e) {
             throw new IllegalStateException("Cannot create logs/ or run/ directories", e);
         }
+        Map<String, String> env = loadDotEnv(root);
         for (Service service : services(root)) {
             ensureDependencies(runner, service);
-            Process process = runner.startDetached(service.command(), service.workingDir(), new java.io.File(service
-                    .logFile()));
+            Process process = runner.startDetached(
+                    service.command(), service.workingDir(), new java.io.File(service.logFile()), env);
             writePid(root, service.name(), process.pid());
             System.out.println("started " + service.name() + " (pid " + process.pid() + ") → " + service.logFile());
         }
@@ -79,9 +80,23 @@ public final class DevStack {
             if (handle.isEmpty()) {
                 continue;
             }
-            handle.get().destroy();
+            // Kill the whole tree: `gradlew bootRun` forks a worker JVM and
+            // pnpm spawns vite/next grandchildren — the wrapper's death alone
+            // would orphan them and leave ports bound. Node wrappers may
+            // swallow SIGTERM, so escalate to forcible kill after a grace wait.
+            ProcessHandle process = handle.get();
+            List<ProcessHandle> tree = new java.util.ArrayList<>();
+            process.descendants().forEach(tree::add);
+            tree.add(process);
+            tree.forEach(ProcessHandle::destroy);
+            try {
+                process.onExit().get(5, java.util.concurrent.TimeUnit.SECONDS);
+            } catch (Exception ignored) {
+                // still alive or interrupted — escalate below
+            }
+            tree.forEach(ProcessHandle::destroyForcibly);
             stopped++;
-            System.out.println("stopped " + service.name() + " (pid " + handle.get().pid() + ")");
+            System.out.println("stopped " + service.name() + " (pid " + process.pid() + ")");
         }
         clearPids(root);
         if (stopped == 0) {
@@ -112,6 +127,32 @@ public final class DevStack {
 
     public static Path runDir(Path root) {
         return root.resolve("run");
+    }
+
+    /** Loads .env so detached bootRun processes can resolve ${DB_PASSWORD} etc. */
+    private static Map<String, String> loadDotEnv(Path root) {
+        Path envFile = ProjectPaths.envFile(root);
+        if (!Files.exists(envFile)) {
+            System.out.println("note: no .env found — dev processes inherit the current shell env only.");
+            return Map.of();
+        }
+        try {
+            Map<String, String> env = new java.util.HashMap<>();
+            for (String line : Files.readAllLines(envFile, StandardCharsets.UTF_8)) {
+                String trimmed = line.trim();
+                if (trimmed.isEmpty() || trimmed.startsWith("#")) {
+                    continue;
+                }
+                int eq = trimmed.indexOf('=');
+                if (eq > 0) {
+                    env.put(trimmed.substring(0, eq).trim(), trimmed.substring(eq + 1).trim());
+                }
+            }
+            return env;
+        } catch (IOException e) {
+            System.out.println("note: could not read .env: " + e.getMessage());
+            return Map.of();
+        }
     }
 
     private static void ensureDependencies(ProcessRunner runner, Service service) {

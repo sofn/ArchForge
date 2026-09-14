@@ -23,6 +23,8 @@ tasks.jar {
 }
 
 tasks.bootRun {
+    // Gradle 9 up-to-date checks can skip bootRun; an app must always run.
+    outputs.upToDateWhen { false }
     jvmArgs(
         "--enable-preview",
         "--enable-native-access=ALL-UNNAMED",

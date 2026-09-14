@@ -109,12 +109,17 @@ public class ProcessRunner {
     }
 
     public Process startDetached(List<String> command, Path workingDir, File logFile) {
+        return startDetached(command, workingDir, logFile, Map.of());
+    }
+
+    public Process startDetached(List<String> command, Path workingDir, File logFile, Map<String, String> extraEnv) {
         echo(command, workingDir);
         try {
             ProcessBuilder builder = new ProcessBuilder(new ArrayList<>(command));
             if (workingDir != null) {
                 builder.directory(workingDir.toFile());
             }
+            builder.environment().putAll(extraEnv);
             builder.redirectErrorStream(true);
             if (logFile != null) {
                 Path parent = logFile.toPath().toAbsolutePath().getParent();

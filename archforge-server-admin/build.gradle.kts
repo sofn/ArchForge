@@ -38,6 +38,8 @@ tasks.jar {
 
 // JDK 25: enable preview features (StructuredTaskScope) + suppress Netty native-access warning
 tasks.bootRun {
+    // Gradle 9 up-to-date checks can skip bootRun; an app must always run.
+    outputs.upToDateWhen { false }
     jvmArgs(
         "--enable-preview",
         "--enable-native-access=ALL-UNNAMED",
