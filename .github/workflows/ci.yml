@@ -234,18 +234,24 @@ jobs:
     timeout-minutes: 30
     env:
       OWASP_NVD_API_KEY: ${{ secrets.OWASP_NVD_API_KEY }}
-    if: ${{ env.OWASP_NVD_API_KEY != '' }}
     steps:
+      - name: Skip notice (no NVD API key)
+        if: env.OWASP_NVD_API_KEY == ''
+        run: echo "OWASP_NVD_API_KEY secret not configured — skipping CVE scan"
       - uses: actions/checkout@v4
+        if: env.OWASP_NVD_API_KEY != ''
       - uses: actions/setup-java@v4
+        if: env.OWASP_NVD_API_KEY != ''
         with:
           distribution: zulu
           java-version: '25'
       - uses: gradle/actions/setup-gradle@v4
+        if: env.OWASP_NVD_API_KEY != ''
       - name: Run dependency check
+        if: env.OWASP_NVD_API_KEY != ''
         run: ./gradlew dependencyCheckAnalyze --no-daemon
       - name: Upload reports
-        if: always()
+        if: always() && env.OWASP_NVD_API_KEY != ''
         uses: actions/upload-artifact@v4
         with:
           name: dependency-check-reports
