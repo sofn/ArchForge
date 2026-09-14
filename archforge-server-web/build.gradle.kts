@@ -67,6 +67,16 @@ tasks.withType<Test> {
     environment("SPRING_PROFILES_ACTIVE", "test")
 }
 
+// Exports the live springdoc OpenAPI document to build/openapi/live-openapi.json.
+// Consumed by :archforge-server-admin:generateOpenApi which merges both exports into spec/openapi.yaml.
+tasks.register<Test>("exportOpenApi") {
+    description = "Exports server-web's live OpenAPI document to build/openapi/live-openapi.json."
+    group = "contract"
+    testClassesDirs = sourceSets["test"].output.classesDirs
+    classpath = sourceSets["test"].runtimeClasspath
+    filter { includeTestsMatching("com.lesofn.archforge.server.web.contract.OpenApiSnapshotTest") }
+}
+
 tasks.named("collectReachabilityMetadata") {
     enabled = false
 }

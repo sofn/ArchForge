@@ -170,9 +170,11 @@ archforge/
   `server-web` (port 8081).
 - **Do not invent deleted APIs**: `/system/menu` and `/system/role` no longer
   exist (see `repos.yaml` → `contract.deleted_paths`).
-- **Contract sync rule**: whenever the backend API changes (paths, parameters,
-  request/response schemas, auth), update `spec/openapi.yaml` in the same
-  change. CI diffs the live export against it and blocks breaking changes.
+- **Contract sync rule**: `spec/openapi.yaml` is a **generated snapshot** —
+  never hand-edit it. After backend API changes (paths, parameters,
+  request/response schemas, auth) run `./gradlew generateOpenApi` and commit
+  the regenerated file in the same change. The task merges live springdoc
+  exports from server-admin and server-web; CI regenerates and fails on diff.
 - **Example modules are not the product.** `archforge-example-task` is an
   unlinked in-tree example (`settings.gradle.kts` dynamic include). Do not
   add it to `server-admin` (`api(project)`, `scanBasePackages`, a second

@@ -104,16 +104,27 @@ jobs:
       - name: Error-code registration check (contract sync)
         run: python3 scripts/check-error-codes.py docs/specs/error-codes.md
 
-      - name: Export live OpenAPI document
-        run: ./gradlew :archforge-server-admin:test --tests '*OpenApiSnapshotTest*' --no-daemon
+      # spec/openapi.yaml is GENERATED from both servers' live springdoc exports
+      # (server-admin + server-web merged). Regenerate it, then diff — any drift
+      # means the committed snapshot was hand-edited or annotations changed
+      # without regenerating. Both fail.
+      - name: Regenerate contract snapshot
+        run: ./gradlew generateOpenApi --no-daemon
+
+      - name: Contract freshness gate (spec must match regenerated output)
+        run: |
+          if ! git diff --exit-code spec/openapi.yaml; then
+            echo "::error::spec/openapi.yaml is stale or hand-edited. Run ./gradlew generateOpenApi and commit the result."
+            exit 1
+          fi
 
       - name: Install oasdiff
         run: curl -sSf https://raw.githubusercontent.com/oasdiff/oasdiff/main/install.sh | sh
 
-      # Breaking-change gate: compare this build's live export against the
-      # contract as it stands on the target branch. Using the *published*
-      # contract as base (instead of the working copy) keeps the gate honest —
-      # editing spec/openapi.yaml in the same PR can no longer hide a break.
+      # Breaking-change gate: compare the regenerated committed contract against
+      # the contract as it stands on the target branch. Using the *published*
+      # contract as base keeps the gate honest — the PR's own spec diff cannot
+      # hide a break.
       - name: Contract diff (breaking changes fail)
         run: |
           BASE_REF="${{ github.base_ref }}"
@@ -122,23 +133,11 @@ jobs:
           if git cat-file -e "origin/${BASE_REF}:spec/openapi.yaml" 2>/dev/null; then
             git show "origin/${BASE_REF}:spec/openapi.yaml" > /tmp/base-openapi.yaml
             oasdiff breaking /tmp/base-openapi.yaml \
-              archforge-server-admin/build/openapi/live-openapi.json \
+              spec/openapi.yaml \
               --format text
           else
             echo "::warning::no spec/openapi.yaml on origin/${BASE_REF} yet — skipping breaking-change diff"
           fi
-
-      # Consistency gate: the committed contract must track the implementation.
-      # ADVISORY during the migration grace period — the contract and the live
-      # export are known to have drifted (coverage ~20%). Reconcile
-      # spec/openapi.yaml against the live export, then drop continue-on-error
-      # to make this a hard gate.
-      - name: Contract vs implementation consistency (advisory)
-        continue-on-error: true
-        run: |
-          oasdiff diff spec/openapi.yaml \
-            archforge-server-admin/build/openapi/live-openapi.json \
-            --format text --fail-on ERR
 
       - name: Upload coverage report
         if: always()

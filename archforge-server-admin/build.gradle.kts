@@ -80,6 +80,30 @@ tasks.withType<Test> {
     environment("SPRING_PROFILES_ACTIVE", "test")
 }
 
+// Exports the live springdoc OpenAPI document to build/openapi/live-openapi.json.
+val exportOpenApi = tasks.register<Test>("exportOpenApi") {
+    description = "Exports server-admin's live OpenAPI document to build/openapi/live-openapi.json."
+    group = "contract"
+    testClassesDirs = sourceSets["test"].output.classesDirs
+    classpath = sourceSets["test"].runtimeClasspath
+    filter { includeTestsMatching("com.lesofn.archforge.server.admin.contract.OpenApiSnapshotTest") }
+}
+
+// Merges the server-admin + server-web live exports into the committed snapshot spec/openapi.yaml.
+// spec/openapi.yaml is GENERATED — do not hand-edit; change backend annotations and re-run this task.
+tasks.register<JavaExec>("generateOpenApi") {
+    description = "Regenerates spec/openapi.yaml from both servers' live springdoc exports."
+    group = "contract"
+    dependsOn(exportOpenApi, ":archforge-server-web:exportOpenApi")
+    classpath = sourceSets["test"].runtimeClasspath
+    mainClass.set("com.lesofn.archforge.server.admin.contract.OpenApiSpecWriter")
+    args(
+        layout.buildDirectory.file("openapi/live-openapi.json").get().asFile,
+        File(rootDir, "archforge-server-web/build/openapi/live-openapi.json"),
+        File(rootDir, "spec/openapi.yaml")
+    )
+}
+
 // GraalVM Native Image 配置
 graalvmNative {
     binaries {
