@@ -111,7 +111,7 @@ api("org.lionsoul:ip2region:3.3.7")
 
         // CLI
         api("info.picocli:picocli:4.7.6")
-        api("info.picocli:picocli-shell-jline3:4.7.6")
+        api("info.picocli:picocli-codegen:4.7.6")
     }
 }
 

@@ -164,16 +164,19 @@ What CI enforces on every PR ([ci.yml](.github/workflows/ci.yml)):
 
 ```bash
 ./archforge --help
-./archforge init --write          # .env secrets + postgres/redis + Flyway migrate (dev)
-./archforge infra up              # just postgres + redis via docker/docker-compose.infra.yml
-./archforge db backup
-./archforge skills install --tool claude
-./archforge --mcp                 # Phase-1 MCP stdio server
+./archforge init --write          # one-time: .env secrets + deps + Flyway migrate
+./archforge dev                   # local dev stack (detached; logs/ + run/*.pid)
+./archforge up                    # containerized full stack
+./archforge status | doctor       # what's running / env health check
+./archforge db backup | db restore <file>
+./archforge skills install claude
+./archforge mcp                   # MCP stdio server
 ```
 
 See [archforge-cli/README.md](archforge-cli/README.md) for the full command reference.
 
-If the fat jar is missing, `./archforge` builds `:archforge-cli:shadowJar` first.
+The `./archforge` wrapper rebuilds the CLI jar when sources changed and
+fails fast if `java` is older than JDK 25.
 
 Windows: run `archforge.bat` instead — same commands (`archforge --help`, `archforge init --write`, …). It builds the jar via `gradlew.bat` on first run and needs `java` on `PATH`.
 

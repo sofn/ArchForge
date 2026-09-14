@@ -15,16 +15,35 @@ import org.jspecify.annotations.Nullable;
  */
 public class ProcessRunner {
 
+    private static volatile boolean verbose;
+
+    /** Global `-v/--verbose`: echo every external command before running it. */
+    public static void setVerbose(boolean value) {
+        verbose = value;
+    }
+
+    private static void echo(List<String> command, Path workingDir) {
+        if (verbose) {
+            System.out.println("+ (cd " + workingDir + " && " + String.join(" ", command) + ")");
+        }
+    }
+
     public int run(List<String> command, Path workingDir) {
         return run(command, workingDir, Map.of(), false);
     }
 
     public int run(List<String> command, Path workingDir, Map<String, String> extraEnv, boolean inheritIo) {
-        return run(command, workingDir, extraEnv, inheritIo, null);
+        return run(command, workingDir, extraEnv, inheritIo, null, null);
     }
 
     public int run(List<String> command, Path workingDir, Map<String, String> extraEnv, boolean inheritIo,
             @Nullable Path stdoutFile) {
+        return run(command, workingDir, extraEnv, inheritIo, stdoutFile, null);
+    }
+
+    public int run(List<String> command, Path workingDir, Map<String, String> extraEnv, boolean inheritIo,
+            @Nullable Path stdoutFile, @Nullable Path stdinFile) {
+        echo(command, workingDir);
         try {
             ProcessBuilder builder = new ProcessBuilder(new ArrayList<>(command));
             if (workingDir != null) {
@@ -42,6 +61,9 @@ public class ProcessRunner {
                 builder.redirectError(ProcessBuilder.Redirect.INHERIT);
             } else {
                 builder.redirectErrorStream(true);
+            }
+            if (stdinFile != null) {
+                builder.redirectInput(stdinFile.toFile());
             }
             Process process = builder.start();
             if (!inheritIo && stdoutFile == null) {
@@ -67,6 +89,7 @@ public class ProcessRunner {
 
     /** Runs silently and captures stdout — for checks like {@code compose ps -q}. */
     public RunResult runCapture(List<String> command, Path workingDir) {
+        echo(command, workingDir);
         try {
             ProcessBuilder builder = new ProcessBuilder(new ArrayList<>(command));
             if (workingDir != null) {
@@ -86,6 +109,7 @@ public class ProcessRunner {
     }
 
     public Process startDetached(List<String> command, Path workingDir, File logFile) {
+        echo(command, workingDir);
         try {
             ProcessBuilder builder = new ProcessBuilder(new ArrayList<>(command));
             if (workingDir != null) {

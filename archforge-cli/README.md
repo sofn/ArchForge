@@ -1,86 +1,76 @@
 # archforge-cli
 
-Developer CLI for the ArchForge backend — picocli + Gradle Shadow fat jar,
-no Spring runtime. Invoked via the repo-root launcher:
+Developer CLI for the ArchForge workspace. Launch with `./archforge` (bash)
+or `archforge.bat` (Windows) at the repo root — the wrapper rebuilds
+`archforge-cli.jar` automatically when sources changed and checks JDK ≥ 25.
+
+Global flags: `--verbose` echoes every external command; `-h/--help` and
+`-V/--version` (from the jar manifest) work everywhere. Bare command groups
+(`db`, `infra`, `skills`) print help and exit 0.
+
+## Commands
 
 ```bash
-./archforge <command>          # Linux/macOS — builds the jar on first run
-archforge.bat <command>        # Windows — same commands via gradlew.bat
+./archforge init --write        # one-time setup: .env secrets + deps + flyway migrate
+                                # (no --write = dry-run, nothing is persisted)
+./archforge dev                 # infra deps + detached bootRun ×2 + pnpm dev ×2
+                                # (pids in run/*.pid, logs in logs/)
+./archforge up                  # containerized full stack: deps + migrate + app
+                                # (-p dev|fulljre|jlink|native|staging|prod)
+./archforge down [-v]           # kill dev processes + stop containers
+                                # (-v also drops named volumes → data loss)
+./archforge status              # dev pid liveness + compose ps (infra + stack)
+./archforge logs [-f] [name]    # tail logs/*.log; --infra / --stack for containers
+./archforge restart             # stop + start the dev stack
+./archforge doctor              # check JDK/docker/compose/pnpm/node/ports/.env
+./archforge build [-p tag]      # bootBuildImage backend + docker build frontends
 ```
 
-## Command reference
-
-### `init` — first-time setup
+### `db` — dev database (postgres container)
 
 ```bash
-./archforge init --write                 # recommended for a fresh clone
-./archforge init --write --profile dev   # dev is the default
+./archforge db init              # postgres up + password sync + flyway migrate
+./archforge db migrate           # apply pending Flyway migrations (alias: update)
+./archforge db backup            # pg_dump → backup/db/archforge_<ts>.sql
+./archforge db restore <file>    # restore dump into the app db (asks YES, -y skips)
+./archforge db shell             # interactive psql
 ```
 
-Does three things for `dev`:
+User/db names resolve from `DB_USERNAME` / `DB_NAME` (env → .env → `archforge`).
 
-1. **Secrets** — generates `JWT_SECRET`, `DB_PASSWORD`, RSA key pair,
-   `AES_KEY`. `--write` persists missing keys into `./.env`
-   (idempotent: existing keys are kept; without `--write` it is a dry-run).
-2. **Infra** — `docker compose -f docker/docker-compose.infra.yml up -d --wait`
-   for postgres + redis, then applies Flyway migrations
-   (`:archforge-server-admin:flywayMigrate`).
-3. **DB password alignment** — resolves `DB_PASSWORD` (flag/env/.env/generated)
-   and syncs it into the live postgres role via `ALTER USER`, so a reused
-   data volume can never silently keep an old password.
-
-### `infra` — dependency containers only
+### `infra` — dependency containers only (docker-compose.infra.yml)
 
 ```bash
 ./archforge infra up                     # postgres + redis, waits healthy
 ./archforge infra up --db-password xxx   # explicit password override
+./archforge infra status                 # compose ps
+./archforge infra logs [-f]              # container logs
 ./archforge infra stop                   # pause
-./archforge infra down                   # remove containers
-./archforge infra clean                  # remove containers AND volumes (asks YES, or --yes)
+./archforge infra down [-v] [-y]         # remove containers (-v: volumes too, asks YES)
+                                         # (hidden alias: infra clean = down --volumes)
 ```
 
 Password resolution order: `--db-password` > `DB_PASSWORD` env > `.env` >
 generated 16-char (written to `.env`, with a WARN). After `up` the resolved
-password is synced into postgres — see `init` above.
+password is synced into the postgres role — named volumes keep the first-init
+password otherwise. Non-generated passwords print masked (`abcd…wxyz`).
 
-### `db` — database operations
+### `skills` — AI tool snippets
 
 ```bash
-./archforge db init        # start postgres + apply migrations
-./archforge db update      # apply latest Flyway migrations only
-./archforge db backup      # pg_dump -> backup/db/archforge_<timestamp>.sql
-./archforge db recovery --file backup/db/xxx.sql          # interactive confirm
-./archforge db recovery --file backup/db/xxx.sql --yes    # automation
+./archforge skills tools          # tool → target file mapping
+./archforge skills install claude # append skill block (positional)
+./archforge skills remove codex
 ```
 
-### `up` / `down` — full stack (app + deps via compose)
+(`skills update` and `skills list` remain as hidden aliases.)
+
+### Misc
 
 ```bash
-./archforge up [--profile dev]   # dev = infra only + instructions
-./archforge down [--profile dev]
-```
-
-### `docker` — business images
-
-```bash
-./archforge docker up [--profile prod]   # deps + migrate + app image
-./archforge docker down [--profile prod]
-./archforge build [--profile prod]       # build images
-```
-
-### `skills` — install agent skills into AI tools
-
-```bash
-./archforge skills list                      # supported tools
-./archforge skills install --tool claude     # append managed block
-./archforge skills update --tool claude      # re-apply snippets
-./archforge skills remove --tool claude      # remove the block
-```
-
-### MCP server
-
-```bash
-./archforge --mcp    # stdio MCP server exposing CLI operations to AI agents
+./archforge mcp                   # MCP stdio server (same as root --mcp)
+./archforge generate-completion bash|zsh   # shell completion script
+./archforge help <command>        # same as <command> --help
 ```
 
 ## Notes
@@ -89,4 +79,6 @@ password is synced into postgres — see `init` above.
   it via `--env-file` automatically.
 - After `init`/`infra up`, load the env vars before `bootRun`/`java -jar`
   (see root README Quick start for Linux/Windows syntax).
+- `dev` processes write `run/<name>.pid` + `logs/<name>.log`; `down` uses the
+  pid files, so ports are actually freed.
 - Building: `./gradlew :archforge-cli:shadowJar`.

@@ -10,7 +10,7 @@ dependencies {
     implementation(project(":archforge-common:archforge-common-error"))
 
     implementation("info.picocli:picocli")
-    implementation("info.picocli:picocli-shell-jline3")
+    implementation("info.picocli:picocli-codegen")
     implementation("tools.jackson.dataformat:jackson-dataformat-yaml")
     implementation("org.slf4j:slf4j-api")
     implementation("org.slf4j:slf4j-simple")
@@ -26,6 +26,7 @@ tasks.shadowJar {
     mergeServiceFiles()
     manifest {
         attributes["Main-Class"] = "com.lesofn.archforge.cli.ArchForgeCli"
+        attributes["Implementation-Version"] = project.version.toString()
     }
 }
 

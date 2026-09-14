@@ -14,13 +14,14 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
 @Command(mixinStandardHelpOptions = true, name = "init",
-        description = "Generate credentials and optionally start local dependencies")
+        description = "One-time setup: generate secrets (dry-run unless --write), patch yaml, " +
+                "start postgres/redis, apply Flyway migrations")
 public class InitCommand implements Callable<Integer> {
 
     @Option(names = "--profile", defaultValue = "dev", description = "dev|test|staging|prod")
     String profile;
 
-    @Option(names = "--write", description = "Persist generated secrets into .env")
+    @Option(names = "--write", description = "Persist generated secrets into .env (default is dry-run)")
     boolean write;
 
     private final Path repoRoot;
@@ -52,15 +53,14 @@ public class InitCommand implements Callable<Integer> {
             DbPasswordResolver.Result password = DbPasswordResolver.resolve(repoRoot, null);
             DbPasswordResolver.printEnvHint(password);
             ComposeSupport compose = new ComposeSupport(processRunner, repoRoot);
-            int infra = compose.up(
-                    "dev", List.of("postgres", "redis"), Map.of("DB_PASSWORD", password.value()));
+            int infra = compose.upInfra(List.of("postgres", "redis"), Map.of("DB_PASSWORD", password.value()));
             if (infra != 0) {
                 return infra;
             }
-            compose.syncDbPassword(
-                    "dev", DbPasswordResolver.resolveDbUsername(repoRoot), password.value());
+            compose.syncDbPassword(DbPasswordResolver.resolveDbUsername(repoRoot), password.value());
             int migrate = processRunner.run(
-                    List.of("./gradlew", ":archforge-server-admin:flywayMigrate", "-x", "test"), repoRoot);
+                    List.of("./gradlew", ":archforge-server-admin:flywayMigrate", "-x", "test"),
+                    repoRoot, Map.of(), true);
             if (migrate != 0) {
                 System.err.println("flywayMigrate returned " + migrate + " (ok if Flyway plugin is not wired yet).");
             }

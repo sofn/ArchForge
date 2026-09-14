@@ -4,6 +4,7 @@
 .settings/
 lib/
 logs/
+run/
 target/
 .DS_Store
 .metadata

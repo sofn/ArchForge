@@ -90,19 +90,46 @@ public final class DbPasswordResolver {
         return "archforge";
     }
 
+    /** DB_NAME resolution: env → .env → {@code archforge}. */
+    public static String resolveDbName(Path repoRoot) {
+        String env = System.getenv("DB_NAME");
+        if (env != null && !env.isBlank()) {
+            return env;
+        }
+        try {
+            String fromFile = SecretGenerator.readEnv(ProjectPaths.envFile(repoRoot)).get("DB_NAME");
+            if (fromFile != null && !fromFile.isBlank()) {
+                return fromFile;
+            }
+        } catch (IOException ignored) {
+            // fall through to default
+        }
+        return "archforge";
+    }
+
     /** Prints the app-startup env vars, Windows and Linux syntax. */
     public static void printEnvHint(Result result) {
+        // Mask the password unless we generated it this run — a user-supplied
+        // secret must not land in terminal scrollback or CI logs.
+        String shown = result.generated() ? result.value() : mask(result.value());
         System.out.println();
         System.out.println("DB credentials — source: " + result.source());
         System.out.println("Set before starting the app (java -jar / bootRun):");
-        System.out.println("  Linux/macOS : export DB_PASSWORD=" + result.value());
-        System.out.println("  Windows cmd : set DB_PASSWORD=" + result.value());
-        System.out.println("  PowerShell  : $env:DB_PASSWORD=\"" + result.value() + "\"");
+        System.out.println("  Linux/macOS : export DB_PASSWORD=" + shown);
+        System.out.println("  Windows cmd : set DB_PASSWORD=" + shown);
+        System.out.println("  PowerShell  : $env:DB_PASSWORD=\"" + shown + "\"");
         if (result.generated()) {
             System.out.println();
             System.out.println("WARN: no DB password was specified — generated a 16-char one" +
                     " and wrote it to .env. To choose your own, set the DB_PASSWORD" +
                     " environment variable (or pass --db-password) before `infra up`.");
         }
+    }
+
+    private static String mask(String value) {
+        if (value.length() <= 8) {
+            return "********";
+        }
+        return value.substring(0, 4) + "…" + value.substring(value.length() - 4);
     }
 }

@@ -1,60 +1,51 @@
 package com.lesofn.archforge.cli.command;
 
+import com.lesofn.archforge.cli.config.DbPasswordResolver;
+import com.lesofn.archforge.cli.config.Profile;
 import com.lesofn.archforge.cli.config.ProjectPaths;
 import com.lesofn.archforge.cli.docker.ComposeSupport;
 import com.lesofn.archforge.cli.proc.ProcessRunner;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
-@Command(mixinStandardHelpOptions = true, name = "up", description = "Start the full stack")
+@Command(
+        mixinStandardHelpOptions = true,
+        name = "up",
+        description = "Start the full containerized stack: deps + Flyway migrate + app containers")
 public class UpCommand implements Callable<Integer> {
 
-    @Option(names = "--profile", defaultValue = "dev")
-    String profile;
+    @Option(
+            names = {
+                    "-p", "--profile"
+            },
+            defaultValue = "dev",
+            converter = Profile.Converter.class,
+            description = "Stack profile: ${COMPLETION-CANDIDATES} (default: ${DEFAULT-VALUE})")
+    Profile profile;
 
     @Override
     public Integer call() {
         Path root = ProjectPaths.repoRoot();
+        ComposeSupport compose = new ComposeSupport(new ProcessRunner(), root);
         ProcessRunner runner = new ProcessRunner();
-        ComposeSupport compose = new ComposeSupport(runner, root);
-        if (!"dev".equals(profile)) {
-            return compose.up(profile, List.of());
-        }
-        int infra = compose.up("dev", List.of("postgres", "redis"));
+        DbPasswordResolver.Result password = DbPasswordResolver.resolve(root, null);
+        int infra = compose.upInfra(List.of("postgres", "redis"), Map.of("DB_PASSWORD", password.value()));
         if (infra != 0) {
             return infra;
         }
-        Path logs = root.resolve("logs");
-        try {
-            Files.createDirectories(logs);
-        } catch (Exception e) {
-            throw new IllegalStateException(e);
-        }
-        runner.startDetached(
-                List.of("./gradlew", ":archforge-server-admin:bootRun"),
+        compose.syncDbPassword(DbPasswordResolver.resolveDbUsername(root), password.value());
+        int migrate = runner.run(
+                List.of("./gradlew", ":archforge-server-admin:flywayMigrate", "-x", "test"),
                 root,
-                logs.resolve("server-admin.log").toFile());
-        runner.startDetached(
-                List.of("./gradlew", ":archforge-server-web:bootRun"),
-                root,
-                logs.resolve("server-web.log").toFile());
-        startFrontend(runner, ProjectPaths.adminRepo(root), logs.resolve("admin.log").toFile());
-        startFrontend(runner, ProjectPaths.webRepo(root), logs.resolve("web.log").toFile());
-        System.out.println("Started backend and frontend processes. Logs under " + logs);
-        return 0;
-    }
-
-    private void startFrontend(ProcessRunner runner, Path repo, java.io.File logFile) {
-        if (!Files.exists(repo)) {
-            return;
+                Map.of(),
+                true);
+        if (migrate != 0) {
+            System.err.println("flywayMigrate returned " + migrate);
         }
-        if (!Files.exists(repo.resolve("node_modules"))) {
-            runner.run(List.of("pnpm", "install"), repo);
-        }
-        runner.startDetached(List.of("pnpm", "dev"), repo, logFile);
+        return compose.upStack(profile);
     }
 }

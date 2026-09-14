@@ -4,11 +4,25 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 JAR="${ROOT}/archforge-cli/build/libs/archforge-cli.jar"
 
+check_jdk() {
+  # ArchForge needs JDK 25+; give a readable error instead of UnsupportedClassVersionError.
+  local version major
+  version="$(java -version 2>&1 | head -n1)"
+  major="$(echo "${version}" | sed -E 's/.*version "([0-9]+).*/\1/')"
+  if ! [[ "${major}" =~ ^[0-9]+$ ]] || (( major < 25 )); then
+    echo "ERROR: ArchForge requires JDK 25+ (found: ${version:-none})." >&2
+    echo "       Fix JAVA_HOME or PATH — e.g. Azul Zulu 25." >&2
+    exit 1
+  fi
+}
+
 needs_rebuild() {
   [[ ! -f "${JAR}" ]] && return 0
   # rebuild when any cli source or build file is newer than the jar
   find "${ROOT}/archforge-cli/src" "${ROOT}/archforge-cli/build.gradle.kts" -newer "${JAR}" -print -quit 2>/dev/null | grep -q .
 }
+
+check_jdk
 
 if needs_rebuild; then
   echo "archforge-cli sources changed — rebuilding jar..."
