@@ -180,10 +180,20 @@ class MetaTableDdlMatrixIntegrationTest extends AbstractIntegrationTest {
         MetaTable table = createTable("ddlmtnl" + SEQ.incrementAndGet(), "空值矩阵", column("payload", MetaColumnType.STRING));
         crudService.insert(java.util.Objects.requireNonNull(table.getId()), Map.of("payload", "x"), 1L);
 
-        updateColumns(table, columns -> columns.get(0).setRequired(true));
+        updateColumns(table, columns -> columns.get(0).setNullable(false));
         assertEquals("NO", physicalIsNullable(table.physicalTableName(), "payload"));
 
-        updateColumns(table, columns -> columns.get(0).setRequired(false));
+        updateColumns(table, columns -> columns.get(0).setNullable(true));
+        assertEquals("YES", physicalIsNullable(table.physicalTableName(), "payload"));
+    }
+
+    @Test
+    void requiredAloneDoesNotDriveDdl() {
+        MetaTable table = createTable("ddlmtreq" + SEQ.incrementAndGet(), "必填不动DDL", column("payload", MetaColumnType.STRING));
+        crudService.insert(java.util.Objects.requireNonNull(table.getId()), Map.of("payload", "x"), 1L);
+
+        // required 只是表单级必填校验，不再决定物理可空性（nullable 是 DDL 真源）
+        updateColumns(table, columns -> columns.get(0).setRequired(true));
         assertEquals("YES", physicalIsNullable(table.physicalTableName(), "payload"));
     }
 

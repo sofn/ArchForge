@@ -120,7 +120,7 @@ class MetaTableSchemaEvolutionIntegrationTest extends AbstractIntegrationTest {
         crudService.insert(id, row(), 1L);
 
         List<MetaColumn> columns = adminService.findColumns(id);
-        columns.forEach(c -> c.setRequired(true));
+        columns.forEach(c -> c.setNullable(false));
 
         MetaTableException exception = assertThrows(MetaTableException.class,
                 () -> adminService.update(id, renameTo(adminService.findById(id)), columns, 1L));
@@ -137,7 +137,7 @@ class MetaTableSchemaEvolutionIntegrationTest extends AbstractIntegrationTest {
         crudService.insert(id, row(), 1L);
 
         List<MetaColumn> columns = adminService.findColumns(id);
-        columns.forEach(c -> c.setRequired(true));
+        columns.forEach(c -> c.setNullable(false));
 
         adminService.update(id, renameTo(adminService.findById(id)), columns, 1L);
 

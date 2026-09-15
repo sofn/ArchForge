@@ -116,7 +116,14 @@ public class MetaColumn extends BasePO {
 
     public boolean isIndexedColumn() { return Boolean.TRUE.equals(index); }
 
-    public boolean isNullableColumn() { return !Boolean.TRUE.equals(required); }
+    /**
+     * 物理列可空性（DDL 真源）：显式配置了 nullable 就用它；
+     * 未配置时回退为 !required（存量行兼容，必填即 NOT NULL）。
+     * required 只承担表单级必填校验，不再直接决定 DDL。
+     */
+    public boolean isNullableColumn() {
+        return nullable == null ? !Boolean.TRUE.equals(required) : Boolean.TRUE.equals(nullable);
+    }
 
     public boolean isListVisibleColumn() { return Boolean.TRUE.equals(listVisible); }
 

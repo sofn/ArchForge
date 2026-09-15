@@ -34,16 +34,24 @@ public class AlterTableDdlGenerator {
     public Optional<String> buildViolationCountSql(MetaTable table, SchemaChange change) {
         return switch (change.getType()) {
             case ALTER_TYPE -> Optional.of(buildTypeLossCountSql(table, change));
-            case ALTER_NULL -> Boolean.TRUE.equals(change.getNewRequired())
+            case ALTER_NULL -> !change.getNewColumn().isNullableColumn()
                     ? Optional.of(buildNullCountSql(table, change))
                     : Optional.<String> empty();
+            case ADD_COLUMN -> {
+                MetaColumn added = change.getNewColumn();
+                String defaultValue = added.getDefaultValue();
+                boolean noDefault = defaultValue == null || defaultValue.isEmpty();
+                yield !added.isNullableColumn() && noDefault
+                        ? Optional.of(buildRowCountSql(table))
+                        : Optional.<String> empty();
+            }
             default -> Optional.<String> empty();
         };
     }
 
     /** SET NOT NULL 需要先执行的默认值回填 UPDATE；仅当目标列配置了默认值时非空。 */
     public Optional<String> buildBackfillUpdateSql(MetaTable table, SchemaChange change) {
-        if (change.getType() != SchemaChangeType.ALTER_NULL || !Boolean.TRUE.equals(change.getNewRequired())) {
+        if (change.getType() != SchemaChangeType.ALTER_NULL || change.getNewColumn().isNullableColumn()) {
             return Optional.empty();
         }
         MetaColumn column = change.getNewColumn();
@@ -61,6 +69,11 @@ public class AlterTableDdlGenerator {
         String physicalName = SqlIdentifier.quote(table.physicalTableName());
         String quoted = SqlIdentifier.quote(change.getNewColumn().getColumnCode());
         return "SELECT COUNT(*) FROM " + physicalName + " WHERE " + quoted + " IS NULL";
+    }
+
+    /** ADD NOT-NULL 列且无默认值时，存量行数即违规数（每行都会违例）。 */
+    private String buildRowCountSql(MetaTable table) {
+        return "SELECT COUNT(*) FROM " + SqlIdentifier.quote(table.physicalTableName());
     }
 
     private String buildTypeLossCountSql(MetaTable table, SchemaChange change) {
@@ -97,7 +110,7 @@ public class AlterTableDdlGenerator {
                 .append(SqlIdentifier.quote(column.getColumnCode()))
                 .append(' ')
                 .append(columnTypeResolver.resolve(column));
-        if (Boolean.TRUE.equals(column.getRequired())) {
+        if (!column.isNullableColumn()) {
             sb.append(" NOT NULL");
         }
         String defaultValue = column.getDefaultValue();
@@ -149,7 +162,7 @@ public class AlterTableDdlGenerator {
     private List<SchemaDdl> generateAlterNull(MetaTable table, SchemaChange change) {
         String physicalName = SqlIdentifier.quote(table.physicalTableName());
         MetaColumn newColumn = change.getNewColumn();
-        String action = Boolean.TRUE.equals(newColumn.getRequired()) ? "SET NOT NULL" : "DROP NOT NULL";
+        String action = newColumn.isNullableColumn() ? "DROP NOT NULL" : "SET NOT NULL";
         return List.of(new SchemaDdl(change, List.of("ALTER TABLE " + physicalName + " ALTER COLUMN " + SqlIdentifier.quote(
                 newColumn.getColumnCode()) + " " + action)));
     }

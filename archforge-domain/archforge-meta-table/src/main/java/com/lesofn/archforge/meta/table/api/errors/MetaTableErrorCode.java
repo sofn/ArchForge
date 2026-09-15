@@ -22,7 +22,8 @@ public enum MetaTableErrorCode implements ErrorCode {
     META_TABLE_EVOLUTION_INVALID(10, "Schema 演进预检失败：{0}"),
     META_QUERY_PARAM_INVALID(11, "查询参数非法：{0}"),
     META_DATA_SCOPE_DENIED(12, "数据超出数据范围：{0}"),
-    META_TABLE_IMPORT_INCOMPATIBLE(13, "物理表不满足纳管条件：{0}");
+    META_TABLE_IMPORT_INCOMPATIBLE(13, "物理表不满足纳管条件：{0}"),
+    META_TABLE_COLUMNS_REQUIRED(14, "字段列表不能为空；仅更新元信息请使用 PATCH /meta-table/{id}");
 
     private final int nodeNum;
     private final String msg;

@@ -1,6 +1,7 @@
 package com.lesofn.archforge.meta.table.internal.service;
 
 import static com.lesofn.archforge.meta.table.api.errors.MetaTableErrorCode.META_TABLE_CODE_EXISTS;
+import static com.lesofn.archforge.meta.table.api.errors.MetaTableErrorCode.META_TABLE_COLUMNS_REQUIRED;
 import static com.lesofn.archforge.meta.table.api.errors.MetaTableErrorCode.META_TABLE_CONCURRENT_MODIFY;
 import static com.lesofn.archforge.meta.table.api.errors.MetaTableErrorCode.META_TABLE_EVOLUTION_INVALID;
 import static com.lesofn.archforge.meta.table.api.errors.MetaTableErrorCode.META_TABLE_HAS_DATA;
@@ -11,6 +12,7 @@ import com.lesofn.archforge.meta.table.api.dao.MetaTableRepository;
 import com.lesofn.archforge.meta.table.api.domain.MetaColumn;
 import com.lesofn.archforge.meta.table.api.domain.MetaTable;
 import com.lesofn.archforge.meta.table.api.domain.MetaTableMigration;
+import com.lesofn.archforge.meta.table.api.dto.SchemaPreview;
 import com.lesofn.archforge.meta.table.api.errors.MetaTableException;
 import com.lesofn.archforge.meta.table.api.service.MetaTableAdminService;
 import com.lesofn.archforge.meta.table.api.service.MetaTableMigrationService;
@@ -90,19 +92,25 @@ public class MetaTableAdminServiceImpl implements MetaTableAdminService {
 
     @Override
     @Transactional("metaTableTransactionManager")
-    public void update(Long id, MetaTable table, @Nullable List<MetaColumn> columns, Long operatorId) {
+    public void updateMeta(Long id, MetaTable table, Long operatorId) {
         MetaTable existing = findById(id);
         existing.setUpdaterId(operatorId);
-
-        if (columns == null || columns.isEmpty()) {
-            existing.setTableName(table.getTableName());
-            existing.setDescription(table.getDescription());
-            if (table.getStatus() != null) {
-                existing.setStatus(table.getStatus());
-            }
-            saveGuarded(existing);
-            return;
+        existing.setTableName(table.getTableName());
+        existing.setDescription(table.getDescription());
+        if (table.getStatus() != null) {
+            existing.setStatus(table.getStatus());
         }
+        saveGuarded(existing);
+    }
+
+    @Override
+    @Transactional("metaTableTransactionManager")
+    public void update(Long id, MetaTable table, List<MetaColumn> columns, Long operatorId) {
+        if (columns == null || columns.isEmpty()) {
+            throw new MetaTableException(META_TABLE_COLUMNS_REQUIRED);
+        }
+        MetaTable existing = findById(id);
+        existing.setUpdaterId(operatorId);
 
         validator.validate(existing, columns);
 
@@ -160,6 +168,75 @@ public class MetaTableAdminServiceImpl implements MetaTableAdminService {
             r.setExecutedAt(executedAt);
         });
         migrationService.saveAll(records);
+    }
+
+    /**
+     * 与 {@link #update} 同一条 diff + preflight 路径，但只读：
+     * violation 计数照常执行（SELECT COUNT），DDL 只生成不执行。
+     */
+    @Override
+    public SchemaPreview previewSchema(Long id, MetaTable table, @Nullable List<MetaColumn> columns) {
+        MetaTable existing = findById(id);
+        SchemaPreview preview = new SchemaPreview();
+        if (columns == null || columns.isEmpty()) {
+            return preview;
+        }
+        validator.validate(existing, columns);
+        List<MetaColumn> oldColumns = findColumns(id);
+        List<SchemaChange> changes = schemaDiffEngine.diff(existing, oldColumns, columns);
+        List<SchemaDdl> ddlStatements = alterTableDdlGenerator.generate(existing, changes);
+
+        for (SchemaDdl ddl : ddlStatements) {
+            SchemaChange change = ddl.change();
+            SchemaPreview.PreviewChange item = new SchemaPreview.PreviewChange();
+            item.setType(change.getType().name());
+            item.setColumnCode(resolveChangeColumnCode(change));
+            if (change.getType() == SchemaChangeType.RENAME_COLUMN && change.getOldColumn() != null) {
+                item.setOldColumnCode(change.getOldColumn().getColumnCode());
+            }
+            item.setOldType(change.getOldType());
+            item.setNewType(change.getNewType());
+            item.setOldDefault(change.getOldDefault());
+            item.setNewDefault(change.getNewDefault());
+            if (change.getType() == SchemaChangeType.ALTER_NULL && change.getNewColumn() != null) {
+                item.setOldNullable(change.getOldColumn() == null || change.getOldColumn().isNullableColumn());
+                item.setNewNullable(change.getNewColumn().isNullableColumn());
+            }
+
+            long violations = alterTableDdlGenerator.buildViolationCountSql(existing, change)
+                    .map(this::countViolations)
+                    .orElse(0L);
+            item.setViolations(violations);
+            boolean backfillable = alterTableDdlGenerator.buildBackfillUpdateSql(existing, change).isPresent();
+            item.setAction(violations == 0 ? "NONE" : backfillable ? "BACKFILL" : "BLOCKED");
+            item.setDdl(ddl.sqls());
+            preview.getChanges().add(item);
+
+            if (violations > 0 || isDangerousType(change.getType())) {
+                preview.setDangerous(true);
+            }
+        }
+        return preview;
+    }
+
+    private static boolean isDangerousType(SchemaChangeType type) {
+        return switch (type) {
+            case DROP_COLUMN, RENAME_COLUMN, ALTER_TYPE -> true;
+            default -> false;
+        };
+    }
+
+    private static @Nullable String resolveChangeColumnCode(SchemaChange change) {
+        if (change.getNewIndexGroup() != null) {
+            return change.getNewIndexGroup();
+        }
+        if (change.getOldIndexGroup() != null) {
+            return change.getOldIndexGroup();
+        }
+        if (change.getNewColumn() != null) {
+            return change.getNewColumn().getColumnCode();
+        }
+        return change.getOldColumn() != null ? change.getOldColumn().getColumnCode() : null;
     }
 
     @Override

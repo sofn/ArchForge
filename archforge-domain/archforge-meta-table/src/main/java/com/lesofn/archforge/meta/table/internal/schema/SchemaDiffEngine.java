@@ -172,7 +172,7 @@ public class SchemaDiffEngine {
             changes.add(change);
         }
 
-        boolean nullChanged = !Objects.equals(oldColumn.getRequired(), newColumn.getRequired());
+        boolean nullChanged = oldColumn.isNullableColumn() != newColumn.isNullableColumn();
         if (nullChanged) {
             SchemaChange change = new SchemaChange();
             change.setType(SchemaChangeType.ALTER_NULL);

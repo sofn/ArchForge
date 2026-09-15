@@ -123,7 +123,7 @@ public final class CodeGenModelFactory {
         col.setListVisible(Boolean.TRUE.equals(column.getListVisible()));
         col.setRequired(Boolean.TRUE.equals(column.getRequired()));
         col.setUnique(Boolean.TRUE.equals(column.getUnique()));
-        col.setNullable(!Boolean.TRUE.equals(column.getRequired()));
+        col.setNullable(column.isNullableColumn());
         col.setLength(column.getLength());
         col.setPrecision(column.getPrecision());
         col.setScale(column.getScale());

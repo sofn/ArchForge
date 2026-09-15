@@ -11,8 +11,11 @@ import com.lesofn.archforge.meta.table.api.dto.ImportResponse;
 import com.lesofn.archforge.meta.table.api.dto.ImportableTableInfo;
 import com.lesofn.archforge.meta.table.api.dto.MetaDataQuery;
 import com.lesofn.archforge.meta.table.api.dto.MetaPageResponse;
+import com.lesofn.archforge.meta.table.api.dto.SchemaPreview;
 import com.lesofn.archforge.meta.table.api.dto.TableImportPreview;
 import com.lesofn.archforge.meta.table.api.enums.MetaDataFormat;
+import com.lesofn.archforge.meta.table.api.errors.MetaTableErrorCode;
+import com.lesofn.archforge.meta.table.api.errors.MetaTableException;
 import com.lesofn.archforge.meta.table.api.service.MetaTableAdminService;
 import com.lesofn.archforge.meta.table.api.service.MetaTableImportService;
 import com.lesofn.archforge.meta.table.api.service.MetaTableCrudService;
@@ -54,6 +57,7 @@ import cn.dev33.satoken.annotation.SaCheckRole;
 import com.lesofn.archforge.infrastructure.auth.stp.StpAdminUtil;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -149,15 +153,36 @@ public class MetaTableController {
     }
 
     @Log
-    @Operation(summary = "更新元表格")
+    @Operation(summary = "更新元表格（结构变更，columns 必填；仅改元信息用 PATCH）")
     @SaCheckPermission(value = "meta-table:edit", type = StpAdminUtil.TYPE)
     @PutMapping("/{id}")
     public Boolean update(@PathVariable Long id, @RequestBody @Valid MetaTableUpdateRequest request) {
         MetaTable table = request.toTable();
         table.setUpdaterId(LoginContext.getAdminUserId());
         List<MetaColumn> columns = request.toColumns();
+        if (columns == null || columns.isEmpty()) {
+            throw new MetaTableException(MetaTableErrorCode.META_TABLE_COLUMNS_REQUIRED);
+        }
         metaTableAdminService.update(id, table, columns, LoginContext.getAdminUserId());
         return true;
+    }
+
+    @Log
+    @Operation(summary = "更新元表格元信息（仅名称/描述/状态，不动表结构）")
+    @SaCheckPermission(value = "meta-table:edit", type = StpAdminUtil.TYPE)
+    @PatchMapping("/{id}")
+    public Boolean updateMeta(@PathVariable Long id, @RequestBody @Valid MetaTableUpdateRequest request) {
+        MetaTable table = request.toTable();
+        table.setUpdaterId(LoginContext.getAdminUserId());
+        metaTableAdminService.updateMeta(id, table, LoginContext.getAdminUserId());
+        return true;
+    }
+
+    @Operation(summary = "预览 Schema 变更（diff + 违规行数 + DDL，不执行）")
+    @SaCheckPermission(value = "meta-table:edit", type = StpAdminUtil.TYPE)
+    @PostMapping("/{id}/schema-preview")
+    public SchemaPreview schemaPreview(@PathVariable Long id, @RequestBody @Valid MetaTableUpdateRequest request) {
+        return metaTableAdminService.previewSchema(id, request.toTable(), request.toColumns());
     }
 
     @Operation(summary = "列出可导入的物理表")

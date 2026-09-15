@@ -1763,7 +1763,7 @@ paths:
     put:
       tags:
       - "元表格管理"
-      summary: "更新元表格"
+      summary: "更新元表格（结构变更，columns 必填；仅改元信息用 PATCH）"
       operationId: "update"
       parameters:
       - name: "id"
@@ -1803,6 +1803,31 @@ paths:
         schema:
           type: "boolean"
           default: false
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "boolean"
+    patch:
+      tags:
+      - "元表格管理"
+      summary: "更新元表格元信息（仅名称/描述/状态，不动表结构）"
+      operationId: "updateMeta"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MetaTableUpdateRequest"
+        required: true
       responses:
         "200":
           description: "OK"
@@ -2094,6 +2119,32 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/MetaTableMigration"
+  /meta-table/{id}/schema-preview:
+    post:
+      tags:
+      - "元表格管理"
+      summary: "预览 Schema 变更（diff + 违规行数 + DDL，不执行）"
+      operationId: "schemaPreview"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MetaTableUpdateRequest"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SchemaPreview"
   /monitor/cache-info:
     get:
       tags:
@@ -4057,15 +4108,15 @@ components:
           type: "string"
         dictCode:
           type: "string"
-        searchableColumn:
-          type: "boolean"
-        listVisibleColumn:
-          type: "boolean"
         uniqueColumn:
           type: "boolean"
         indexedColumn:
           type: "boolean"
         nullableColumn:
+          type: "boolean"
+        listVisibleColumn:
+          type: "boolean"
+        searchableColumn:
           type: "boolean"
     MetaColumnRequest:
       required:
@@ -4524,6 +4575,36 @@ components:
           items:
             type: "integer"
             format: "int64"
+    PreviewChange:
+      type: "object"
+      properties:
+        type:
+          type: "string"
+        columnCode:
+          type: "string"
+        oldColumnCode:
+          type: "string"
+        oldType:
+          type: "string"
+        newType:
+          type: "string"
+        oldDefault:
+          type: "string"
+        newDefault:
+          type: "string"
+        oldNullable:
+          type: "boolean"
+        newNullable:
+          type: "boolean"
+        violations:
+          type: "integer"
+          format: "int64"
+        action:
+          type: "string"
+        ddl:
+          type: "array"
+          items:
+            type: "string"
     PreviewColumn:
       type: "object"
       properties:
@@ -4795,6 +4876,15 @@ components:
         finishedAt:
           type: "string"
           format: "date-time"
+    SchemaPreview:
+      type: "object"
+      properties:
+        changes:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/PreviewChange"
+        dangerous:
+          type: "boolean"
     ServerInfoResponse:
       type: "object"
       properties:

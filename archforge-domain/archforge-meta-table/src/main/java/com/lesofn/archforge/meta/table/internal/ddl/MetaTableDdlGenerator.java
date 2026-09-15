@@ -64,7 +64,7 @@ public class MetaTableDdlGenerator {
         String type = columnTypeResolver.resolve(column);
         StringBuilder sb = new StringBuilder();
         sb.append(name).append(' ').append(type);
-        if (Boolean.TRUE.equals(column.getRequired())) {
+        if (!column.isNullableColumn()) {
             sb.append(" NOT NULL");
         }
         String defaultValue = column.getDefaultValue();
