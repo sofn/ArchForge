@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.Nullable;
 import org.springframework.dao.DataAccessException;
@@ -405,43 +406,61 @@ public class MetaTableAdminServiceImpl implements MetaTableAdminService {
         return "\"" + table.physicalTableName().replace("\"", "\"\"") + "\"";
     }
 
+    /**
+     * 一版本一记录（uq_meta_table_migration_version 约束）：单变更保留明细字段，
+     * 多变更聚合为一条 changeType=MULTI、ddlSql 拼接全部语句的记录。
+     */
     private List<MetaTableMigration> buildPendingMigrations(MetaTable table, int version, List<SchemaDdl> ddlList,
             Long operatorId) {
         LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
-        List<MetaTableMigration> records = new ArrayList<>();
-        for (SchemaDdl ddl : ddlList) {
-            MetaTableMigration record = new MetaTableMigration();
-            record.setTableId(java.util.Objects.requireNonNull(table.getId()));
-            record.setVersion(version);
-            record.setChangeType(ddl.change().getType().name());
-            record.setDdlSql(String.join(";\n", ddl.sqls()));
-            record.setStatus("PENDING");
-            record.setCreatorId(operatorId);
-            record.setCreateTime(now);
-            record.setDeleted(false);
-
-            MetaColumn oldColumn = ddl.change().getOldColumn();
-            MetaColumn newColumn = ddl.change().getNewColumn();
-
-            if (ddl.change().getOldIndexGroup() != null) {
-                record.setColumnCode(ddl.change().getOldIndexGroup());
-            } else if (ddl.change().getNewIndexGroup() != null) {
-                record.setColumnCode(ddl.change().getNewIndexGroup());
-            } else if (oldColumn != null) {
-                record.setColumnCode(oldColumn.getColumnCode());
-            } else if (newColumn != null) {
-                record.setColumnCode(newColumn.getColumnCode());
-            }
-            if (newColumn != null && oldColumn != null && ddl.change().getOldIndexGroup() == null) {
-                record.setOldColumnCode(oldColumn.getColumnCode());
-            }
-
-            record.setOldType(ddl.change().getOldType());
-            record.setNewType(ddl.change().getNewType());
-            record.setOldDefault(ddl.change().getOldDefault());
-            record.setNewDefault(ddl.change().getNewDefault());
-            records.add(record);
+        if (ddlList.size() == 1) {
+            return List.of(buildMigrationRecord(table, version, ddlList.getFirst(), operatorId, now));
         }
-        return records;
+        MetaTableMigration record = new MetaTableMigration();
+        fillRecordBase(record, table, version, operatorId, now);
+        record.setChangeType("MULTI");
+        record.setDdlSql(ddlList.stream().flatMap(ddl -> ddl.sqls().stream())
+                .collect(Collectors.joining(";\n")));
+        return List.of(record);
+    }
+
+    private MetaTableMigration buildMigrationRecord(MetaTable table, int version, SchemaDdl ddl, Long operatorId,
+            LocalDateTime now) {
+        MetaTableMigration record = new MetaTableMigration();
+        fillRecordBase(record, table, version, operatorId, now);
+        record.setChangeType(ddl.change().getType().name());
+        record.setDdlSql(String.join(";\n", ddl.sqls()));
+
+        MetaColumn oldColumn = ddl.change().getOldColumn();
+        MetaColumn newColumn = ddl.change().getNewColumn();
+
+        if (ddl.change().getOldIndexGroup() != null) {
+            record.setColumnCode(ddl.change().getOldIndexGroup());
+        } else if (ddl.change().getNewIndexGroup() != null) {
+            record.setColumnCode(ddl.change().getNewIndexGroup());
+        } else if (oldColumn != null) {
+            record.setColumnCode(oldColumn.getColumnCode());
+        } else if (newColumn != null) {
+            record.setColumnCode(newColumn.getColumnCode());
+        }
+        if (newColumn != null && oldColumn != null && ddl.change().getOldIndexGroup() == null) {
+            record.setOldColumnCode(oldColumn.getColumnCode());
+        }
+
+        record.setOldType(ddl.change().getOldType());
+        record.setNewType(ddl.change().getNewType());
+        record.setOldDefault(ddl.change().getOldDefault());
+        record.setNewDefault(ddl.change().getNewDefault());
+        return record;
+    }
+
+    private void fillRecordBase(MetaTableMigration record, MetaTable table, int version, Long operatorId,
+            LocalDateTime now) {
+        record.setTableId(java.util.Objects.requireNonNull(table.getId()));
+        record.setVersion(version);
+        record.setStatus("PENDING");
+        record.setCreatorId(operatorId);
+        record.setCreateTime(now);
+        record.setDeleted(false);
     }
 }

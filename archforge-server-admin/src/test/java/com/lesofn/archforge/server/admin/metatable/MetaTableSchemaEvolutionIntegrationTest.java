@@ -49,7 +49,8 @@ import org.springframework.transaction.annotation.Transactional;
 class MetaTableSchemaEvolutionIntegrationTest extends AbstractIntegrationTest {
 
     private static final List<String> CODES = List.of(
-            "p1itnotnull", "p1itbackfill", "p1itlossy", "p1itwiden", "p1ituq", "p1itreadd", "p1itlock");
+            "p1itnotnull", "p1itbackfill", "p1itlossy", "p1itwiden", "p1ituq", "p1itreadd", "p1itlock",
+            "p1itmulti");
 
     @Qualifier("metaTableJdbcTemplate")
     @Autowired
@@ -206,6 +207,29 @@ class MetaTableSchemaEvolutionIntegrationTest extends AbstractIntegrationTest {
         adminService.update(id, renameTo(adminService.findById(id)), withLegacyAgain, 1L);
 
         assertEquals(2, probe.countColumns(id));
+    }
+
+    @Test
+    void multiChangeUpdateWritesSingleMigrationRow() {
+        Long id = createTable("p1itmulti", stringColumn("grade", null));
+        crudService.insert(id, row(), 1L);
+
+        // 一次 update 产生 ALTER_DEFAULT + ALTER_NULL 两条 change ——
+        // 回归：uq_meta_table_migration_version 要求一版本一记录（聚合为 MULTI）
+        List<MetaColumn> columns = adminService.findColumns(id);
+        columns.forEach(c -> {
+            c.setNullable(false);
+            c.setDefaultValue("A");
+        });
+        adminService.update(id, renameTo(adminService.findById(id)), columns, 1L);
+
+        assertEquals("NO", columnNullable("meta_p1itmulti", "grade"));
+        List<Map<String, Object>> migrations = jdbc.queryForList(
+                "SELECT version, change_type, status FROM sys_meta_table_migration "
+                        + "WHERE table_id = :t AND deleted = 0",
+                Map.of("t", id));
+        assertEquals(1, migrations.size());
+        assertEquals("MULTI", migrations.getFirst().get("change_type"));
     }
 
     @Test
