@@ -20,8 +20,8 @@ public class FlywayProperties {
     /** Master switch. <code>FlywayConfig</code> is conditional on it; keep explicit per profile. */
     private boolean enabled = false;
 
-    /** Classpath locations scanned for migrations. */
-    private List<String> locations = List.of("classpath:db/migration");
+    /** Root migration locations; module dirs under db/migration are discovered automatically. */
+    private List<String> locations = List.of("classpath:db/migration/__root");
 
     /** Default schema managed by Flyway (PostgreSQL: <code>public</code>). */
     private @Nullable String defaultSchema;

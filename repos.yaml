@@ -25,9 +25,9 @@ repos:
       - archforge-common/archforge-common-base
       - archforge-common/archforge-common-error
       - archforge-common/archforge-common-jpa
-      - archforge-domain/archforge-admin-user
-      - archforge-domain/archforge-blog
-      - archforge-domain/archforge-meta-table
+      - archforge-builtin/archforge-admin-user
+      - archforge-module-cms
+      - archforge-builtin/archforge-meta-table
       - archforge-infrastructure
       - archforge-server-admin
       - archforge-server-web

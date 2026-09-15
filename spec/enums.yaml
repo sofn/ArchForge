@@ -35,7 +35,7 @@ enums:
         label: 冻结
 
   MenuTypeEnum:
-    source: archforge-domain/archforge-admin-user
+    source: archforge-builtin/archforge-admin-user
     class: com.lesofn.archforge.user.api.enums.MenuTypeEnum
     dictionary: sysMenu.menuType
     field: sys_menu.menu_type
@@ -58,10 +58,10 @@ enums:
       file: src/views/system/menu/utils/enums.ts
       rule: menuTypeOptions values must equal 1 / 2 / 3 / 4; buttons use isButton
 
-  BlogArticleStatus:
-    source: archforge-domain/archforge-blog
-    class: com.lesofn.archforge.blog.api.enums.BlogArticleStatus
-    field: blog_article.status
+  CmsArticleStatus:
+    source: archforge-module-cms
+    class: com.lesofn.archforge.cms.api.enums.CmsArticleStatus
+    field: cms_article.status
     values:
       - name: DRAFT
         value: 0

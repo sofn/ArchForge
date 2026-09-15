@@ -121,7 +121,7 @@ public class AdminUserServiceImpl implements AdminUserService {
     }
 
     @Override
-    @Transactional("userTransactionManager")
+    @Transactional
     public Long createUser(UserCreateRequest request) {
         SysUser user = adminUserMapper.fromCreateRequest(request);
         if (user.getPhoneNumber() == null) {
@@ -139,7 +139,7 @@ public class AdminUserServiceImpl implements AdminUserService {
     }
 
     @Override
-    @Transactional("userTransactionManager")
+    @Transactional
     public Boolean updateUser(UserUpdateRequest request) {
         if (sysUserService.findById(request.getId()).isEmpty()) {
             return false;

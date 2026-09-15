@@ -86,7 +86,7 @@ archforge-server-* → archforge-infrastructure → archforge-common/{base,error
 1. Create `domain/<context-name>/build.gradle.kts`
 2. Add `include("domain:<context-name>")` to `settings.gradle.kts`
 3. Add dependency in the server module: `implementation(project(":domain:<context-name>"))`
-4. Create Flyway migrations under `archforge-common/archforge-common-jpa/src/main/resources/db/migration/` if the context introduces new tables
+4. Create Flyway migrations under the module's own `src/main/resources/db/migration/<module>/` (module-local V1..Vn) if the context introduces new tables; shared/platform tables go to common-jpa `db/migration/__root/`
 
 ---
 
@@ -585,8 +585,11 @@ Full stack includes: PostgreSQL + Redis + Application + Nginx reverse proxy.
 
 - Flyway manages all schema changes; JPA `ddl-auto` is `validate` everywhere (no `update`).
 - Migration files: `V<version>__<description>.sql` (e.g., `V1__create_user_table.sql`)
-- Location: `archforge-common/archforge-common-jpa/src/main/resources/db/migration/` —
-  shared classpath so `server-admin` and `server-web` migrate the same `archforge` DB.
+- Location: shared legacy sequence in
+  `archforge-common/archforge-common-jpa/src/main/resources/db/migration/__root/`;
+  each module ships `db/migration/<module>/` in its own jar with module-local
+  versions and a dedicated `flyway_schema_history_<module>` table. The
+  `FlywayConfig` orchestrator runs `__root` first, then modules in name order.
 - Wiring: `FlywayConfig` + `FlywayDependencyBeanFactoryPostProcessor` in
   `common.persistence`, gated on `arch-forge.flyway.enabled` (see `docs/specs/flyway.md`).
 - CLI: `archforge db init` / `archforge db update` run `./gradlew :archforge-server-admin:flywayMigrate`.

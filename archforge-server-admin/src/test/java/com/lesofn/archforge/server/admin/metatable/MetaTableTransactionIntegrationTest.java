@@ -26,8 +26,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Integration test proving {@code metaTableJdbcTemplate} shares the transactional connection of
- * {@code metaTableTransactionManager}: DDL/DML executed through the template must roll back
- * together with JPA metadata writes when the business transaction fails.
+ * the single application {@code transactionManager}: DDL/DML executed through the template must
+ * roll back together with JPA metadata writes when the business transaction fails.
  *
  * @author sofn
  */
@@ -83,7 +83,7 @@ class MetaTableTransactionIntegrationTest extends AbstractIntegrationTest {
         record SessionIdentity(long holderPid, long templatePid, boolean autoCommit) {
         }
 
-        @Transactional("metaTableTransactionManager")
+        @Transactional
         public SessionIdentity sessionIdentity() {
             DataSource ds = requireDataSource();
             Connection bound = DataSourceUtils.getConnection(ds);
@@ -102,13 +102,13 @@ class MetaTableTransactionIntegrationTest extends AbstractIntegrationTest {
             }
         }
 
-        @Transactional("metaTableTransactionManager")
+        @Transactional
         public void createAllThenFail() {
             createAll();
             throw new IllegalStateException("boom");
         }
 
-        @Transactional("metaTableTransactionManager")
+        @Transactional
         public void createAll() {
             MetaTable table = new MetaTable();
             table.setTableCode(PROBE_CODE);

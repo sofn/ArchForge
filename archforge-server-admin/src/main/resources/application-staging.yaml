@@ -56,7 +56,7 @@ arch-forge:
     enabled: true
     baseline-on-migrate: true
     ignore-migration-patterns: "*:missing"
-    locations: classpath:db/migration
+    locations: classpath:db/migration/__root
     default-schema: public
   monitor:
     enabled: true

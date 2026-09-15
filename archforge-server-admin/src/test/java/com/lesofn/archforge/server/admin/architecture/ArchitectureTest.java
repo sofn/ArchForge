@@ -45,14 +45,14 @@ class ArchitectureTest {
     }
 
     @Test
-    void blogShouldNotDependOnInfrastructure() {
+    void cmsShouldNotDependOnInfrastructure() {
         noClasses()
                 .that()
-                .resideInAPackage("..archforge.blog..")
+                .resideInAPackage("..archforge.cms..")
                 .should()
                 .dependOnClassesThat()
                 .resideInAPackage("..archforge.infrastructure..")
-                .because("ARCH-002: domain modules (blog) must not depend on infrastructure")
+                .because("ARCH-002: domain modules (cms) must not depend on infrastructure")
                 .check(classes);
     }
 
@@ -84,7 +84,7 @@ class ArchitectureTest {
     void domainModulesShouldNotDependOnServerApplications() {
         noClasses()
                 .that()
-                .resideInAnyPackage("..archforge.domain..", "..archforge.user..", "..archforge.blog..",
+                .resideInAnyPackage("..archforge.domain..", "..archforge.user..", "..archforge.cms..",
                         "..archforge.meta.table..")
                 .should()
                 .dependOnClassesThat()
@@ -133,8 +133,8 @@ class ArchitectureTest {
                 .resideInAnyPackage(
                         "com.lesofn.archforge.user.domain..",
                         "com.lesofn.archforge.user.infrastructure..",
-                        "com.lesofn.archforge.blog.domain..",
-                        "com.lesofn.archforge.blog.infrastructure..",
+                        "com.lesofn.archforge.cms.domain..",
+                        "com.lesofn.archforge.cms.infrastructure..",
                         "com.lesofn.archforge.meta.table.domain..",
                         "com.lesofn.archforge.meta.table.infrastructure..")
                 .because("ARCH-008: domain modules contain exactly api+internal (ADR-0001)")
@@ -164,6 +164,73 @@ class ArchitectureTest {
                         .orShould()
                         .haveSimpleNameEndingWith("ItemDTO")
                         .because("ARCH-010: request/response types use *Request/*Response (frozen legacy *DTO set)"))
+                .check(classes);
+    }
+
+    /**
+     * ARCH-011: L3 builtin modules (admin-user, meta-table) meet each other via
+     * {@code api} named interfaces only — never reach into the OTHER module's
+     * {@code internal}. Written directionally: a blanket {@code ..internal..} target
+     * would also flag a module's own internal-to-internal calls, which are legal.
+     */
+    @Test
+    void builtinModulesShouldNotReachIntoEachOtherInternals() {
+        FreezingArchRule.freeze(
+                noClasses()
+                        .that()
+                        .resideInAPackage("..archforge.user..")
+                        .should()
+                        .dependOnClassesThat()
+                        .resideInAPackage("..archforge.meta.table.internal..")
+                        .because("ARCH-011a: L3 builtin modules meet via api, never the other module's internal"))
+                .check(classes);
+        FreezingArchRule.freeze(
+                noClasses()
+                        .that()
+                        .resideInAPackage("..archforge.meta.table..")
+                        .should()
+                        .dependOnClassesThat()
+                        .resideInAPackage("..archforge.user.internal..")
+                        .because("ARCH-011b: L3 builtin modules meet via api, never the other module's internal"))
+                .check(classes);
+    }
+
+    /**
+     * ARCH-012: the kernel (common + infrastructure) must not reverse-depend on
+     * apps (server), L3 builtin (user, meta.table), or L4 modules (cms, task).
+     */
+    @Test
+    void kernelShouldNotDependOnAppsBuiltinOrModules() {
+        FreezingArchRule.freeze(
+                noClasses()
+                        .that()
+                        .resideInAnyPackage("..archforge.common..", "..archforge.infrastructure..")
+                        .should()
+                        .dependOnClassesThat()
+                        .resideInAnyPackage(
+                                "..archforge.user..",
+                                "..archforge.meta.table..",
+                                "..archforge.server..",
+                                "..archforge.cms..",
+                                "..archforge.task..")
+                        .because("ARCH-012: Kernel must not depend on Apps / L3 builtin / L4 modules"))
+                .check(classes);
+    }
+
+    /**
+     * ARCH-013: L3 builtin modules must not depend on L4 business modules — the
+     * dependency direction is L4 → L3 → Kernel, never the reverse.
+     */
+    @Test
+    void builtinModulesShouldNotDependOnL4Modules() {
+        FreezingArchRule.freeze(
+                noClasses()
+                        .that()
+                        .resideInAnyPackage("..archforge.user..", "..archforge.meta.table..")
+                        .should()
+                        .dependOnClassesThat()
+                        .resideInAnyPackage("..archforge.cms..", "..archforge.task..")
+                        .because("ARCH-013: L3 builtin must not depend on L4 business modules"))
                 .check(classes);
     }
 }

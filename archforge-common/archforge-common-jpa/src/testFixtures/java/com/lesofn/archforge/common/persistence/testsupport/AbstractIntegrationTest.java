@@ -19,7 +19,7 @@ import org.testcontainers.utility.DockerImageName;
  *
  * <p>
  * 本类位于 common-jpa 的 {@code testFixtures} 源集，server-admin 与 server-web 的集成测试共用 —— 两者使用同一组
- * 数据源（{@code master}/{@code slave}），schema 由本模块 {@code classpath:db/migration} 的 Flyway 迁移建立。
+ * 数据源（{@code master}/{@code slave}），schema 由 {@code db/migration/__root} + 各模块 db/migration/module 目录的 Flyway 迁移建立。
  *
  * <p>
  * 对象存储默认不做任何处理 —— 应用本身默认使用本地文件存储（{@code arch-forge.file-storage.type=local}）， 因此没有 S3 也能正常跑。需要覆盖真实 S3 路径时，用
@@ -78,7 +78,10 @@ public abstract class AbstractIntegrationTest {
         PostgreSQLContainer container = new PostgreSQLContainer(DockerImageName.parse(POSTGRES_IMAGE))
                 .withDatabaseName(USER_DATABASE)
                 .withUsername(DB_USER)
-                .withPassword(DB_PASSWORD);
+                .withPassword(DB_PASSWORD)
+                // 测试 JVM 内多个 ApplicationContext 各持 master+slave 两个 Hikari 池，
+                // 默认 max_connections=100 在全套件下会被顶满（"too many clients"）
+                .withCommand("postgres", "-c", "max_connections=500");
         container.start();
         return container;
     }

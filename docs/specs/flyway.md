@@ -1,11 +1,18 @@
 # Flyway history gaps
 
-`archforge-common/archforge-common-jpa/src/main/resources/db/migration/` currently has
-**V1–V4, V6–V18, V20–V25**. There is **no V5 and no V19** in the repository.
+`archforge-common/archforge-common-jpa/src/main/resources/db/migration/__root/` currently has
+**V1–V4, V6–V18, V20–V27**. There is **no V5 and no V19** in the repository.
 
-Migrations live in `common-jpa` so `server-admin` and `server-web` share the same
-`classpath:db/migration` — both apps migrate the shared `archforge` database
-(Flyway serialises concurrent runs via `flyway_schema_history`).
+`db/migration/` is split per directory: `__root/` holds the shared legacy
+sequence (written to the default `flyway_schema_history`, runs first), and every
+other `db/migration/<module>/` directory is a module-owned sequence with its own
+history table `flyway_schema_history_<module>` — see `FlywayConfig`'s module
+orchestrator. Module jars ship `db/migration/<module>/V1__*.sql`; their version
+numbers are module-local and restart at V1.
+
+Migrations live on the shared classpath so `server-admin` and `server-web`
+migrate the same `archforge` database (Flyway serialises concurrent runs via
+the history-table lock).
 
 ## Why
 
@@ -22,8 +29,7 @@ so `spring.flyway.*` keys bind to nothing in this project. Migration is wired by
 `com.lesofn.archforge.common.persistence.FlywayConfig`, gated on
 `arch-forge.flyway.enabled` and configured via `arch-forge.flyway.*`
 (`FlywayProperties`). EMF ordering is enforced by
-`FlywayDependencyBeanFactoryPostProcessor` (covers `userDbConfig`, `blogDbConfig`,
-`metaTableDbConfig`).
+`FlywayDependencyBeanFactoryPostProcessor` (depends on the single `jpaConfig`).
 
 `application-prod.yaml` / `application-staging.yaml` (both servers) set:
 
@@ -44,4 +50,5 @@ environment has migrated past V23** (V23 deletes the stale history rows, after
 which "missing" is never reported). Remove the key at that point; do not widen
 the pattern before it.
 
-When adding a new version, never reuse V5 or V19; next file is **V26**.
+When adding a new version, never reuse V5 or V19; next `__root` file is **V28**.
+Module-local migrations version independently (next `cms`/`task` file is V2).

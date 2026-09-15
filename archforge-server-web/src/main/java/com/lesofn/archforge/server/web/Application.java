@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @SpringBootApplication(
         scanBasePackages = {
-                "com.lesofn.archforge.blog",
+                "com.lesofn.archforge.cms",
                 "com.lesofn.archforge.common",
                 "com.lesofn.archforge.infrastructure",
                 "com.lesofn.archforge.server.web",

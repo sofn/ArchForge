@@ -48,7 +48,7 @@ class ArchForgeStpInterfaceTest {
 
     @Test
     void adminLoginReturnsRoleKeyForNormalUser() {
-        RoleInfo roleInfo = new RoleInfo(2L, "editor", DataScopeEnum.ONLY_SELF, Set.of(), Set.of("blog:list"), Set.of(2L));
+        RoleInfo roleInfo = new RoleInfo(2L, "editor", DataScopeEnum.ONLY_SELF, Set.of(), Set.of("cms:list"), Set.of(2L));
         SystemLoginUser loginUser = new SystemLoginUser(8L, false, "alice", "secret", roleInfo, 5L);
         StpAdminUtil.getSessionByLoginId(8L, true).set(LoginSessionKeys.LOGIN_USER, loginUser);
 
@@ -56,7 +56,7 @@ class ArchForgeStpInterfaceTest {
         List<String> permissions = stpInterface.getPermissionList(8L, StpAdminUtil.TYPE);
 
         assertEquals(List.of("editor"), roles);
-        assertEquals(List.of("blog:list"), permissions);
+        assertEquals(List.of("cms:list"), permissions);
     }
 
     @Test

@@ -132,15 +132,15 @@ FILE_STORAGE_TYPE=local ./gradlew :archforge-server-admin:bootRun
 | 模块 | 职责 |
 |------|------|
 | `archforge-common/archforge-common-{base,error,jpa}` | 公共内核：工具、`ErrorCode` 框架、JPA 约定 |
-| `archforge-domain/archforge-admin-user` | 用户、角色、菜单、部门、字典（DDD） |
-| `archforge-domain/archforge-blog` | 文章、分类 |
-| `archforge-domain/archforge-meta-table` | 低代码表格引擎 |
+| `archforge-builtin/archforge-admin-user` | 用户、角色、菜单、部门、字典（DDD） |
+| `archforge-builtin/archforge-meta-table` | 低代码表格引擎 |
+| `archforge-module-cms` | 文章、分类 |
+| `archforge-module-task` | 任务域 |
 | `archforge-infrastructure` | sa-token 配置、Redis、动态数据源、安全过滤器 |
 | `archforge-server-admin` | B 端应用（`:8080`） |
 | `archforge-server-web` | C 端应用（`:8081`） |
 | `archforge-starters/*` | cache / lock / redisson / trace 启动器 |
 | `archforge-cli` | `./archforge` 开发者 CLI + MCP server |
-| `archforge-example/archforge-example-task` | 未接入 server-admin 的示例模块（`/task` 不入 OpenAPI 契约） |
 | `archforge-dependencies` | 版本平台（BOM） |
 
 非 Gradle 目录不加前缀：`docker/`、`config/`、`scripts/`、`.agents/`。

@@ -10,11 +10,12 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @SpringBootApplication(
         scanBasePackages = {
-                "com.lesofn.archforge.blog",
+                "com.lesofn.archforge.cms",
                 "com.lesofn.archforge.common",
                 "com.lesofn.archforge.infrastructure",
                 "com.lesofn.archforge.meta.table",
                 "com.lesofn.archforge.server.admin",
+                "com.lesofn.archforge.task",
                 "com.lesofn.archforge.user"
         },
         exclude = {

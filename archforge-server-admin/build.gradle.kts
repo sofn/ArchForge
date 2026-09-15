@@ -133,9 +133,10 @@ dependencies {
     api(project(":archforge-common:archforge-common-base"))
     api(project(":archforge-common:archforge-common-jpa"))
     api(project(":archforge-infrastructure"))
-    api(project(":archforge-domain:archforge-admin-user"))
-    api(project(":archforge-domain:archforge-meta-table"))
-    api(project(":archforge-domain:archforge-blog"))
+    api(project(":archforge-builtin:archforge-admin-user"))
+    api(project(":archforge-builtin:archforge-meta-table"))
+    api(project(":archforge-module-cms"))
+    api(project(":archforge-module-task"))
 
     // 排除logback，使用log4j2
     api("org.springframework.boot:spring-boot-starter-web") {
@@ -185,9 +186,9 @@ dependencies {
 
     // Cross-module test data builders (G2) + shared integration-test container base
     testImplementation(testFixtures(project(":archforge-common:archforge-common-jpa")))
-    testImplementation(testFixtures(project(":archforge-domain:archforge-admin-user")))
-    testImplementation(testFixtures(project(":archforge-domain:archforge-blog")))
-    testImplementation(testFixtures(project(":archforge-domain:archforge-meta-table")))
+    testImplementation(testFixtures(project(":archforge-builtin:archforge-admin-user")))
+    testImplementation(testFixtures(project(":archforge-module-cms")))
+    testImplementation(testFixtures(project(":archforge-builtin:archforge-meta-table")))
 
     // Lombok 注解在测试源码中同样可用（testAnnotationProcessor 已由根工程统一配置）
     testCompileOnly("org.projectlombok:lombok")
@@ -239,7 +240,8 @@ val buildMinimalJre by tasks.registering(Exec::class) {
 
 
 // Flyway Gradle 插件配置（archforge db init/update → :archforge-server-admin:flywayMigrate）
-// 迁移 SQL 位于 common-jpa 资源目录（server-admin 与 server-web 共享 classpath:db/migration）。
+// 递归扫 db/migration（__root + 各模块目录）。CLI 场景下全部记入共享历史表——模块历史表
+// 由运行时 FlywayConfig 在首次启动时补建并重放（模块迁移均为幂等写法）。
 flyway {
     driver = "org.postgresql.Driver"
     url = providers.environmentVariable("DB_MASTER_URL")
@@ -249,7 +251,9 @@ flyway {
     schemas = arrayOf("public")
     defaultSchema = "public"
     locations = arrayOf(
-        "filesystem:${rootDir}/archforge-common/archforge-common-jpa/src/main/resources/db/migration"
+        "filesystem:${rootDir}/archforge-common/archforge-common-jpa/src/main/resources/db/migration",
+        "filesystem:${rootDir}/archforge-module-cms/src/main/resources/db/migration",
+        "filesystem:${rootDir}/archforge-module-task/src/main/resources/db/migration"
     )
     baselineOnMigrate = true
     baselineVersion = "0"

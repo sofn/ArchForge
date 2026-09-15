@@ -14,7 +14,7 @@ spring:
   datasource:
     dynamic:
       primary: master
-      strict: false
+      strict: true
       datasource:
         master:
           driver-class-name: org.postgresql.Driver
@@ -59,7 +59,7 @@ arch-forge:
     enabled: true
     baseline-on-migrate: true
     ignore-migration-patterns: "*:missing"
-    locations: classpath:db/migration
+    locations: classpath:db/migration/__root
     default-schema: public
   file-storage:
     type: ${FILE_STORAGE_TYPE:s3}

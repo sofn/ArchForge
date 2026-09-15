@@ -27,14 +27,14 @@ ArchForge/
 ├── archforge-common/archforge-common-base   # Base utilities, enums, encryption, Jackson
 ├── archforge-common/archforge-common-error  # ErrorCode, exceptions, error manager
 ├── archforge-common/archforge-common-jpa    # JPA base entities, converters, query helpers
-├── archforge-domain/archforge-admin-user    # User/Role/Menu/Dept domain
-├── archforge-domain/archforge-blog          # Blog bounded context
-├── archforge-domain/archforge-meta-table    # Metadata table / codegen
+├── archforge-builtin/archforge-admin-user   # User/Role/Menu/Dept domain
+├── archforge-builtin/archforge-meta-table   # Metadata table / codegen
+├── archforge-module-cms                     # CMS bounded context (articles, categories)
+├── archforge-module-task                    # Task domain (assembled by default)
 ├── archforge-infrastructure                 # Auth (sa-token), file, tracing
 ├── archforge-server-admin                   # Admin API :8080
 ├── archforge-server-web                     # C-end API :8081
 ├── archforge-cli                            # Developer CLI (picocli)
-├── archforge-example/archforge-example-task # Unlinked example (not in server-admin)
 ├── archforge-starters/                      # cache / lock / redisson / trace
 └── archforge-dependencies                   # Centralized BOM (java-platform)
 ```
@@ -74,7 +74,7 @@ ArchForge/
   - `application-staging.yaml`: external services, Flyway
   - `application-prod.yaml`: production hardened, Flyway
 - Logging: Log4j2 via `log4j2-spring.xml` with `<SpringProfile>` sections
-- Database: PostgreSQL via Flyway migrations (`archforge-common/archforge-common-jpa/src/main/resources/db/migration/` — shared by server-admin and server-web) and `archforge-domain/archforge-admin-user/src/main/resources/sql/` seed data
+- Database: PostgreSQL via Flyway migrations (`archforge-common/archforge-common-jpa/src/main/resources/db/migration/__root/` — shared legacy sequence; each module ships `db/migration/<module>/` with its own `flyway_schema_history_<module>` table) and `archforge-builtin/archforge-admin-user/src/main/resources/sql/` seed data
 
 ## JDK 25 Features
 

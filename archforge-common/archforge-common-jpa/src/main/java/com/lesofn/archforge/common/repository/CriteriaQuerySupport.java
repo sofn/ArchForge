@@ -15,15 +15,15 @@ import java.util.List;
  * Metamodel for type-safe queries.
  *
  * <p>
- * Subclasses are auto-instantiated by Spring Data JPA. The correct {@link EntityManager} is
- * injected based on the {@code entityManagerFactoryRef} configured in
- * {@code @EnableJpaRepositories}.
+ * Subclasses are auto-instantiated by Spring Data JPA. The application has exactly one
+ * {@link EntityManager} factory (see {@code JpaConfig}), so no {@code unitName} disambiguation is
+ * needed.
  *
  * @author sofn
  */
 public abstract class CriteriaQuerySupport {
 
-    @PersistenceContext(unitName = "user")
+    @PersistenceContext
     protected EntityManager entityManager;
 
     protected CriteriaBuilder cb() {

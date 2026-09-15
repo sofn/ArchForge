@@ -128,15 +128,15 @@ Default admin login is `admin / admin123` (captcha is on in `dev`). C-end API:
 | Module | Purpose |
 |--------|---------|
 | `archforge-common/archforge-common-{base,error,jpa}` | shared kernels: utils, `ErrorCode` framework, JPA conventions |
-| `archforge-domain/archforge-admin-user` | users, roles, menus, depts, dicts (DDD) |
-| `archforge-domain/archforge-blog` | articles, categories |
-| `archforge-domain/archforge-meta-table` | low-code table engine |
+| `archforge-builtin/archforge-admin-user` | users, roles, menus, depts, dicts (DDD) |
+| `archforge-builtin/archforge-meta-table` | low-code table engine |
+| `archforge-module-cms` | articles, categories |
+| `archforge-module-task` | task domain |
 | `archforge-infrastructure` | sa-token config, Redis, dynamic datasources, security filters |
 | `archforge-server-admin` | B-end application (`:8080`) |
 | `archforge-server-web` | C-end application (`:8081`) |
 | `archforge-starters/*` | cache / lock / redisson / trace starters |
 | `archforge-cli` | `./archforge` developer CLI + MCP server |
-| `archforge-example/archforge-example-task` | unlinked example module (not in server-admin; `/task` is not in OpenAPI) |
 | `archforge-dependencies` | version platform (BOM) |
 
 Non-Gradle dirs stay unprefixed: `docker/`, `config/`, `scripts/`, `.agents/`.

@@ -98,7 +98,7 @@ subprojects {
             "archforge-common-error" to "0.42",
             "archforge-common-jpa" to "0.49",
             "archforge-admin-user" to "0.04",
-            "archforge-blog" to "0.28",
+            "archforge-module-cms" to "0.28",
             "archforge-meta-table" to "0.64",
             "archforge-infrastructure" to "0.20",
             "archforge-server-admin" to "0.51",
@@ -108,7 +108,7 @@ subprojects {
             "archforge-redisson-starter" to "0.85",
             "archforge-request-log-starter" to "0.54",
             "archforge-trace-starter" to "0.92",
-            "archforge-example-task" to "0.0", // unlinked example — no floor yet
+            "archforge-module-task" to "0.0", // no floor yet
         )
         coverageFloors[name]?.let { floor ->
             tasks.named<org.gradle.testing.jacoco.tasks.JacocoCoverageVerification>(
@@ -306,6 +306,8 @@ subprojects {
         // 配置测试任务使用JUnit Platform
         tasks.withType<Test> {
             jvmArgs("--enable-preview", "--enable-native-access=ALL-UNNAMED")
+            // 全套件下大量 ApplicationContext 缓存（EMF + Hikari 池）常驻——默认 512m 会 OOM
+            maxHeapSize = "2g"
             // JUnit @Tag 体系 (P0/P1/contract/slow):
             //   ./gradlew test -Ptags=P0,contract          只跑指定 tag
             //   ./gradlew build -PexcludeTags=slow         跳过慢速集成测试

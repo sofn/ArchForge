@@ -12,14 +12,14 @@ import org.junit.jupiter.api.Test;
 class MutatingPermissionCoverageTest {
 
     @Test
-    void blogMutationsDeclarePermission() throws IOException {
+    void cmsMutationsDeclarePermission() throws IOException {
         String article = Files.readString(Path.of(
-                "src/main/java/com/lesofn/archforge/server/admin/controller/blog/BlogArticleController.java"));
+                "src/main/java/com/lesofn/archforge/server/admin/controller/cms/CmsArticleController.java"));
         String category = Files.readString(Path.of(
-                "src/main/java/com/lesofn/archforge/server/admin/controller/blog/BlogCategoryController.java"));
-        assertTrue(article.contains("blog:article:remove"));
-        assertTrue(article.contains("blog:article:publish"));
-        assertTrue(article.contains("blog:article:offline"));
-        assertTrue(category.contains("blog:category:remove"));
+                "src/main/java/com/lesofn/archforge/server/admin/controller/cms/CmsCategoryController.java"));
+        assertTrue(article.contains("cms:article:remove"));
+        assertTrue(article.contains("cms:article:publish"));
+        assertTrue(article.contains("cms:article:offline"));
+        assertTrue(category.contains("cms:category:remove"));
     }
 }

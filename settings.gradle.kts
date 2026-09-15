@@ -28,17 +28,13 @@ include("archforge-common:archforge-common-error")
 include("archforge-infrastructure")
 include("archforge-dependencies")
 include("archforge-server-admin")
-include("archforge-domain:archforge-blog")
+include("archforge-module-cms")
 include("archforge-server-web")
 
-include("archforge-domain:archforge-admin-user")
-include("archforge-domain:archforge-meta-table")
+include("archforge-builtin:archforge-admin-user")
+include("archforge-builtin:archforge-meta-table")
 
-file("archforge-example").listFiles()?.filter {
-    it.isDirectory && File(it, "build.gradle.kts").exists()
-}?.forEach { dir ->
-    include("archforge-example:${dir.name}")
-}
+include("archforge-module-task")
 
 include("archforge-starters:archforge-redisson-starter")
 include("archforge-starters:archforge-cache-starter")

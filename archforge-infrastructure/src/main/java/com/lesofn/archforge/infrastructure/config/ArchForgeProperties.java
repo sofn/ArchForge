@@ -303,6 +303,9 @@ public class ArchForgeProperties {
     public static class CodeGen {
         /** 代码生成工作区根目录，所有生成输出必须位于该目录内 */
         private String workspaceRoot = System.getProperty("user.home") + "/.archforge/codegen";
+
+        /** 生成模块目录名前缀（如 archforge → archforge-module-订单code；用户仓可换成自有前缀） */
+        private String modulePrefix = "archforge";
     }
 
     @Setter

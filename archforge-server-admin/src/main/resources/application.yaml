@@ -41,7 +41,7 @@ spring:
   datasource:
     dynamic:
       primary: master
-      strict: false
+      strict: true
   mvc:
     problemdetails:
       enabled: true

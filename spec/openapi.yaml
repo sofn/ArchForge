@@ -18,7 +18,7 @@ components:
             type: "object"
       description: "Error response (RFC 9457 ProblemDetail)"
   schemas:
-    AdminBlogArticleCreateRequest:
+    AdminCmsArticleCreateRequest:
       properties:
         categoryId:
           format: "int64"
@@ -47,7 +47,7 @@ components:
       - "status"
       - "title"
       type: "object"
-    AdminBlogArticleListRequest:
+    AdminCmsArticleListRequest:
       properties:
         categoryId:
           format: "int64"
@@ -64,7 +64,7 @@ components:
         title:
           type: "string"
       type: "object"
-    AdminBlogArticleResponse:
+    AdminCmsArticleResponse:
       properties:
         categoryId:
           format: "int64"
@@ -102,7 +102,7 @@ components:
           format: "date-time"
           type: "string"
       type: "object"
-    AdminBlogArticleUpdateRequest:
+    AdminCmsArticleUpdateRequest:
       properties:
         categoryId:
           format: "int64"
@@ -135,7 +135,7 @@ components:
       - "status"
       - "title"
       type: "object"
-    AdminBlogCategoryCreateRequest:
+    AdminCmsCategoryCreateRequest:
       properties:
         name:
           minLength: 1
@@ -153,7 +153,7 @@ components:
       - "name"
       - "slug"
       type: "object"
-    AdminBlogCategoryListRequest:
+    AdminCmsCategoryListRequest:
       properties:
         currentPage:
           format: "int32"
@@ -164,7 +164,7 @@ components:
           format: "int32"
           type: "integer"
       type: "object"
-    AdminBlogCategoryResponse:
+    AdminCmsCategoryResponse:
       properties:
         articleCount:
           format: "int64"
@@ -188,7 +188,7 @@ components:
         statusLabel:
           type: "string"
       type: "object"
-    AdminBlogCategoryUpdateRequest:
+    AdminCmsCategoryUpdateRequest:
       properties:
         id:
           format: "int64"
@@ -294,14 +294,14 @@ components:
         title:
           type: "string"
       type: "object"
-    AdminPageResponseAdminBlogArticleResponse:
+    AdminPageResponseAdminCmsArticleResponse:
       properties:
         currentPage:
           format: "int32"
           type: "integer"
         list:
           items:
-            $ref: "#/components/schemas/AdminBlogArticleResponse"
+            $ref: "#/components/schemas/AdminCmsArticleResponse"
           type: "array"
         pageSize:
           format: "int32"
@@ -310,14 +310,14 @@ components:
           format: "int64"
           type: "integer"
       type: "object"
-    AdminPageResponseAdminBlogCategoryResponse:
+    AdminPageResponseAdminCmsCategoryResponse:
       properties:
         currentPage:
           format: "int32"
           type: "integer"
         list:
           items:
-            $ref: "#/components/schemas/AdminBlogCategoryResponse"
+            $ref: "#/components/schemas/AdminCmsCategoryResponse"
           type: "array"
         pageSize:
           format: "int32"
@@ -723,6 +723,19 @@ components:
           type: "string"
       required:
       - "content"
+      type: "object"
+    ClientVersion:
+      properties:
+        channel:
+          type: "string"
+        clientVersion:
+          $ref: "#/components/schemas/Version"
+        device:
+          type: "string"
+        sdkVersion:
+          $ref: "#/components/schemas/Version"
+        udid:
+          type: "string"
       type: "object"
     ConfigCreateRequest:
       properties:
@@ -1964,6 +1977,27 @@ components:
         refreshToken:
           type: "string"
       type: "object"
+    RequestContext:
+      properties:
+        app_id:
+          format: "int32"
+          type: "integer"
+        client_version:
+          $ref: "#/components/schemas/ClientVersion"
+        current_uid:
+          format: "int64"
+          type: "integer"
+        ip:
+          type: "string"
+        is_official_app:
+          type: "boolean"
+        officialApp:
+          type: "boolean"
+        platform:
+          type: "string"
+        request_id:
+          type: "string"
+      type: "object"
     ResponseResultString:
       properties:
         code:
@@ -2238,6 +2272,104 @@ components:
         tableName:
           type: "string"
       type: "object"
+    TaskActionRequest:
+      properties:
+        id:
+          format: "int64"
+          type: "integer"
+      required:
+      - "id"
+      type: "object"
+    TaskCreateRequest:
+      properties:
+        description:
+          type: "string"
+        title:
+          minLength: 1
+          type: "string"
+        uid:
+          format: "int64"
+          type: "integer"
+      required:
+      - "title"
+      type: "object"
+    TaskDeleteRequest:
+      properties:
+        id:
+          format: "int64"
+          type: "integer"
+      required:
+      - "id"
+      type: "object"
+    TaskListRequest:
+      properties:
+        currentPage:
+          format: "int32"
+          type: "integer"
+        pageSize:
+          format: "int32"
+          type: "integer"
+        status:
+          type: "string"
+        title:
+          type: "string"
+        uid:
+          format: "int64"
+          type: "integer"
+      type: "object"
+    TaskPageResponseTaskResponse:
+      properties:
+        currentPage:
+          format: "int32"
+          type: "integer"
+        list:
+          items:
+            $ref: "#/components/schemas/TaskResponse"
+          type: "array"
+        pageSize:
+          format: "int32"
+          type: "integer"
+        total:
+          format: "int64"
+          type: "integer"
+      type: "object"
+    TaskResponse:
+      properties:
+        createTime:
+          format: "int64"
+          type: "integer"
+        description:
+          type: "string"
+        id:
+          format: "int64"
+          type: "integer"
+        status:
+          type: "string"
+        statusLabel:
+          type: "string"
+        title:
+          type: "string"
+        uid:
+          format: "int64"
+          type: "integer"
+      type: "object"
+    TaskUpdateRequest:
+      properties:
+        description:
+          type: "string"
+        id:
+          format: "int64"
+          type: "integer"
+        title:
+          minLength: 1
+          type: "string"
+        uid:
+          format: "int64"
+          type: "integer"
+      required:
+      - "id"
+      - "title"
+      type: "object"
     TransitionDTO:
       properties:
         enterTransition:
@@ -2422,6 +2554,21 @@ components:
           type: "string"
       required:
       - "id"
+      type: "object"
+    Version:
+      properties:
+        build:
+          format: "int32"
+          type: "integer"
+        major:
+          format: "int32"
+          type: "integer"
+        minor:
+          format: "int32"
+          type: "integer"
+        revision:
+          format: "int32"
+          type: "integer"
       type: "object"
     WebArticleCreateRequest:
       properties:
@@ -2863,246 +3010,6 @@ paths:
       summary: "刷新令牌"
       tags:
       - "登录API"
-  /admin/blog/article:
-    post:
-      operationId: "list_2"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/AdminBlogArticleListRequest"
-        required: true
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AdminPageResponseAdminBlogArticleResponse"
-          description: "OK"
-        "4XX":
-          $ref: "#/components/responses/Error"
-      summary: "List 2"
-      tags:
-      - "blog-article-controller"
-  /admin/blog/article/create:
-    post:
-      operationId: "create_2"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/AdminBlogArticleCreateRequest"
-        required: true
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                format: "int64"
-                type: "integer"
-          description: "OK"
-        "4XX":
-          $ref: "#/components/responses/Error"
-      summary: "Create 2"
-      tags:
-      - "blog-article-controller"
-  /admin/blog/article/delete:
-    post:
-      operationId: "delete_2"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/IdRequest"
-        required: true
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                type: "boolean"
-          description: "OK"
-        "4XX":
-          $ref: "#/components/responses/Error"
-      summary: "Delete 2"
-      tags:
-      - "blog-article-controller"
-  /admin/blog/article/update:
-    put:
-      operationId: "update_3"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/AdminBlogArticleUpdateRequest"
-        required: true
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                type: "boolean"
-          description: "OK"
-        "4XX":
-          $ref: "#/components/responses/Error"
-      summary: "Update 3"
-      tags:
-      - "blog-article-controller"
-  /admin/blog/article/{id}/offline:
-    post:
-      operationId: "offline"
-      parameters:
-      - in: "path"
-        name: "id"
-        required: true
-        schema:
-          format: "int64"
-          type: "integer"
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                type: "boolean"
-          description: "OK"
-        "4XX":
-          $ref: "#/components/responses/Error"
-      summary: "Offline"
-      tags:
-      - "blog-article-controller"
-  /admin/blog/article/{id}/publish:
-    post:
-      operationId: "publish"
-      parameters:
-      - in: "path"
-        name: "id"
-        required: true
-        schema:
-          format: "int64"
-          type: "integer"
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                type: "boolean"
-          description: "OK"
-        "4XX":
-          $ref: "#/components/responses/Error"
-      summary: "Publish"
-      tags:
-      - "blog-article-controller"
-  /admin/blog/category:
-    post:
-      operationId: "list_1"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/AdminBlogCategoryListRequest"
-        required: true
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AdminPageResponseAdminBlogCategoryResponse"
-          description: "OK"
-        "4XX":
-          $ref: "#/components/responses/Error"
-      summary: "List 1"
-      tags:
-      - "blog-category-controller"
-  /admin/blog/category/create:
-    post:
-      operationId: "create_1"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/AdminBlogCategoryCreateRequest"
-        required: true
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                format: "int64"
-                type: "integer"
-          description: "OK"
-        "4XX":
-          $ref: "#/components/responses/Error"
-      summary: "Create 1"
-      tags:
-      - "blog-category-controller"
-  /admin/blog/category/delete:
-    post:
-      operationId: "delete_1"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/IdRequest"
-        required: true
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                type: "boolean"
-          description: "OK"
-        "4XX":
-          $ref: "#/components/responses/Error"
-      summary: "Delete 1"
-      tags:
-      - "blog-category-controller"
-  /admin/blog/category/update:
-    put:
-      operationId: "update_2"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/AdminBlogCategoryUpdateRequest"
-        required: true
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                type: "boolean"
-          description: "OK"
-        "4XX":
-          $ref: "#/components/responses/Error"
-      summary: "Update 2"
-      tags:
-      - "blog-category-controller"
-  /admin/blog/file/upload:
-    post:
-      operationId: "uploadMarkdownImage"
-      parameters:
-      - in: "query"
-        name: "file[]"
-        required: true
-        schema:
-          items:
-            format: "binary"
-            type: "string"
-          type: "array"
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                additionalProperties:
-                  type: "object"
-                type: "object"
-          description: "OK"
-        "4XX":
-          $ref: "#/components/responses/Error"
-      summary: "Upload markdown image"
-      tags:
-      - "blog-file-controller"
   /admin/chat/config:
     get:
       operationId: "config"
@@ -3157,7 +3064,7 @@ paths:
       - "ChatAI"
   /admin/chat/sessions/{id}:
     delete:
-      operationId: "delete_4"
+      operationId: "delete_5"
       parameters:
       - in: "path"
         name: "id"
@@ -3223,6 +3130,246 @@ paths:
       summary: "发送消息（SSE：delta / done / error）"
       tags:
       - "ChatAI"
+  /admin/cms/article:
+    post:
+      operationId: "list_3"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminCmsArticleListRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminPageResponseAdminCmsArticleResponse"
+          description: "OK"
+        "4XX":
+          $ref: "#/components/responses/Error"
+      summary: "List 3"
+      tags:
+      - "cms-article-controller"
+  /admin/cms/article/create:
+    post:
+      operationId: "create_3"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminCmsArticleCreateRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                format: "int64"
+                type: "integer"
+          description: "OK"
+        "4XX":
+          $ref: "#/components/responses/Error"
+      summary: "Create 3"
+      tags:
+      - "cms-article-controller"
+  /admin/cms/article/delete:
+    post:
+      operationId: "delete_3"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IdRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: "boolean"
+          description: "OK"
+        "4XX":
+          $ref: "#/components/responses/Error"
+      summary: "Delete 3"
+      tags:
+      - "cms-article-controller"
+  /admin/cms/article/update:
+    put:
+      operationId: "update_4"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminCmsArticleUpdateRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: "boolean"
+          description: "OK"
+        "4XX":
+          $ref: "#/components/responses/Error"
+      summary: "Update 4"
+      tags:
+      - "cms-article-controller"
+  /admin/cms/article/{id}/offline:
+    post:
+      operationId: "offline"
+      parameters:
+      - in: "path"
+        name: "id"
+        required: true
+        schema:
+          format: "int64"
+          type: "integer"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: "boolean"
+          description: "OK"
+        "4XX":
+          $ref: "#/components/responses/Error"
+      summary: "Offline"
+      tags:
+      - "cms-article-controller"
+  /admin/cms/article/{id}/publish:
+    post:
+      operationId: "publish"
+      parameters:
+      - in: "path"
+        name: "id"
+        required: true
+        schema:
+          format: "int64"
+          type: "integer"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: "boolean"
+          description: "OK"
+        "4XX":
+          $ref: "#/components/responses/Error"
+      summary: "Publish"
+      tags:
+      - "cms-article-controller"
+  /admin/cms/category:
+    post:
+      operationId: "list_2"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminCmsCategoryListRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminPageResponseAdminCmsCategoryResponse"
+          description: "OK"
+        "4XX":
+          $ref: "#/components/responses/Error"
+      summary: "List 2"
+      tags:
+      - "cms-category-controller"
+  /admin/cms/category/create:
+    post:
+      operationId: "create_2"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminCmsCategoryCreateRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                format: "int64"
+                type: "integer"
+          description: "OK"
+        "4XX":
+          $ref: "#/components/responses/Error"
+      summary: "Create 2"
+      tags:
+      - "cms-category-controller"
+  /admin/cms/category/delete:
+    post:
+      operationId: "delete_2"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IdRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: "boolean"
+          description: "OK"
+        "4XX":
+          $ref: "#/components/responses/Error"
+      summary: "Delete 2"
+      tags:
+      - "cms-category-controller"
+  /admin/cms/category/update:
+    put:
+      operationId: "update_3"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminCmsCategoryUpdateRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: "boolean"
+          description: "OK"
+        "4XX":
+          $ref: "#/components/responses/Error"
+      summary: "Update 3"
+      tags:
+      - "cms-category-controller"
+  /admin/cms/file/upload:
+    post:
+      operationId: "uploadMarkdownImage"
+      parameters:
+      - in: "query"
+        name: "file[]"
+        required: true
+        schema:
+          items:
+            format: "binary"
+            type: "string"
+          type: "array"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                additionalProperties:
+                  type: "object"
+                type: "object"
+          description: "OK"
+        "4XX":
+          $ref: "#/components/responses/Error"
+      summary: "Upload markdown image"
+      tags:
+      - "cms-file-controller"
   /admin/config:
     post:
       operationId: "getConfigList"
@@ -3736,7 +3883,7 @@ paths:
       - "菜单管理"
   /admin/meta-table:
     post:
-      operationId: "list"
+      operationId: "list_1"
       requestBody:
         content:
           application/json:
@@ -3757,7 +3904,7 @@ paths:
       - "元表格管理"
   /admin/meta-table/create:
     post:
-      operationId: "create"
+      operationId: "create_1"
       requestBody:
         content:
           application/json:
@@ -3914,7 +4061,7 @@ paths:
       tags:
       - "元表格管理"
     put:
-      operationId: "update_1"
+      operationId: "update_2"
       parameters:
       - in: "path"
         name: "id"
@@ -4725,7 +4872,7 @@ paths:
       - "角色管理"
   /admin/scheduler-job:
     get:
-      operationId: "list_3"
+      operationId: "list_4"
       parameters:
       - in: "query"
         name: "query"
@@ -4843,7 +4990,7 @@ paths:
       - "定时任务管理"
   /admin/scheduler-job/update/{id}:
     put:
-      operationId: "update"
+      operationId: "update_1"
       parameters:
       - in: "path"
         name: "id"
@@ -4888,7 +5035,7 @@ paths:
       - "定时任务管理"
   /admin/scheduler-job/{id}:
     delete:
-      operationId: "delete_3"
+      operationId: "delete_4"
       parameters:
       - in: "path"
         name: "id"
@@ -5109,6 +5256,166 @@ paths:
       summary: "更新字典类型"
       tags:
       - "字典配置"
+  /admin/task:
+    post:
+      operationId: "list"
+      parameters:
+      - in: "query"
+        name: "rc"
+        required: true
+        schema:
+          $ref: "#/components/schemas/RequestContext"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TaskListRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TaskPageResponseTaskResponse"
+          description: "OK"
+        "4XX":
+          $ref: "#/components/responses/Error"
+      summary: "获取任务列表"
+      tags:
+      - "任务管理"
+  /admin/task/cancel:
+    post:
+      operationId: "cancel"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TaskActionRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: "boolean"
+          description: "OK"
+        "4XX":
+          $ref: "#/components/responses/Error"
+      summary: "取消任务"
+      tags:
+      - "任务管理"
+  /admin/task/complete:
+    post:
+      operationId: "complete"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TaskActionRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: "boolean"
+          description: "OK"
+        "4XX":
+          $ref: "#/components/responses/Error"
+      summary: "完成任务"
+      tags:
+      - "任务管理"
+  /admin/task/create:
+    post:
+      operationId: "create"
+      parameters:
+      - in: "query"
+        name: "rc"
+        required: true
+        schema:
+          $ref: "#/components/schemas/RequestContext"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TaskCreateRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                format: "int64"
+                type: "integer"
+          description: "OK"
+        "4XX":
+          $ref: "#/components/responses/Error"
+      summary: "创建任务"
+      tags:
+      - "任务管理"
+  /admin/task/delete:
+    post:
+      operationId: "delete_1"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TaskDeleteRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: "boolean"
+          description: "OK"
+        "4XX":
+          $ref: "#/components/responses/Error"
+      summary: "删除任务"
+      tags:
+      - "任务管理"
+  /admin/task/start:
+    post:
+      operationId: "start"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TaskActionRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: "boolean"
+          description: "OK"
+        "4XX":
+          $ref: "#/components/responses/Error"
+      summary: "开始任务"
+      tags:
+      - "任务管理"
+  /admin/task/update:
+    put:
+      operationId: "update"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TaskUpdateRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: "boolean"
+          description: "OK"
+        "4XX":
+          $ref: "#/components/responses/Error"
+      summary: "更新任务"
+      tags:
+      - "任务管理"
   /admin/user:
     post:
       operationId: "getUserList"
@@ -5332,7 +5639,7 @@ paths:
           $ref: "#/components/responses/Error"
       summary: "Get articles"
       tags:
-      - "web-blog-controller"
+      - "web-cms-controller"
     post:
       operationId: "createArticle"
       requestBody:
@@ -5353,7 +5660,7 @@ paths:
           $ref: "#/components/responses/Error"
       summary: "Create article"
       tags:
-      - "web-blog-controller"
+      - "web-cms-controller"
   /web/articles/{slug}:
     get:
       operationId: "getArticle"
@@ -5374,7 +5681,7 @@ paths:
           $ref: "#/components/responses/Error"
       summary: "Get article"
       tags:
-      - "web-blog-controller"
+      - "web-cms-controller"
   /web/categories:
     get:
       operationId: "getCategories"
@@ -5391,7 +5698,7 @@ paths:
           $ref: "#/components/responses/Error"
       summary: "Get categories"
       tags:
-      - "web-blog-controller"
+      - "web-cms-controller"
   /web/dashboard/metrics:
     get:
       operationId: "webMetrics"
@@ -5659,7 +5966,7 @@ paths:
           $ref: "#/components/responses/Error"
       summary: "My articles"
       tags:
-      - "web-blog-controller"
+      - "web-cms-controller"
   /web/user/change-password:
     post:
       operationId: "changePassword"

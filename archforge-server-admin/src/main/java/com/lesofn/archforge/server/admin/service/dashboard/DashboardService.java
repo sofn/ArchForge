@@ -1,6 +1,6 @@
 package com.lesofn.archforge.server.admin.service.dashboard;
 
-import com.lesofn.archforge.blog.api.dao.BlogArticleRepository;
+import com.lesofn.archforge.cms.api.dao.CmsArticleRepository;
 import com.lesofn.archforge.meta.table.api.dao.MetaTableRepository;
 import com.lesofn.archforge.user.api.dao.SysUserRepository;
 import java.time.LocalDate;
@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 public class DashboardService {
 
     private final SysUserRepository userRepository;
-    private final BlogArticleRepository articleRepository;
+    private final CmsArticleRepository articleRepository;
     private final MetaTableRepository metaTableRepository;
 
     public DashboardMetricsResponse metrics() {
@@ -50,7 +50,7 @@ public class DashboardService {
     public List<DashboardTodo> todo() {
         return List.of(
                 new DashboardTodo("Users", userRepository.countByDeletedFalse(), "/welcome"),
-                new DashboardTodo("Articles", articleRepository.countByDeletedFalse(), "/blog/article/index"),
+                new DashboardTodo("Articles", articleRepository.countByDeletedFalse(), "/cms/article/index"),
                 new DashboardTodo("Meta tables", metaTableRepository.countByDeletedFalse(), "/metatable"));
     }
 }

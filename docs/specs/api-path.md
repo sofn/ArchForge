@@ -40,10 +40,11 @@ New endpoints go under `/admin/{resource}` or `/web/{resource}`. Do not add a th
 /admin/permission-matrix/menus/tree
 /admin/permission-matrix/roles/{roleId}/permissions
 /admin/scheduler-job
-/admin/blog/article
-/admin/blog/category
-/admin/blog/file
+/admin/cms/article
+/admin/cms/category
+/admin/cms/file
 /admin/meta-table
+/admin/task
 /admin/file
 /admin/monitor
 /admin/system/dict
@@ -52,17 +53,6 @@ New endpoints go under `/admin/{resource}` or `/web/{resource}`. Do not add a th
 
 Shared infrastructure mounts per-server: `IdempotentTokenController` reads
 `arch-forge.idempotent.base-path` (`/admin/idempotent` on :8080, `/web/idempotent` on :8081).
-
-## Example endpoints — not in the contract
-
-`archforge-example-task` is an unlinked example; it is **not** assembled into `server-admin`. Its HTTP surface is **not** in `spec/openapi.yaml`:
-
-```
-/task                   # TaskController — example only; do not treat as a platform API
-/web/task               # was WebTaskController (Thymeleaf views); deleted — do not re-add
-```
-
-Do not add `/task` or `/web/task` to the OpenAPI contract unless the example module is a first-class product. Prefer `/admin/example-task` if the demo stays in the admin app.
 
 ## Deleted — do not document or re-add
 

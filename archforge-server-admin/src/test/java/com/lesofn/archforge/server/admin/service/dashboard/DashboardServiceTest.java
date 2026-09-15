@@ -3,9 +3,9 @@ package com.lesofn.archforge.server.admin.service.dashboard;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
-import com.lesofn.archforge.blog.api.dao.BlogArticleRepository;
-import com.lesofn.archforge.blog.api.domain.BlogArticle;
-import com.lesofn.archforge.blog.testing.ArticleTestBuilder;
+import com.lesofn.archforge.cms.api.dao.CmsArticleRepository;
+import com.lesofn.archforge.cms.api.domain.CmsArticle;
+import com.lesofn.archforge.cms.testing.ArticleTestBuilder;
 import com.lesofn.archforge.meta.table.api.dao.MetaTableRepository;
 import com.lesofn.archforge.user.api.dao.SysUserRepository;
 import java.util.List;
@@ -26,7 +26,7 @@ class DashboardServiceTest {
     @Mock
     private SysUserRepository userRepository;
     @Mock
-    private BlogArticleRepository articleRepository;
+    private CmsArticleRepository articleRepository;
     @Mock
     private MetaTableRepository metaTableRepository;
 
@@ -70,9 +70,9 @@ class DashboardServiceTest {
 
     @Test
     void recentActivitiesFallsBackToIdWhenTitleMissing() {
-        BlogArticle titled = ArticleTestBuilder.anArticle().withId(1L).withTitle("Hello").build();
+        CmsArticle titled = ArticleTestBuilder.anArticle().withId(1L).withTitle("Hello").build();
         // Builders default the title; clear it to exercise the service fallback.
-        BlogArticle untitled = ArticleTestBuilder.anArticle().withId(2L).build();
+        CmsArticle untitled = ArticleTestBuilder.anArticle().withId(2L).build();
         untitled.setTitle(null);
         when(articleRepository.findAll(org.mockito.ArgumentMatchers.any(PageRequest.class)))
                 .thenReturn(new PageImpl<>(List.of(titled, untitled)));
@@ -95,7 +95,7 @@ class DashboardServiceTest {
 
         assertEquals(3, todos.size());
         assertEquals("/welcome", todos.get(0).href());
-        assertEquals("/blog/article/index", todos.get(1).href());
+        assertEquals("/cms/article/index", todos.get(1).href());
         assertEquals("/metatable", todos.get(2).href());
     }
 }

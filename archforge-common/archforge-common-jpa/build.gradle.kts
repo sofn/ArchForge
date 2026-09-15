@@ -35,4 +35,7 @@ dependencies {
     // Lombok
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
+
+    // 编排器单测用的内存库（Flyway 对 H2 的支持在 flyway-core 内）
+    testImplementation("com.h2database:h2")
 }

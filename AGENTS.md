@@ -139,6 +139,9 @@ Before claiming work is complete:
 - [ ] `./gradlew :archforge-server-admin:bootRun` starts without errors
 - [ ] No new Error Prone warnings introduced beyond the pre-existing baseline
 - [ ] Plan file updated with final status
+- [ ] New L3 (`archforge-builtin/`) modules: the PR description must justify it
+  as an organizational capability and link the review outcome
+  (`docs/specs/module-governance.md`)
 
 ## Project Context
 
@@ -175,13 +178,13 @@ archforge/
   request/response schemas, auth) run `./gradlew generateOpenApi` and commit
   the regenerated file in the same change. The task merges live springdoc
   exports from server-admin and server-web; CI regenerates and fails on diff.
-- **Example modules are not the product.** `archforge-example-task` is an
-  unlinked in-tree example (`settings.gradle.kts` dynamic include). Do not
-  add it to `server-admin` (`api(project)`, `scanBasePackages`, a second
-  EMF, `task_master`, or `hibernate.hbm2ddl.auto=update`). Do not put
-  `/task` or `/web/task` in `spec/openapi.yaml`. Production
-  EntityManagerFactories must not hard-code `hibernate.hbm2ddl.auto=update`
-  — schema belongs to Flyway.
+- **Module governance**: L4 business domains are flat `archforge-module-*`
+  at repo root, **assembled into server-admin by default** — see
+  `docs/specs/module-governance.md`. There is exactly **one**
+  EntityManagerFactory + one TransactionManager (`common.persistence.JpaConfig`);
+  never add a per-module `*DbConfig`, a second EMF, a `GroupDataSourceProxy`,
+  or `hibernate.hbm2ddl.auto=update` — schema belongs to Flyway
+  (`db/migration/<module>/` inside the module jar).
 - **Scheduler is db-scheduler**, not Quartz. HTTP lives at `/admin/scheduler-job`.
   Do not reintroduce `/quartz` or document `sys_quartz_job` / `QuartzReflectionJob`
   as current. See `.agents/skills/archforge-project-standard/standard.md` §3.8.

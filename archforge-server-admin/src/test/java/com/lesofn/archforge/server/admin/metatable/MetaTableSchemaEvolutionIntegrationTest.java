@@ -101,7 +101,7 @@ class MetaTableSchemaEvolutionIntegrationTest extends AbstractIntegrationTest {
         }
 
         /** Loads a managed entity, moves the row's version behind its back, then flushes. */
-        @Transactional("metaTableTransactionManager")
+        @Transactional
         public void flushStale(long tableId) {
             MetaTable stale = repository.findById(tableId).orElseThrow();
             jdbcTemplate.getJdbcOperations().execute(

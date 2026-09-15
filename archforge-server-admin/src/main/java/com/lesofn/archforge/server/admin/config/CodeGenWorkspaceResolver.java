@@ -2,6 +2,7 @@ package com.lesofn.archforge.server.admin.config;
 
 import com.lesofn.archforge.common.error.system.SystemException;
 import com.lesofn.archforge.infrastructure.config.ArchForgeProperties;
+import com.lesofn.archforge.meta.table.api.codegen.CodeGenModelFactory;
 import jakarta.annotation.Nullable;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -25,9 +26,11 @@ public class CodeGenWorkspaceResolver {
     private static final String FRONTEND_DIR = "ArchForgeAdmin";
 
     private final Path workspaceRoot;
+    private final String modulePrefix;
 
     public CodeGenWorkspaceResolver(ArchForgeProperties properties) {
         this.workspaceRoot = Paths.get(properties.getCodeGen().getWorkspaceRoot()).toAbsolutePath().normalize();
+        this.modulePrefix = properties.getCodeGen().getModulePrefix();
     }
 
     /**
@@ -44,7 +47,7 @@ public class CodeGenWorkspaceResolver {
 
     /** Default backend output directory relative to the workspace root. */
     public Path defaultBackendDir(String tableCode) {
-        return Paths.get(BACKEND_DIR, "example", tableCode);
+        return Paths.get(BACKEND_DIR, modulePrefix + "-module-" + CodeGenModelFactory.toModuleSlug(tableCode));
     }
 
     /** Default frontend output directory relative to the workspace root. */

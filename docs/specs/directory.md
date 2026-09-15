@@ -10,15 +10,15 @@ ArchForge/
 │   ├── archforge-common-base/
 │   ├── archforge-common-error/
 │   └── archforge-common-jpa/
-├── archforge-domain/
+├── archforge-builtin/
 │   ├── archforge-admin-user/
-│   ├── archforge-blog/
 │   └── archforge-meta-table/
+├── archforge-module-cms/
+├── archforge-module-task/
 ├── archforge-infrastructure/
 ├── archforge-server-admin/
 ├── archforge-server-web/
 ├── archforge-cli/
-├── archforge-example/archforge-example-task/
 ├── archforge-starters/
 │   ├── archforge-cache-starter/
 │   ├── archforge-lock-starter/

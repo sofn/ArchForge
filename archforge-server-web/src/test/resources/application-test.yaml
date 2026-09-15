@@ -20,7 +20,7 @@ spring:
   datasource:
     dynamic:
       primary: master
-      strict: false
+      strict: true
   data:
     redis:
       host: 127.0.0.1
@@ -40,7 +40,7 @@ arch-forge:
   flyway:
     enabled: true
     baseline-on-migrate: true
-    locations: classpath:db/migration
+    locations: classpath:db/migration/__root
     default-schema: public
   jwt:
     secret: ${JWT_SECRET:test-jwt-secret-for-integration-only}

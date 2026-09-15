@@ -1,4 +1,8 @@
 #
-#Sun Sep 13 22:55:39 CST 2026
+#Wed Sep 16 01:00:57 CST 2026
 no\ classes\ should\ have\ simple\ name\ ending\ with\ 'DTO'\ or\ should\ have\ simple\ name\ ending\ with\ 'ItemDTO'=be1057cb-5f99-4e65-aebb-ac3588772a34
 no\ classes\ should\ have\ simple\ name\ ending\ with\ 'DTO'\ or\ should\ have\ simple\ name\ ending\ with\ 'ItemDTO',\ because\ ARCH-010\:\ request/response\ types\ use\ *Request/*Response\ (frozen\ legacy\ *DTO\ set)=9398f3c7-e6bd-4c7d-89ce-98015783ba2c
+no\ classes\ that\ reside\ in\ a\ package\ '..archforge.meta.table..'\ should\ depend\ on\ classes\ that\ reside\ in\ a\ package\ '..archforge.user.internal..',\ because\ ARCH-011b\:\ L3\ builtin\ modules\ meet\ via\ api,\ never\ the\ other\ module's\ internal=8385b630-1781-46b1-a3a4-aed158b4c62f
+no\ classes\ that\ reside\ in\ a\ package\ '..archforge.user..'\ should\ depend\ on\ classes\ that\ reside\ in\ a\ package\ '..archforge.meta.table.internal..',\ because\ ARCH-011a\:\ L3\ builtin\ modules\ meet\ via\ api,\ never\ the\ other\ module's\ internal=e6af94a0-5ad0-4667-924a-8bd2358f9bf3
+no\ classes\ that\ reside\ in\ any\ package\ ['..archforge.common..',\ '..archforge.infrastructure..']\ should\ depend\ on\ classes\ that\ reside\ in\ any\ package\ ['..archforge.user..',\ '..archforge.meta.table..',\ '..archforge.server..',\ '..archforge.cms..',\ '..archforge.task..'],\ because\ ARCH-012\:\ Kernel\ must\ not\ depend\ on\ Apps\ /\ L3\ builtin\ /\ L4\ modules=75f671e2-6e59-4b71-a088-e4d2ffc4dd83
+no\ classes\ that\ reside\ in\ any\ package\ ['..archforge.user..',\ '..archforge.meta.table..']\ should\ depend\ on\ classes\ that\ reside\ in\ any\ package\ ['..archforge.cms..',\ '..archforge.task..'],\ because\ ARCH-013\:\ L3\ builtin\ must\ not\ depend\ on\ L4\ business\ modules=174f955f-3fbe-41b8-b9a3-25d710f9e04f

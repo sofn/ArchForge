@@ -91,8 +91,8 @@ dependencies {
     api(project(":archforge-common:archforge-common-base"))
     api(project(":archforge-common:archforge-common-jpa"))
     api(project(":archforge-infrastructure"))
-    api(project(":archforge-domain:archforge-blog"))
-    api(project(":archforge-domain:archforge-admin-user"))
+    api(project(":archforge-module-cms"))
+    api(project(":archforge-builtin:archforge-admin-user"))
 
     api("org.springframework.boot:spring-boot-starter-web") {
         exclude(group = "org.springframework.boot", module = "spring-boot-starter-logging")
@@ -125,9 +125,9 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 
     // 集成测试容器基座（Testcontainers PG/Redis，DynamicPropertySource 注入数据源）
-    // + blog 测试数据 builder
+    // + cms 测试数据 builder
     testImplementation(testFixtures(project(":archforge-common:archforge-common-jpa")))
-    testImplementation(testFixtures(project(":archforge-domain:archforge-blog")))
+    testImplementation(testFixtures(project(":archforge-module-cms")))
 
     // ArchUnit architecture tests (G7)
     testImplementation("com.tngtech.archunit:archunit")

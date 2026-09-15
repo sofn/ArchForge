@@ -3,7 +3,7 @@ package com.lesofn.archforge.server.admin.service.dashboard;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
-import com.lesofn.archforge.blog.api.dao.BlogArticleRepository;
+import com.lesofn.archforge.cms.api.dao.CmsArticleRepository;
 import com.lesofn.archforge.meta.table.api.dao.MetaTableRepository;
 import com.lesofn.archforge.user.api.dao.SysUserRepository;
 import org.junit.jupiter.api.Test;
@@ -19,7 +19,7 @@ class DashboardMetricsTest {
     private SysUserRepository userRepository;
 
     @Mock
-    private BlogArticleRepository articleRepository;
+    private CmsArticleRepository articleRepository;
 
     @Mock
     private MetaTableRepository metaTableRepository;

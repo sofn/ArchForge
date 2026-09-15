@@ -34,7 +34,7 @@ jobs:
           assert "name: MENU" in text and "value: 1" in text
           assert "name: CATALOG" in text
           assert "name: BUTTON" not in text.split("MenuTypeEnum:",1)[1].split("frontend:",1)[0]
-          for name in ("BlogArticleStatus", "NoticeTypeEnum", "NoticeStatusEnum", "GenderEnum", "OperationStatusEnum", "LoginStatusEnum"):
+          for name in ("CmsArticleStatus", "NoticeTypeEnum", "NoticeStatusEnum", "GenderEnum", "OperationStatusEnum", "LoginStatusEnum"):
               assert name in text, name
           print("MenuTypeEnum contract ok")
           PY
@@ -48,7 +48,7 @@ jobs:
           grep -q "CHAT_AI" docs/specs/error-codes.md
           grep -q "/admin/user/create" spec/openapi.yaml
           grep -q "/admin/menu/create" spec/openapi.yaml
-          grep -q "/admin/blog/article/create" spec/openapi.yaml
+          grep -q "/admin/cms/article/create" spec/openapi.yaml
           echo paths ok
 
   build-and-test:

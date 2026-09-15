@@ -1,6 +1,5 @@
 package com.lesofn.archforge.server.admin;
 
-import com.lesofn.archforge.common.persistence.GroupDataSourceProxy;
 import com.lesofn.archforge.common.persistence.testsupport.AbstractIntegrationTest;
 import jakarta.annotation.PostConstruct;
 import java.nio.charset.StandardCharsets;
@@ -36,14 +35,14 @@ public class TestDataInitializer {
         try {
             log.info("开始初始化数据库数据...");
 
-            DataSource userDs = new GroupDataSourceProxy(dataSource, "user");
+            DataSource userDs = dataSource;
 
             ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
             populator.addScript(new ClassPathResource("sql/data-admin-user.sql"));
             populator.addScript(new ClassPathResource("sql/data-admin-dept.sql"));
             populator.addScript(new ClassPathResource("sql/data-admin-config.sql"));
             populator.addScript(new ClassPathResource("sql/data-admin-scheduler.sql"));
-            populator.addScript(new ClassPathResource("sql/data-admin-blog.sql"));
+            populator.addScript(new ClassPathResource("sql/data-admin-cms.sql"));
             populator.setSqlScriptEncoding(StandardCharsets.UTF_8.name());
             populator.setContinueOnError(true);
 
@@ -71,8 +70,8 @@ public class TestDataInitializer {
                 "sys_oper_log_oper_id_seq",
                 "sys_login_log_info_id_seq",
                 "sys_file_file_id_seq",
-                "blog_category_id_seq",
-                "blog_article_id_seq"
+                "cms_category_id_seq",
+                "cms_article_id_seq"
         };
         String[] tables = {
                 "sys_user",
@@ -84,8 +83,8 @@ public class TestDataInitializer {
                 "sys_oper_log",
                 "sys_login_log",
                 "sys_file",
-                "blog_category",
-                "blog_article"
+                "cms_category",
+                "cms_article"
         };
         String[] idCols = {
                 "user_id", "menu_id", "role_id", "dept_id", "config_id", "notice_id", "oper_id", "info_id", "file_id",
