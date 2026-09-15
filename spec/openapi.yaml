@@ -22,21 +22,6 @@ tags:
 - name: "登录API"
   description: "登录相关接口"
 paths:
-  /admin/auth/:
-    get:
-      tags:
-      - "登录API"
-      summary: "首页"
-      operationId: "index"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            application/json:
-              schema:
-                type: "string"
-        "4XX":
-          $ref: "#/components/responses/Error"
   /admin/auth/captchaImage:
     get:
       tags:
@@ -1116,7 +1101,7 @@ paths:
                 format: "int64"
         "4XX":
           $ref: "#/components/responses/Error"
-  /admin/meta-table/import-preview/{tableName}:
+  /admin/meta-table/import-preview:
     get:
       tags:
       - "元表格管理"
@@ -1124,7 +1109,7 @@ paths:
       operationId: "importPreview"
       parameters:
       - name: "tableName"
-        in: "path"
+        in: "query"
         required: true
         schema:
           type: "string"
@@ -4437,15 +4422,15 @@ components:
           type: "string"
         dictCode:
           type: "string"
+        uniqueColumn:
+          type: "boolean"
+        indexedColumn:
+          type: "boolean"
         nullableColumn:
           type: "boolean"
         listVisibleColumn:
           type: "boolean"
         searchableColumn:
-          type: "boolean"
-        uniqueColumn:
-          type: "boolean"
-        indexedColumn:
           type: "boolean"
     MetaColumnRequest:
       required:

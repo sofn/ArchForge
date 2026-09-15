@@ -5,7 +5,6 @@ import com.lesofn.archforge.infrastructure.auth.LoginContext;
 import com.lesofn.archforge.infrastructure.auth.errors.AdminAuthErrorCode;
 import com.lesofn.archforge.infrastructure.auth.errors.AdminAuthException;
 import com.lesofn.archforge.common.auth.SystemLoginUser;
-import com.lesofn.archforge.infrastructure.config.ArchForgeProperties;
 import com.lesofn.archforge.common.auth.RoleInfo;
 import com.lesofn.archforge.server.admin.dto.CaptchaResponse;
 import com.lesofn.archforge.server.admin.dto.CurrentLoginUserResponse;
@@ -58,17 +57,7 @@ public class LoginController {
     private final LoginService loginService;
     private final AdminUserService userService;
     private final SysMenuService menuService;
-    private final ArchForgeProperties appForgeConfig;
     private final TokenService tokenService;
-
-    /** 访问首页，提示语 */
-    @Operation(summary = "首页")
-    @GetMapping("/")
-    public String index() {
-        return String.format(
-                "欢迎使用%s后台管理系统，当前版本：v%s，请通过前端地址访问。",
-                appForgeConfig.getName(), appForgeConfig.getVersion());
-    }
 
     /**
      * 获取系统的内置配置

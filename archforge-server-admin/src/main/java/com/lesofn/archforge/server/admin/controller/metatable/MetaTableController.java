@@ -194,8 +194,8 @@ public class MetaTableController {
 
     @Operation(summary = "预览物理表导入映射")
     @SaCheckPermission(value = "meta-table:list", type = StpAdminUtil.TYPE)
-    @GetMapping("/import-preview/{tableName}")
-    public TableImportPreview importPreview(@PathVariable String tableName) {
+    @GetMapping("/import-preview")
+    public TableImportPreview importPreview(@RequestParam String tableName) {
         return metaTableImportService.preview(tableName);
     }
 

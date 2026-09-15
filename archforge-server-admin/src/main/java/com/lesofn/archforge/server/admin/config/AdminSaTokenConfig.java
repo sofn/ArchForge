@@ -26,7 +26,6 @@ public class AdminSaTokenConfig implements WebMvcConfigurer {
                         "/admin/auth/getConfig",
                         "/admin/auth/captchaImage",
                         "/admin/auth/refresh-token",
-                        "/admin/auth/",
                         "/admin/idempotent/token",
                         "/v3/api-docs",
                         "/v3/api-docs/**",
