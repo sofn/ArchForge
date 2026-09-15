@@ -15,6 +15,4 @@ public interface MetaColumnRepository extends JpaRepository<MetaColumn, Long> {
     List<MetaColumn> findByTableIdAndDeletedFalseAndSearchableTrueOrderBySortAsc(Long tableId);
 
     long countByTableIdAndDeletedFalse(Long tableId);
-
-    void deleteByTableId(Long tableId);
 }

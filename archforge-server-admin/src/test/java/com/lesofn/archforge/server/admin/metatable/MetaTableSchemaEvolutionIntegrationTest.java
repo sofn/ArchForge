@@ -50,7 +50,7 @@ class MetaTableSchemaEvolutionIntegrationTest extends AbstractIntegrationTest {
 
     private static final List<String> CODES = List.of(
             "p1itnotnull", "p1itbackfill", "p1itlossy", "p1itwiden", "p1ituq", "p1itreadd", "p1itlock",
-            "p1itmulti");
+            "p1itmulti", "p1itdel");
 
     @Qualifier("metaTableJdbcTemplate")
     @Autowired
@@ -225,11 +225,28 @@ class MetaTableSchemaEvolutionIntegrationTest extends AbstractIntegrationTest {
 
         assertEquals("NO", columnNullable("meta_p1itmulti", "grade"));
         List<Map<String, Object>> migrations = jdbc.queryForList(
-                "SELECT version, change_type, status FROM sys_meta_table_migration "
-                        + "WHERE table_id = :t AND deleted = 0",
+                "SELECT version, change_type, status FROM sys_meta_table_migration " + "WHERE table_id = :t AND deleted = 0",
                 Map.of("t", id));
         assertEquals(1, migrations.size());
         assertEquals("MULTI", migrations.getFirst().get("change_type"));
+    }
+
+    @Test
+    void deleteTableWithMigrationHistorySoftDeletes() {
+        Long id = createTable("p1itdel", stringColumn("grade", "A"));
+        List<MetaColumn> columns = adminService.findColumns(id);
+        columns.forEach(c -> c.setNullable(false));
+        adminService.update(id, renameTo(adminService.findById(id)), columns, 1L);
+
+        // 回归：有迁移记录的表删除曾是物理删、撞 sys_meta_table_migration FK —— 现为软删
+        adminService.delete(id, true);
+
+        assertEquals(1, jdbc.queryForObject(
+                "SELECT COUNT(*) FROM sys_meta_table WHERE id = :t AND deleted = 1",
+                Map.of("t", id), Integer.class));
+        assertEquals(1, jdbc.queryForObject(
+                "SELECT COUNT(*) FROM sys_meta_table_migration WHERE table_id = :t",
+                Map.of("t", id), Integer.class));
     }
 
     @Test

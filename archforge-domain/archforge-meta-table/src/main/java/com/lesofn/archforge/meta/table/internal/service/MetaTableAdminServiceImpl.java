@@ -307,22 +307,17 @@ public class MetaTableAdminServiceImpl implements MetaTableAdminService {
 
         jdbcTemplate.getJdbcOperations().execute(ddlGenerator.generateDropTable(table.physicalTableName()));
 
-        metaColumnRepository.deleteByTableId(id);
-        deleteGuarded(id);
+        // 软删列与表（物理表已 DROP）：硬删会撞 sys_meta_table_migration 的外键
+        List<MetaColumn> columns = metaColumnRepository.findByTableIdAndDeletedFalseOrderBySortAsc(id);
+        columns.forEach(c -> c.setDeleted(true));
+        metaColumnRepository.saveAll(columns);
+        table.setDeleted(true);
+        saveGuarded(table);
     }
 
     private void saveGuarded(MetaTable table) {
         try {
             metaTableRepository.saveAndFlush(table);
-        } catch (OptimisticLockingFailureException e) {
-            throw new MetaTableException(META_TABLE_CONCURRENT_MODIFY);
-        }
-    }
-
-    private void deleteGuarded(Long id) {
-        try {
-            metaTableRepository.deleteById(id);
-            metaTableRepository.flush();
         } catch (OptimisticLockingFailureException e) {
             throw new MetaTableException(META_TABLE_CONCURRENT_MODIFY);
         }
