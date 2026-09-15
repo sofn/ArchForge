@@ -25,7 +25,7 @@ Duplicates fail at startup (`错误码重复`).
 | `ADMIN_USER` | 1 | 2 | `10201+` user / dict |
 | `TASK` | 1 | 3 | `10301+` |
 | `META_TABLE` | 1 | 4 | `10401+` |
-| `BLOG` | 1 | 5 | `10501+` |
+| `CMS` | 1 | 5 | `10501+` |
 | `WEB_AUTH` | 1 | 6 | `10601+` |
 | `CHAT_AI` | 1 | 7 | `10701+` |
 
