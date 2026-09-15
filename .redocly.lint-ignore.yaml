@@ -4,6 +4,21 @@
 # /auth/ is the legacy greeting endpoint: removing it from the generated spec
 # would trip the oasdiff breaking gate, so the trailing-slash deviation is
 # waived here instead. Drop this entry together with the endpoint.
+#
+# /meta-table/{id}/<action> collides in shape with /meta-table/import-preview/{tableName}
+# (e.g. /meta-table/import-preview/copy matches both). Harmless at runtime — {id}
+# binds to Long — but restructuring either side is a contract break, so the 9
+# ambiguous-shape warnings are waived.
 spec/openapi.yaml:
   no-path-trailing-slash:
     - '#/paths/~1auth~1'
+  no-ambiguous-paths:
+    - '#/paths/~1meta-table~1{id}~1copy'
+    - '#/paths/~1meta-table~1{id}~1data'
+    - '#/paths/~1meta-table~1{id}~1delete-check'
+    - '#/paths/~1meta-table~1{id}~1export'
+    - '#/paths/~1meta-table~1{id}~1export-migration'
+    - '#/paths/~1meta-table~1{id}~1generate'
+    - '#/paths/~1meta-table~1{id}~1import'
+    - '#/paths/~1meta-table~1{id}~1migrations'
+    - '#/paths/~1meta-table~1{id}~1schema-preview'

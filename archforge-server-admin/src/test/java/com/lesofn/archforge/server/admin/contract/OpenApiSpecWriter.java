@@ -14,6 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -77,7 +78,68 @@ public final class OpenApiSpecWriter {
         out.set("tags", mergeTags(admin, web));
         dedupeOperationIds(out);
         fillMissingSummaries(out);
+        fillLicense(out);
+        ensureErrorResponses(out);
         return out;
+    }
+
+    /** Apache-2.0 per the repo LICENSE file; put-if-absent so a configured value wins. */
+    private static void fillLicense(ObjectNode doc) {
+        ObjectNode info = doc.withObjectProperty("info");
+        if (!info.has("license")) {
+            ObjectNode license = info.putObject("license");
+            license.put("name", "Apache-2.0");
+            license.put("identifier", "Apache-2.0");
+        }
+    }
+
+    /**
+     * Every endpoint can fail auth (401/403 via the sa-token interceptor) or validation
+     * (400), all rendered as RFC 9457 ProblemDetail — but springdoc only documents the
+     * success path. Declare the error shape once in {@code components.responses.Error}
+     * and inject a {@code 4XX} wildcard $ref into operations that lack one
+     * ({@code operation-4xx-response}).
+     */
+    private static void ensureErrorResponses(ObjectNode doc) {
+        ObjectNode responses = doc.withObjectProperty("components").withObjectProperty("responses");
+        if (!responses.has("Error")) {
+            ObjectNode error = responses.putObject("Error");
+            error.put("description", "Error response (RFC 9457 ProblemDetail)");
+            ObjectNode schema = error.withObjectProperty("content")
+                    .withObjectProperty("application/json")
+                    .putObject("schema");
+            schema.put("type", "object");
+            ObjectNode props = schema.putObject("properties");
+            props.putObject("type").put("type", "string");
+            props.putObject("title").put("type", "string");
+            props.putObject("status").put("type", "integer");
+            props.putObject("detail").put("type", "string");
+            props.putObject("instance").put("type", "string");
+        }
+        doc.required("paths")
+                .properties()
+                .forEach(pathEntry -> {
+                    if (!(pathEntry.getValue()instanceof ObjectNode pathItem)) {
+                        return;
+                    }
+                    pathItem.properties().forEach(opEntry -> {
+                        if (!(opEntry.getValue()instanceof ObjectNode op) || !(op.get(
+                                "responses")instanceof ObjectNode resps)) {
+                            return;
+                        }
+                        boolean has4xx = false;
+                        for (Iterator<String> names = resps.fieldNames(); names.hasNext();) {
+                            if (names.next().startsWith("4")) {
+                                has4xx = true;
+                                break;
+                            }
+                        }
+                        if (!has4xx) {
+                            resps.withObjectProperty("4XX")
+                                    .put("$ref", "#/components/responses/Error");
+                        }
+                    });
+                });
     }
 
     /**

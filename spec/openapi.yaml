@@ -5,6 +5,9 @@ info:
   contact:
     name: "ArchForge"
   version: "版本号:1.0.0"
+  license:
+    name: "Apache-2.0"
+    identifier: "Apache-2.0"
 servers:
 - url: "/"
 security:
@@ -34,6 +37,8 @@ paths:
                 type: "object"
                 additionalProperties:
                   type: "object"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /admin/chat/sessions:
     get:
       tags:
@@ -51,6 +56,8 @@ paths:
                   type: "object"
                   additionalProperties:
                     type: "object"
+        "4XX":
+          $ref: "#/components/responses/Error"
     post:
       tags:
       - "ChatAI"
@@ -65,6 +72,8 @@ paths:
                 type: "object"
                 additionalProperties:
                   type: "object"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /admin/chat/sessions/{id}:
     delete:
       tags:
@@ -80,6 +89,8 @@ paths:
       responses:
         "200":
           description: "OK"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /admin/chat/sessions/{id}/messages:
     get:
       tags:
@@ -103,6 +114,8 @@ paths:
                   type: "object"
                   additionalProperties:
                     type: "string"
+        "4XX":
+          $ref: "#/components/responses/Error"
     post:
       tags:
       - "ChatAI"
@@ -127,6 +140,8 @@ paths:
             text/event-stream:
               schema:
                 $ref: "#/components/schemas/SseEmitter"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /admin/config:
     post:
       tags:
@@ -146,6 +161,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AdminPageResponseConfigResponse"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /admin/config/create:
     post:
       tags:
@@ -166,6 +183,8 @@ paths:
               schema:
                 type: "integer"
                 format: "int64"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /admin/config/delete:
     post:
       tags:
@@ -185,6 +204,8 @@ paths:
             application/json:
               schema:
                 type: "boolean"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /admin/config/update:
     put:
       tags:
@@ -204,6 +225,8 @@ paths:
             application/json:
               schema:
                 type: "boolean"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /admin/dashboard/metrics:
     get:
       tags:
@@ -217,6 +240,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/DashboardMetricsResponse"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /admin/dashboard/recent-activities:
     get:
       tags:
@@ -232,6 +257,8 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/DashboardActivity"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /admin/dashboard/todo:
     get:
       tags:
@@ -247,6 +274,8 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/DashboardTodo"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /admin/dashboard/trends:
     get:
       tags:
@@ -270,6 +299,8 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/DashboardTrendPoint"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /admin/dept:
     post:
       tags:
@@ -285,6 +316,8 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/AdminDeptDTO"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /admin/dept/create:
     post:
       tags:
@@ -305,6 +338,8 @@ paths:
               schema:
                 type: "integer"
                 format: "int64"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /admin/dept/delete:
     post:
       tags:
@@ -324,6 +359,8 @@ paths:
             application/json:
               schema:
                 type: "boolean"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /admin/dept/update:
     put:
       tags:
@@ -343,6 +380,8 @@ paths:
             application/json:
               schema:
                 type: "boolean"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /admin/login-log:
     post:
       tags:
@@ -362,6 +401,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AdminPageResponseLoginLogResponse"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /admin/login-log/clear:
     post:
       tags:
@@ -375,6 +416,8 @@ paths:
             application/json:
               schema:
                 type: "boolean"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /admin/login-log/delete:
     post:
       tags:
@@ -394,6 +437,8 @@ paths:
             application/json:
               schema:
                 type: "boolean"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /admin/menu:
     post:
       tags:
@@ -409,6 +454,8 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/AdminMenuDTO"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /admin/menu/create:
     post:
       tags:
@@ -429,6 +476,8 @@ paths:
               schema:
                 type: "integer"
                 format: "int64"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /admin/menu/delete:
     post:
       tags:
@@ -448,6 +497,8 @@ paths:
             application/json:
               schema:
                 type: "boolean"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /admin/menu/update:
     put:
       tags:
@@ -467,6 +518,8 @@ paths:
             application/json:
               schema:
                 type: "boolean"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /admin/notice:
     post:
       tags:
@@ -486,6 +539,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AdminPageResponseNoticeResponse"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /admin/notice/create:
     post:
       tags:
@@ -506,6 +561,8 @@ paths:
               schema:
                 type: "integer"
                 format: "int64"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /admin/notice/delete:
     post:
       tags:
@@ -525,6 +582,8 @@ paths:
             application/json:
               schema:
                 type: "boolean"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /admin/notice/update:
     put:
       tags:
@@ -544,6 +603,8 @@ paths:
             application/json:
               schema:
                 type: "boolean"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /admin/operation-log:
     post:
       tags:
@@ -563,6 +624,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AdminPageResponseOperationLogResponse"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /admin/operation-log/clear:
     post:
       tags:
@@ -576,6 +639,8 @@ paths:
             application/json:
               schema:
                 type: "boolean"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /admin/operation-log/delete:
     post:
       tags:
@@ -595,6 +660,8 @@ paths:
             application/json:
               schema:
                 type: "boolean"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /admin/permission-matrix/menus/tree:
     get:
       tags:
@@ -610,6 +677,8 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/PermissionMenuNode"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /admin/permission-matrix/roles/{roleId}/permissions:
     get:
       tags:
@@ -633,6 +702,8 @@ paths:
                 items:
                   type: "integer"
                   format: "int64"
+        "4XX":
+          $ref: "#/components/responses/Error"
     put:
       tags:
       - "权限矩阵"
@@ -654,6 +725,8 @@ paths:
       responses:
         "200":
           description: "OK"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /admin/role:
     post:
       tags:
@@ -673,6 +746,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AdminPageResponseAdminRoleDTO"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /admin/role/all:
     get:
       tags:
@@ -688,6 +763,8 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/AdminRoleSimpleDTO"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /admin/role/create:
     post:
       tags:
@@ -708,6 +785,8 @@ paths:
               schema:
                 type: "integer"
                 format: "int64"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /admin/role/data-scope:
     post:
       tags:
@@ -727,6 +806,8 @@ paths:
             application/json:
               schema:
                 type: "boolean"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /admin/role/delete:
     post:
       tags:
@@ -746,6 +827,8 @@ paths:
             application/json:
               schema:
                 type: "boolean"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /admin/role/menu:
     post:
       tags:
@@ -761,6 +844,8 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/AdminRoleMenuDTO"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /admin/role/menu-ids:
     post:
       tags:
@@ -783,6 +868,8 @@ paths:
                 items:
                   type: "integer"
                   format: "int64"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /admin/role/save-menu:
     post:
       tags:
@@ -802,6 +889,8 @@ paths:
             application/json:
               schema:
                 type: "boolean"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /admin/role/status:
     post:
       tags:
@@ -821,6 +910,8 @@ paths:
             application/json:
               schema:
                 type: "boolean"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /admin/role/update:
     put:
       tags:
@@ -840,6 +931,8 @@ paths:
             application/json:
               schema:
                 type: "boolean"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /admin/scheduler-job:
     get:
       tags:
@@ -859,6 +952,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AdminPageResponseSchedulerJobResponse"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /admin/scheduler-job/add:
     post:
       tags:
@@ -879,6 +974,8 @@ paths:
               schema:
                 type: "integer"
                 format: "int64"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /admin/scheduler-job/log:
     get:
       tags:
@@ -898,6 +995,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AdminPageResponseSchedulerLogResponse"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /admin/scheduler-job/pause/{id}:
     post:
       tags:
@@ -914,6 +1013,8 @@ paths:
       responses:
         "200":
           description: "OK"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /admin/scheduler-job/resume/{id}:
     post:
       tags:
@@ -930,6 +1031,8 @@ paths:
       responses:
         "200":
           description: "OK"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /admin/scheduler-job/run/{id}:
     post:
       tags:
@@ -946,6 +1049,8 @@ paths:
       responses:
         "200":
           description: "OK"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /admin/scheduler-job/update/{id}:
     put:
       tags:
@@ -968,6 +1073,8 @@ paths:
       responses:
         "200":
           description: "OK"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /admin/scheduler-job/validate-cron:
     post:
       tags:
@@ -987,6 +1094,8 @@ paths:
             application/json:
               schema:
                 type: "boolean"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /admin/scheduler-job/{id}:
     delete:
       tags:
@@ -1003,6 +1112,8 @@ paths:
       responses:
         "200":
           description: "OK"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /admin/server:
     get:
       tags:
@@ -1016,6 +1127,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ServerInfoResponse"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /admin/user:
     post:
       tags:
@@ -1035,6 +1148,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AdminPageResponseAdminUserDTO"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /admin/user/assign-role:
     post:
       tags:
@@ -1054,6 +1169,8 @@ paths:
             application/json:
               schema:
                 type: "boolean"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /admin/user/create:
     post:
       tags:
@@ -1074,6 +1191,8 @@ paths:
               schema:
                 type: "integer"
                 format: "int64"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /admin/user/delete:
     post:
       tags:
@@ -1093,6 +1212,8 @@ paths:
             application/json:
               schema:
                 type: "boolean"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /admin/user/export:
     get:
       tags:
@@ -1102,6 +1223,8 @@ paths:
       responses:
         "200":
           description: "OK"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /admin/user/list-role-ids:
     post:
       tags:
@@ -1124,6 +1247,8 @@ paths:
                 items:
                   type: "integer"
                   format: "int64"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /admin/user/reset-password:
     post:
       tags:
@@ -1143,6 +1268,8 @@ paths:
             application/json:
               schema:
                 type: "boolean"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /admin/user/status:
     post:
       tags:
@@ -1162,6 +1289,8 @@ paths:
             application/json:
               schema:
                 type: "boolean"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /admin/user/update:
     put:
       tags:
@@ -1181,6 +1310,8 @@ paths:
             application/json:
               schema:
                 type: "boolean"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /auth/:
     get:
       tags:
@@ -1194,6 +1325,8 @@ paths:
             application/json:
               schema:
                 type: "string"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /auth/captchaImage:
     get:
       tags:
@@ -1206,6 +1339,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/CaptchaResponse"
+        "4XX":
+          $ref: "#/components/responses/Error"
       summary: "Get captcha img"
   /auth/get-async-routes:
     get:
@@ -1223,6 +1358,8 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/RouterDTO"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /auth/getConfig:
     get:
       tags:
@@ -1236,6 +1373,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/LoginConfigResponse"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /auth/getLoginUserInfo:
     get:
       tags:
@@ -1249,6 +1388,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/CurrentLoginUserResponse"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /auth/getRouters:
     get:
       tags:
@@ -1265,6 +1406,8 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/RouterDTO"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /auth/login:
     post:
       tags:
@@ -1284,6 +1427,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/LoginResponse"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /auth/logout:
     post:
       tags:
@@ -1302,6 +1447,8 @@ paths:
             application/json:
               schema:
                 type: "boolean"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /auth/refresh-token:
     post:
       tags:
@@ -1321,6 +1468,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/RefreshTokenResponse"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /blog/article:
     post:
       tags:
@@ -1339,6 +1488,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AdminPageResponseAdminBlogArticleResponse"
+        "4XX":
+          $ref: "#/components/responses/Error"
       summary: "List 2"
   /blog/article/create:
     post:
@@ -1359,6 +1510,8 @@ paths:
               schema:
                 type: "integer"
                 format: "int64"
+        "4XX":
+          $ref: "#/components/responses/Error"
       summary: "Create 2"
   /blog/article/delete:
     post:
@@ -1378,6 +1531,8 @@ paths:
             application/json:
               schema:
                 type: "boolean"
+        "4XX":
+          $ref: "#/components/responses/Error"
       summary: "Delete 2"
   /blog/article/update:
     put:
@@ -1397,6 +1552,8 @@ paths:
             application/json:
               schema:
                 type: "boolean"
+        "4XX":
+          $ref: "#/components/responses/Error"
       summary: "Update 2"
   /blog/article/{id}/offline:
     post:
@@ -1417,6 +1574,8 @@ paths:
             application/json:
               schema:
                 type: "boolean"
+        "4XX":
+          $ref: "#/components/responses/Error"
       summary: "Offline"
   /blog/article/{id}/publish:
     post:
@@ -1437,6 +1596,8 @@ paths:
             application/json:
               schema:
                 type: "boolean"
+        "4XX":
+          $ref: "#/components/responses/Error"
       summary: "Publish"
   /blog/category:
     post:
@@ -1456,6 +1617,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AdminPageResponseAdminBlogCategoryResponse"
+        "4XX":
+          $ref: "#/components/responses/Error"
       summary: "List 1"
   /blog/category/create:
     post:
@@ -1476,6 +1639,8 @@ paths:
               schema:
                 type: "integer"
                 format: "int64"
+        "4XX":
+          $ref: "#/components/responses/Error"
       summary: "Create 1"
   /blog/category/delete:
     post:
@@ -1495,6 +1660,8 @@ paths:
             application/json:
               schema:
                 type: "boolean"
+        "4XX":
+          $ref: "#/components/responses/Error"
       summary: "Delete 1"
   /blog/category/update:
     put:
@@ -1514,6 +1681,8 @@ paths:
             application/json:
               schema:
                 type: "boolean"
+        "4XX":
+          $ref: "#/components/responses/Error"
       summary: "Update 1"
   /blog/file/upload:
     post:
@@ -1538,6 +1707,8 @@ paths:
                 type: "object"
                 additionalProperties:
                   type: "object"
+        "4XX":
+          $ref: "#/components/responses/Error"
       summary: "Upload markdown image"
   /file:
     get:
@@ -1558,6 +1729,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AdminPageResponseFileResponse"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /file/download/{fileId}:
     get:
       tags:
@@ -1579,6 +1752,8 @@ paths:
               schema:
                 type: "string"
                 format: "binary"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /file/upload:
     post:
       tags:
@@ -1603,6 +1778,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/UploadFileResponse"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /file/upload-image:
     post:
       tags:
@@ -1627,6 +1804,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/UploadFileResponse"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /file/{fileId}:
     delete:
       tags:
@@ -1647,6 +1826,8 @@ paths:
             application/json:
               schema:
                 type: "boolean"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /idempotent/token:
     get:
       tags:
@@ -1659,6 +1840,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ResponseResultString"
+        "4XX":
+          $ref: "#/components/responses/Error"
       summary: "Token"
   /meta-table:
     post:
@@ -1679,6 +1862,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AdminPageResponseMetaTableResponse"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /meta-table/create:
     post:
       tags:
@@ -1699,6 +1884,8 @@ paths:
               schema:
                 type: "integer"
                 format: "int64"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /meta-table/import:
     post:
       tags:
@@ -1719,6 +1906,8 @@ paths:
               schema:
                 type: "integer"
                 format: "int64"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /meta-table/import-preview/{tableName}:
     get:
       tags:
@@ -1738,6 +1927,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/TableImportPreview"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /meta-table/importable-tables:
     get:
       tags:
@@ -1753,6 +1944,8 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/ImportableTableInfo"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /meta-table/{id}:
     get:
       tags:
@@ -1773,6 +1966,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/MetaTableResponse"
+        "4XX":
+          $ref: "#/components/responses/Error"
     put:
       tags:
       - "元表格管理"
@@ -1798,6 +1993,8 @@ paths:
             application/json:
               schema:
                 type: "boolean"
+        "4XX":
+          $ref: "#/components/responses/Error"
     delete:
       tags:
       - "元表格管理"
@@ -1823,6 +2020,8 @@ paths:
             application/json:
               schema:
                 type: "boolean"
+        "4XX":
+          $ref: "#/components/responses/Error"
     patch:
       tags:
       - "元表格管理"
@@ -1848,6 +2047,8 @@ paths:
             application/json:
               schema:
                 type: "boolean"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /meta-table/{id}/copy:
     post:
       tags:
@@ -1869,6 +2070,8 @@ paths:
               schema:
                 type: "integer"
                 format: "int64"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /meta-table/{id}/data:
     post:
       tags:
@@ -1895,6 +2098,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AdminPageResponseMapStringObject"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /meta-table/{id}/data/create:
     post:
       tags:
@@ -1924,6 +2129,8 @@ paths:
               schema:
                 type: "integer"
                 format: "int64"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /meta-table/{id}/data/{dataId}:
     put:
       tags:
@@ -1958,6 +2165,8 @@ paths:
             application/json:
               schema:
                 type: "boolean"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /meta-table/{id}/data/{dataId}/delete:
     post:
       tags:
@@ -1984,6 +2193,8 @@ paths:
             application/json:
               schema:
                 type: "boolean"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /meta-table/{id}/delete-check:
     get:
       tags:
@@ -2005,6 +2216,8 @@ paths:
               schema:
                 type: "integer"
                 format: "int64"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /meta-table/{id}/export:
     get:
       tags:
@@ -2027,6 +2240,8 @@ paths:
       responses:
         "200":
           description: "OK"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /meta-table/{id}/export-migration:
     get:
       tags:
@@ -2047,6 +2262,8 @@ paths:
             application/json:
               schema:
                 type: "string"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /meta-table/{id}/generate:
     post:
       tags:
@@ -2073,6 +2290,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/MetaTableGenerateResponse"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /meta-table/{id}/import:
     post:
       tags:
@@ -2110,6 +2329,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ImportResponse"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /meta-table/{id}/migrations:
     get:
       tags:
@@ -2132,6 +2353,8 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/MetaTableMigration"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /meta-table/{id}/schema-preview:
     post:
       tags:
@@ -2158,6 +2381,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/SchemaPreview"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /monitor/cache-info:
     get:
       tags:
@@ -2171,6 +2396,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/CacheInfoResponse"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /monitor/online-logs:
     post:
       tags:
@@ -2190,6 +2417,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AdminPageResponseOnlineUserResponse"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /system/dict/item/{id}:
     put:
       tags:
@@ -2216,6 +2445,8 @@ paths:
             application/json:
               schema:
                 type: "boolean"
+        "4XX":
+          $ref: "#/components/responses/Error"
     delete:
       tags:
       - "字典配置"
@@ -2235,6 +2466,8 @@ paths:
             application/json:
               schema:
                 type: "boolean"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /system/dict/type:
     post:
       tags:
@@ -2254,6 +2487,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AdminPageResponseDictTypeResponse"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /system/dict/type/create:
     post:
       tags:
@@ -2274,6 +2509,8 @@ paths:
               schema:
                 type: "integer"
                 format: "int64"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /system/dict/type/{typeId}/item:
     post:
       tags:
@@ -2301,6 +2538,8 @@ paths:
               schema:
                 type: "integer"
                 format: "int64"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /system/dict/type/{typeKey}:
     get:
       tags:
@@ -2320,6 +2559,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/DictTypeResponse"
+        "4XX":
+          $ref: "#/components/responses/Error"
     put:
       tags:
       - "字典配置"
@@ -2345,6 +2586,8 @@ paths:
             application/json:
               schema:
                 type: "boolean"
+        "4XX":
+          $ref: "#/components/responses/Error"
     delete:
       tags:
       - "字典配置"
@@ -2364,6 +2607,8 @@ paths:
             application/json:
               schema:
                 type: "boolean"
+        "4XX":
+          $ref: "#/components/responses/Error"
   /web/articles:
     get:
       tags:
@@ -2402,6 +2647,8 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/WebPageResponseWebArticleSummaryResponse"
+        "4XX":
+          $ref: "#/components/responses/Error"
       summary: "Get articles"
     post:
       tags:
@@ -2421,6 +2668,8 @@ paths:
               schema:
                 type: "integer"
                 format: "int64"
+        "4XX":
+          $ref: "#/components/responses/Error"
       summary: "Create article"
   /web/articles/{slug}:
     get:
@@ -2440,6 +2689,8 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/WebArticleDetailResponse"
+        "4XX":
+          $ref: "#/components/responses/Error"
       summary: "Get article"
   /web/categories:
     get:
@@ -2455,6 +2706,8 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/WebCategoryResponse"
+        "4XX":
+          $ref: "#/components/responses/Error"
       summary: "Get categories"
   /web/dashboard/metrics:
     get:
@@ -2468,6 +2721,8 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/WebDashboardMetricsResponse"
+        "4XX":
+          $ref: "#/components/responses/Error"
       summary: "Web metrics"
   /web/file/upload:
     post:
@@ -2492,6 +2747,8 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/FileUploadResponse"
+        "4XX":
+          $ref: "#/components/responses/Error"
       summary: "Upload"
   /web/file/{fileId}:
     get:
@@ -2513,6 +2770,8 @@ paths:
               schema:
                 type: "string"
                 format: "binary"
+        "4XX":
+          $ref: "#/components/responses/Error"
       summary: "Download"
   /web/forgot-password:
     post:
@@ -2532,6 +2791,8 @@ paths:
             '*/*':
               schema:
                 type: "boolean"
+        "4XX":
+          $ref: "#/components/responses/Error"
       summary: "Forgot password"
   /web/login:
     post:
@@ -2551,6 +2812,8 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/WebLoginResponse"
+        "4XX":
+          $ref: "#/components/responses/Error"
       summary: "Web login"
   /web/logout:
     post:
@@ -2569,6 +2832,8 @@ paths:
             '*/*':
               schema:
                 type: "boolean"
+        "4XX":
+          $ref: "#/components/responses/Error"
       summary: "Web logout"
   /web/notices:
     get:
@@ -2584,6 +2849,8 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/WebNoticeResponse"
+        "4XX":
+          $ref: "#/components/responses/Error"
       summary: "Notices"
   /web/operation-logs:
     get:
@@ -2599,6 +2866,8 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/WebOperationLogResponse"
+        "4XX":
+          $ref: "#/components/responses/Error"
       summary: "Operation logs"
   /web/refresh-token:
     post:
@@ -2618,6 +2887,8 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/WebLoginResponse"
+        "4XX":
+          $ref: "#/components/responses/Error"
       summary: "Web refresh token"
   /web/register:
     post:
@@ -2637,6 +2908,8 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/WebLoginResponse"
+        "4XX":
+          $ref: "#/components/responses/Error"
       summary: "Register"
   /web/reset-password:
     post:
@@ -2656,6 +2929,8 @@ paths:
             '*/*':
               schema:
                 type: "boolean"
+        "4XX":
+          $ref: "#/components/responses/Error"
       summary: "Reset password"
   /web/user/articles:
     get:
@@ -2684,6 +2959,8 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/WebPageResponseWebArticleSummaryResponse"
+        "4XX":
+          $ref: "#/components/responses/Error"
       summary: "My articles"
   /web/user/change-password:
     post:
@@ -2703,6 +2980,8 @@ paths:
             '*/*':
               schema:
                 type: "boolean"
+        "4XX":
+          $ref: "#/components/responses/Error"
       summary: "Change password"
   /web/user/profile:
     get:
@@ -2716,6 +2995,8 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/WebUserProfileResponse"
+        "4XX":
+          $ref: "#/components/responses/Error"
       summary: "Profile"
   /web/verification-code/send:
     post:
@@ -2735,6 +3016,8 @@ paths:
             '*/*':
               schema:
                 type: "boolean"
+        "4XX":
+          $ref: "#/components/responses/Error"
       summary: "Send verification code"
 components:
   schemas:
@@ -5429,3 +5712,21 @@ components:
       type: "http"
       scheme: "bearer"
       bearerFormat: "JWT"
+  responses:
+    Error:
+      description: "Error response (RFC 9457 ProblemDetail)"
+      content:
+        application/json:
+          schema:
+            type: "object"
+            properties:
+              type:
+                type: "string"
+              title:
+                type: "string"
+              status:
+                type: "integer"
+              detail:
+                type: "string"
+              instance:
+                type: "string"
