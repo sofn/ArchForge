@@ -75,6 +75,9 @@ tasks.register<Test>("exportOpenApi") {
     testClassesDirs = sourceSets["test"].output.classesDirs
     classpath = sourceSets["test"].runtimeClasspath
     filter { includeTestsMatching("com.lesofn.archforge.server.web.contract.OpenApiSnapshotTest") }
+    // Declared so a FROM-CACHE hit restores the JSON — without it generateOpenApi
+    // reads a file that cache-skipped execution never wrote.
+    outputs.file(layout.buildDirectory.file("openapi/live-openapi.json"))
 }
 
 tasks.named("collectReachabilityMetadata") {

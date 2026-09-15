@@ -76,7 +76,51 @@ public final class OpenApiSpecWriter {
         out.set("components", mergeComponents(admin, web, renames));
         out.set("tags", mergeTags(admin, web));
         dedupeOperationIds(out);
+        fillMissingSummaries(out);
         return out;
+    }
+
+    /**
+     * springdoc only emits {@code summary} when {@code @Operation(summary=...)} is present.
+     * The committed spec must lint clean ({@code operation-summary}), so operations without
+     * one get a deterministic fallback: humanized operationId, else {@code METHOD path}.
+     */
+    private static void fillMissingSummaries(ObjectNode doc) {
+        doc.required("paths")
+                .properties()
+                .forEach(pathEntry -> {
+                    if (!(pathEntry.getValue()instanceof ObjectNode pathItem)) {
+                        return;
+                    }
+                    pathItem.properties().forEach(opEntry -> {
+                        if (!(opEntry.getValue()instanceof ObjectNode op) || op.has("summary")) {
+                            return;
+                        }
+                        JsonNode idNode = op.get("operationId");
+                        String summary = idNode != null && idNode.isTextual()
+                                ? humanizeOperationId(idNode.asText())
+                                : opEntry.getKey().toUpperCase(java.util.Locale.ROOT) + " " + pathEntry.getKey();
+                        op.put("summary", summary);
+                    });
+                });
+    }
+
+    /** {@code getUserList} → {@code "Get user list"}; {@code list_2} → {@code "List 2"}. */
+    private static String humanizeOperationId(String operationId) {
+        StringBuilder out = new StringBuilder();
+        for (int i = 0; i < operationId.length(); i++) {
+            char c = operationId.charAt(i);
+            if (Character.isUpperCase(c) && i > 0) {
+                out.append(' ');
+                out.append(Character.toLowerCase(c));
+            } else if (c == '_' || c == '-') {
+                out.append(' ');
+            } else {
+                out.append(i == 0 ? Character.toUpperCase(c) : c);
+            }
+        }
+        String summary = out.toString().trim();
+        return summary.isEmpty() ? operationId : summary;
     }
 
     /**

@@ -1206,6 +1206,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/CaptchaResponse"
+      summary: "Get captcha img"
   /auth/get-async-routes:
     get:
       tags:
@@ -1338,6 +1339,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AdminPageResponseAdminBlogArticleResponse"
+      summary: "List 2"
   /blog/article/create:
     post:
       tags:
@@ -1357,6 +1359,7 @@ paths:
               schema:
                 type: "integer"
                 format: "int64"
+      summary: "Create 2"
   /blog/article/delete:
     post:
       tags:
@@ -1375,6 +1378,7 @@ paths:
             application/json:
               schema:
                 type: "boolean"
+      summary: "Delete 2"
   /blog/article/update:
     put:
       tags:
@@ -1393,6 +1397,7 @@ paths:
             application/json:
               schema:
                 type: "boolean"
+      summary: "Update 2"
   /blog/article/{id}/offline:
     post:
       tags:
@@ -1412,6 +1417,7 @@ paths:
             application/json:
               schema:
                 type: "boolean"
+      summary: "Offline"
   /blog/article/{id}/publish:
     post:
       tags:
@@ -1431,6 +1437,7 @@ paths:
             application/json:
               schema:
                 type: "boolean"
+      summary: "Publish"
   /blog/category:
     post:
       tags:
@@ -1449,6 +1456,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AdminPageResponseAdminBlogCategoryResponse"
+      summary: "List 1"
   /blog/category/create:
     post:
       tags:
@@ -1468,6 +1476,7 @@ paths:
               schema:
                 type: "integer"
                 format: "int64"
+      summary: "Create 1"
   /blog/category/delete:
     post:
       tags:
@@ -1486,6 +1495,7 @@ paths:
             application/json:
               schema:
                 type: "boolean"
+      summary: "Delete 1"
   /blog/category/update:
     put:
       tags:
@@ -1504,6 +1514,7 @@ paths:
             application/json:
               schema:
                 type: "boolean"
+      summary: "Update 1"
   /blog/file/upload:
     post:
       tags:
@@ -1527,6 +1538,7 @@ paths:
                 type: "object"
                 additionalProperties:
                   type: "object"
+      summary: "Upload markdown image"
   /file:
     get:
       tags:
@@ -1647,6 +1659,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ResponseResultString"
+      summary: "Token"
   /meta-table:
     post:
       tags:
@@ -2261,70 +2274,6 @@ paths:
               schema:
                 type: "integer"
                 format: "int64"
-  /system/dict/type/{dictCode}:
-    get:
-      tags:
-      - "字典配置"
-      summary: "根据字典编码查询详情及全部项"
-      operationId: "getTypeByCode"
-      parameters:
-      - name: "dictCode"
-        in: "path"
-        required: true
-        schema:
-          type: "string"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/DictTypeResponse"
-  /system/dict/type/{id}:
-    put:
-      tags:
-      - "字典配置"
-      summary: "更新字典类型"
-      operationId: "updateType"
-      parameters:
-      - name: "id"
-        in: "path"
-        required: true
-        schema:
-          type: "integer"
-          format: "int64"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/DictTypeUpdateRequest"
-        required: true
-      responses:
-        "200":
-          description: "OK"
-          content:
-            application/json:
-              schema:
-                type: "boolean"
-    delete:
-      tags:
-      - "字典配置"
-      summary: "删除字典类型"
-      operationId: "deleteType"
-      parameters:
-      - name: "id"
-        in: "path"
-        required: true
-        schema:
-          type: "integer"
-          format: "int64"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            application/json:
-              schema:
-                type: "boolean"
   /system/dict/type/{typeId}/item:
     post:
       tags:
@@ -2352,6 +2301,69 @@ paths:
               schema:
                 type: "integer"
                 format: "int64"
+  /system/dict/type/{typeKey}:
+    get:
+      tags:
+      - "字典配置"
+      summary: "根据字典编码查询详情及全部项"
+      operationId: "getTypeByCode"
+      parameters:
+      - name: "typeKey"
+        in: "path"
+        required: true
+        schema:
+          type: "string"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DictTypeResponse"
+    put:
+      tags:
+      - "字典配置"
+      summary: "更新字典类型"
+      operationId: "updateType"
+      parameters:
+      - name: "typeKey"
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DictTypeUpdateRequest"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "boolean"
+    delete:
+      tags:
+      - "字典配置"
+      summary: "删除字典类型"
+      operationId: "deleteType"
+      parameters:
+      - name: "typeKey"
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "boolean"
   /web/articles:
     get:
       tags:
@@ -2390,6 +2402,7 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/WebPageResponseWebArticleSummaryResponse"
+      summary: "Get articles"
     post:
       tags:
       - "web-blog-controller"
@@ -2408,6 +2421,7 @@ paths:
               schema:
                 type: "integer"
                 format: "int64"
+      summary: "Create article"
   /web/articles/{slug}:
     get:
       tags:
@@ -2426,6 +2440,7 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/WebArticleDetailResponse"
+      summary: "Get article"
   /web/categories:
     get:
       tags:
@@ -2440,6 +2455,7 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/WebCategoryResponse"
+      summary: "Get categories"
   /web/dashboard/metrics:
     get:
       tags:
@@ -2452,6 +2468,7 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/WebDashboardMetricsResponse"
+      summary: "Web metrics"
   /web/file/upload:
     post:
       tags:
@@ -2475,6 +2492,7 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/FileUploadResponse"
+      summary: "Upload"
   /web/file/{fileId}:
     get:
       tags:
@@ -2495,6 +2513,7 @@ paths:
               schema:
                 type: "string"
                 format: "binary"
+      summary: "Download"
   /web/forgot-password:
     post:
       tags:
@@ -2513,6 +2532,7 @@ paths:
             '*/*':
               schema:
                 type: "boolean"
+      summary: "Forgot password"
   /web/login:
     post:
       tags:
@@ -2531,6 +2551,7 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/WebLoginResponse"
+      summary: "Web login"
   /web/logout:
     post:
       tags:
@@ -2548,6 +2569,7 @@ paths:
             '*/*':
               schema:
                 type: "boolean"
+      summary: "Web logout"
   /web/notices:
     get:
       tags:
@@ -2562,6 +2584,7 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/WebNoticeResponse"
+      summary: "Notices"
   /web/operation-logs:
     get:
       tags:
@@ -2576,6 +2599,7 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/WebOperationLogResponse"
+      summary: "Operation logs"
   /web/refresh-token:
     post:
       tags:
@@ -2594,6 +2618,7 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/WebLoginResponse"
+      summary: "Web refresh token"
   /web/register:
     post:
       tags:
@@ -2612,6 +2637,7 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/WebLoginResponse"
+      summary: "Register"
   /web/reset-password:
     post:
       tags:
@@ -2630,6 +2656,7 @@ paths:
             '*/*':
               schema:
                 type: "boolean"
+      summary: "Reset password"
   /web/user/articles:
     get:
       tags:
@@ -2657,6 +2684,7 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/WebPageResponseWebArticleSummaryResponse"
+      summary: "My articles"
   /web/user/change-password:
     post:
       tags:
@@ -2675,6 +2703,7 @@ paths:
             '*/*':
               schema:
                 type: "boolean"
+      summary: "Change password"
   /web/user/profile:
     get:
       tags:
@@ -2687,6 +2716,7 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/WebUserProfileResponse"
+      summary: "Profile"
   /web/verification-code/send:
     post:
       tags:
@@ -2705,6 +2735,7 @@ paths:
             '*/*':
               schema:
                 type: "boolean"
+      summary: "Send verification code"
 components:
   schemas:
     AdminBlogArticleCreateRequest:
@@ -4108,15 +4139,15 @@ components:
           type: "string"
         dictCode:
           type: "string"
-        uniqueColumn:
-          type: "boolean"
-        indexedColumn:
-          type: "boolean"
         nullableColumn:
           type: "boolean"
         listVisibleColumn:
           type: "boolean"
         searchableColumn:
+          type: "boolean"
+        uniqueColumn:
+          type: "boolean"
+        indexedColumn:
           type: "boolean"
     MetaColumnRequest:
       required:

@@ -51,6 +51,8 @@ allprojects {
 sonarqube {
     properties {
         property("sonar.projectKey", "ArchForge")
+        // SonarCloud requires the org key; harmless for self-hosted SonarQube.
+        property("sonar.organization", "lesofn")
         property(
             "sonar.coverage.jacoco.xmlReportPaths",
             layout.buildDirectory.file("reports/jacoco/jacocoAggregateReport.xml").get().asFile.absolutePath

@@ -65,8 +65,8 @@ public class DictController {
 
     @Operation(summary = "根据字典编码查询详情及全部项")
     @SaCheckPermission(value = "system:dict:query", type = StpAdminUtil.TYPE)
-    @GetMapping("/type/{dictCode}")
-    public @Nullable DictTypeResponse getTypeByCode(@PathVariable String dictCode) {
+    @GetMapping("/type/{typeKey}")
+    public @Nullable DictTypeResponse getTypeByCode(@PathVariable("typeKey") String dictCode) {
         Optional<SysDictType> type = dictService.findTypeByCode(dictCode);
         if (type.isEmpty() || Boolean.TRUE.equals(type.get().getDeleted())) {
             return null;
@@ -103,8 +103,8 @@ public class DictController {
     @Log(module = "字典配置", summary = "更新字典类型")
     @Operation(summary = "更新字典类型")
     @SaCheckPermission(value = "system:dict:edit", type = StpAdminUtil.TYPE)
-    @PutMapping("/type/{id}")
-    public Boolean updateType(@PathVariable Long id, @RequestBody @Valid DictTypeUpdateRequest request) {
+    @PutMapping("/type/{typeKey}")
+    public Boolean updateType(@PathVariable("typeKey") Long id, @RequestBody @Valid DictTypeUpdateRequest request) {
         SysDictType type = dictService.findTypeById(id).orElse(null);
         if (type == null) {
             return false;
@@ -120,8 +120,8 @@ public class DictController {
     @Log(module = "字典配置", summary = "删除字典类型")
     @Operation(summary = "删除字典类型")
     @SaCheckPermission(value = "system:dict:remove", type = StpAdminUtil.TYPE)
-    @DeleteMapping("/type/{id}")
-    public Boolean deleteType(@PathVariable Long id) {
+    @DeleteMapping("/type/{typeKey}")
+    public Boolean deleteType(@PathVariable("typeKey") Long id) {
         dictService.deleteType(id);
         return true;
     }

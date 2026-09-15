@@ -87,6 +87,9 @@ val exportOpenApi = tasks.register<Test>("exportOpenApi") {
     testClassesDirs = sourceSets["test"].output.classesDirs
     classpath = sourceSets["test"].runtimeClasspath
     filter { includeTestsMatching("com.lesofn.archforge.server.admin.contract.OpenApiSnapshotTest") }
+    // Declared so a FROM-CACHE hit restores the JSON — without it generateOpenApi
+    // reads a file that cache-skipped execution never wrote.
+    outputs.file(layout.buildDirectory.file("openapi/live-openapi.json"))
 }
 
 // Merges the server-admin + server-web live exports into the committed snapshot spec/openapi.yaml.
