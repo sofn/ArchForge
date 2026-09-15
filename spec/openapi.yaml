@@ -22,6 +22,404 @@ tags:
 - name: "登录API"
   description: "登录相关接口"
 paths:
+  /admin/auth/:
+    get:
+      tags:
+      - "登录API"
+      summary: "首页"
+      operationId: "index"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "string"
+        "4XX":
+          $ref: "#/components/responses/Error"
+  /admin/auth/captchaImage:
+    get:
+      tags:
+      - "登录API"
+      operationId: "getCaptchaImg"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CaptchaResponse"
+        "4XX":
+          $ref: "#/components/responses/Error"
+      summary: "Get captcha img"
+  /admin/auth/get-async-routes:
+    get:
+      tags:
+      - "登录API"
+      summary: "获取异步路由"
+      description: "兼容vue-pure-admin前端的路由获取接口"
+      operationId: "getAsyncRoutes"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/RouterDTO"
+        "4XX":
+          $ref: "#/components/responses/Error"
+  /admin/auth/getConfig:
+    get:
+      tags:
+      - "登录API"
+      summary: "获取系统配置"
+      operationId: "getConfig"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginConfigResponse"
+        "4XX":
+          $ref: "#/components/responses/Error"
+  /admin/auth/getLoginUserInfo:
+    get:
+      tags:
+      - "登录API"
+      summary: "获取当前登录用户信息"
+      operationId: "getLoginUserInfo"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CurrentLoginUserResponse"
+        "4XX":
+          $ref: "#/components/responses/Error"
+  /admin/auth/getRouters:
+    get:
+      tags:
+      - "登录API"
+      summary: "获取用户对应的菜单路由"
+      description: "用于动态生成路由"
+      operationId: "getRouters"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/RouterDTO"
+        "4XX":
+          $ref: "#/components/responses/Error"
+  /admin/auth/login:
+    post:
+      tags:
+      - "登录API"
+      summary: "登录"
+      operationId: "login"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResponse"
+        "4XX":
+          $ref: "#/components/responses/Error"
+  /admin/auth/logout:
+    post:
+      tags:
+      - "登录API"
+      summary: "退出登录"
+      operationId: "logout"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RefreshTokenRequest"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "boolean"
+        "4XX":
+          $ref: "#/components/responses/Error"
+  /admin/auth/refresh-token:
+    post:
+      tags:
+      - "登录API"
+      summary: "刷新令牌"
+      operationId: "refreshToken"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RefreshTokenRequest"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RefreshTokenResponse"
+        "4XX":
+          $ref: "#/components/responses/Error"
+  /admin/blog/article:
+    post:
+      tags:
+      - "blog-article-controller"
+      operationId: "list_2"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminBlogArticleListRequest"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminPageResponseAdminBlogArticleResponse"
+        "4XX":
+          $ref: "#/components/responses/Error"
+      summary: "List 2"
+  /admin/blog/article/create:
+    post:
+      tags:
+      - "blog-article-controller"
+      operationId: "create_2"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminBlogArticleCreateRequest"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "integer"
+                format: "int64"
+        "4XX":
+          $ref: "#/components/responses/Error"
+      summary: "Create 2"
+  /admin/blog/article/delete:
+    post:
+      tags:
+      - "blog-article-controller"
+      operationId: "delete_2"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IdRequest"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "boolean"
+        "4XX":
+          $ref: "#/components/responses/Error"
+      summary: "Delete 2"
+  /admin/blog/article/update:
+    put:
+      tags:
+      - "blog-article-controller"
+      operationId: "update_3"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminBlogArticleUpdateRequest"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "boolean"
+        "4XX":
+          $ref: "#/components/responses/Error"
+      summary: "Update 3"
+  /admin/blog/article/{id}/offline:
+    post:
+      tags:
+      - "blog-article-controller"
+      operationId: "offline"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "boolean"
+        "4XX":
+          $ref: "#/components/responses/Error"
+      summary: "Offline"
+  /admin/blog/article/{id}/publish:
+    post:
+      tags:
+      - "blog-article-controller"
+      operationId: "publish"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "boolean"
+        "4XX":
+          $ref: "#/components/responses/Error"
+      summary: "Publish"
+  /admin/blog/category:
+    post:
+      tags:
+      - "blog-category-controller"
+      operationId: "list_1"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminBlogCategoryListRequest"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminPageResponseAdminBlogCategoryResponse"
+        "4XX":
+          $ref: "#/components/responses/Error"
+      summary: "List 1"
+  /admin/blog/category/create:
+    post:
+      tags:
+      - "blog-category-controller"
+      operationId: "create_1"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminBlogCategoryCreateRequest"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "integer"
+                format: "int64"
+        "4XX":
+          $ref: "#/components/responses/Error"
+      summary: "Create 1"
+  /admin/blog/category/delete:
+    post:
+      tags:
+      - "blog-category-controller"
+      operationId: "delete_1"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IdRequest"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "boolean"
+        "4XX":
+          $ref: "#/components/responses/Error"
+      summary: "Delete 1"
+  /admin/blog/category/update:
+    put:
+      tags:
+      - "blog-category-controller"
+      operationId: "update_2"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminBlogCategoryUpdateRequest"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "boolean"
+        "4XX":
+          $ref: "#/components/responses/Error"
+      summary: "Update 2"
+  /admin/blog/file/upload:
+    post:
+      tags:
+      - "blog-file-controller"
+      operationId: "uploadMarkdownImage"
+      parameters:
+      - name: "file[]"
+        in: "query"
+        required: true
+        schema:
+          type: "array"
+          items:
+            type: "string"
+            format: "binary"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                additionalProperties:
+                  type: "object"
+        "4XX":
+          $ref: "#/components/responses/Error"
+      summary: "Upload markdown image"
   /admin/chat/config:
     get:
       tags:
@@ -382,6 +780,139 @@ paths:
                 type: "boolean"
         "4XX":
           $ref: "#/components/responses/Error"
+  /admin/file:
+    get:
+      tags:
+      - "文件管理"
+      summary: "获取文件列表"
+      operationId: "listFiles"
+      parameters:
+      - name: "params"
+        in: "query"
+        required: true
+        schema:
+          $ref: "#/components/schemas/FileListRequest"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminPageResponseFileResponse"
+        "4XX":
+          $ref: "#/components/responses/Error"
+  /admin/file/download/{fileId}:
+    get:
+      tags:
+      - "文件管理"
+      summary: "下载文件"
+      operationId: "downloadFile"
+      parameters:
+      - name: "fileId"
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "string"
+                format: "binary"
+        "4XX":
+          $ref: "#/components/responses/Error"
+  /admin/file/upload:
+    post:
+      tags:
+      - "文件管理"
+      summary: "上传文件"
+      operationId: "uploadFile"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+              - "file"
+              type: "object"
+              properties:
+                file:
+                  type: "string"
+                  format: "binary"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UploadFileResponse"
+        "4XX":
+          $ref: "#/components/responses/Error"
+  /admin/file/upload-image:
+    post:
+      tags:
+      - "文件管理"
+      summary: "上传图片（头像等）"
+      operationId: "uploadImage"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+              - "file"
+              type: "object"
+              properties:
+                file:
+                  type: "string"
+                  format: "binary"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UploadFileResponse"
+        "4XX":
+          $ref: "#/components/responses/Error"
+  /admin/file/{fileId}:
+    delete:
+      tags:
+      - "文件管理"
+      summary: "删除文件"
+      operationId: "deleteFile"
+      parameters:
+      - name: "fileId"
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "boolean"
+        "4XX":
+          $ref: "#/components/responses/Error"
+  /admin/idempotent/token:
+    get:
+      tags:
+      - "idempotent-token-controller"
+      operationId: "token"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseResultString"
+        "4XX":
+          $ref: "#/components/responses/Error"
+      summary: "Token"
   /admin/login-log:
     post:
       tags:
@@ -518,6 +1049,582 @@ paths:
             application/json:
               schema:
                 type: "boolean"
+        "4XX":
+          $ref: "#/components/responses/Error"
+  /admin/meta-table:
+    post:
+      tags:
+      - "元表格管理"
+      summary: "获取元表格列表"
+      operationId: "list"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MetaTableListRequest"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminPageResponseMetaTableResponse"
+        "4XX":
+          $ref: "#/components/responses/Error"
+  /admin/meta-table/create:
+    post:
+      tags:
+      - "元表格管理"
+      summary: "创建元表格"
+      operationId: "create"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MetaTableCreateRequest"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "integer"
+                format: "int64"
+        "4XX":
+          $ref: "#/components/responses/Error"
+  /admin/meta-table/import:
+    post:
+      tags:
+      - "元表格管理"
+      summary: "导入已有物理表"
+      operationId: "importTable"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MetaTableImportRequest"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "integer"
+                format: "int64"
+        "4XX":
+          $ref: "#/components/responses/Error"
+  /admin/meta-table/import-preview/{tableName}:
+    get:
+      tags:
+      - "元表格管理"
+      summary: "预览物理表导入映射"
+      operationId: "importPreview"
+      parameters:
+      - name: "tableName"
+        in: "path"
+        required: true
+        schema:
+          type: "string"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TableImportPreview"
+        "4XX":
+          $ref: "#/components/responses/Error"
+  /admin/meta-table/importable-tables:
+    get:
+      tags:
+      - "元表格管理"
+      summary: "列出可导入的物理表"
+      operationId: "importableTables"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/ImportableTableInfo"
+        "4XX":
+          $ref: "#/components/responses/Error"
+  /admin/meta-table/{id}:
+    get:
+      tags:
+      - "元表格管理"
+      summary: "获取元表格详情"
+      operationId: "detail"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MetaTableResponse"
+        "4XX":
+          $ref: "#/components/responses/Error"
+    put:
+      tags:
+      - "元表格管理"
+      summary: "更新元表格（结构变更，columns 必填；仅改元信息用 PATCH）"
+      operationId: "update_1"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MetaTableUpdateRequest"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "boolean"
+        "4XX":
+          $ref: "#/components/responses/Error"
+    delete:
+      tags:
+      - "元表格管理"
+      summary: "删除元表格"
+      operationId: "delete"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
+      - name: "force"
+        in: "query"
+        required: false
+        schema:
+          type: "boolean"
+          default: false
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "boolean"
+        "4XX":
+          $ref: "#/components/responses/Error"
+    patch:
+      tags:
+      - "元表格管理"
+      summary: "更新元表格元信息（仅名称/描述/状态，不动表结构）"
+      operationId: "updateMeta"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MetaTableUpdateRequest"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "boolean"
+        "4XX":
+          $ref: "#/components/responses/Error"
+  /admin/meta-table/{id}/copy:
+    post:
+      tags:
+      - "元表格管理"
+      summary: "复制元表格"
+      operationId: "copy"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "integer"
+                format: "int64"
+        "4XX":
+          $ref: "#/components/responses/Error"
+  /admin/meta-table/{id}/data:
+    post:
+      tags:
+      - "元表格管理"
+      summary: "获取元表格数据"
+      operationId: "listData"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MetaDataListRequest"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminPageResponseMapStringObject"
+        "4XX":
+          $ref: "#/components/responses/Error"
+  /admin/meta-table/{id}/data/create:
+    post:
+      tags:
+      - "元表格管理"
+      summary: "新增元表格数据"
+      operationId: "createData"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object"
+              additionalProperties:
+                type: "object"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "integer"
+                format: "int64"
+        "4XX":
+          $ref: "#/components/responses/Error"
+  /admin/meta-table/{id}/data/{dataId}:
+    put:
+      tags:
+      - "元表格管理"
+      summary: "修改元表格数据"
+      operationId: "updateData"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
+      - name: "dataId"
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object"
+              additionalProperties:
+                type: "object"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "boolean"
+        "4XX":
+          $ref: "#/components/responses/Error"
+  /admin/meta-table/{id}/data/{dataId}/delete:
+    post:
+      tags:
+      - "元表格管理"
+      summary: "删除元表格数据"
+      operationId: "deleteData"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
+      - name: "dataId"
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "boolean"
+        "4XX":
+          $ref: "#/components/responses/Error"
+  /admin/meta-table/{id}/delete-check:
+    get:
+      tags:
+      - "元表格管理"
+      summary: "检查删除元表格"
+      operationId: "deleteCheck"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "integer"
+                format: "int64"
+        "4XX":
+          $ref: "#/components/responses/Error"
+  /admin/meta-table/{id}/export:
+    get:
+      tags:
+      - "元表格管理"
+      summary: "导出元表格数据"
+      operationId: "export_1"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
+      - name: "format"
+        in: "query"
+        required: false
+        schema:
+          type: "string"
+          default: "EXCEL"
+      responses:
+        "200":
+          description: "OK"
+        "4XX":
+          $ref: "#/components/responses/Error"
+  /admin/meta-table/{id}/export-migration:
+    get:
+      tags:
+      - "元表格管理"
+      summary: "导出元表格 Schema 迁移为 Flyway SQL"
+      operationId: "exportMigration"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "string"
+        "4XX":
+          $ref: "#/components/responses/Error"
+  /admin/meta-table/{id}/generate:
+    post:
+      tags:
+      - "元表格管理"
+      summary: "生成元表格代码"
+      operationId: "generate"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MetaTableGenerateRequest"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MetaTableGenerateResponse"
+        "4XX":
+          $ref: "#/components/responses/Error"
+  /admin/meta-table/{id}/import:
+    post:
+      tags:
+      - "元表格管理"
+      summary: "导入元表格数据"
+      operationId: "importData"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
+      - name: "format"
+        in: "query"
+        required: false
+        schema:
+          type: "string"
+          default: "CSV"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+              - "file"
+              type: "object"
+              properties:
+                file:
+                  type: "string"
+                  format: "binary"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ImportResponse"
+        "4XX":
+          $ref: "#/components/responses/Error"
+  /admin/meta-table/{id}/migrations:
+    get:
+      tags:
+      - "元表格管理"
+      summary: "获取元表格 Schema 迁移历史"
+      operationId: "migrations"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/MetaTableMigration"
+        "4XX":
+          $ref: "#/components/responses/Error"
+  /admin/meta-table/{id}/schema-preview:
+    post:
+      tags:
+      - "元表格管理"
+      summary: "预览 Schema 变更（diff + 违规行数 + DDL，不执行）"
+      operationId: "schemaPreview"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MetaTableUpdateRequest"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SchemaPreview"
+        "4XX":
+          $ref: "#/components/responses/Error"
+  /admin/monitor/cache-info:
+    get:
+      tags:
+      - "系统监控"
+      summary: "缓存监控信息"
+      operationId: "getCacheInfo"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CacheInfoResponse"
+        "4XX":
+          $ref: "#/components/responses/Error"
+  /admin/monitor/online-logs:
+    post:
+      tags:
+      - "系统监控"
+      summary: "在线用户列表"
+      operationId: "getOnlineLogsList"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OnlineLogListRequest"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminPageResponseOnlineUserResponse"
         "4XX":
           $ref: "#/components/responses/Error"
   /admin/notice:
@@ -1056,7 +2163,7 @@ paths:
       tags:
       - "定时任务管理"
       summary: "更新定时任务"
-      operationId: "update_3"
+      operationId: "update"
       parameters:
       - name: "id"
         in: "path"
@@ -1127,6 +2234,196 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ServerInfoResponse"
+        "4XX":
+          $ref: "#/components/responses/Error"
+  /admin/system/dict/item/{id}:
+    put:
+      tags:
+      - "字典配置"
+      summary: "更新字典项"
+      operationId: "updateItem"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DictItemRequest"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "boolean"
+        "4XX":
+          $ref: "#/components/responses/Error"
+    delete:
+      tags:
+      - "字典配置"
+      summary: "删除字典项"
+      operationId: "deleteItem"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "boolean"
+        "4XX":
+          $ref: "#/components/responses/Error"
+  /admin/system/dict/type:
+    post:
+      tags:
+      - "字典配置"
+      summary: "字典类型分页列表"
+      operationId: "listTypes"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DictTypeQueryRequest"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminPageResponseDictTypeResponse"
+        "4XX":
+          $ref: "#/components/responses/Error"
+  /admin/system/dict/type/create:
+    post:
+      tags:
+      - "字典配置"
+      summary: "创建字典类型"
+      operationId: "createType"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DictTypeCreateRequest"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "integer"
+                format: "int64"
+        "4XX":
+          $ref: "#/components/responses/Error"
+  /admin/system/dict/type/{typeId}/item:
+    post:
+      tags:
+      - "字典配置"
+      summary: "创建字典项"
+      operationId: "createItem"
+      parameters:
+      - name: "typeId"
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DictItemRequest"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "integer"
+                format: "int64"
+        "4XX":
+          $ref: "#/components/responses/Error"
+  /admin/system/dict/type/{typeKey}:
+    get:
+      tags:
+      - "字典配置"
+      summary: "根据字典编码查询详情及全部项"
+      operationId: "getTypeByCode"
+      parameters:
+      - name: "typeKey"
+        in: "path"
+        required: true
+        schema:
+          type: "string"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DictTypeResponse"
+        "4XX":
+          $ref: "#/components/responses/Error"
+    put:
+      tags:
+      - "字典配置"
+      summary: "更新字典类型"
+      operationId: "updateType"
+      parameters:
+      - name: "typeKey"
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DictTypeUpdateRequest"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "boolean"
+        "4XX":
+          $ref: "#/components/responses/Error"
+    delete:
+      tags:
+      - "字典配置"
+      summary: "删除字典类型"
+      operationId: "deleteType"
+      parameters:
+      - name: "typeKey"
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "boolean"
         "4XX":
           $ref: "#/components/responses/Error"
   /admin/user:
@@ -1219,7 +2516,7 @@ paths:
       tags:
       - "用户导出"
       summary: "导出用户列表为 xlsx"
-      operationId: "export_1"
+      operationId: "export"
       responses:
         "200":
           description: "OK"
@@ -1303,1303 +2600,6 @@ paths:
             schema:
               $ref: "#/components/schemas/UserUpdateRequest"
         required: true
-      responses:
-        "200":
-          description: "OK"
-          content:
-            application/json:
-              schema:
-                type: "boolean"
-        "4XX":
-          $ref: "#/components/responses/Error"
-  /auth/:
-    get:
-      tags:
-      - "登录API"
-      summary: "首页"
-      operationId: "index"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            application/json:
-              schema:
-                type: "string"
-        "4XX":
-          $ref: "#/components/responses/Error"
-  /auth/captchaImage:
-    get:
-      tags:
-      - "登录API"
-      operationId: "getCaptchaImg"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/CaptchaResponse"
-        "4XX":
-          $ref: "#/components/responses/Error"
-      summary: "Get captcha img"
-  /auth/get-async-routes:
-    get:
-      tags:
-      - "登录API"
-      summary: "获取异步路由"
-      description: "兼容vue-pure-admin前端的路由获取接口"
-      operationId: "getAsyncRoutes"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            application/json:
-              schema:
-                type: "array"
-                items:
-                  $ref: "#/components/schemas/RouterDTO"
-        "4XX":
-          $ref: "#/components/responses/Error"
-  /auth/getConfig:
-    get:
-      tags:
-      - "登录API"
-      summary: "获取系统配置"
-      operationId: "getConfig"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/LoginConfigResponse"
-        "4XX":
-          $ref: "#/components/responses/Error"
-  /auth/getLoginUserInfo:
-    get:
-      tags:
-      - "登录API"
-      summary: "获取当前登录用户信息"
-      operationId: "getLoginUserInfo"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/CurrentLoginUserResponse"
-        "4XX":
-          $ref: "#/components/responses/Error"
-  /auth/getRouters:
-    get:
-      tags:
-      - "登录API"
-      summary: "获取用户对应的菜单路由"
-      description: "用于动态生成路由"
-      operationId: "getRouters"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            application/json:
-              schema:
-                type: "array"
-                items:
-                  $ref: "#/components/schemas/RouterDTO"
-        "4XX":
-          $ref: "#/components/responses/Error"
-  /auth/login:
-    post:
-      tags:
-      - "登录API"
-      summary: "登录"
-      operationId: "login"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/LoginRequest"
-        required: true
-      responses:
-        "200":
-          description: "OK"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/LoginResponse"
-        "4XX":
-          $ref: "#/components/responses/Error"
-  /auth/logout:
-    post:
-      tags:
-      - "登录API"
-      summary: "退出登录"
-      operationId: "logout"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/RefreshTokenRequest"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            application/json:
-              schema:
-                type: "boolean"
-        "4XX":
-          $ref: "#/components/responses/Error"
-  /auth/refresh-token:
-    post:
-      tags:
-      - "登录API"
-      summary: "刷新令牌"
-      operationId: "refreshToken"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/RefreshTokenRequest"
-        required: true
-      responses:
-        "200":
-          description: "OK"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/RefreshTokenResponse"
-        "4XX":
-          $ref: "#/components/responses/Error"
-  /blog/article:
-    post:
-      tags:
-      - "blog-article-controller"
-      operationId: "list_2"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/AdminBlogArticleListRequest"
-        required: true
-      responses:
-        "200":
-          description: "OK"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AdminPageResponseAdminBlogArticleResponse"
-        "4XX":
-          $ref: "#/components/responses/Error"
-      summary: "List 2"
-  /blog/article/create:
-    post:
-      tags:
-      - "blog-article-controller"
-      operationId: "create_2"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/AdminBlogArticleCreateRequest"
-        required: true
-      responses:
-        "200":
-          description: "OK"
-          content:
-            application/json:
-              schema:
-                type: "integer"
-                format: "int64"
-        "4XX":
-          $ref: "#/components/responses/Error"
-      summary: "Create 2"
-  /blog/article/delete:
-    post:
-      tags:
-      - "blog-article-controller"
-      operationId: "delete_2"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/IdRequest"
-        required: true
-      responses:
-        "200":
-          description: "OK"
-          content:
-            application/json:
-              schema:
-                type: "boolean"
-        "4XX":
-          $ref: "#/components/responses/Error"
-      summary: "Delete 2"
-  /blog/article/update:
-    put:
-      tags:
-      - "blog-article-controller"
-      operationId: "update_2"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/AdminBlogArticleUpdateRequest"
-        required: true
-      responses:
-        "200":
-          description: "OK"
-          content:
-            application/json:
-              schema:
-                type: "boolean"
-        "4XX":
-          $ref: "#/components/responses/Error"
-      summary: "Update 2"
-  /blog/article/{id}/offline:
-    post:
-      tags:
-      - "blog-article-controller"
-      operationId: "offline"
-      parameters:
-      - name: "id"
-        in: "path"
-        required: true
-        schema:
-          type: "integer"
-          format: "int64"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            application/json:
-              schema:
-                type: "boolean"
-        "4XX":
-          $ref: "#/components/responses/Error"
-      summary: "Offline"
-  /blog/article/{id}/publish:
-    post:
-      tags:
-      - "blog-article-controller"
-      operationId: "publish"
-      parameters:
-      - name: "id"
-        in: "path"
-        required: true
-        schema:
-          type: "integer"
-          format: "int64"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            application/json:
-              schema:
-                type: "boolean"
-        "4XX":
-          $ref: "#/components/responses/Error"
-      summary: "Publish"
-  /blog/category:
-    post:
-      tags:
-      - "blog-category-controller"
-      operationId: "list_1"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/AdminBlogCategoryListRequest"
-        required: true
-      responses:
-        "200":
-          description: "OK"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AdminPageResponseAdminBlogCategoryResponse"
-        "4XX":
-          $ref: "#/components/responses/Error"
-      summary: "List 1"
-  /blog/category/create:
-    post:
-      tags:
-      - "blog-category-controller"
-      operationId: "create_1"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/AdminBlogCategoryCreateRequest"
-        required: true
-      responses:
-        "200":
-          description: "OK"
-          content:
-            application/json:
-              schema:
-                type: "integer"
-                format: "int64"
-        "4XX":
-          $ref: "#/components/responses/Error"
-      summary: "Create 1"
-  /blog/category/delete:
-    post:
-      tags:
-      - "blog-category-controller"
-      operationId: "delete_1"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/IdRequest"
-        required: true
-      responses:
-        "200":
-          description: "OK"
-          content:
-            application/json:
-              schema:
-                type: "boolean"
-        "4XX":
-          $ref: "#/components/responses/Error"
-      summary: "Delete 1"
-  /blog/category/update:
-    put:
-      tags:
-      - "blog-category-controller"
-      operationId: "update_1"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/AdminBlogCategoryUpdateRequest"
-        required: true
-      responses:
-        "200":
-          description: "OK"
-          content:
-            application/json:
-              schema:
-                type: "boolean"
-        "4XX":
-          $ref: "#/components/responses/Error"
-      summary: "Update 1"
-  /blog/file/upload:
-    post:
-      tags:
-      - "blog-file-controller"
-      operationId: "uploadMarkdownImage"
-      parameters:
-      - name: "file[]"
-        in: "query"
-        required: true
-        schema:
-          type: "array"
-          items:
-            type: "string"
-            format: "binary"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            application/json:
-              schema:
-                type: "object"
-                additionalProperties:
-                  type: "object"
-        "4XX":
-          $ref: "#/components/responses/Error"
-      summary: "Upload markdown image"
-  /file:
-    get:
-      tags:
-      - "文件管理"
-      summary: "获取文件列表"
-      operationId: "listFiles"
-      parameters:
-      - name: "params"
-        in: "query"
-        required: true
-        schema:
-          $ref: "#/components/schemas/FileListRequest"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AdminPageResponseFileResponse"
-        "4XX":
-          $ref: "#/components/responses/Error"
-  /file/download/{fileId}:
-    get:
-      tags:
-      - "文件管理"
-      summary: "下载文件"
-      operationId: "downloadFile"
-      parameters:
-      - name: "fileId"
-        in: "path"
-        required: true
-        schema:
-          type: "integer"
-          format: "int64"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            application/json:
-              schema:
-                type: "string"
-                format: "binary"
-        "4XX":
-          $ref: "#/components/responses/Error"
-  /file/upload:
-    post:
-      tags:
-      - "文件管理"
-      summary: "上传文件"
-      operationId: "uploadFile"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              required:
-              - "file"
-              type: "object"
-              properties:
-                file:
-                  type: "string"
-                  format: "binary"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/UploadFileResponse"
-        "4XX":
-          $ref: "#/components/responses/Error"
-  /file/upload-image:
-    post:
-      tags:
-      - "文件管理"
-      summary: "上传图片（头像等）"
-      operationId: "uploadImage"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              required:
-              - "file"
-              type: "object"
-              properties:
-                file:
-                  type: "string"
-                  format: "binary"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/UploadFileResponse"
-        "4XX":
-          $ref: "#/components/responses/Error"
-  /file/{fileId}:
-    delete:
-      tags:
-      - "文件管理"
-      summary: "删除文件"
-      operationId: "deleteFile"
-      parameters:
-      - name: "fileId"
-        in: "path"
-        required: true
-        schema:
-          type: "integer"
-          format: "int64"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            application/json:
-              schema:
-                type: "boolean"
-        "4XX":
-          $ref: "#/components/responses/Error"
-  /idempotent/token:
-    get:
-      tags:
-      - "idempotent-token-controller"
-      operationId: "token"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ResponseResultString"
-        "4XX":
-          $ref: "#/components/responses/Error"
-      summary: "Token"
-  /meta-table:
-    post:
-      tags:
-      - "元表格管理"
-      summary: "获取元表格列表"
-      operationId: "list"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/MetaTableListRequest"
-        required: true
-      responses:
-        "200":
-          description: "OK"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AdminPageResponseMetaTableResponse"
-        "4XX":
-          $ref: "#/components/responses/Error"
-  /meta-table/create:
-    post:
-      tags:
-      - "元表格管理"
-      summary: "创建元表格"
-      operationId: "create"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/MetaTableCreateRequest"
-        required: true
-      responses:
-        "200":
-          description: "OK"
-          content:
-            application/json:
-              schema:
-                type: "integer"
-                format: "int64"
-        "4XX":
-          $ref: "#/components/responses/Error"
-  /meta-table/import:
-    post:
-      tags:
-      - "元表格管理"
-      summary: "导入已有物理表"
-      operationId: "importTable"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/MetaTableImportRequest"
-        required: true
-      responses:
-        "200":
-          description: "OK"
-          content:
-            application/json:
-              schema:
-                type: "integer"
-                format: "int64"
-        "4XX":
-          $ref: "#/components/responses/Error"
-  /meta-table/import-preview/{tableName}:
-    get:
-      tags:
-      - "元表格管理"
-      summary: "预览物理表导入映射"
-      operationId: "importPreview"
-      parameters:
-      - name: "tableName"
-        in: "path"
-        required: true
-        schema:
-          type: "string"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/TableImportPreview"
-        "4XX":
-          $ref: "#/components/responses/Error"
-  /meta-table/importable-tables:
-    get:
-      tags:
-      - "元表格管理"
-      summary: "列出可导入的物理表"
-      operationId: "importableTables"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            application/json:
-              schema:
-                type: "array"
-                items:
-                  $ref: "#/components/schemas/ImportableTableInfo"
-        "4XX":
-          $ref: "#/components/responses/Error"
-  /meta-table/{id}:
-    get:
-      tags:
-      - "元表格管理"
-      summary: "获取元表格详情"
-      operationId: "detail"
-      parameters:
-      - name: "id"
-        in: "path"
-        required: true
-        schema:
-          type: "integer"
-          format: "int64"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/MetaTableResponse"
-        "4XX":
-          $ref: "#/components/responses/Error"
-    put:
-      tags:
-      - "元表格管理"
-      summary: "更新元表格（结构变更，columns 必填；仅改元信息用 PATCH）"
-      operationId: "update"
-      parameters:
-      - name: "id"
-        in: "path"
-        required: true
-        schema:
-          type: "integer"
-          format: "int64"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/MetaTableUpdateRequest"
-        required: true
-      responses:
-        "200":
-          description: "OK"
-          content:
-            application/json:
-              schema:
-                type: "boolean"
-        "4XX":
-          $ref: "#/components/responses/Error"
-    delete:
-      tags:
-      - "元表格管理"
-      summary: "删除元表格"
-      operationId: "delete"
-      parameters:
-      - name: "id"
-        in: "path"
-        required: true
-        schema:
-          type: "integer"
-          format: "int64"
-      - name: "force"
-        in: "query"
-        required: false
-        schema:
-          type: "boolean"
-          default: false
-      responses:
-        "200":
-          description: "OK"
-          content:
-            application/json:
-              schema:
-                type: "boolean"
-        "4XX":
-          $ref: "#/components/responses/Error"
-    patch:
-      tags:
-      - "元表格管理"
-      summary: "更新元表格元信息（仅名称/描述/状态，不动表结构）"
-      operationId: "updateMeta"
-      parameters:
-      - name: "id"
-        in: "path"
-        required: true
-        schema:
-          type: "integer"
-          format: "int64"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/MetaTableUpdateRequest"
-        required: true
-      responses:
-        "200":
-          description: "OK"
-          content:
-            application/json:
-              schema:
-                type: "boolean"
-        "4XX":
-          $ref: "#/components/responses/Error"
-  /meta-table/{id}/copy:
-    post:
-      tags:
-      - "元表格管理"
-      summary: "复制元表格"
-      operationId: "copy"
-      parameters:
-      - name: "id"
-        in: "path"
-        required: true
-        schema:
-          type: "integer"
-          format: "int64"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            application/json:
-              schema:
-                type: "integer"
-                format: "int64"
-        "4XX":
-          $ref: "#/components/responses/Error"
-  /meta-table/{id}/data:
-    post:
-      tags:
-      - "元表格管理"
-      summary: "获取元表格数据"
-      operationId: "listData"
-      parameters:
-      - name: "id"
-        in: "path"
-        required: true
-        schema:
-          type: "integer"
-          format: "int64"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/MetaDataListRequest"
-        required: true
-      responses:
-        "200":
-          description: "OK"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AdminPageResponseMapStringObject"
-        "4XX":
-          $ref: "#/components/responses/Error"
-  /meta-table/{id}/data/create:
-    post:
-      tags:
-      - "元表格管理"
-      summary: "新增元表格数据"
-      operationId: "createData"
-      parameters:
-      - name: "id"
-        in: "path"
-        required: true
-        schema:
-          type: "integer"
-          format: "int64"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: "object"
-              additionalProperties:
-                type: "object"
-        required: true
-      responses:
-        "200":
-          description: "OK"
-          content:
-            application/json:
-              schema:
-                type: "integer"
-                format: "int64"
-        "4XX":
-          $ref: "#/components/responses/Error"
-  /meta-table/{id}/data/{dataId}:
-    put:
-      tags:
-      - "元表格管理"
-      summary: "修改元表格数据"
-      operationId: "updateData"
-      parameters:
-      - name: "id"
-        in: "path"
-        required: true
-        schema:
-          type: "integer"
-          format: "int64"
-      - name: "dataId"
-        in: "path"
-        required: true
-        schema:
-          type: "integer"
-          format: "int64"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: "object"
-              additionalProperties:
-                type: "object"
-        required: true
-      responses:
-        "200":
-          description: "OK"
-          content:
-            application/json:
-              schema:
-                type: "boolean"
-        "4XX":
-          $ref: "#/components/responses/Error"
-  /meta-table/{id}/data/{dataId}/delete:
-    post:
-      tags:
-      - "元表格管理"
-      summary: "删除元表格数据"
-      operationId: "deleteData"
-      parameters:
-      - name: "id"
-        in: "path"
-        required: true
-        schema:
-          type: "integer"
-          format: "int64"
-      - name: "dataId"
-        in: "path"
-        required: true
-        schema:
-          type: "integer"
-          format: "int64"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            application/json:
-              schema:
-                type: "boolean"
-        "4XX":
-          $ref: "#/components/responses/Error"
-  /meta-table/{id}/delete-check:
-    get:
-      tags:
-      - "元表格管理"
-      summary: "检查删除元表格"
-      operationId: "deleteCheck"
-      parameters:
-      - name: "id"
-        in: "path"
-        required: true
-        schema:
-          type: "integer"
-          format: "int64"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            application/json:
-              schema:
-                type: "integer"
-                format: "int64"
-        "4XX":
-          $ref: "#/components/responses/Error"
-  /meta-table/{id}/export:
-    get:
-      tags:
-      - "元表格管理"
-      summary: "导出元表格数据"
-      operationId: "export"
-      parameters:
-      - name: "id"
-        in: "path"
-        required: true
-        schema:
-          type: "integer"
-          format: "int64"
-      - name: "format"
-        in: "query"
-        required: false
-        schema:
-          type: "string"
-          default: "EXCEL"
-      responses:
-        "200":
-          description: "OK"
-        "4XX":
-          $ref: "#/components/responses/Error"
-  /meta-table/{id}/export-migration:
-    get:
-      tags:
-      - "元表格管理"
-      summary: "导出元表格 Schema 迁移为 Flyway SQL"
-      operationId: "exportMigration"
-      parameters:
-      - name: "id"
-        in: "path"
-        required: true
-        schema:
-          type: "integer"
-          format: "int64"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            application/json:
-              schema:
-                type: "string"
-        "4XX":
-          $ref: "#/components/responses/Error"
-  /meta-table/{id}/generate:
-    post:
-      tags:
-      - "元表格管理"
-      summary: "生成元表格代码"
-      operationId: "generate"
-      parameters:
-      - name: "id"
-        in: "path"
-        required: true
-        schema:
-          type: "integer"
-          format: "int64"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/MetaTableGenerateRequest"
-        required: true
-      responses:
-        "200":
-          description: "OK"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/MetaTableGenerateResponse"
-        "4XX":
-          $ref: "#/components/responses/Error"
-  /meta-table/{id}/import:
-    post:
-      tags:
-      - "元表格管理"
-      summary: "导入元表格数据"
-      operationId: "importData"
-      parameters:
-      - name: "id"
-        in: "path"
-        required: true
-        schema:
-          type: "integer"
-          format: "int64"
-      - name: "format"
-        in: "query"
-        required: false
-        schema:
-          type: "string"
-          default: "CSV"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              required:
-              - "file"
-              type: "object"
-              properties:
-                file:
-                  type: "string"
-                  format: "binary"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ImportResponse"
-        "4XX":
-          $ref: "#/components/responses/Error"
-  /meta-table/{id}/migrations:
-    get:
-      tags:
-      - "元表格管理"
-      summary: "获取元表格 Schema 迁移历史"
-      operationId: "migrations"
-      parameters:
-      - name: "id"
-        in: "path"
-        required: true
-        schema:
-          type: "integer"
-          format: "int64"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            application/json:
-              schema:
-                type: "array"
-                items:
-                  $ref: "#/components/schemas/MetaTableMigration"
-        "4XX":
-          $ref: "#/components/responses/Error"
-  /meta-table/{id}/schema-preview:
-    post:
-      tags:
-      - "元表格管理"
-      summary: "预览 Schema 变更（diff + 违规行数 + DDL，不执行）"
-      operationId: "schemaPreview"
-      parameters:
-      - name: "id"
-        in: "path"
-        required: true
-        schema:
-          type: "integer"
-          format: "int64"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/MetaTableUpdateRequest"
-        required: true
-      responses:
-        "200":
-          description: "OK"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/SchemaPreview"
-        "4XX":
-          $ref: "#/components/responses/Error"
-  /monitor/cache-info:
-    get:
-      tags:
-      - "系统监控"
-      summary: "缓存监控信息"
-      operationId: "getCacheInfo"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/CacheInfoResponse"
-        "4XX":
-          $ref: "#/components/responses/Error"
-  /monitor/online-logs:
-    post:
-      tags:
-      - "系统监控"
-      summary: "在线用户列表"
-      operationId: "getOnlineLogsList"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/OnlineLogListRequest"
-        required: true
-      responses:
-        "200":
-          description: "OK"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AdminPageResponseOnlineUserResponse"
-        "4XX":
-          $ref: "#/components/responses/Error"
-  /system/dict/item/{id}:
-    put:
-      tags:
-      - "字典配置"
-      summary: "更新字典项"
-      operationId: "updateItem"
-      parameters:
-      - name: "id"
-        in: "path"
-        required: true
-        schema:
-          type: "integer"
-          format: "int64"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/DictItemRequest"
-        required: true
-      responses:
-        "200":
-          description: "OK"
-          content:
-            application/json:
-              schema:
-                type: "boolean"
-        "4XX":
-          $ref: "#/components/responses/Error"
-    delete:
-      tags:
-      - "字典配置"
-      summary: "删除字典项"
-      operationId: "deleteItem"
-      parameters:
-      - name: "id"
-        in: "path"
-        required: true
-        schema:
-          type: "integer"
-          format: "int64"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            application/json:
-              schema:
-                type: "boolean"
-        "4XX":
-          $ref: "#/components/responses/Error"
-  /system/dict/type:
-    post:
-      tags:
-      - "字典配置"
-      summary: "字典类型分页列表"
-      operationId: "listTypes"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/DictTypeQueryRequest"
-        required: true
-      responses:
-        "200":
-          description: "OK"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AdminPageResponseDictTypeResponse"
-        "4XX":
-          $ref: "#/components/responses/Error"
-  /system/dict/type/create:
-    post:
-      tags:
-      - "字典配置"
-      summary: "创建字典类型"
-      operationId: "createType"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/DictTypeCreateRequest"
-        required: true
-      responses:
-        "200":
-          description: "OK"
-          content:
-            application/json:
-              schema:
-                type: "integer"
-                format: "int64"
-        "4XX":
-          $ref: "#/components/responses/Error"
-  /system/dict/type/{typeId}/item:
-    post:
-      tags:
-      - "字典配置"
-      summary: "创建字典项"
-      operationId: "createItem"
-      parameters:
-      - name: "typeId"
-        in: "path"
-        required: true
-        schema:
-          type: "integer"
-          format: "int64"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/DictItemRequest"
-        required: true
-      responses:
-        "200":
-          description: "OK"
-          content:
-            application/json:
-              schema:
-                type: "integer"
-                format: "int64"
-        "4XX":
-          $ref: "#/components/responses/Error"
-  /system/dict/type/{typeKey}:
-    get:
-      tags:
-      - "字典配置"
-      summary: "根据字典编码查询详情及全部项"
-      operationId: "getTypeByCode"
-      parameters:
-      - name: "typeKey"
-        in: "path"
-        required: true
-        schema:
-          type: "string"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/DictTypeResponse"
-        "4XX":
-          $ref: "#/components/responses/Error"
-    put:
-      tags:
-      - "字典配置"
-      summary: "更新字典类型"
-      operationId: "updateType"
-      parameters:
-      - name: "typeKey"
-        in: "path"
-        required: true
-        schema:
-          type: "integer"
-          format: "int64"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/DictTypeUpdateRequest"
-        required: true
-      responses:
-        "200":
-          description: "OK"
-          content:
-            application/json:
-              schema:
-                type: "boolean"
-        "4XX":
-          $ref: "#/components/responses/Error"
-    delete:
-      tags:
-      - "字典配置"
-      summary: "删除字典类型"
-      operationId: "deleteType"
-      parameters:
-      - name: "typeKey"
-        in: "path"
-        required: true
-        schema:
-          type: "integer"
-          format: "int64"
       responses:
         "200":
           description: "OK"
@@ -2794,6 +2794,21 @@ paths:
         "4XX":
           $ref: "#/components/responses/Error"
       summary: "Forgot password"
+  /web/idempotent/token:
+    get:
+      tags:
+      - "idempotent-token-controller"
+      operationId: "webToken"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ResponseResultString"
+        "4XX":
+          $ref: "#/components/responses/Error"
+      summary: "Web token"
   /web/login:
     post:
       tags:

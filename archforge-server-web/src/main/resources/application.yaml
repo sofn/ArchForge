@@ -53,3 +53,5 @@ sa-token:
 arch-forge:
   mock-auth:
     enabled: false
+  idempotent:
+    base-path: /web/idempotent

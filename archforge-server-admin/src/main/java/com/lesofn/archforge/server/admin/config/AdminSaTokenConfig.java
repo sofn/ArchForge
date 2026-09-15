@@ -21,13 +21,13 @@ public class AdminSaTokenConfig implements WebMvcConfigurer {
         registry.addInterceptor(new SaInterceptor(handler -> StpAdminUtil.checkLogin()))
                 .addPathPatterns("/**")
                 .excludePathPatterns(
-                        "/auth/login",
-                        "/auth/register",
-                        "/auth/getConfig",
-                        "/auth/captchaImage",
-                        "/auth/refresh-token",
-                        "/auth/",
-                        "/idempotent/token",
+                        "/admin/auth/login",
+                        "/admin/auth/register",
+                        "/admin/auth/getConfig",
+                        "/admin/auth/captchaImage",
+                        "/admin/auth/refresh-token",
+                        "/admin/auth/",
+                        "/admin/idempotent/token",
                         "/v3/api-docs",
                         "/v3/api-docs/**",
                         "/swagger-ui.html",

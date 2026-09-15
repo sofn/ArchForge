@@ -39,7 +39,7 @@ import org.springframework.web.bind.annotation.RestController;
 @SaCheckRole(value = "ADMIN", type = StpAdminUtil.TYPE)
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/monitor")
+@RequestMapping("/admin/monitor")
 public class MonitorController {
 
     private final RedisUtil redisUtil;

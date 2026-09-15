@@ -83,7 +83,7 @@ class AdminApiIntegrationTest extends Specification {
 
     def "1.1 登录成功并获取token"() {
         when:
-        Map response = doPost("/auth/login", [username: "admin", password: "admin123"])
+        Map response = doPost("/admin/auth/login", [username: "admin", password: "admin123"])
         accessToken = response.data.accessToken
 
         then:
@@ -100,7 +100,7 @@ class AdminApiIntegrationTest extends Specification {
 
     def "1.2 错误密码登录失败"() {
         when:
-        Map response = doPost("/auth/login", [username: "admin", password: "wrongpassword"])
+        Map response = doPost("/admin/auth/login", [username: "admin", password: "wrongpassword"])
 
         then:
         response.code != 0
@@ -108,11 +108,11 @@ class AdminApiIntegrationTest extends Specification {
 
     def "1.3 刷新token"() {
         given:
-        Map loginResponse = doPost("/auth/login", [username: "admin", password: "admin123"])
+        Map loginResponse = doPost("/admin/auth/login", [username: "admin", password: "admin123"])
         String freshRefreshToken = loginResponse.data.refreshToken
 
         when:
-        Map response = doPost("/auth/refresh-token", [refreshToken: freshRefreshToken])
+        Map response = doPost("/admin/auth/refresh-token", [refreshToken: freshRefreshToken])
 
         then:
         response != null
@@ -121,7 +121,7 @@ class AdminApiIntegrationTest extends Specification {
 
     def "1.4 未认证请求返回401"() {
         when:
-        Map response = doGet("/auth/get-async-routes")
+        Map response = doGet("/admin/auth/get-async-routes")
 
         then:
         response.code != 0
@@ -129,7 +129,7 @@ class AdminApiIntegrationTest extends Specification {
 
     def "1.5 获取异步路由"() {
         when:
-        Map response = doGet("/auth/get-async-routes", accessToken)
+        Map response = doGet("/admin/auth/get-async-routes", accessToken)
 
         then:
         response.code == 0

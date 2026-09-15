@@ -61,7 +61,8 @@ public class WebConfig implements WebMvcConfigurer {
                         "/web/verification-code/send",
                         "/web/register",
                         "/web/forgot-password",
-                        "/web/reset-password");
+                        "/web/reset-password",
+                        "/web/idempotent/token");
     }
 
     @Override

@@ -28,4 +28,10 @@ public class IdempotentProperties {
 
     /** 默认幂等 Token 请求头 */
     private String headerName = "X-Idempotent-Token";
+
+    /**
+     * Token 申请接口挂载路径 —— server-admin 设 /admin/idempotent，server-web 设
+     * /web/idempotent（契约要求所有 path 带服务前缀）。
+     */
+    private String basePath = "/idempotent";
 }

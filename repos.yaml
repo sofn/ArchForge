@@ -98,5 +98,4 @@ contract:
   deleted_paths:
     - /system/menu
     - /system/role
-  migration_backlog:
-    - /system/dict
+  migration_backlog: []

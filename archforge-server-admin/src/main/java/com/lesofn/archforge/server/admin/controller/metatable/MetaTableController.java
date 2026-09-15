@@ -76,7 +76,7 @@ import org.springframework.web.multipart.MultipartFile;
 @SaCheckRole(value = "ADMIN", type = StpAdminUtil.TYPE)
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/meta-table")
+@RequestMapping("/admin/meta-table")
 public class MetaTableController {
 
     private final MetaTableAdminService metaTableAdminService;

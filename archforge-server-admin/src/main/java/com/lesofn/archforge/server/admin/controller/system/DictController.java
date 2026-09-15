@@ -39,7 +39,7 @@ import org.springframework.web.bind.annotation.RestController;
 @SaCheckRole(value = "ADMIN", type = StpAdminUtil.TYPE)
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/system/dict")
+@RequestMapping("/admin/system/dict")
 public class DictController {
 
     private final SysDictService dictService;

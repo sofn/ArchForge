@@ -55,7 +55,7 @@ class QueryHelpIntegrationTest extends AbstractIntegrationTest {
     void setup() throws Exception {
         rest = RestClient.builder().baseUrl("http://localhost:" + port).build();
         String resp = rest.post()
-                .uri("/auth/login")
+                .uri("/admin/auth/login")
                 .header("Content-Type", "application/json")
                 .body(Map.of("username", "admin", "password", "admin123"))
                 .retrieve()

@@ -89,6 +89,8 @@ arch-forge:
   sensitive:
     enabled: true
   rsa-private-key: ${ARCH_FORGE_RSA_PRIVATE_KEY:}
+  idempotent:
+    base-path: /admin/idempotent
   scheduler:
     # db-scheduler runtime（调度状态存 scheduled_tasks 表，反射调用仅允许此名单内的 bean）
     allowed-job-beans: demoSchedulerJob

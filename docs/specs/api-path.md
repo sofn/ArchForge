@@ -1,11 +1,10 @@
 # API path prefixes
 
-Target prefixes:
+Every contract path carries a service prefix:
 
 | Server | Prefix | Client |
 |--------|--------|--------|
 | `server-admin` :8080 | `/admin/*` | ArchForgeAdmin |
-| `server-admin` :8080 | `/auth/*` | Admin login / captcha / routers |
 | `server-web` :8081 | `/web/*` | ArchForgeWeb |
 
 New endpoints go under `/admin/{resource}` or `/web/{resource}`. Do not add a third prefix.
@@ -13,13 +12,13 @@ New endpoints go under `/admin/{resource}` or `/web/{resource}`. Do not add a th
 ## Live admin resources
 
 ```
-/auth/login
-/auth/logout
-/auth/refresh-token
-/auth/getConfig
-/auth/captchaImage
-/auth/getLoginUserInfo
-/auth/getRouters
+/admin/auth/login
+/admin/auth/logout
+/admin/auth/refresh-token
+/admin/auth/getConfig
+/admin/auth/captchaImage
+/admin/auth/getLoginUserInfo
+/admin/auth/getRouters
 
 /admin/user
 /admin/role
@@ -41,18 +40,18 @@ New endpoints go under `/admin/{resource}` or `/web/{resource}`. Do not add a th
 /admin/permission-matrix/menus/tree
 /admin/permission-matrix/roles/{roleId}/permissions
 /admin/scheduler-job
+/admin/blog/article
+/admin/blog/category
+/admin/blog/file
+/admin/meta-table
+/admin/file
+/admin/monitor
+/admin/system/dict
+/admin/idempotent/token
 ```
 
-Admin paths that still lack `/admin` (legacy, migrate when touched):
-
-```
-/blog/article
-/blog/category
-/blog/file
-/meta-table
-/file
-/monitor
-```
+Shared infrastructure mounts per-server: `IdempotentTokenController` reads
+`arch-forge.idempotent.base-path` (`/admin/idempotent` on :8080, `/web/idempotent` on :8081).
 
 ## Example endpoints — not in the contract
 
@@ -74,14 +73,7 @@ Do not add `/task` or `/web/task` to the OpenAPI contract unless the example mod
 ```
 
 Those controllers are not part of the contract. Menu and role live at `/admin/menu` and `/admin/role`.
-
-## Migration backlog
-
-```
-/system/dict
-```
-
-Dictionary admin still uses the leftover `/system` prefix. Move to `/admin/dict` (and update Admin `src/api/dict.ts`) as a dedicated change. Until then it is the only allowed `/system/*` path.
+`/system/dict` moved to `/admin/system/dict` — no `/system/*` path remains.
 
 ## Web resources
 
@@ -104,6 +96,7 @@ Dictionary admin still uses the leftover `/system` prefix. Move to `/admin/dict`
 /web/user/articles
 /web/file/upload
 /web/file/{fileId}
+/web/idempotent/token
 ```
 
 See [spec/openapi.yaml](../../spec/openapi.yaml).

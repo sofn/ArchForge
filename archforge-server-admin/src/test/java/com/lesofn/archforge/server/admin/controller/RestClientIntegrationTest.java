@@ -104,7 +104,7 @@ class RestClientIntegrationTest extends AbstractIntegrationTest {
     @Test
     @Order(1)
     void login() {
-        Map<String, Object> response = post("/auth/login", Map.of("username", "admin", "password", "admin123"));
+        Map<String, Object> response = post("/admin/auth/login", Map.of("username", "admin", "password", "admin123"));
         assertEquals(0, response.get("code"));
         @SuppressWarnings("unchecked")
         Map<String, Object> data = dataOf(response);

@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author sofn
  */
 @RestController
-@RequestMapping("/idempotent")
+@RequestMapping("${arch-forge.idempotent.base-path:/idempotent}")
 @ConditionalOnProperty(prefix = "arch-forge.idempotent", name = "enabled", havingValue = "true", matchIfMissing = true)
 @RequiredArgsConstructor
 public class IdempotentTokenController {

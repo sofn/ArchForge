@@ -58,7 +58,7 @@ import org.springframework.web.multipart.MultipartFile;
 @SaCheckRole(value = "ADMIN", type = StpAdminUtil.TYPE)
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/file")
+@RequestMapping("/admin/file")
 public class FileController {
 
     private final FileStorageService fileStorageService;
@@ -115,7 +115,8 @@ public class FileController {
         sysFile.setStorageType(appForgeConfig.getFileStorage().getType());
         SysFile saved = fileService.create(sysFile);
 
-        return new UploadFileResponse(saved.getFileId(), originalName, "/file/download/" + saved.getFileId(), file.getSize());
+        return new UploadFileResponse(saved.getFileId(), originalName, "/admin/file/download/" + saved.getFileId(), file
+                .getSize());
     }
 
     @Operation(summary = "获取文件列表")

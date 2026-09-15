@@ -50,7 +50,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "登录API", description = "登录相关接口")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/auth")
+@RequestMapping("/admin/auth")
 public class LoginController {
 
     private static final DateTimeFormatter EXPIRES_FORMATTER = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");

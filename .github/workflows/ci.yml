@@ -48,7 +48,7 @@ jobs:
           grep -q "CHAT_AI" docs/specs/error-codes.md
           grep -q "/admin/user/create" spec/openapi.yaml
           grep -q "/admin/menu/create" spec/openapi.yaml
-          grep -q "/blog/article/create" spec/openapi.yaml
+          grep -q "/admin/blog/article/create" spec/openapi.yaml
           echo paths ok
 
   build-and-test:
