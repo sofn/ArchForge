@@ -9,6 +9,9 @@ import com.lesofn.archforge.cli.config.Profile;
 import com.lesofn.archforge.cli.docker.ComposeSupport;
 import com.lesofn.archforge.cli.proc.DevStack;
 import com.lesofn.archforge.cli.proc.ProcessRunner;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -76,6 +79,39 @@ class CliStructureTest {
         cmd.setOut(out.writer());
         assertEquals(0, cmd.execute("db"));
         assertTrue(out.text().contains("restore"));
+    }
+
+    @Test
+    void cleanMountedFilesRemovesBindMountDirs() throws Exception {
+        Path dockerDir = tempDir.resolve("docker");
+        for (String rel : List.of("logs", "logs-web", "allinone/context")) {
+            Path dir = dockerDir.resolve(rel);
+            Files.createDirectories(dir);
+            Files.writeString(dir.resolve("keep.log"), "x");
+        }
+        ComposeSupport compose = new ComposeSupport(new ProcessRunner(), tempDir);
+        assertEquals(0, compose.cleanMountedFiles());
+        for (String rel : List.of("logs", "logs-web", "allinone/context")) {
+            assertTrue(Files.notExists(dockerDir.resolve(rel)), "still exists: " + rel);
+        }
+    }
+
+    @Test
+    void cleanMountedFilesIsNoopWhenNothingMounted() {
+        ComposeSupport compose = new ComposeSupport(new ProcessRunner(), tempDir);
+        assertEquals(0, compose.cleanMountedFiles());
+    }
+
+    @Test
+    void infraCleanAbortsWithoutYes() {
+        InputStream original = System.in;
+        try {
+            System.setIn(new ByteArrayInputStream("no\n".getBytes(StandardCharsets.UTF_8)));
+            CommandLine cmd = new CommandLine(new ArchForgeCli());
+            assertEquals(1, cmd.execute("infra", "clean"));
+        } finally {
+            System.setIn(original);
+        }
     }
 
     @Test

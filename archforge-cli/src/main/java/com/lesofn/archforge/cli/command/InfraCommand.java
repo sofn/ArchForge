@@ -100,8 +100,7 @@ public class InfraCommand implements Callable<Integer> {
     @Command(
             mixinStandardHelpOptions = true,
             name = "clean",
-            hidden = true,
-            description = "Alias for `infra down --volumes`")
+            description = "Remove infra containers + volumes AND mounted local files (docker/logs*, allinone context)")
     static class Clean implements Callable<Integer> {
         @Option(names = {
                 "-y", "--yes"
@@ -110,10 +109,18 @@ public class InfraCommand implements Callable<Integer> {
 
         @Override
         public Integer call() throws IOException {
-            Down down = new Down();
-            down.volumes = true;
-            down.yes = yes;
-            return down.call();
+            ComposeSupport compose = new ComposeSupport(new ProcessRunner(), ProjectPaths.repoRoot());
+            if (!yes && !confirmClean()) {
+                return 1;
+            }
+            if (compose.hasRunningInfra()) {
+                System.out.println("Infra containers are still running — bringing them down first...");
+            }
+            int code = compose.downInfra(true);
+            if (code != 0) {
+                return code;
+            }
+            return compose.cleanMountedFiles();
         }
     }
 
@@ -150,8 +157,18 @@ public class InfraCommand implements Callable<Integer> {
     }
 
     private static boolean confirmVolumes() throws IOException {
-        System.out.println(
+        return confirm(
                 "This removes the containers and the postgres-data volume — all local dev data is lost.");
+    }
+
+    private static boolean confirmClean() throws IOException {
+        return confirm(
+                "This removes infra containers, the postgres-data volume, and mounted local files " +
+                        "(docker/logs*, docker/allinone/context) — all local dev data is lost.");
+    }
+
+    private static boolean confirm(String warning) throws IOException {
+        System.out.println(warning);
         System.out.print("Type YES to continue: ");
         String answer = new BufferedReader(new InputStreamReader(System.in, StandardCharsets.UTF_8)).readLine();
         if (!"YES".equals(answer)) {

@@ -3,11 +3,14 @@ package com.lesofn.archforge.cli.docker;
 import com.lesofn.archforge.cli.config.Profile;
 import com.lesofn.archforge.cli.config.ProjectPaths;
 import com.lesofn.archforge.cli.proc.ProcessRunner;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -16,6 +19,16 @@ import org.jspecify.annotations.Nullable;
  * per-profile stack file selected by {@link Profile}.
  */
 public class ComposeSupport {
+
+    /**
+     * Host dirs bind-mounted into containers (logs) or generated for docker builds
+     * (allinone context). Container-written files are often root-owned, so plain
+     * deletes can fail — those paths fall back to a throwaway container.
+     */
+    private static final List<String> MOUNTED_LOCAL_DIRS = List.of("logs", "logs-web", "allinone/context");
+
+    /** Any image already pulled by the infra stack — used for root-owned cleanup. */
+    private static final String CLEANUP_IMAGE = "postgres:17-alpine";
 
     private final ProcessRunner processRunner;
     private final Path repoRoot;
@@ -95,6 +108,53 @@ public class ComposeSupport {
         command.add("-q");
         ProcessRunner.RunResult result = processRunner.runCapture(command, ProjectPaths.dockerDir(repoRoot));
         return result.exitCode() == 0 && !result.stdout().isBlank();
+    }
+
+    /**
+     * Removes local dirs bind-mounted into containers ({@code docker/logs},
+     * {@code docker/logs-web}) and the generated allinone build context.
+     * Root-owned leftovers are removed through a throwaway container.
+     *
+     * @return 0 on success (including "nothing to clean")
+     */
+    public int cleanMountedFiles() {
+        Path dockerDir = ProjectPaths.dockerDir(repoRoot);
+        List<String> needsContainer = new ArrayList<>();
+        int removed = 0;
+        for (String rel : MOUNTED_LOCAL_DIRS) {
+            Path dir = dockerDir.resolve(rel);
+            if (!Files.exists(dir)) {
+                continue;
+            }
+            try {
+                deleteTree(dir);
+                removed++;
+            } catch (IOException e) {
+                needsContainer.add(rel);
+            }
+        }
+        if (needsContainer.isEmpty()) {
+            if (removed > 0) {
+                System.out.println("Removed " + removed + " mounted dir(s) under docker/.");
+            }
+            return 0;
+        }
+        System.out.println("Some files are root-owned — removing via a throwaway container...");
+        List<String> command = new ArrayList<>(List.of(
+                "docker", "run", "--rm", "--entrypoint", "rm",
+                "-v", dockerDir.toAbsolutePath() + ":/mnt", CLEANUP_IMAGE, "-rf"));
+        for (String rel : needsContainer) {
+            command.add("/mnt/" + rel);
+        }
+        return processRunner.run(command, dockerDir);
+    }
+
+    private void deleteTree(Path dir) throws IOException {
+        try (Stream<Path> paths = Files.walk(dir)) {
+            for (Path p : paths.sorted(Comparator.reverseOrder()).toList()) {
+                Files.delete(p);
+            }
+        }
     }
 
     public int execInfra(List<String> execArgs) {

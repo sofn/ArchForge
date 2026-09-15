@@ -60,7 +60,8 @@ User/db names resolve from `DB_USERNAME` / `DB_NAME` (env → .env → `archforg
 ./archforge infra logs [-f]              # container logs
 ./archforge infra stop                   # pause
 ./archforge infra down [-v] [-y]         # remove containers (-v: volumes too, asks YES)
-                                         # (hidden alias: infra clean = down --volumes)
+./archforge infra clean [-y]             # down -v + delete mounted local files
+                                         # (docker/logs*, docker/allinone/context)
 ```
 
 Password resolution order: `--db-password` > `DB_PASSWORD` env > `.env` >

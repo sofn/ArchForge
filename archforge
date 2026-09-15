@@ -18,8 +18,16 @@ check_jdk() {
 
 needs_rebuild() {
   [[ ! -f "${JAR}" ]] && return 0
-  # rebuild when any cli source or build file is newer than the jar
-  find "${ROOT}/archforge-cli/src" "${ROOT}/archforge-cli/build.gradle.kts" -newer "${JAR}" -print -quit 2>/dev/null | grep -q .
+  # rebuild when any cli source, build file, or bundled dependency source is newer
+  # than the jar. shadowJar inlines archforge-common-* classes, so their changes
+  # must trigger a rebuild too.
+  find \
+    "${ROOT}/archforge-cli/src" \
+    "${ROOT}/archforge-cli/build.gradle.kts" \
+    "${ROOT}/archforge-common/archforge-common-base/src" \
+    "${ROOT}/archforge-common/archforge-common-error/src" \
+    "${ROOT}/archforge-dependencies/build.gradle.kts" \
+    -newer "${JAR}" -print -quit 2>/dev/null | grep -q .
 }
 
 check_jdk
