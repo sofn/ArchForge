@@ -375,6 +375,26 @@ public final class OpenApiSpecWriter {
         return node;
     }
 
+    /**
+     * springdoc emits schema properties in a JVM-dependent order (the same DTO serializes
+     * with different field orders on different machines — e.g. uniqueColumn/indexedColumn
+     * flipped between local and CI exports). Sort every object recursively so the output
+     * is byte-stable regardless of source order. Arrays keep their order.
+     */
+    private static JsonNode sortDeep(JsonNode node) {
+        if (node instanceof ObjectNode obj) {
+            Map<String, JsonNode> sorted = new TreeMap<>();
+            obj.properties().forEach(e -> sorted.put(e.getKey(), sortDeep(e.getValue())));
+            return toObjectNode(sorted);
+        }
+        if (node instanceof ArrayNode arr) {
+            ArrayNode out = JsonNodeFactory.instance.arrayNode();
+            arr.forEach(child -> out.add(sortDeep(child)));
+            return out;
+        }
+        return node;
+    }
+
     private static void writeYaml(ObjectNode merged, Path out) throws IOException {
         YAMLFactory factory = YAMLFactory.builder()
                 .disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER)
@@ -385,6 +405,6 @@ public final class OpenApiSpecWriter {
                 .build();
         Files.createDirectories(
                 java.util.Objects.requireNonNull(out.getParent(), "output dir"));
-        yaml.writeValue(out.toFile(), merged);
+        yaml.writeValue(out.toFile(), sortDeep(merged));
     }
 }
