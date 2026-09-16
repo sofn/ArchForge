@@ -55,7 +55,7 @@ services:
       DB_MASTER_URL: jdbc:postgresql://postgres:5432/archforge
       DB_USERNAME: ${DB_USERNAME:-archforge}
       DB_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD}
-      JWT_SECRET: ${JWT_SECRET}
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET}
       ARCH_FORGE_RSA_PRIVATE_KEY: ${ARCH_FORGE_RSA_PRIVATE_KEY:?Set ARCH_FORGE_RSA_PRIVATE_KEY (archforge init --write)}
       WEB_PUBLIC_URL: ${NEXT_PUBLIC_SITE_URL:-http://localhost}
       # prod rejects '*' — the admin console origin. Remap ADMIN_PORT? set this too.
