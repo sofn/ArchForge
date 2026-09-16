@@ -9,6 +9,8 @@ import com.lesofn.archforge.cli.command.InfraCommand;
 import com.lesofn.archforge.cli.command.InitCommand;
 import com.lesofn.archforge.cli.command.LogsCommand;
 import com.lesofn.archforge.cli.command.McpCommand;
+import com.lesofn.archforge.cli.command.ModuleCommand;
+import com.lesofn.archforge.cli.command.NewCommand;
 import com.lesofn.archforge.cli.command.RestartCommand;
 import com.lesofn.archforge.cli.command.SkillsCommand;
 import com.lesofn.archforge.cli.command.StatusCommand;
@@ -52,6 +54,8 @@ import picocli.CommandLine.Option;
                 InfraCommand.class,
                 SkillsCommand.class,
                 McpCommand.class,
+                NewCommand.class,
+                ModuleCommand.class,
                 AutoComplete.GenerateCompletion.class,
                 HelpCommand.class
         })

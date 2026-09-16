@@ -1,0 +1,8 @@
+# ArchForge Project Definition — the file-first source of truth (P3-4).
+# meta/      table definitions (YAML)
+# api/       API definitions
+# permissions/  permission model
+# enums/     shared enumerations
+project:
+  name: %NAME%
+  group: %GROUP%

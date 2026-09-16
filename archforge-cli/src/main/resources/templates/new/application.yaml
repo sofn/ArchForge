@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: %NAME%
+
+server:
+  port: 8080
+
+arch-forge:
+  request-log:
+    enabled: true

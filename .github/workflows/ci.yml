@@ -82,6 +82,26 @@ jobs:
       - name: Publish release set to mavenLocal (resolvability gate)
         run: ./gradlew publishToMavenLocal --no-daemon
 
+      # P2-4 gate: `archforge new` must emit a project that only consumes the
+      # published com.lesofn.archforge:* coordinates — a stray
+      # project(":archforge-…") reference means the scaffold silently forks.
+      - name: Scaffold gate (generated project must not reference in-repo projects)
+        run: |
+          SCAFFOLD_DIR="$(mktemp -d)"
+          java -jar archforge-cli/build/libs/archforge-cli.jar new scaffold-probe -d "$SCAFFOLD_DIR"
+          (cd "$SCAFFOLD_DIR/scaffold-probe" \
+            && java -jar "$GITHUB_WORKSPACE/archforge-cli/build/libs/archforge-cli.jar" module new probe)
+          # Gradle files only — template AGENTS.md mentions the pattern as a rule.
+          if grep -r 'project(":archforge-' "$SCAFFOLD_DIR/scaffold-probe" \
+              --include='*.gradle' --include='*.gradle.kts'; then
+            echo "FAIL: generated project references in-repo project() coordinates"
+            exit 1
+          fi
+          grep -q 'com.lesofn.archforge' "$SCAFFOLD_DIR/scaffold-probe/build.gradle.kts" || {
+            echo "FAIL: generated build.gradle.kts lost the ArchForge BOM"
+            exit 1
+          }
+
       - name: Aggregate JaCoCo report
         if: always()
         run: ./gradlew jacocoAggregateReport --no-daemon -x test
