@@ -148,7 +148,7 @@ public class NewCommand implements Callable<Integer> {
                 true);
         try {
             Files.setPosixFilePermissions(
-                    target.resolve("gradlew"), PosixFilePermissions.fromString("rwxr-xr-x"));
+                    target.resolve("gradlew"), PosixFilePermissions.fromString("rwxr-x---"));
         } catch (UnsupportedOperationException | IOException ignored) {
             // non-POSIX filesystem (Windows) — gradlew.bat still works
         }
