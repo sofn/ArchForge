@@ -60,7 +60,30 @@ sonarqube {
     }
 }
 
+// P1-C release set (T6): modules published as Maven artifacts.
+// archforge-dependencies (BOM) carries its own javaPlatform publication.
+// designer / cli / server-* / module-* stay repo-local and are never published.
+val releaseModules =
+        setOf(
+                "archforge-common-base",
+                "archforge-common-jpa",
+                "archforge-common-error",
+                "archforge-infrastructure",
+                "archforge-admin-user",
+                "archforge-meta-runtime",
+                "archforge-redisson-starter",
+                "archforge-cache-starter",
+                "archforge-lock-starter",
+                "archforge-trace-starter",
+                "archforge-request-log-starter",
+        )
+
 subprojects {
+    // Subprojects do not inherit root group/version — set them explicitly so
+    // Maven publications resolve as com.lesofn.archforge:<module>:<archforgeVersion>.
+    group = "com.lesofn.archforge"
+    version = property("archforgeVersion") as String
+
     // 为除了 archforge-dependencies 之外的所有子项目应用插件
     if (name != "archforge-dependencies") {
         apply(plugin = "java-library")
@@ -73,6 +96,10 @@ subprojects {
         apply(plugin = "com.github.spotbugs")
         apply(plugin = "de.thetaphi.forbiddenapis")
         apply(plugin = "org.owasp.dependencycheck")
+
+        if (name in releaseModules) {
+            apply(from = rootProject.file("gradle/publish-conventions.gradle.kts"))
+        }
 
         configure<JacocoPluginExtension> {
             toolVersion = jacocoToolVersion

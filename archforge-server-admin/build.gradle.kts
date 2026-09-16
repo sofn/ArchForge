@@ -29,11 +29,15 @@ configurations {
 
 tasks.bootJar {
     enabled = true
+    // Deployable jars keep a stable unversioned name — Dockerfiles, docker/allinone
+    // and cli BuildCommand reference build/libs/archforge-server-admin.jar.
+    archiveVersion.set("")
 }
 
 tasks.jar {
     enabled = true
     archiveClassifier.set("plain")
+    archiveVersion.set("")
 }
 
 // JDK 25: enable preview features (StructuredTaskScope) + suppress Netty native-access warning

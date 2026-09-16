@@ -24,10 +24,10 @@ import java.lang.annotation.Target;
  *         private String blurry;
  *
  *         &#64;Query(type = Query.Type.BETWEEN)
- *         private List<LocalDateTime> createTime;
+ *         private List&lt;LocalDateTime&gt; createTime;
  *
  *         &#64;Query(propName = "id", type = Query.Type.IN, joinName = "dept")
- *         private Set<Long> deptIds;
+ *         private Set&lt;Long&gt; deptIds;
  *     }
  * }
  * </pre>

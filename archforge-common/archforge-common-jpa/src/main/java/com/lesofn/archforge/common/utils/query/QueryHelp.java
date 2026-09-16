@@ -29,8 +29,8 @@ import org.jspecify.annotations.Nullable;
  * <pre>
  * {
  *     &#64;code
- *     Specification<SysUser> spec = (root, q, cb) -> QueryHelp.getPredicate(root, criteria, cb);
- *     Page<SysUser> page = repo.findAll(spec, pageable);
+ *     Specification&lt;SysUser&gt; spec = (root, q, cb) -> QueryHelp.getPredicate(root, criteria, cb);
+ *     Page&lt;SysUser&gt; page = repo.findAll(spec, pageable);
  * }
  * </pre>
  *

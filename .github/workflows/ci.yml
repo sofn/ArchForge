@@ -77,6 +77,11 @@ jobs:
       - name: Build
         run: ./gradlew build --no-daemon
 
+      # P1-C gate: the release set must stay publishable — catches missing
+      # versions/groups and broken publications without pushing anywhere remote.
+      - name: Publish release set to mavenLocal (resolvability gate)
+        run: ./gradlew publishToMavenLocal --no-daemon
+
       - name: Aggregate JaCoCo report
         if: always()
         run: ./gradlew jacocoAggregateReport --no-daemon -x test

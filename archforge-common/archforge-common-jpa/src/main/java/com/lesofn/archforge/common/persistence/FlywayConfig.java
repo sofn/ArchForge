@@ -65,7 +65,7 @@ public class FlywayConfig {
     }
 
     /**
-     * 先跑 __root（默认历史表），再逐模块跑 {@code db/migration/<module>/}（独立历史表）。作为名为
+     * 先跑 __root（默认历史表），再逐模块跑 db/migration/&lt;module&gt;/（独立历史表）。作为名为
      * {@code flyway} 的 bean 暴露——{@link FlywayDependencyBeanFactoryPostProcessor} 借此把 EMF 装配
      * 排在全部迁移之后。
      */

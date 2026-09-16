@@ -14,6 +14,22 @@ javaPlatform {
 dependencies {
     // 定义依赖约束，这些依赖不会被直接引入，但会为使用它们的项目提供版本管理
     constraints {
+        // 发布集自身模块（P1-C/T6）：消费方引入 BOM 后无需再写版本号。
+        // 版本与发布物同由 archforgeVersion 单源驱动（gradle.properties）。
+        val v = property("archforgeVersion") as String
+        val g = "com.lesofn.archforge"
+        api("$g:archforge-common-base:$v")
+        api("$g:archforge-common-jpa:$v")
+        api("$g:archforge-common-error:$v")
+        api("$g:archforge-infrastructure:$v")
+        api("$g:archforge-admin-user:$v")
+        api("$g:archforge-meta-runtime:$v")
+        api("$g:archforge-redisson-starter:$v")
+        api("$g:archforge-cache-starter:$v")
+        api("$g:archforge-lock-starter:$v")
+        api("$g:archforge-trace-starter:$v")
+        api("$g:archforge-request-log-starter:$v")
+
         // 数据库相关
         api("com.baomidou:dynamic-datasource-spring-boot4-starter:4.5.0")
         api("org.postgresql:postgresql:42.7.11")

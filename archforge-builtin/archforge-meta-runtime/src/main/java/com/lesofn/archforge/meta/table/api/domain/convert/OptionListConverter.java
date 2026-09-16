@@ -10,7 +10,7 @@ import java.util.List;
 import org.springframework.util.StringUtils;
 
 /**
- * 字段枚举选项（List<OptionItem>）与 JSON 字符串的转换器。
+ * 字段枚举选项（List&lt;OptionItem&gt;）与 JSON 字符串的转换器。
  */
 @Converter
 public class OptionListConverter implements AttributeConverter<List<OptionItem>, String> {
