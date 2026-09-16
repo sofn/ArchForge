@@ -1,0 +1,81 @@
+# yaml-language-server: $schema=../../spec/schemas/meta/table.schema.json
+---
+tableCode: "blog_category"
+tableName: "博客分类"
+description: "导入已有物理表演示"
+tablePrefix: ""
+status: 1
+schemaVersion: 1
+columns:
+- columnCode: "name"
+  columnName: "name"
+  dataType: "STRING"
+  length: 128
+  precision: 0
+  scale: 0
+  nullable: false
+  unique: false
+  required: true
+  searchable: false
+  listVisible: true
+  index: false
+  sort: 2
+  options: []
+  tenantColumn: false
+  ownerColumn: false
+  indexType: "BTREE"
+  searchType: "EXACT"
+- columnCode: "slug"
+  columnName: "slug"
+  dataType: "STRING"
+  length: 128
+  precision: 0
+  scale: 0
+  nullable: false
+  unique: true
+  required: true
+  searchable: false
+  listVisible: true
+  index: false
+  sort: 3
+  options: []
+  tenantColumn: false
+  ownerColumn: false
+  indexType: "BTREE"
+  searchType: "EXACT"
+- columnCode: "sort_order"
+  columnName: "sort_order"
+  dataType: "INTEGER"
+  length: 0
+  precision: 0
+  scale: 0
+  nullable: true
+  unique: false
+  required: false
+  searchable: false
+  listVisible: true
+  index: false
+  sort: 4
+  options: []
+  tenantColumn: false
+  ownerColumn: false
+  indexType: "BTREE"
+  searchType: "EXACT"
+- columnCode: "status"
+  columnName: "status"
+  dataType: "INTEGER"
+  length: 0
+  precision: 0
+  scale: 0
+  nullable: true
+  unique: false
+  required: false
+  searchable: false
+  listVisible: true
+  index: false
+  sort: 5
+  options: []
+  tenantColumn: false
+  ownerColumn: false
+  indexType: "BTREE"
+  searchType: "EXACT"

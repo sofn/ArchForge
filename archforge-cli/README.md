@@ -25,6 +25,12 @@ Global flags: `--verbose` echoes every external command; `-h/--help` and
 ./archforge doctor              # check JDK/docker/compose/pnpm/node/ports/repos/.env
 ./archforge build [-p tag]      # bootBuildImage backend + docker build frontends
 ./archforge build --allinone    # single-image build → archforge:allinone
+./archforge new <project>       # scaffold a Spring Boot 4 app on the published BOM
+                                # (Gradle wrapper + archforge/ + spec/ + AI rules)
+./archforge module new <name>   # add archforge-module-<name> inside a project
+                                # (auto-included by flat-prefix scan)
+./archforge meta export         # DB → project-definition/meta/*.yaml
+./archforge meta import         # YAML → DB (dry-run diff; --apply writes)
 ```
 
 ### All-in-one image (`archforge:allinone`)

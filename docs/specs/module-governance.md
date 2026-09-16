@@ -57,6 +57,12 @@ orthogonal axis decides **who ships to production** and **who is publishable**:
   that generate `spec/openapi.yaml` and host the integration/ArchUnit testbed.
   They are not "the framework itself"; physical extraction to an `examples/`
   repo is deferred until a real external consumer exists (P3).
+- **Project Definition files** (P3-4): meta-table definitions have a file form —
+  `project-definition/meta/<tableCode>.yaml`, contract
+  `spec/schemas/meta/table.schema.json`. `archforge meta export|import` syncs
+  DB ↔ YAML (`MetaTableDefinitionCodec`/`Service` in designer, strict parsing,
+  dry-run diff by default, `removedColumns` = the only column delete). The DB is
+  still the runtime truth; the file-first flip is a separate reviewed decision.
 
 ## Data layer
 

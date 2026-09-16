@@ -1,0 +1,116 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://archforge.dev/schemas/meta/table.schema.json",
+  "title": "MetaTable Definition",
+  "description": "ArchForge meta-table definition: declarative description of a business table managed by the meta-table subsystem. One file per table at archforge/meta/<tableCode>.yaml.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["tableCode", "tableName", "columns"],
+  "properties": {
+    "tableCode": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$",
+      "description": "Stable machine code; combined with tablePrefix to form the physical table name."
+    },
+    "tableName": {
+      "type": "string",
+      "description": "Human-readable display name."
+    },
+    "description": {
+      "type": "string"
+    },
+    "tablePrefix": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*_$",
+      "default": "meta_",
+      "description": "Physical table prefix; physical name = tablePrefix + tableCode."
+    },
+    "status": {
+      "type": "integer",
+      "enum": [0, 1],
+      "default": 1,
+      "description": "1 = enabled, 0 = disabled."
+    },
+    "schemaVersion": {
+      "type": "integer",
+      "minimum": 1,
+      "default": 1,
+      "description": "Definition format version, incremented on incompatible layout changes."
+    },
+    "columns": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/column" },
+      "description": "Ordered column definitions; sort order is preserved."
+    },
+    "removedColumns": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Column codes intentionally deleted — import refuses to drop columns implicitly; listing a code here is the explicit delete."
+    }
+  },
+  "$defs": {
+    "option": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["label", "value"],
+      "properties": {
+        "label": { "type": "string" },
+        "value": { "type": ["string", "number", "boolean"] }
+      }
+    },
+    "column": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["columnCode", "columnName", "dataType"],
+      "properties": {
+        "columnCode": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "description": "Physical column name (snake_case)."
+        },
+        "columnName": {
+          "type": "string",
+          "description": "Human-readable display name."
+        },
+        "dataType": {
+          "type": "string",
+          "enum": [
+            "STRING", "TEXT", "INTEGER", "DECIMAL", "BOOLEAN", "DATE",
+            "DATETIME", "ENUM", "JSON", "FILE", "IMAGE", "MULTI_IMAGE",
+            "UUID", "TIMESTAMPTZ", "ARRAY", "GEO", "REFERENCE"
+          ],
+          "description": "Logical type from MetaColumnType."
+        },
+        "length": { "type": "integer", "minimum": 0 },
+        "precision": { "type": "integer", "minimum": 0 },
+        "scale": { "type": "integer", "minimum": 0 },
+        "nullable": {
+          "type": "boolean",
+          "description": "Physical DDL nullability. Absent = derived from !required."
+        },
+        "defaultValue": { "type": "string" },
+        "unique": { "type": "boolean", "default": false },
+        "required": { "type": "boolean", "default": false },
+        "searchable": { "type": "boolean", "default": false },
+        "listVisible": { "type": "boolean", "default": false },
+        "index": { "type": "boolean", "default": false },
+        "sort": { "type": "integer" },
+        "options": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/option" },
+          "description": "Choice list for ENUM columns."
+        },
+        "referenceTable": { "type": "string" },
+        "referenceColumn": { "type": "string" },
+        "displayExpression": { "type": "string" },
+        "tenantColumn": { "type": "boolean", "default": false },
+        "ownerColumn": { "type": "boolean", "default": false },
+        "indexType": { "type": "string" },
+        "indexGroup": { "type": "string" },
+        "arrayElementType": { "type": "string" },
+        "searchType": { "type": "string" },
+        "dictCode": { "type": "string" }
+      }
+    }
+  }
+}

@@ -61,6 +61,7 @@ ArchForge/
 │   ├── docker-compose.native.yml
 │   ├── nginx/
 │   └── start.sh                   # One-click: ./start.sh jvm | native
+├── project-definition/meta/       # Meta-table definitions as YAML (archforge meta export/import)
 ├── build.gradle.kts               # Root: repositories, Spotless, Java toolchain
 ├── settings.gradle.kts            # Module includes
 └── skills/                        # Reusable Devin skills
@@ -593,6 +594,14 @@ Full stack includes: PostgreSQL + Redis + Application + Nginx reverse proxy.
   `common.persistence`, gated on `arch-forge.flyway.enabled` (see `docs/specs/flyway.md`).
 - CLI: `archforge db init` / `archforge db update` run `./gradlew :archforge-server-admin:flywayMigrate`.
 - Flyway runs automatically on application startup (can be disabled per profile).
+- Meta-table **definitions** (not DDL) also have a file form: `archforge meta export`
+  writes `project-definition/meta/<tableCode>.yaml` from the DB;
+  `archforge meta import` (dry-run by default, `--apply` to write) syncs files → DB
+  via a one-shot CLI runner (`MetaTableSyncCliRunner`, gated on
+  `arch-forge.meta.sync.*`). YAML contract: `spec/schemas/meta/table.schema.json`;
+  exported files carry a `yaml-language-server` schema hint. `removedColumns` is
+  the only column-delete mechanism. The DB remains runtime truth — files are a
+  reviewable mirror until the file-first flip is decided.
 
 ### 6.5 Health Checks
 
