@@ -4,60 +4,24 @@ import com.lesofn.archforge.infrastructure.annotation.Log;
 import com.lesofn.archforge.infrastructure.auth.LoginContext;
 import com.lesofn.archforge.infrastructure.config.ArchForgeProperties;
 import com.lesofn.archforge.infrastructure.security.datascope.DataPermission;
-import com.lesofn.archforge.meta.table.api.domain.MetaColumn;
-import com.lesofn.archforge.meta.table.api.domain.MetaTable;
-import com.lesofn.archforge.meta.table.api.domain.MetaTableMigration;
 import com.lesofn.archforge.meta.table.api.dto.ImportResponse;
-import com.lesofn.archforge.meta.table.api.dto.ImportableTableInfo;
 import com.lesofn.archforge.meta.table.api.dto.MetaDataQuery;
 import com.lesofn.archforge.meta.table.api.dto.MetaPageResponse;
-import com.lesofn.archforge.meta.table.api.dto.SchemaPreview;
-import com.lesofn.archforge.meta.table.api.dto.TableImportPreview;
 import com.lesofn.archforge.meta.table.api.enums.MetaDataFormat;
-import com.lesofn.archforge.meta.table.api.errors.MetaTableErrorCode;
-import com.lesofn.archforge.meta.table.api.errors.MetaTableException;
-import com.lesofn.archforge.meta.table.api.service.MetaTableAdminService;
-import com.lesofn.archforge.meta.table.api.service.MetaTableImportService;
 import com.lesofn.archforge.meta.table.api.service.MetaTableCrudService;
-import com.lesofn.archforge.meta.table.api.codegen.CodeGenOptions;
-import com.lesofn.archforge.meta.table.api.codegen.GeneratedResult;
-import com.lesofn.archforge.meta.table.api.codegen.MetaTableCodeGenerator;
-import com.lesofn.archforge.meta.table.api.service.MetaTableMigrationExporter;
-import com.lesofn.archforge.meta.table.api.service.MetaTableMigrationService;
-import com.lesofn.archforge.server.admin.config.CodeGenWorkspaceResolver;
 import com.lesofn.archforge.server.admin.dto.AdminPageResponse;
-import com.lesofn.archforge.server.admin.dto.MetaTableResponse;
 import com.lesofn.archforge.server.admin.dto.request.MetaDataListRequest;
-import com.lesofn.archforge.server.admin.dto.request.MetaTableCreateRequest;
-import com.lesofn.archforge.server.admin.dto.request.MetaTableGenerateRequest;
-import com.lesofn.archforge.server.admin.dto.request.MetaTableImportRequest;
-import com.lesofn.archforge.server.admin.dto.request.MetaTableListRequest;
-import com.lesofn.archforge.server.admin.dto.request.MetaTableUpdateRequest;
-import com.lesofn.archforge.server.admin.dto.response.MetaTableGenerateResponse;
-import com.lesofn.archforge.user.api.domain.SysUser;
-import com.lesofn.archforge.user.api.service.SysUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.Valid;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.dev33.satoken.annotation.SaCheckRole;
 import com.lesofn.archforge.infrastructure.auth.stp.StpAdminUtil;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -69,9 +33,13 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
- * 元表格管理接口
+ * 元表格运行期数据接口（动态 CRUD / 导入导出）。
+ *
+ * <p>
+ * 常驻装配——运行期能力（meta-runtime）。设计期端点（schema 管理 / 代码生成等）在
+ * {@link MetaTableDesignerController}，由 {@code arch-forge.designer.enabled} 门控。
  */
-@Tag(name = "元表格管理")
+@Tag(name = "元表格数据")
 @SaCheckLogin(type = StpAdminUtil.TYPE)
 @SaCheckRole(value = "ADMIN", type = StpAdminUtil.TYPE)
 @RestController
@@ -79,213 +47,8 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/admin/meta-table")
 public class MetaTableController {
 
-    private final MetaTableAdminService metaTableAdminService;
     private final MetaTableCrudService metaTableCrudService;
-    private final MetaTableCodeGenerator metaTableCodeGenerator;
-    private final CodeGenWorkspaceResolver codeGenWorkspaceResolver;
-    private final MetaTableMigrationService metaTableMigrationService;
-    private final MetaTableImportService metaTableImportService;
-    private final MetaTableMigrationExporter metaTableMigrationExporter;
-    private final SysUserService sysUserService;
     private final ArchForgeProperties archForgeProperties;
-
-    @Operation(summary = "获取元表格列表")
-    @SaCheckPermission(value = "meta-table:list", type = StpAdminUtil.TYPE)
-    @PostMapping
-    public AdminPageResponse<MetaTableResponse> list(@RequestBody MetaTableListRequest request) {
-        int currentPage = request.getCurrentPage() != null && request.getCurrentPage() > 0
-                ? request.getCurrentPage()
-                : 1;
-        int pageSize = request.getPageSize() != null && request.getPageSize() > 0
-                ? request.getPageSize()
-                : 10;
-        Pageable pageable = PageRequest.of(currentPage - 1, pageSize);
-        Page<MetaTable> page = metaTableAdminService.list(request.getKeyword(), pageable);
-        Map<Long, String> userNameMap = buildUserNameMap(page.getContent());
-        List<MetaTableResponse> list = page.getContent().stream()
-                .map(table -> {
-                    MetaTableResponse response = MetaTableResponse.of(table);
-                    response.setCreatorName(userNameMap.getOrDefault(table.getCreatorId(), ""));
-                    response.setUpdaterName(userNameMap.getOrDefault(table.getUpdaterId(), ""));
-                    return response;
-                })
-                .toList();
-        return AdminPageResponse.of(list, page.getTotalElements(), pageSize, currentPage);
-    }
-
-    private Map<Long, String> buildUserNameMap(List<MetaTable> tables) {
-        Set<Long> userIds = tables.stream()
-                .flatMap(t -> java.util.stream.Stream.of(t.getCreatorId(), t.getUpdaterId()))
-                .filter(id -> id != null)
-                .collect(Collectors.toSet());
-        return userIds.stream()
-                .collect(Collectors.toMap(
-                        id -> id,
-                        id -> resolveUserName(id)));
-    }
-
-    private String resolveUserName(Long userId) {
-        Optional<SysUser> user = sysUserService.findById(userId);
-        return user.map(u -> u.getNickname() != null && !u.getNickname().isEmpty() ? u.getNickname() : u.getUsername())
-                .orElse("");
-    }
-
-    @Operation(summary = "获取元表格详情")
-    @GetMapping("/{id}")
-    public MetaTableResponse detail(@PathVariable Long id) {
-        MetaTable table = metaTableAdminService.findById(id);
-        List<MetaColumn> columns = metaTableAdminService.findColumns(id);
-        return MetaTableResponse.of(table, columns);
-    }
-
-    @Log
-    @Operation(summary = "创建元表格")
-    @SaCheckPermission(value = "meta-table:add", type = StpAdminUtil.TYPE)
-    @PostMapping("/create")
-    public Long create(@RequestBody @Valid MetaTableCreateRequest request) {
-        MetaTable table = request.toTable();
-        table.setCreatorId(LoginContext.getAdminUserId());
-        List<MetaColumn> columns = request.toColumns();
-        for (MetaColumn column : columns) {
-            column.setCreatorId(LoginContext.getAdminUserId());
-        }
-        return metaTableAdminService.create(table, columns);
-    }
-
-    @Log
-    @Operation(summary = "更新元表格（结构变更，columns 必填；仅改元信息用 PATCH）")
-    @SaCheckPermission(value = "meta-table:edit", type = StpAdminUtil.TYPE)
-    @PutMapping("/{id}")
-    public Boolean update(@PathVariable Long id, @RequestBody @Valid MetaTableUpdateRequest request) {
-        MetaTable table = request.toTable();
-        table.setUpdaterId(LoginContext.getAdminUserId());
-        List<MetaColumn> columns = request.toColumns();
-        if (columns == null || columns.isEmpty()) {
-            throw new MetaTableException(MetaTableErrorCode.META_TABLE_COLUMNS_REQUIRED);
-        }
-        metaTableAdminService.update(id, table, columns, LoginContext.getAdminUserId());
-        return true;
-    }
-
-    @Log
-    @Operation(summary = "更新元表格元信息（仅名称/描述/状态，不动表结构）")
-    @SaCheckPermission(value = "meta-table:edit", type = StpAdminUtil.TYPE)
-    @PatchMapping("/{id}")
-    public Boolean updateMeta(@PathVariable Long id, @RequestBody @Valid MetaTableUpdateRequest request) {
-        MetaTable table = request.toTable();
-        table.setUpdaterId(LoginContext.getAdminUserId());
-        metaTableAdminService.updateMeta(id, table, LoginContext.getAdminUserId());
-        return true;
-    }
-
-    @Operation(summary = "预览 Schema 变更（diff + 违规行数 + DDL，不执行）")
-    @SaCheckPermission(value = "meta-table:edit", type = StpAdminUtil.TYPE)
-    @PostMapping("/{id}/schema-preview")
-    public SchemaPreview schemaPreview(@PathVariable Long id, @RequestBody @Valid MetaTableUpdateRequest request) {
-        return metaTableAdminService.previewSchema(id, request.toTable(), request.toColumns());
-    }
-
-    @Operation(summary = "列出可导入的物理表")
-    @SaCheckPermission(value = "meta-table:list", type = StpAdminUtil.TYPE)
-    @GetMapping("/importable-tables")
-    public List<ImportableTableInfo> importableTables() {
-        return metaTableImportService.listImportable();
-    }
-
-    @Operation(summary = "预览物理表导入映射")
-    @SaCheckPermission(value = "meta-table:list", type = StpAdminUtil.TYPE)
-    @GetMapping("/import-preview")
-    public TableImportPreview importPreview(@RequestParam String tableName) {
-        return metaTableImportService.preview(tableName);
-    }
-
-    @Log
-    @Operation(summary = "导入已有物理表")
-    @SaCheckPermission(value = "meta-table:add", type = StpAdminUtil.TYPE)
-    @PostMapping("/import")
-    public Long importTable(@RequestBody @Valid MetaTableImportRequest request) {
-        return metaTableImportService.importTable(
-                request.getTableName(), request.getDisplayName(), request.getDescription(),
-                LoginContext.getAdminUserId());
-    }
-
-    @Log
-    @Operation(summary = "复制元表格")
-    @SaCheckPermission(value = "meta-table:add", type = StpAdminUtil.TYPE)
-    @PostMapping("/{id}/copy")
-    public Long copy(@PathVariable Long id) {
-        return metaTableAdminService.copy(id);
-    }
-
-    @Log
-    @Operation(summary = "生成元表格代码")
-    @SaCheckPermission(value = "meta-table:edit", type = StpAdminUtil.TYPE)
-    @com.lesofn.archforge.infrastructure.annotation.RateLimit(key = "meta-table-generate", time = 60, maxCount = 5,
-            limitType = com.lesofn.archforge.infrastructure.annotation.RateLimit.LimitType.USER)
-    @PostMapping("/{id}/generate")
-    public MetaTableGenerateResponse generate(@PathVariable Long id, @RequestBody @Valid MetaTableGenerateRequest request) {
-        MetaTable table = metaTableAdminService.findById(id);
-        List<MetaColumn> columns = metaTableAdminService.findColumns(id);
-
-        String tableCode = table.getTableCode();
-        Path projectRoot = codeGenWorkspaceResolver.resolve();
-
-        Path backendDir = codeGenWorkspaceResolver.resolveBackendDir(request.getBackendDir(), tableCode);
-        Path frontendDir = codeGenWorkspaceResolver.resolveFrontendDir(request.getFrontendDir(), tableCode);
-
-        String basePath = request.getBasePath();
-        if (basePath == null || basePath.isBlank()) {
-            basePath = "/generated/" + tableCode;
-        }
-        boolean overwrite = Boolean.TRUE.equals(request.getOverwrite());
-
-        CodeGenOptions options = new CodeGenOptions();
-        options.setProjectRoot(projectRoot);
-        options.setBackendOutputDir(backendDir);
-        options.setFrontendOutputDir(frontendDir);
-        options.setBasePath(basePath);
-        options.setOverwrite(overwrite);
-
-        GeneratedResult result = metaTableCodeGenerator.generate(table, columns, options);
-
-        MetaTableGenerateResponse response = new MetaTableGenerateResponse();
-        response.setBackendDir(result.getBackendDir().toString());
-        response.setFrontendDir(result.getFrontendDir().toString());
-        response.setFiles(result.getFiles().size());
-        return response;
-    }
-
-    @Operation(summary = "检查删除元表格")
-    @GetMapping("/{id}/delete-check")
-    public Long deleteCheck(@PathVariable Long id) {
-        return metaTableAdminService.checkDelete(id);
-    }
-
-    @Log
-    @Operation(summary = "删除元表格")
-    @SaCheckPermission(value = "meta-table:remove", type = StpAdminUtil.TYPE)
-    @DeleteMapping("/{id}")
-    public Boolean delete(@PathVariable Long id, @RequestParam(defaultValue = "false") Boolean force) {
-        metaTableAdminService.delete(id, Boolean.TRUE.equals(force));
-        return true;
-    }
-
-    @Operation(summary = "获取元表格 Schema 迁移历史")
-    @GetMapping("/{id}/migrations")
-    public List<MetaTableMigration> migrations(@PathVariable Long id) {
-        return metaTableMigrationService.listByTableId(id);
-    }
-
-    @Log
-    @Operation(summary = "导出元表格 Schema 迁移为 Flyway SQL")
-    @GetMapping("/{id}/export-migration")
-    public String exportMigration(@PathVariable Long id) throws IOException {
-        Path projectRoot = codeGenWorkspaceResolver.resolve();
-        Path outputDir = projectRoot.resolve(
-                "archforge-builtin/archforge-meta-table/src/main/resources/db/migration/meta-table");
-        Path file = metaTableMigrationExporter.export(id, outputDir);
-        return file.toString();
-    }
 
     @Operation(summary = "获取元表格数据")
     @SaCheckPermission(value = "meta-table:list", type = StpAdminUtil.TYPE)

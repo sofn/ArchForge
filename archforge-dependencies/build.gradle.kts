@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "com.lesofn.archforge"
-version = "0.1.SNAPSHOT"
+version = property("archforgeVersion") as String
 
 // 配置平台，允许定义依赖约束
 javaPlatform {

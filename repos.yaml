@@ -27,12 +27,12 @@ repos:
       - archforge-common/archforge-common-jpa
       - archforge-builtin/archforge-admin-user
       - archforge-module-cms
-      - archforge-builtin/archforge-meta-table
+      - archforge-builtin/archforge-meta-runtime
+      - archforge-builtin/archforge-meta-designer
       - archforge-infrastructure
       - archforge-server-admin
       - archforge-server-web
       - archforge-cli
-      - archforge-example/archforge-example-task
       - archforge-starters/archforge-cache-starter
       - archforge-starters/archforge-lock-starter
       - archforge-starters/archforge-redisson-starter

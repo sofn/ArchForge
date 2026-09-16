@@ -27,7 +27,7 @@ val spotbugsToolVersion = "4.10.4"
 val jacocoToolVersion = "0.8.15"
 
 group = "com.lesofn.archforge"
-version = "0.1.0-SNAPSHOT"
+version = property("archforgeVersion") as String
 
 allprojects {
     repositories {
@@ -99,7 +99,8 @@ subprojects {
             "archforge-common-jpa" to "0.49",
             "archforge-admin-user" to "0.04",
             "archforge-module-cms" to "0.28",
-            "archforge-meta-table" to "0.64",
+            "archforge-meta-runtime" to "0.5",
+            "archforge-meta-designer" to "0.5",
             "archforge-infrastructure" to "0.20",
             "archforge-server-admin" to "0.51",
             "archforge-server-web" to "0.61",

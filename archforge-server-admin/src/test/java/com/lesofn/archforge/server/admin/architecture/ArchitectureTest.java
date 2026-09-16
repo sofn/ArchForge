@@ -1,11 +1,15 @@
 package com.lesofn.archforge.server.admin.architecture;
 
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 
+import com.tngtech.archunit.base.DescribedPredicate;
+import com.tngtech.archunit.core.domain.JavaClass;
 import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
 import com.tngtech.archunit.library.freeze.FreezingArchRule;
 import com.tngtech.archunit.core.importer.ImportOption;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -22,6 +26,19 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @Tag("contract")
 class ArchitectureTest {
+
+    /**
+     * ARCH-014: meta-designer types in packages shared with meta-runtime
+     * ({@code api.service} / {@code internal.service}) — enumerated because package
+     * patterns alone cannot separate the two jars.
+     */
+    private static final Set<String> META_DESIGNER_SHARED_TYPES = Set.of(
+            "com.lesofn.archforge.meta.table.api.service.MetaTableAdminService",
+            "com.lesofn.archforge.meta.table.api.service.MetaTableImportService",
+            "com.lesofn.archforge.meta.table.api.service.MetaTableMigrationService",
+            "com.lesofn.archforge.meta.table.api.service.MetaTableMigrationExporter",
+            "com.lesofn.archforge.meta.table.internal.service.MetaTableAdminServiceImpl",
+            "com.lesofn.archforge.meta.table.internal.service.MetaTableImportServiceImpl");
 
     private static JavaClasses classes;
 
@@ -231,6 +248,33 @@ class ArchitectureTest {
                         .dependOnClassesThat()
                         .resideInAnyPackage("..archforge.cms..", "..archforge.task..")
                         .because("ARCH-013: L3 builtin must not depend on L4 business modules"))
+                .check(classes);
+    }
+
+    /**
+     * ARCH-014: meta-designer types (codegen / ddl / schema / introspect / designer services)
+     * are design-time only — reachable inside {@code meta.table} or from the {@code server-admin}
+     * design shell. The meta-runtime jar cannot violate this at all (designer is absent from its
+     * compile classpath); this rule guards the assembled application classpath.
+     */
+    @Test
+    void metaDesignerIsOnlyReachedInsideMetaTableOrFromAdminShell() {
+        DescribedPredicate<JavaClass> designerTypes = JavaClass.Predicates.resideInAnyPackage(
+                "..meta.table.api.codegen..",
+                "..meta.table.api.ddl..",
+                "..meta.table.internal.ddl..",
+                "..meta.table.internal.schema..",
+                "..meta.table.internal.introspect..")
+                .or(DescribedPredicate.describe(
+                        "meta-designer types in shared packages",
+                        javaClass -> META_DESIGNER_SHARED_TYPES.contains(javaClass.getName())));
+        FreezingArchRule.freeze(
+                classes().that(designerTypes)
+                        .should()
+                        .onlyBeAccessed()
+                        .byAnyPackage("..meta.table..", "..archforge.server.admin..")
+                        .because("ARCH-014: meta-designer is design-time only — reached inside meta.table" +
+                                " or from the server-admin design shell"))
                 .check(classes);
     }
 }

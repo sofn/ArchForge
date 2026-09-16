@@ -34,6 +34,9 @@ management:
         url: http://localhost:4318/v1/metrics
 
 arch-forge:
+  designer:
+    # 集成测试需要设计期端点在线（MetaTableDesignerController 由该开关装配）
+    enabled: true
   ip-region:
     # keep integration tests off the 48 MB xdb downloads; the offline path degrades to null
     offline-enabled: false

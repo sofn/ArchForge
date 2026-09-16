@@ -60,7 +60,11 @@ public class MetaTableGenerateCliRunner implements CommandLineRunner {
         log.info("Generated frontend: {}", result.getFrontendDir());
         log.info("Generated files count: {}", result.getFiles().size());
 
+        // P0-K: 设计工具不得杀宿主进程——只关闭 context，由 JVM 自然退出（进程内残留
+        // 非 daemon 线程时调用方负责终止，例如 CI/超时控制）
         int exitCode = SpringApplication.exit(applicationContext, () -> 0);
-        System.exit(exitCode);
+        if (exitCode != 0) {
+            log.warn("Code generation finished with non-zero exit code {}", exitCode);
+        }
     }
 }

@@ -67,6 +67,9 @@ management:
 arch-forge:
   flyway:
     enabled: true
+  designer:
+    # 设计期端点（meta-table schema/codegen）在本地开发开启；prod/staging 不配置即关闭
+    enabled: true
   monitor:
     enabled: true
   web:

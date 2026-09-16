@@ -133,7 +133,8 @@ FILE_STORAGE_TYPE=local ./gradlew :archforge-server-admin:bootRun
 |------|------|
 | `archforge-common/archforge-common-{base,error,jpa}` | 公共内核：工具、`ErrorCode` 框架、JPA 约定 |
 | `archforge-builtin/archforge-admin-user` | 用户、角色、菜单、部门、字典（DDD） |
-| `archforge-builtin/archforge-meta-table` | 低代码表格引擎 |
+| `archforge-builtin/archforge-meta-runtime` | 低代码表格引擎——运行期（定义模型、动态 CRUD、数据权限） |
+| `archforge-builtin/archforge-meta-designer` | 低代码表格引擎——仅设计期（codegen、DDL、导入），不发布 |
 | `archforge-module-cms` | 文章、分类 |
 | `archforge-module-task` | 任务域 |
 | `archforge-infrastructure` | sa-token 配置、Redis、动态数据源、安全过滤器 |

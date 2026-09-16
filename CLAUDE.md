@@ -28,7 +28,8 @@ ArchForge/
 ├── archforge-common/archforge-common-error  # ErrorCode, exceptions, error manager
 ├── archforge-common/archforge-common-jpa    # JPA base entities, converters, query helpers
 ├── archforge-builtin/archforge-admin-user   # User/Role/Menu/Dept domain
-├── archforge-builtin/archforge-meta-table   # Metadata table / codegen
+├── archforge-builtin/archforge-meta-runtime # Metadata table runtime (model + dynamic CRUD)
+├── archforge-builtin/archforge-meta-designer# Metadata table design-time (codegen/DDL, not published)
 ├── archforge-module-cms                     # CMS bounded context (articles, categories)
 ├── archforge-module-task                    # Task domain (assembled by default)
 ├── archforge-infrastructure                 # Auth (sa-token), file, tracing

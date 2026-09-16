@@ -46,15 +46,14 @@ ArchForge/
 ├── archforge-common/
 │   ├── archforge-common-base/     # Shared utilities, base entities, constants
 │   ├── archforge-common-error/    # Error codes, exception hierarchy
-│   └── archforge-common-jpa/      # JPA base entities, GroupDataSourceProxy
+│   └── archforge-common-jpa/      # JPA base entities, JpaConfig (single EMF)
 ├── archforge-infrastructure/      # Auth (sa-token), filters, file storage
-├── archforge-domain/
-│   └── archforge-<bounded-context>/  # e.g. admin-user, blog, meta-table
+├── archforge-builtin/
+│   └── archforge-<builtin-module>/   # e.g. admin-user, meta-runtime, meta-designer
+├── archforge-module-*/            # business domains (cms, task, …)
 ├── archforge-server-admin/        # Admin API :8080
 ├── archforge-server-web/          # C-end API :8081
 ├── archforge-cli/
-├── archforge-example/             # Example/demo modules
-│   └── archforge-example-task/
 ├── docker/
 │   ├── jvm/Dockerfile             # JVM mode (jlink + Leyden CDS)
 │   ├── native/Dockerfile          # GraalVM Native Image mode
@@ -467,8 +466,8 @@ consumed via `testImplementation(testFixtures(project(...)))`:
 | Builder | Module | Entity |
 |---------|--------|--------|
 | `UserTestBuilder` / `RoleTestBuilder` | archforge-admin-user | `SysUser` / `SysRole` |
-| `ArticleTestBuilder` | archforge-blog | `BlogArticle` |
-| `MetaTableTestBuilder` | archforge-meta-table | `MetaTable` + `MetaColumn` |
+| `ArticleTestBuilder` | archforge-module-cms | `CmsArticle` |
+| `MetaTableTestBuilder` | archforge-meta-runtime | `MetaTable` + `MetaColumn` |
 | `ChatSessionTestBuilder` | archforge-server-admin (test) | chat session message maps |
 
 Rules:

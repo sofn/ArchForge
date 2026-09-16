@@ -32,7 +32,8 @@ include("archforge-module-cms")
 include("archforge-server-web")
 
 include("archforge-builtin:archforge-admin-user")
-include("archforge-builtin:archforge-meta-table")
+include("archforge-builtin:archforge-meta-runtime")
+include("archforge-builtin:archforge-meta-designer")
 
 include("archforge-module-task")
 

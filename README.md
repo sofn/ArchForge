@@ -129,7 +129,8 @@ Default admin login is `admin / admin123` (captcha is on in `dev`). C-end API:
 |--------|---------|
 | `archforge-common/archforge-common-{base,error,jpa}` | shared kernels: utils, `ErrorCode` framework, JPA conventions |
 | `archforge-builtin/archforge-admin-user` | users, roles, menus, depts, dicts (DDD) |
-| `archforge-builtin/archforge-meta-table` | low-code table engine |
+| `archforge-builtin/archforge-meta-runtime` | low-code table engine — runtime (definition model, dynamic CRUD, datascope) |
+| `archforge-builtin/archforge-meta-designer` | low-code table engine — design-time only (codegen, DDL, import); never published |
 | `archforge-module-cms` | articles, categories |
 | `archforge-module-task` | task domain |
 | `archforge-infrastructure` | sa-token config, Redis, dynamic datasources, security filters |

@@ -14,14 +14,9 @@ import com.lesofn.archforge.meta.table.api.dto.MetaDataQuery;
 import com.lesofn.archforge.meta.table.api.dto.MetaPageResponse;
 import com.lesofn.archforge.meta.table.api.errors.MetaTableErrorCode;
 import com.lesofn.archforge.meta.table.api.errors.MetaTableException;
-import com.lesofn.archforge.meta.table.api.service.MetaTableAdminService;
 import com.lesofn.archforge.meta.table.api.service.MetaTableCrudService;
-import com.lesofn.archforge.meta.table.api.codegen.MetaTableCodeGenerator;
-import com.lesofn.archforge.meta.table.api.service.MetaTableMigrationService;
-import com.lesofn.archforge.server.admin.config.CodeGenWorkspaceResolver;
 import com.lesofn.archforge.server.admin.controller.metatable.MetaTableController;
 import com.lesofn.archforge.server.admin.dto.request.MetaDataListRequest;
-import com.lesofn.archforge.user.api.service.SysUserService;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,12 +31,7 @@ class MetaTableControllerListDataTest {
     @BeforeEach
     void setUp() {
         metaTableCrudService = mock(MetaTableCrudService.class);
-        controller = new MetaTableController(mock(MetaTableAdminService.class), metaTableCrudService, mock(
-                MetaTableCodeGenerator.class), mock(CodeGenWorkspaceResolver.class), mock(
-                        MetaTableMigrationService.class), mock(
-                                com.lesofn.archforge.meta.table.api.service.MetaTableImportService.class), mock(
-                                        com.lesofn.archforge.meta.table.api.service.MetaTableMigrationExporter.class), mock(
-                                                SysUserService.class), new ArchForgeProperties());
+        controller = new MetaTableController(metaTableCrudService, new ArchForgeProperties());
         when(metaTableCrudService.list(any(), any()))
                 .thenReturn(MetaPageResponse.of(List.of(), 0, 10, 1));
     }

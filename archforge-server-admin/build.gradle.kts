@@ -125,6 +125,7 @@ graalvmNative {
 }
 
 dependencies {
+    implementation("org.springframework.boot:spring-boot-starter-validation")
     // 引入 Spring Boot dependencies BOM
     implementation(platform("org.springframework.boot:spring-boot-dependencies:4.1.0"))
     // 引入项目统一版本管理平台
@@ -134,7 +135,8 @@ dependencies {
     api(project(":archforge-common:archforge-common-jpa"))
     api(project(":archforge-infrastructure"))
     api(project(":archforge-builtin:archforge-admin-user"))
-    api(project(":archforge-builtin:archforge-meta-table"))
+    api(project(":archforge-builtin:archforge-meta-runtime"))
+    api(project(":archforge-builtin:archforge-meta-designer"))
     api(project(":archforge-module-cms"))
     api(project(":archforge-module-task"))
 
@@ -188,7 +190,7 @@ dependencies {
     testImplementation(testFixtures(project(":archforge-common:archforge-common-jpa")))
     testImplementation(testFixtures(project(":archforge-builtin:archforge-admin-user")))
     testImplementation(testFixtures(project(":archforge-module-cms")))
-    testImplementation(testFixtures(project(":archforge-builtin:archforge-meta-table")))
+    testImplementation(testFixtures(project(":archforge-builtin:archforge-meta-runtime")))
 
     // Lombok 注解在测试源码中同样可用（testAnnotationProcessor 已由根工程统一配置）
     testCompileOnly("org.projectlombok:lombok")

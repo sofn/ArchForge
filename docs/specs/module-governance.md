@@ -11,7 +11,8 @@ L1 Kernel     archforge-common-* · archforge-infrastructure · archforge-starte
               → publishable, semantic version, strict backward compat
 L2 Apps       archforge-server-admin :8080 · archforge-server-web :8081
               → the only bootable shells; assembly only, no business code
-L3 Built-in   archforge-builtin/archforge-admin-user · archforge-builtin/archforge-meta-table
+L3 Built-in   archforge-builtin/archforge-admin-user · archforge-builtin/archforge-meta-runtime
+              · archforge-builtin/archforge-meta-designer
               → organizational capabilities (auth/dict/log/scheduler/modeling)
               → whitelist, capped (≤10), default-assembled
 L4 Modules    archforge-module-*      ← flat at repo root, no group dir
@@ -38,6 +39,24 @@ L4 Modules    archforge-module-*      ← flat at repo root, no group dir
 
 **Adding an L3 module requires review** (the cap exists). Business domains
 always go `archforge-module-*` via codegen — never into `archforge-builtin/`.
+
+## Design-time vs runtime (publish axis)
+
+The L1–L4 layering is the **governance** axis (who may depend on whom). A second,
+orthogonal axis decides **who ships to production** and **who is publishable**:
+
+- `archforge-meta-runtime` — publishable runtime: meta definition model +
+  repositories + dynamic CRUD/datascope. No codegen, no DDL generators, no web.
+- `archforge-meta-designer` — design-time only, **never published**: codegen
+  (`api/codegen/**`), DDL generators, schema diff, physical-table introspection,
+  `MetaTableAdminService`/`Import`/`Migration*` surfaces. One-way dependency:
+  designer → runtime, never reverse (ArchUnit `ARCH-014`).
+- HTTP surface is gated: `MetaTableDesignerController` assembles only when
+  `arch-forge.designer.enabled=true` (dev/test profiles set it; prod omits it).
+- `server-admin` / `server-web` are **Reference Applications** — bootable shells
+  that generate `spec/openapi.yaml` and host the integration/ArchUnit testbed.
+  They are not "the framework itself"; physical extraction to an `examples/`
+  repo is deferred until a real external consumer exists (P3).
 
 ## Data layer
 
@@ -73,6 +92,7 @@ the promotion is mechanical (`-api`/`-biz` naming matches yudao).
 
 - `@ApplicationModule(id, type, allowedDependencies)` on every module root
   package; `server-admin` whitelists the L3/L4 `api` packages it consumes.
-- ArchUnit `ARCH-*` rules + `ModulithIntegrationTest` assert the default
-  assembly set (`admin-user`, `meta-table`, `cms`, `task`).
+- ArchUnit `ARCH-*` rules (incl. `ARCH-014` designer boundary) +
+  `ModulithIntegrationTest` assert the default assembly set
+  (`admin-user`, `meta-table`, `cms`, `task`).
 - `docs/specs/flyway.md` owns migration history policy.

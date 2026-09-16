@@ -1,5 +1,6 @@
 #
-#Wed Sep 16 01:00:57 CST 2026
+#Wed Sep 16 09:45:55 CST 2026
+classes\ that\ reside\ in\ any\ package\ ['..meta.table.api.codegen..',\ '..meta.table.api.ddl..',\ '..meta.table.internal.ddl..',\ '..meta.table.internal.schema..',\ '..meta.table.internal.introspect..']\ or\ meta-designer\ types\ in\ shared\ packages\ should\ only\ be\ accessed\ by\ any\ package\ ['..meta.table..',\ '..archforge.server.admin..'],\ because\ ARCH-014\:\ meta-designer\ is\ design-time\ only\ \u2014\ reached\ inside\ meta.table\ or\ from\ the\ server-admin\ design\ shell=418487aa-f552-4045-9e75-fec38e47b236
 no\ classes\ should\ have\ simple\ name\ ending\ with\ 'DTO'\ or\ should\ have\ simple\ name\ ending\ with\ 'ItemDTO'=be1057cb-5f99-4e65-aebb-ac3588772a34
 no\ classes\ should\ have\ simple\ name\ ending\ with\ 'DTO'\ or\ should\ have\ simple\ name\ ending\ with\ 'ItemDTO',\ because\ ARCH-010\:\ request/response\ types\ use\ *Request/*Response\ (frozen\ legacy\ *DTO\ set)=9398f3c7-e6bd-4c7d-89ce-98015783ba2c
 no\ classes\ that\ reside\ in\ a\ package\ '..archforge.meta.table..'\ should\ depend\ on\ classes\ that\ reside\ in\ a\ package\ '..archforge.user.internal..',\ because\ ARCH-011b\:\ L3\ builtin\ modules\ meet\ via\ api,\ never\ the\ other\ module's\ internal=8385b630-1781-46b1-a3a4-aed158b4c62f

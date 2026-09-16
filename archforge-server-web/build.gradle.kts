@@ -85,6 +85,7 @@ tasks.named("collectReachabilityMetadata") {
 }
 
 dependencies {
+    implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation(platform("org.springframework.boot:spring-boot-dependencies:4.1.0"))
     implementation(platform(project(":archforge-dependencies")))
 

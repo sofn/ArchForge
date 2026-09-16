@@ -1,0 +1,386 @@
+package com.lesofn.archforge.meta.table.internal.service;
+
+import static com.lesofn.archforge.meta.table.api.errors.MetaTableErrorCode.META_QUERY_PARAM_INVALID;
+import static com.lesofn.archforge.meta.table.api.errors.MetaTableErrorCode.META_TABLE_NOT_EXISTS;
+
+import com.lesofn.archforge.meta.table.api.domain.MetaColumn;
+import com.lesofn.archforge.meta.table.api.domain.MetaTable;
+import com.lesofn.archforge.meta.table.api.dto.ImportResponse;
+import com.lesofn.archforge.meta.table.api.dto.MetaDataQuery;
+import com.lesofn.archforge.meta.table.api.dto.MetaPageResponse;
+import com.lesofn.archforge.meta.table.api.enums.MetaDataFormat;
+import com.lesofn.archforge.meta.table.api.errors.MetaTableErrorCode;
+import com.lesofn.archforge.meta.table.api.errors.MetaTableException;
+import com.lesofn.archforge.meta.table.api.dao.MetaColumnRepository;
+import com.lesofn.archforge.meta.table.api.dao.MetaTableRepository;
+import com.lesofn.archforge.meta.table.api.service.MetaTableCrudService;
+import com.lesofn.archforge.meta.table.internal.datascope.MetaDataScopeFilter;
+import com.lesofn.archforge.meta.table.internal.util.SqlIdentifier;
+import com.lesofn.archforge.meta.table.internal.validator.MetaTableValidator;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.sql.Array;
+import java.sql.Date;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.Nullable;
+import org.postgresql.util.PGobject;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * 元表格行数据通用 CRUD 服务实现。
+ */
+@Service
+@RequiredArgsConstructor
+public class MetaTableCrudServiceImpl implements MetaTableCrudService {
+
+    private final NamedParameterJdbcTemplate jdbcTemplate;
+    private final MetaTableRepository metaTableRepository;
+    private final MetaColumnRepository metaColumnRepository;
+    private final MetaTableValidator validator;
+    private final MetaTableDataInserter inserter;
+    private final MetaTableDataExporter exporter;
+    private final MetaTableDataImporter importer;
+    private final MetaDataScopeFilter dataScopeFilter;
+
+    @Override
+    @Transactional
+    public Long insert(Long tableId, Map<String, Object> row, Long currentUid) {
+        MetaTable table = loadTable(tableId);
+        List<MetaColumn> columns = metaColumnRepository.findByTableIdAndDeletedFalseOrderBySortAsc(tableId);
+        validator.validateValues(row, columns, true);
+        dataScopeFilter.checkRowInScope(columns, row);
+        return inserter.insert(table, columns, row, currentUid);
+    }
+
+    @Override
+    @Transactional
+    public Boolean update(Long tableId, Long dataId, Map<String, Object> row, Long currentUid) {
+        MetaTable table = loadTable(tableId);
+        List<MetaColumn> columns = metaColumnRepository.findByTableIdAndDeletedFalseOrderBySortAsc(tableId);
+        validator.validateValues(row, columns, false);
+        dataScopeFilter.checkUpdatedRow(columns, row);
+
+        String physicalName = SqlIdentifier.quote(table.physicalTableName());
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("id", dataId);
+        params.addValue("updaterId", currentUid);
+        params.addValue("updateTime", java.time.LocalDateTime.now(ZoneId.systemDefault()));
+
+        List<String> sets = new ArrayList<>();
+        sets.add(SqlIdentifier.quote("updater_id") + " = :updaterId");
+        sets.add(SqlIdentifier.quote("update_time") + " = :updateTime");
+
+        appendUpdateColumns(columns, row, sets, params);
+
+        String sql = String.format(
+                "UPDATE %s main SET %s WHERE main.id = :id AND main.deleted = 0%s",
+                physicalName,
+                String.join(", ", sets),
+                dataScopeFilter.buildClause(columns, "main", params));
+
+        int rows = jdbcTemplate.update(sql, params);
+        return rows > 0;
+    }
+
+    @Override
+    @Transactional
+    public Boolean softDelete(Long tableId, Long dataId, Long currentUid) {
+        MetaTable table = loadTable(tableId);
+        List<MetaColumn> columns = metaColumnRepository.findByTableIdAndDeletedFalseOrderBySortAsc(tableId);
+        String physicalName = SqlIdentifier.quote(table.physicalTableName());
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("id", dataId);
+        params.addValue("deleted", 1);
+        params.addValue("updaterId", currentUid);
+        params.addValue("updateTime", java.time.LocalDateTime.now(ZoneId.systemDefault()));
+
+        String sql = String.format(
+                "UPDATE %s main SET deleted = :deleted, updater_id = :updaterId, update_time = :updateTime " +
+                        "WHERE main.id = :id AND main.deleted = 0%s",
+                physicalName,
+                dataScopeFilter.buildClause(columns, "main", params));
+
+        int rows = jdbcTemplate.update(sql, params);
+        return rows > 0;
+    }
+
+    @Override
+    public MetaPageResponse<Map<String, Object>> list(Long tableId, MetaDataQuery query) {
+        MetaTable table = loadTable(tableId);
+        List<MetaColumn> columns = metaColumnRepository.findByTableIdAndDeletedFalseOrderBySortAsc(tableId);
+
+        String physicalName = SqlIdentifier.quote(table.physicalTableName());
+        String mainAlias = "main";
+        List<String> selectColumns = ReferenceDisplayBuilder.buildSelectColumns(columns, mainAlias);
+        List<String> joins = ReferenceDisplayBuilder.buildJoins(columns, mainAlias);
+
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        String whereClause = buildWhereClause(columns, query.filters(), params, mainAlias) + dataScopeFilter.buildClause(
+                columns, mainAlias, params);
+
+        String fromClause = " FROM " + physicalName + " " + mainAlias + " " + String.join(" ", joins);
+        long total = -1L;
+        if (!query.skipCount()) {
+            String countSql = "SELECT COUNT(*)" + fromClause + " WHERE " + mainAlias + ".deleted = 0" + whereClause;
+            Long count = jdbcTemplate.queryForObject(countSql, params, Long.class);
+            total = count == null ? 0L : count;
+        }
+
+        int currentPage = Math.max(query.currentPage(), 1);
+        int pageSize = Math.max(query.pageSize(), 1);
+        int offset = (currentPage - 1) * pageSize;
+        params.addValue("limit", pageSize);
+        params.addValue("offset", offset);
+
+        String orderClause = buildOrderClause(columns, mainAlias, query.orderBy(), query.orderDir());
+        String querySql = "SELECT " + String.join(", ", selectColumns) + fromClause + " WHERE " + mainAlias +
+                ".deleted = 0" + whereClause + " ORDER BY " + orderClause + " LIMIT :limit OFFSET :offset";
+
+        List<Map<String, Object>> rows = jdbcTemplate.queryForList(querySql, params);
+        List<Map<String, Object>> converted = rows.stream().map(this::convertRow).toList();
+
+        return MetaPageResponse.of(converted, total, pageSize, currentPage);
+    }
+
+    private static final Set<String> AUDIT_ORDER_COLUMNS = Set.of("id", "creator_id", "create_time", "updater_id",
+            "update_time");
+
+    private String buildOrderClause(List<MetaColumn> columns, String mainAlias, @Nullable String orderBy,
+            @Nullable String orderDir) {
+        String direction = resolveOrderDirection(orderDir);
+        String column = orderBy == null || orderBy.isBlank() ? "id" : orderBy;
+        Set<String> allowed = new HashSet<>(AUDIT_ORDER_COLUMNS);
+        for (MetaColumn metaColumn : columns) {
+            allowed.add(metaColumn.getColumnCode());
+        }
+        if (!allowed.contains(column)) {
+            throw new MetaTableException(META_QUERY_PARAM_INVALID, "排序字段不允许: " + orderBy);
+        }
+        return mainAlias + "." + SqlIdentifier.quote(column) + " " + direction;
+    }
+
+    private String resolveOrderDirection(@Nullable String orderDir) {
+        if (orderDir == null || orderDir.isBlank()) {
+            return "DESC";
+        }
+        if ("ASC".equalsIgnoreCase(orderDir.trim())) {
+            return "ASC";
+        }
+        if ("DESC".equalsIgnoreCase(orderDir.trim())) {
+            return "DESC";
+        }
+        throw new MetaTableException(META_QUERY_PARAM_INVALID, "排序方向必须是 ASC 或 DESC: " + orderDir);
+    }
+
+    @Override
+    public void export(Long tableId, MetaDataFormat format, OutputStream out) {
+        exporter.export(tableId, format, out);
+    }
+
+    @Override
+    public ImportResponse importData(Long tableId, MetaDataFormat format, InputStream in, Long currentUid) {
+        return importer.importData(tableId, format, in, currentUid);
+    }
+
+    private String buildWhereClause(List<MetaColumn> columns, Map<String, Object> filters, MapSqlParameterSource params,
+            String mainAlias) {
+        if (filters == null || filters.isEmpty()) {
+            return "";
+        }
+        Map<String, MetaColumn> columnMap = columns.stream()
+                .collect(Collectors.toMap(MetaColumn::getColumnCode, c -> c, (a, b) -> a));
+        StringBuilder sb = new StringBuilder();
+        for (Map.Entry<String, Object> entry : filters.entrySet()) {
+            String key = entry.getKey();
+            Object value = entry.getValue();
+            if (value == null || isEmptyFilterValue(value)) {
+                continue;
+            }
+            FilterPath filterPath = parseFilterKey(columnMap, key);
+            if (filterPath == null || !filterPath.column().isSearchableColumn()) {
+                continue;
+            }
+            MetaColumn column = filterPath.column();
+            String paramName = "filter_" + key.replace('.', '_').replace(' ', '_');
+            String jsonPath = filterPath.jsonPath();
+            if (jsonPath != null) {
+                params.addValue(paramName, value.toString());
+                sb.append(" AND ")
+                        .append(buildJsonPathExpression(column, jsonPath, paramName, value, mainAlias));
+            } else if (isRangeSearch(column, value)) {
+                appendRangeCondition(sb, column, key, value, paramName, params, mainAlias);
+            } else if (isLikeSearch(column)) {
+                params.addValue(paramName, "%" + value + "%");
+                sb.append(" AND ").append(mainAlias).append(".").append(SqlIdentifier.quote(key)).append("::text LIKE :")
+                        .append(paramName);
+            } else {
+                params.addValue(paramName, validator.convertValue(column, value));
+                sb.append(" AND ").append(mainAlias).append(".").append(SqlIdentifier.quote(key)).append(" = :")
+                        .append(paramName);
+            }
+        }
+        return sb.toString();
+    }
+
+    private @Nullable FilterPath parseFilterKey(Map<String, MetaColumn> columnMap, String key) {
+        int dot = key.indexOf('.');
+        if (dot > 0) {
+            String columnCode = key.substring(0, dot);
+            MetaColumn column = columnMap.get(columnCode);
+            if (column != null) {
+                return new FilterPath(column, key.substring(dot + 1));
+            }
+        }
+        MetaColumn column = columnMap.get(key);
+        return column == null ? null : new FilterPath(column, null);
+    }
+
+    private boolean isLikeSearch(MetaColumn column) {
+        return "LIKE".equalsIgnoreCase(resolveSearchType(column));
+    }
+
+    private boolean isRangeSearch(MetaColumn column, Object value) {
+        if (!"RANGE".equalsIgnoreCase(resolveSearchType(column))) {
+            return false;
+        }
+        return (value instanceof Map<?, ?> map && (map.containsKey("start") || map.containsKey("end"))) ||
+                (value instanceof List<?> list && list.size() == 2);
+    }
+
+    private String resolveSearchType(MetaColumn column) {
+        if (column.getSearchType() != null && !column.getSearchType().isEmpty()) {
+            return column.getSearchType();
+        }
+        return switch (column.getDataType()) {
+            case STRING, TEXT, ENUM, JSON, GEO -> "LIKE";
+            default -> "EXACT";
+        };
+    }
+
+    private void appendRangeCondition(StringBuilder sb, MetaColumn column, String key, Object value, String paramName,
+            MapSqlParameterSource params, String mainAlias) {
+        Object start = null;
+        Object end = null;
+        if (value instanceof Map<?, ?> map) {
+            start = map.get("start");
+            end = map.get("end");
+        } else if (value instanceof List<?> list) {
+            start = list.get(0);
+            end = list.get(1);
+        }
+        String quoted = mainAlias + "." + SqlIdentifier.quote(key);
+        if (start != null && !isEmptyFilterValue(start)) {
+            params.addValue(paramName + "_start", validator.convertValue(column, start));
+            sb.append(" AND ").append(quoted).append(" >= :").append(paramName).append("_start");
+        }
+        if (end != null && !isEmptyFilterValue(end)) {
+            params.addValue(paramName + "_end", validator.convertValue(column, end));
+            sb.append(" AND ").append(quoted).append(" <= :").append(paramName).append("_end");
+        }
+    }
+
+    private boolean isEmptyFilterValue(Object value) {
+        if (value == null) {
+            return true;
+        }
+        if (value instanceof String string) {
+            return string.isEmpty();
+        }
+        if (value instanceof Collection<?> collection) {
+            return collection.isEmpty();
+        }
+        return false;
+    }
+
+    private String buildJsonPathExpression(MetaColumn column, String jsonPath, String paramName, Object value,
+            String mainAlias) {
+        String quoted = mainAlias + "." + SqlIdentifier.quote(column.getColumnCode());
+        String[] parts = jsonPath.split("\\.");
+        if (parts.length == 1) {
+            return quoted + " ->> '" + parts[0].replace("'", "''") + "' LIKE :" + paramName;
+        }
+        return quoted + " #>> ARRAY[" + java.util.Arrays.stream(parts)
+                .map(p -> "'" + p.replace("'", "''") + "'")
+                .collect(Collectors.joining(", ")) + "] LIKE :" + paramName;
+    }
+
+    private record FilterPath(MetaColumn column, @Nullable String jsonPath) {
+    }
+
+    private Map<String, Object> convertRow(Map<String, Object> row) {
+        for (Map.Entry<String, Object> entry : row.entrySet()) {
+            Object value = entry.getValue();
+            if (value == null) {
+                continue;
+            }
+            if (value instanceof Timestamp timestamp) {
+                entry.setValue(timestamp.toLocalDateTime());
+            } else if (value instanceof Date date) {
+                entry.setValue(date.toLocalDate());
+            } else if (value instanceof OffsetDateTime offsetDateTime) {
+                entry.setValue(offsetDateTime.toString());
+            } else if (value instanceof UUID uuid) {
+                entry.setValue(uuid.toString());
+            } else if (value instanceof Array sqlArray) {
+                entry.setValue(convertSqlArray(sqlArray));
+            } else if (value instanceof PGobject pgObject) {
+                entry.setValue(pgObject.getValue());
+            }
+        }
+        return row;
+    }
+
+    private List<Object> convertSqlArray(Array sqlArray) {
+        try {
+            Object array = sqlArray.getArray();
+            if (array instanceof Object[] array2) {
+                return Arrays.asList(array2);
+            }
+            return Collections.singletonList(array.toString());
+        } catch (SQLException e) {
+            throw new MetaTableException(MetaTableErrorCode.META_COLUMN_VALUE_INVALID, "读取数组字段失败");
+        }
+    }
+
+    private void appendUpdateColumns(
+            List<MetaColumn> columns,
+            Map<String, Object> row,
+            List<String> sets,
+            MapSqlParameterSource params) {
+        for (MetaColumn column : columns) {
+            if (row.containsKey(column.getColumnCode())) {
+                Object value = row.get(column.getColumnCode());
+                String quoted = SqlIdentifier.quote(column.getColumnCode());
+                if (value == null) {
+                    sets.add(quoted + " = NULL");
+                } else {
+                    sets.add(quoted + " = :" + column.getColumnCode());
+                    params.addValue(column.getColumnCode(), validator.convertValue(column, value));
+                }
+            }
+        }
+    }
+
+    private MetaTable loadTable(Long tableId) {
+        return metaTableRepository.findById(tableId)
+                .filter(t -> !Boolean.TRUE.equals(t.getDeleted()))
+                .orElseThrow(() -> new MetaTableException(META_TABLE_NOT_EXISTS));
+    }
+}

@@ -33,12 +33,19 @@ dependencies {
     api("com.fasterxml.jackson.core:jackson-annotations")
 
     // web (Spring Boot BOM 管理的版本)
-    api("org.springframework.boot:spring-boot-starter-web") {
+    // compileOnly: ServletHolderUtil / IpUtil / BaseLoginUser need servlet API at compile
+    // time, but web must not leak to non-web consumers (e.g. archforge-cli) — P0-J.
+    compileOnly("org.springframework.boot:spring-boot-starter-web") {
         exclude(group = "org.springframework.boot", module = "spring-boot-starter-logging")
     }
+    // Tests mock the servlet API (ServletHolderUtilTest / IpUtilTest) — servlet-api
+    // for the interfaces, spring-web for RequestContextHolder. Neither leaks to
+    // consumers: testImplementation is not exposed.
+    testImplementation("jakarta.servlet:jakarta.servlet-api")
+    testImplementation("org.springframework:spring-web")
 
     // Validation (Spring Boot BOM 管理的版本)
-    api("org.springframework.boot:spring-boot-starter-validation") {
+    compileOnly("org.springframework.boot:spring-boot-starter-validation") {
         exclude(group = "org.springframework.boot", module = "spring-boot-starter-logging")
     }
 
