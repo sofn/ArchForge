@@ -31,6 +31,7 @@ Global flags: `--verbose` echoes every external command; `-h/--help` and
                                 # (auto-included by flat-prefix scan)
 ./archforge meta export         # DB → project-definition/meta/*.yaml
 ./archforge meta import         # YAML → DB (dry-run diff; --apply writes)
+./archforge meta check          # file ↔ DB drift gate (exit 1 on drift)
 ```
 
 ### All-in-one image (`archforge:allinone`)

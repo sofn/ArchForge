@@ -15,11 +15,12 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 /**
- * Meta-table definition sync CLI entry — DB ↔ {@code archforge/meta/*.yaml}.
- * Activated by {@code --arch-forge.meta.sync.mode=export|import} plus
+ * Meta-table definition sync CLI entry — DB ↔ definition YAML files.
+ * Activated by {@code --arch-forge.meta.sync.mode=export|import|check} plus
  * {@code .dir} (default {@code archforge/meta}), {@code .table} (optional
  * single-table filter) and {@code .apply} (import actually writes; default is
- * a dry-run diff report). One-shot process: exits via {@code System.exit}
+ * a dry-run diff report). {@code check} exits non-zero on any file↔DB drift.
+ * One-shot process: exits via {@code System.exit}
  * after running, so later unordered runners never see a closed context.
  */
 @Slf4j
@@ -42,24 +43,35 @@ public class MetaTableSyncCliRunner implements CommandLineRunner {
         String table = environment.getProperty("arch-forge.meta.sync.table");
         boolean apply = Boolean.parseBoolean(environment.getProperty("arch-forge.meta.sync.apply", "false"));
 
-        switch (mode) {
+        int exitCode = switch (mode) {
             case "export" -> {
                 var written = definitionService.exportTo(Path.of(dir), table);
                 log.info("meta export: {} definition file(s) under {}", written.size(), dir);
+                yield 0;
             }
             case "import" -> {
                 SyncReport report = definitionService.syncFrom(Path.of(dir), table, apply);
                 report.lines().forEach(line -> log.info("  {}", line));
                 log.info("meta import {}: {}", apply ? "applied" : "dry-run",
                         report.isEmpty() ? "no changes" : report.lines().size() + " change line(s)");
+                yield 0;
             }
-            default -> throw new IllegalArgumentException("unknown arch-forge.meta.sync.mode=" + mode + " (export|import)");
-        }
+            case "check" -> {
+                // Drift gate: same diff as import dry-run, but non-zero exit on any drift.
+                SyncReport report = definitionService.syncFrom(Path.of(dir), table, false);
+                report.lines().forEach(line -> log.info("  {}", line));
+                log.info("meta check: {}", report.isEmpty() ? "in sync" : "DRIFT — " + report.lines().size() + " line(s)");
+                yield report.isEmpty() ? 0 : 1;
+            }
+            default -> throw new IllegalArgumentException("unknown arch-forge.meta.sync.mode=" + mode +
+                    " (export|import|check)");
+        };
 
         // One-shot process — exit immediately rather than returning into
         // callRunners: closing the context first makes every subsequent
         // unordered runner hit a dead datasource. System.exit is safe here
         // because this bean only exists under the explicit sync property.
-        System.exit(SpringApplication.exit(applicationContext, () -> 0));
+        int finalExitCode = exitCode;
+        System.exit(SpringApplication.exit(applicationContext, () -> finalExitCode));
     }
 }

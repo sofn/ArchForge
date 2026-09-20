@@ -3,6 +3,8 @@ package com.lesofn.archforge.meta.table.api.service;
 import com.lesofn.archforge.meta.table.api.dao.MetaColumnRepository;
 import com.lesofn.archforge.meta.table.api.dao.MetaTableRepository;
 import com.lesofn.archforge.meta.table.api.definition.ColumnDefinition;
+import com.lesofn.archforge.meta.table.api.definition.DefinitionSource;
+import com.lesofn.archforge.meta.table.api.definition.FsDefinitionSource;
 import com.lesofn.archforge.meta.table.api.definition.MetaTableDefinitionCodec;
 import com.lesofn.archforge.meta.table.api.definition.TableDefinition;
 import com.lesofn.archforge.meta.table.api.domain.MetaColumn;
@@ -17,7 +19,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
@@ -106,7 +107,16 @@ public class MetaTableDefinitionService {
      */
     @Transactional
     public SyncReport syncFrom(Path dir, @Nullable String tableCode, boolean apply) {
-        Map<String, TableDefinition> definitions = loadDefinitions(dir, tableCode);
+        return syncFrom(new FsDefinitionSource(dir), tableCode, apply);
+    }
+
+    /**
+     * Same as {@link #syncFrom(Path, String, boolean)} but reads the YAML
+     * documents from any {@link DefinitionSource} (filesystem, classpath, ...).
+     */
+    @Transactional
+    public SyncReport syncFrom(DefinitionSource source, @Nullable String tableCode, boolean apply) {
+        Map<String, TableDefinition> definitions = loadDefinitions(source, tableCode);
         List<String> createdTables = new ArrayList<>();
         List<String> updatedTables = new ArrayList<>();
         List<String> newColumns = new ArrayList<>();
@@ -220,26 +230,16 @@ public class MetaTableDefinitionService {
                                 .getSchemaVersion(), b.getSchemaVersion());
     }
 
-    private static Map<String, TableDefinition> loadDefinitions(Path dir, @Nullable String tableCode) {
-        if (!Files.isDirectory(dir)) {
-            throw new IllegalStateException("definition directory not found: " + dir);
-        }
+    private static Map<String, TableDefinition> loadDefinitions(DefinitionSource source, @Nullable String tableCode) {
         Map<String, TableDefinition> definitions = new LinkedHashMap<>();
-        try (Stream<Path> files = Files.list(dir)) {
-            for (Path file : files
-                    .filter(f -> f.toString().endsWith(".yaml"))
-                    .sorted()
-                    .toList()) {
-                TableDefinition def = MetaTableDefinitionCodec.fromYaml(Files.readString(file, StandardCharsets.UTF_8));
-                if (tableCode == null || tableCode.equals(def.getTableCode())) {
-                    definitions.put(def.getTableCode(), def);
-                }
+        for (Map.Entry<String, String> doc : source.load().entrySet()) {
+            TableDefinition def = MetaTableDefinitionCodec.fromYaml(doc.getValue());
+            if (tableCode == null || tableCode.equals(def.getTableCode())) {
+                definitions.put(def.getTableCode(), def);
             }
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
         }
         if (tableCode != null && !definitions.containsKey(tableCode)) {
-            throw new IllegalStateException("no definition file for tableCode=" + tableCode + " in " + dir);
+            throw new IllegalStateException("no definition file for tableCode=" + tableCode);
         }
         return definitions;
     }

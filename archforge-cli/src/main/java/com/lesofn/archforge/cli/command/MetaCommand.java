@@ -27,7 +27,8 @@ import picocli.CommandLine.Spec;
         description = "Meta-table definition sync (definition YAML <-> DB)",
         subcommands = {
                 MetaCommand.Export.class,
-                MetaCommand.Import.class
+                MetaCommand.Import.class,
+                MetaCommand.Check.class
         })
 public class MetaCommand implements Callable<Integer> {
 
@@ -83,6 +84,21 @@ public class MetaCommand implements Callable<Integer> {
         @Override
         public Integer call() {
             return runSync("import", options, apply);
+        }
+    }
+
+    @Command(
+            mixinStandardHelpOptions = true,
+            name = "check",
+            description = "Compare definition YAML files against the DB (exit 1 on drift)")
+    static class Check implements Callable<Integer> {
+
+        @picocli.CommandLine.Mixin
+        SyncOptions options = new SyncOptions();
+
+        @Override
+        public Integer call() {
+            return runSync("check", options, false);
         }
     }
 

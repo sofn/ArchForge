@@ -59,10 +59,16 @@ orthogonal axis decides **who ships to production** and **who is publishable**:
   repo is deferred until a real external consumer exists (P3).
 - **Project Definition files** (P3-4): meta-table definitions have a file form —
   `project-definition/meta/<tableCode>.yaml`, contract
-  `spec/schemas/meta/table.schema.json`. `archforge meta export|import` syncs
-  DB ↔ YAML (`MetaTableDefinitionCodec`/`Service` in designer, strict parsing,
-  dry-run diff by default, `removedColumns` = the only column delete). The DB is
-  still the runtime truth; the file-first flip is a separate reviewed decision.
+  `spec/schemas/meta/table.schema.json`. `archforge meta export|import|check`
+  syncs DB ↔ YAML (`MetaTableDefinitionCodec`/`Service` in designer, strict
+  parsing, dry-run diff by default, `removedColumns` = the only column delete;
+  `check` exits non-zero on drift). Source-of-truth flip roadmap
+  (`arch-forge.meta.source=db|shadow|file`): **db** = today; **shadow** = startup
+  diff-only WARN (dev/test profiles); **file** = startup apply + designer writes
+  disabled (F2). Definition-write surface under file mode: `MetaTableAdminService`
+  + `MetaTableImportService` (disabled), `EnumOptionsMigrationRunner`
+  (code-derived options — pending per-field decision), `syncFrom` (the only
+  legitimate materializer).
 
 ## Data layer
 

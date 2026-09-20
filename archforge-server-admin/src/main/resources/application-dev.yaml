@@ -70,6 +70,9 @@ arch-forge:
   designer:
     # 设计期端点（meta-table schema/codegen）在本地开发开启；prod/staging 不配置即关闭
     enabled: true
+  meta:
+    # shadow = 启动时比对 project-definition/meta/*.yaml 与 DB 并 WARN 漂移（P3-4-3 F1，只读不写）
+    source: shadow
   monitor:
     enabled: true
   web:

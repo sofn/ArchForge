@@ -37,6 +37,9 @@ arch-forge:
   designer:
     # 集成测试需要设计期端点在线（MetaTableDesignerController 由该开关装配）
     enabled: true
+  meta:
+    # shadow：集成测试期间顺带比对仓内定义文件与种子数据（只读）
+    source: shadow
   ip-region:
     # keep integration tests off the 48 MB xdb downloads; the offline path degrades to null
     offline-enabled: false
