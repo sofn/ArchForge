@@ -1,10 +1,11 @@
 package com.lesofn.archforge.server.admin.service.scheduler;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.kagkarlsson.scheduler.task.TaskInstanceId;
-import org.jspecify.annotations.Nullable;
 import com.github.kagkarlsson.scheduler.task.helper.ScheduleAndData;
 import com.github.kagkarlsson.scheduler.task.schedule.Schedule;
 import java.io.Serializable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Persistent payload for admin-managed recurring jobs (db-scheduler).
@@ -38,6 +39,9 @@ public record JobInvocationData(
     @Override
     public Schedule getSchedule() { return schedule; }
 
+    // Would be serialized as a "data" property = self → JSON cycle. db-scheduler
+    // only reads the record components; this getter exists for ScheduleAndData.
+    @JsonIgnore
     @Override
     public Object getData() { return this; }
 

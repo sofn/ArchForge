@@ -1,6 +1,8 @@
 package com.lesofn.archforge.server.admin.service.scheduler;
 
 import com.github.kagkarlsson.scheduler.Scheduler;
+import com.github.kagkarlsson.scheduler.serializer.JacksonSerializer;
+import com.github.kagkarlsson.scheduler.serializer.SerializerWithFallbackDeserializers;
 import com.github.kagkarlsson.scheduler.task.TaskDescriptor;
 import com.github.kagkarlsson.scheduler.task.helper.OneTimeTask;
 import com.github.kagkarlsson.scheduler.task.helper.RecurringTaskWithPersistentSchedule;
@@ -60,6 +62,13 @@ public class SchedulerConfig {
         Scheduler scheduler = Scheduler.create(dataSource, recurring, once)
                 .threads(threads)
                 .pollingInterval(Duration.ofSeconds(1))
+                // task_data is JSON going forward — classloader-immune (Java
+                // serialization breaks under DevTools restarts: two different
+                // JobInvocationData classes, "cannot cast X to X"). Legacy
+                // Java-serialized rows stay readable via the pinned-loader
+                // fallback and are rewritten as JSON on the next reschedule.
+                .serializer(
+                        new SerializerWithFallbackDeserializers(new JacksonSerializer(), new PinnedLoaderJavaDeserializer()))
                 .build();
         scheduler.start();
         log.info("db-scheduler started: tasks={}, threads={}", ADMIN_JOB_TASK_NAME, threads);
