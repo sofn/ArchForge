@@ -17,6 +17,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.dev33.satoken.annotation.SaCheckRole;
@@ -119,9 +121,11 @@ public class MetaTableController {
             case JSON -> "application/json";
             default -> "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
         };
-        String fileName = "meta_table_" + tableCode + suffix;
+        // tableCode is a raw path segment: only identifier chars may reach the header (no quote/CRLF splitting).
+        String fileName = "meta_table_" + tableCode.replaceAll("[^A-Za-z0-9_]", "_") + suffix;
         response.setContentType(contentType);
-        response.setHeader("Content-Disposition", "attachment; filename=" + fileName);
+        response.setHeader(HttpHeaders.CONTENT_DISPOSITION, ContentDisposition.attachment().filename(fileName).build()
+                .toString());
         metaTableCrudService.export(tableCode, dataFormat, response.getOutputStream());
     }
 

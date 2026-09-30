@@ -1,6 +1,7 @@
 package com.lesofn.archforge.server.admin.metatable;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -21,6 +22,7 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.springframework.mock.web.MockHttpServletResponse;
 
 /** Unit coverage for data-list request handling: pageSize cap and sort/skip-count passthrough. */
 class MetaTableControllerListDataTest {
@@ -34,6 +36,18 @@ class MetaTableControllerListDataTest {
         controller = new MetaTableController(metaTableCrudService, new ArchForgeProperties());
         when(metaTableCrudService.list(any(), any()))
                 .thenReturn(MetaPageResponse.of(List.of(), 0, 10, 1));
+    }
+
+    @Test
+    void exportNeverReflectsARawTableCodeIntoContentDisposition() throws Exception {
+        // tableCode is a user-controlled path segment since F3 — the header must stay one well-formed value.
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        controller.export("x\"\r\nX-Injected: 1", "CSV", response);
+
+        String header = String.valueOf(response.getHeader("Content-Disposition"));
+        assertFalse(header.contains("\r") || header.contains("\n"), header);
+        assertTrue(header.startsWith("attachment;"), header);
     }
 
     @Test

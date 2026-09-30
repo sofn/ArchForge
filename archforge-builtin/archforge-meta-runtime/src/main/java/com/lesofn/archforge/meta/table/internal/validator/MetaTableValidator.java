@@ -120,7 +120,8 @@ public class MetaTableValidator {
     private void validateColumnConfig(MetaColumn column) {
         MetaColumnType type = column.getDataType();
         if (type == MetaColumnType.DECIMAL) {
-            if (column.getPrecision() != null && column.getPrecision() < column.getScale()) {
+            if (column.getPrecision() != null && column.getScale() != null && column.getPrecision() < column
+                    .getScale()) {
                 throw new MetaTableException(MetaTableErrorCode.META_COLUMN_TYPE_INVALID, "精度必须大于等于小数位数");
             }
         }

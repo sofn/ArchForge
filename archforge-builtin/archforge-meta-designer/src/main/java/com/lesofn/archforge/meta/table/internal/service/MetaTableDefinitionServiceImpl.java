@@ -262,7 +262,8 @@ public class MetaTableDefinitionServiceImpl implements MetaTableDefinitionServic
         final List<String> orphanTables = new ArrayList<>();
 
         SyncReport report() {
-            return new SyncReport(createdTables, updatedTables, newColumns, changedColumns, orphanColumns, removedColumns, orphanTables);
+            return new SyncReport(List.copyOf(createdTables), List.copyOf(updatedTables), List.copyOf(newColumns), List.copyOf(
+                    changedColumns), List.copyOf(orphanColumns), List.copyOf(removedColumns), List.copyOf(orphanTables));
         }
     }
 }

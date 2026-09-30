@@ -34,6 +34,18 @@ class MetaTableValidatorTest {
     }
 
     @Test
+    void decimalWithPrecisionButNoScaleValidates() {
+        // Definition files may omit scale (unmanaged key → DB default 0); validation must not unbox it.
+        MetaColumn amount = new MetaColumn();
+        amount.setColumnCode("amount");
+        amount.setColumnName("金额");
+        amount.setDataType(MetaColumnType.DECIMAL);
+        amount.setPrecision(10);
+
+        assertDoesNotThrow(() -> validator.validate(table(), List.of(amount)));
+    }
+
+    @Test
     void insertRejectsMissingRequiredValue() {
         MetaColumn column = requiredColumn("name");
         Map<String, Object> row = new HashMap<>();
