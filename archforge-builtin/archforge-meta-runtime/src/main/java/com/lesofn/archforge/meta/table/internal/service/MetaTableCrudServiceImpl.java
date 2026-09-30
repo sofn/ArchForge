@@ -11,8 +11,8 @@ import com.lesofn.archforge.meta.table.api.dto.MetaPageResponse;
 import com.lesofn.archforge.meta.table.api.enums.MetaDataFormat;
 import com.lesofn.archforge.meta.table.api.errors.MetaTableErrorCode;
 import com.lesofn.archforge.meta.table.api.errors.MetaTableException;
-import com.lesofn.archforge.meta.table.api.dao.MetaColumnRepository;
-import com.lesofn.archforge.meta.table.api.dao.MetaTableRepository;
+import com.lesofn.archforge.meta.table.api.service.MetaDefinitionRegistry;
+import com.lesofn.archforge.meta.table.api.service.MetaDefinitionRegistry.TableSnapshot;
 import com.lesofn.archforge.meta.table.api.service.MetaTableCrudService;
 import com.lesofn.archforge.meta.table.internal.datascope.MetaDataScopeFilter;
 import com.lesofn.archforge.meta.table.internal.util.SqlIdentifier;
@@ -51,8 +51,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class MetaTableCrudServiceImpl implements MetaTableCrudService {
 
     private final NamedParameterJdbcTemplate jdbcTemplate;
-    private final MetaTableRepository metaTableRepository;
-    private final MetaColumnRepository metaColumnRepository;
+    private final MetaDefinitionRegistry registry;
     private final MetaTableValidator validator;
     private final MetaTableDataInserter inserter;
     private final MetaTableDataExporter exporter;
@@ -61,9 +60,10 @@ public class MetaTableCrudServiceImpl implements MetaTableCrudService {
 
     @Override
     @Transactional
-    public Long insert(Long tableId, Map<String, Object> row, Long currentUid) {
-        MetaTable table = loadTable(tableId);
-        List<MetaColumn> columns = metaColumnRepository.findByTableIdAndDeletedFalseOrderBySortAsc(tableId);
+    public Long insert(String tableCode, Map<String, Object> row, Long currentUid) {
+        TableSnapshot definition = load(tableCode);
+        MetaTable table = definition.table();
+        List<MetaColumn> columns = definition.columns();
         validator.validateValues(row, columns, true);
         dataScopeFilter.checkRowInScope(columns, row);
         return inserter.insert(table, columns, row, currentUid);
@@ -71,9 +71,10 @@ public class MetaTableCrudServiceImpl implements MetaTableCrudService {
 
     @Override
     @Transactional
-    public Boolean update(Long tableId, Long dataId, Map<String, Object> row, Long currentUid) {
-        MetaTable table = loadTable(tableId);
-        List<MetaColumn> columns = metaColumnRepository.findByTableIdAndDeletedFalseOrderBySortAsc(tableId);
+    public Boolean update(String tableCode, Long dataId, Map<String, Object> row, Long currentUid) {
+        TableSnapshot definition = load(tableCode);
+        MetaTable table = definition.table();
+        List<MetaColumn> columns = definition.columns();
         validator.validateValues(row, columns, false);
         dataScopeFilter.checkUpdatedRow(columns, row);
 
@@ -101,9 +102,10 @@ public class MetaTableCrudServiceImpl implements MetaTableCrudService {
 
     @Override
     @Transactional
-    public Boolean softDelete(Long tableId, Long dataId, Long currentUid) {
-        MetaTable table = loadTable(tableId);
-        List<MetaColumn> columns = metaColumnRepository.findByTableIdAndDeletedFalseOrderBySortAsc(tableId);
+    public Boolean softDelete(String tableCode, Long dataId, Long currentUid) {
+        TableSnapshot definition = load(tableCode);
+        MetaTable table = definition.table();
+        List<MetaColumn> columns = definition.columns();
         String physicalName = SqlIdentifier.quote(table.physicalTableName());
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("id", dataId);
@@ -122,9 +124,10 @@ public class MetaTableCrudServiceImpl implements MetaTableCrudService {
     }
 
     @Override
-    public MetaPageResponse<Map<String, Object>> list(Long tableId, MetaDataQuery query) {
-        MetaTable table = loadTable(tableId);
-        List<MetaColumn> columns = metaColumnRepository.findByTableIdAndDeletedFalseOrderBySortAsc(tableId);
+    public MetaPageResponse<Map<String, Object>> list(String tableCode, MetaDataQuery query) {
+        TableSnapshot definition = load(tableCode);
+        MetaTable table = definition.table();
+        List<MetaColumn> columns = definition.columns();
 
         String physicalName = SqlIdentifier.quote(table.physicalTableName());
         String mainAlias = "main";
@@ -190,13 +193,13 @@ public class MetaTableCrudServiceImpl implements MetaTableCrudService {
     }
 
     @Override
-    public void export(Long tableId, MetaDataFormat format, OutputStream out) {
-        exporter.export(tableId, format, out);
+    public void export(String tableCode, MetaDataFormat format, OutputStream out) {
+        exporter.export(tableCode, format, out);
     }
 
     @Override
-    public ImportResponse importData(Long tableId, MetaDataFormat format, InputStream in, Long currentUid) {
-        return importer.importData(tableId, format, in, currentUid);
+    public ImportResponse importData(String tableCode, MetaDataFormat format, InputStream in, Long currentUid) {
+        return importer.importData(tableCode, format, in, currentUid);
     }
 
     private String buildWhereClause(List<MetaColumn> columns, Map<String, Object> filters, MapSqlParameterSource params,
@@ -378,9 +381,7 @@ public class MetaTableCrudServiceImpl implements MetaTableCrudService {
         }
     }
 
-    private MetaTable loadTable(Long tableId) {
-        return metaTableRepository.findById(tableId)
-                .filter(t -> !Boolean.TRUE.equals(t.getDeleted()))
-                .orElseThrow(() -> new MetaTableException(META_TABLE_NOT_EXISTS));
+    private TableSnapshot load(String tableCode) {
+        return registry.find(tableCode).orElseThrow(() -> new MetaTableException(META_TABLE_NOT_EXISTS));
     }
 }

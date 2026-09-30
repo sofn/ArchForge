@@ -41,10 +41,10 @@ class MetaTableControllerListDataTest {
         MetaDataListRequest request = new MetaDataListRequest();
         request.setPageSize(100_000);
 
-        controller.listData(1L, request);
+        controller.listData("orders", request);
 
         ArgumentCaptor<MetaDataQuery> captor = ArgumentCaptor.forClass(MetaDataQuery.class);
-        verify(metaTableCrudService).list(eq(1L), captor.capture());
+        verify(metaTableCrudService).list(eq("orders"), captor.capture());
         assertEquals(200, captor.getValue().pageSize());
     }
 
@@ -55,10 +55,10 @@ class MetaTableControllerListDataTest {
         request.setOrderDir("asc");
         request.setSkipCount(true);
 
-        controller.listData(1L, request);
+        controller.listData("orders", request);
 
         ArgumentCaptor<MetaDataQuery> captor = ArgumentCaptor.forClass(MetaDataQuery.class);
-        verify(metaTableCrudService).list(eq(1L), captor.capture());
+        verify(metaTableCrudService).list(eq("orders"), captor.capture());
         MetaDataQuery query = captor.getValue();
         assertEquals("create_time", query.orderBy());
         assertEquals("asc", query.orderDir());
@@ -72,6 +72,6 @@ class MetaTableControllerListDataTest {
         MetaDataListRequest request = new MetaDataListRequest();
         request.setOrderBy("x");
 
-        assertThrows(MetaTableException.class, () -> controller.listData(1L, request));
+        assertThrows(MetaTableException.class, () -> controller.listData("orders", request));
     }
 }

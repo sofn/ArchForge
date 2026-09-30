@@ -9,19 +9,20 @@ import java.io.OutputStream;
 import java.util.Map;
 
 /**
- * 元表格行数据通用 CRUD 服务。
+ * 元表格行数据通用 CRUD 服务。表以 {@code tableCode} 寻址（稳定身份键，跨环境一致；
+ * 定义经 {@link MetaDefinitionRegistry} 解析）。
  */
 public interface MetaTableCrudService {
 
-    Long insert(Long tableId, Map<String, Object> row, Long currentUid);
+    Long insert(String tableCode, Map<String, Object> row, Long currentUid);
 
-    Boolean update(Long tableId, Long dataId, Map<String, Object> row, Long currentUid);
+    Boolean update(String tableCode, Long dataId, Map<String, Object> row, Long currentUid);
 
-    Boolean softDelete(Long tableId, Long dataId, Long currentUid);
+    Boolean softDelete(String tableCode, Long dataId, Long currentUid);
 
-    MetaPageResponse<Map<String, Object>> list(Long tableId, MetaDataQuery query);
+    MetaPageResponse<Map<String, Object>> list(String tableCode, MetaDataQuery query);
 
-    void export(Long tableId, MetaDataFormat format, OutputStream out);
+    void export(String tableCode, MetaDataFormat format, OutputStream out);
 
-    ImportResponse importData(Long tableId, MetaDataFormat format, InputStream in, Long currentUid);
+    ImportResponse importData(String tableCode, MetaDataFormat format, InputStream in, Long currentUid);
 }

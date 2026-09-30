@@ -83,6 +83,15 @@ orthogonal axis decides **who ships to production** and **who is publishable**:
   Both `shadow` and `file` find their source in this order:
   `arch-forge.meta.definition-dir`, then walk-up `project-definition/meta` or
   `archforge/meta`, then the packaged classpath mirror.
+- **Runtime read path** (ADR-0008): definitions are resolved through
+  meta-runtime's `MetaDefinitionRegistry`, addressed by `tableCode`.
+  - `db`/`shadow`: a repository pass-through.
+  - `file`: pinned after the startup apply. The view is immutable and runs no
+    request-time definition SQL.
+  - Runtime code must not mutate the returned entities, because pinned
+    snapshots are shared.
+  - REST identity is `tableCode` on every `/admin/meta-table/{tableCode}/**`
+    path. DB ids stay internal.
 
 ## Data layer
 

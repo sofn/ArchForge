@@ -6,7 +6,7 @@ import static org.mockito.Mockito.when;
 import com.lesofn.archforge.cms.api.dao.CmsArticleRepository;
 import com.lesofn.archforge.cms.api.domain.CmsArticle;
 import com.lesofn.archforge.cms.testing.ArticleTestBuilder;
-import com.lesofn.archforge.meta.table.api.dao.MetaTableRepository;
+import com.lesofn.archforge.meta.table.api.service.MetaDefinitionRegistry;
 import com.lesofn.archforge.user.api.dao.SysUserRepository;
 import java.util.List;
 import org.junit.jupiter.api.Tag;
@@ -28,7 +28,7 @@ class DashboardServiceTest {
     @Mock
     private CmsArticleRepository articleRepository;
     @Mock
-    private MetaTableRepository metaTableRepository;
+    private MetaDefinitionRegistry metaDefinitionRegistry;
 
     @InjectMocks
     private DashboardService service;
@@ -37,7 +37,7 @@ class DashboardServiceTest {
     void metricsCountsLiveRowsOnly() {
         when(userRepository.countByDeletedFalse()).thenReturn(11L);
         when(articleRepository.countByDeletedFalse()).thenReturn(22L);
-        when(metaTableRepository.countByDeletedFalse()).thenReturn(33L);
+        when(metaDefinitionRegistry.count()).thenReturn(33L);
 
         DashboardMetricsResponse metrics = service.metrics();
 
@@ -89,7 +89,7 @@ class DashboardServiceTest {
     void todoListsAllCountersWithLinks() {
         when(userRepository.countByDeletedFalse()).thenReturn(1L);
         when(articleRepository.countByDeletedFalse()).thenReturn(2L);
-        when(metaTableRepository.countByDeletedFalse()).thenReturn(3L);
+        when(metaDefinitionRegistry.count()).thenReturn(3L);
 
         List<DashboardTodo> todos = service.todo();
 

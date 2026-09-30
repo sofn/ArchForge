@@ -3984,16 +3984,15 @@ paths:
       summary: "列出可导入的物理表"
       tags:
       - "元表格设计器"
-  /admin/meta-table/{id}:
+  /admin/meta-table/{tableCode}:
     delete:
       operationId: "delete"
       parameters:
       - in: "path"
-        name: "id"
+        name: "tableCode"
         required: true
         schema:
-          format: "int64"
-          type: "integer"
+          type: "string"
       - in: "query"
         name: "force"
         required: false
@@ -4016,11 +4015,10 @@ paths:
       operationId: "detail"
       parameters:
       - in: "path"
-        name: "id"
+        name: "tableCode"
         required: true
         schema:
-          format: "int64"
-          type: "integer"
+          type: "string"
       responses:
         "200":
           content:
@@ -4037,11 +4035,10 @@ paths:
       operationId: "updateMeta"
       parameters:
       - in: "path"
-        name: "id"
+        name: "tableCode"
         required: true
         schema:
-          format: "int64"
-          type: "integer"
+          type: "string"
       requestBody:
         content:
           application/json:
@@ -4064,11 +4061,10 @@ paths:
       operationId: "update_2"
       parameters:
       - in: "path"
-        name: "id"
+        name: "tableCode"
         required: true
         schema:
-          format: "int64"
-          type: "integer"
+          type: "string"
       requestBody:
         content:
           application/json:
@@ -4087,16 +4083,15 @@ paths:
       summary: "更新元表格（结构变更，columns 必填；仅改元信息用 PATCH）"
       tags:
       - "元表格设计器"
-  /admin/meta-table/{id}/copy:
+  /admin/meta-table/{tableCode}/copy:
     post:
       operationId: "copy"
       parameters:
       - in: "path"
-        name: "id"
+        name: "tableCode"
         required: true
         schema:
-          format: "int64"
-          type: "integer"
+          type: "string"
       responses:
         "200":
           content:
@@ -4110,16 +4105,15 @@ paths:
       summary: "复制元表格"
       tags:
       - "元表格设计器"
-  /admin/meta-table/{id}/data:
+  /admin/meta-table/{tableCode}/data:
     post:
       operationId: "listData"
       parameters:
       - in: "path"
-        name: "id"
+        name: "tableCode"
         required: true
         schema:
-          format: "int64"
-          type: "integer"
+          type: "string"
       requestBody:
         content:
           application/json:
@@ -4138,16 +4132,15 @@ paths:
       summary: "获取元表格数据"
       tags:
       - "元表格数据"
-  /admin/meta-table/{id}/data/create:
+  /admin/meta-table/{tableCode}/data/create:
     post:
       operationId: "createData"
       parameters:
       - in: "path"
-        name: "id"
+        name: "tableCode"
         required: true
         schema:
-          format: "int64"
-          type: "integer"
+          type: "string"
       requestBody:
         content:
           application/json:
@@ -4169,16 +4162,15 @@ paths:
       summary: "新增元表格数据"
       tags:
       - "元表格数据"
-  /admin/meta-table/{id}/data/{dataId}:
+  /admin/meta-table/{tableCode}/data/{dataId}:
     put:
       operationId: "updateData"
       parameters:
       - in: "path"
-        name: "id"
+        name: "tableCode"
         required: true
         schema:
-          format: "int64"
-          type: "integer"
+          type: "string"
       - in: "path"
         name: "dataId"
         required: true
@@ -4205,16 +4197,15 @@ paths:
       summary: "修改元表格数据"
       tags:
       - "元表格数据"
-  /admin/meta-table/{id}/data/{dataId}/delete:
+  /admin/meta-table/{tableCode}/data/{dataId}/delete:
     post:
       operationId: "deleteData"
       parameters:
       - in: "path"
-        name: "id"
+        name: "tableCode"
         required: true
         schema:
-          format: "int64"
-          type: "integer"
+          type: "string"
       - in: "path"
         name: "dataId"
         required: true
@@ -4233,16 +4224,15 @@ paths:
       summary: "删除元表格数据"
       tags:
       - "元表格数据"
-  /admin/meta-table/{id}/delete-check:
+  /admin/meta-table/{tableCode}/delete-check:
     get:
       operationId: "deleteCheck"
       parameters:
       - in: "path"
-        name: "id"
+        name: "tableCode"
         required: true
         schema:
-          format: "int64"
-          type: "integer"
+          type: "string"
       responses:
         "200":
           content:
@@ -4256,16 +4246,15 @@ paths:
       summary: "检查删除元表格"
       tags:
       - "元表格设计器"
-  /admin/meta-table/{id}/export:
+  /admin/meta-table/{tableCode}/export:
     get:
       operationId: "export_1"
       parameters:
       - in: "path"
-        name: "id"
+        name: "tableCode"
         required: true
         schema:
-          format: "int64"
-          type: "integer"
+          type: "string"
       - in: "query"
         name: "format"
         required: false
@@ -4280,16 +4269,15 @@ paths:
       summary: "导出元表格数据"
       tags:
       - "元表格数据"
-  /admin/meta-table/{id}/export-migration:
+  /admin/meta-table/{tableCode}/export-migration:
     get:
       operationId: "exportMigration"
       parameters:
       - in: "path"
-        name: "id"
+        name: "tableCode"
         required: true
         schema:
-          format: "int64"
-          type: "integer"
+          type: "string"
       responses:
         "200":
           content:
@@ -4302,16 +4290,15 @@ paths:
       summary: "导出元表格 Schema 迁移为 Flyway SQL"
       tags:
       - "元表格设计器"
-  /admin/meta-table/{id}/generate:
+  /admin/meta-table/{tableCode}/generate:
     post:
       operationId: "generate"
       parameters:
       - in: "path"
-        name: "id"
+        name: "tableCode"
         required: true
         schema:
-          format: "int64"
-          type: "integer"
+          type: "string"
       requestBody:
         content:
           application/json:
@@ -4330,16 +4317,15 @@ paths:
       summary: "生成元表格代码"
       tags:
       - "元表格设计器"
-  /admin/meta-table/{id}/import:
+  /admin/meta-table/{tableCode}/import:
     post:
       operationId: "importData"
       parameters:
       - in: "path"
-        name: "id"
+        name: "tableCode"
         required: true
         schema:
-          format: "int64"
-          type: "integer"
+          type: "string"
       - in: "query"
         name: "format"
         required: false
@@ -4369,16 +4355,15 @@ paths:
       summary: "导入元表格数据"
       tags:
       - "元表格数据"
-  /admin/meta-table/{id}/migrations:
+  /admin/meta-table/{tableCode}/migrations:
     get:
       operationId: "migrations"
       parameters:
       - in: "path"
-        name: "id"
+        name: "tableCode"
         required: true
         schema:
-          format: "int64"
-          type: "integer"
+          type: "string"
       responses:
         "200":
           content:
@@ -4393,16 +4378,15 @@ paths:
       summary: "获取元表格 Schema 迁移历史"
       tags:
       - "元表格设计器"
-  /admin/meta-table/{id}/schema-preview:
+  /admin/meta-table/{tableCode}/schema-preview:
     post:
       operationId: "schemaPreview"
       parameters:
       - in: "path"
-        name: "id"
+        name: "tableCode"
         required: true
         schema:
-          format: "int64"
-          type: "integer"
+          type: "string"
       requestBody:
         content:
           application/json:

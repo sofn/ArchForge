@@ -12,8 +12,8 @@ import com.lesofn.archforge.meta.table.api.domain.MetaTable;
 import com.lesofn.archforge.meta.table.api.enums.MetaDataFormat;
 import com.lesofn.archforge.meta.table.api.errors.MetaTableErrorCode;
 import com.lesofn.archforge.meta.table.api.errors.MetaTableException;
-import com.lesofn.archforge.meta.table.api.dao.MetaColumnRepository;
-import com.lesofn.archforge.meta.table.api.dao.MetaTableRepository;
+import com.lesofn.archforge.meta.table.api.service.MetaDefinitionRegistry;
+import com.lesofn.archforge.meta.table.api.service.MetaDefinitionRegistry.TableSnapshot;
 import com.lesofn.archforge.meta.table.internal.config.MetaTableTransferProperties;
 import com.lesofn.archforge.meta.table.internal.datascope.MetaDataScopeFilter;
 import com.lesofn.archforge.meta.table.internal.util.SqlIdentifier;
@@ -47,16 +47,17 @@ import org.springframework.stereotype.Component;
 public class MetaTableDataExporter {
 
     private final NamedParameterJdbcTemplate jdbcTemplate;
-    private final MetaTableRepository metaTableRepository;
-    private final MetaColumnRepository metaColumnRepository;
+    private final MetaDefinitionRegistry registry;
     private final MetaTableValidator validator;
     private final MetaTableTransferProperties transferProperties;
     private final MetaDataScopeFilter dataScopeFilter;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public void export(Long tableId, MetaDataFormat format, OutputStream out) {
-        MetaTable table = loadTable(tableId);
-        List<MetaColumn> columns = metaColumnRepository.findByTableIdAndDeletedFalseOrderBySortAsc(tableId);
+    public void export(String tableCode, MetaDataFormat format, OutputStream out) {
+        TableSnapshot definition = registry.find(tableCode)
+                .orElseThrow(() -> new MetaTableException(META_TABLE_NOT_EXISTS));
+        MetaTable table = definition.table();
+        List<MetaColumn> columns = definition.columns();
         enforceRowLimit(table, columns);
 
         switch (format) {
@@ -233,11 +234,5 @@ public class MetaTableDataExporter {
 
     private interface RowConsumer {
         void accept(Map<String, Object> row) throws IOException;
-    }
-
-    private MetaTable loadTable(Long tableId) {
-        return metaTableRepository.findById(tableId)
-                .filter(t -> !Boolean.TRUE.equals(t.getDeleted()))
-                .orElseThrow(() -> new MetaTableException(META_TABLE_NOT_EXISTS));
     }
 }

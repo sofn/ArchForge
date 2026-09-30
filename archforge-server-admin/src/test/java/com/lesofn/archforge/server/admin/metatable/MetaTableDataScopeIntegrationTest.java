@@ -66,20 +66,20 @@ class MetaTableDataScopeIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     void allScopeReturnsEveryRow() throws Exception {
-        Long tableId = deptScopedTable("dsitall");
-        insertRows(tableId);
+        String tableCode = deptScopedTable("dsitall");
+        insertRows(tableCode);
 
-        List<Map<String, Object>> rows = listWithScope(tableId, scope(DataScopeEnum.ALL, 1L, null, null));
+        List<Map<String, Object>> rows = listWithScope(tableCode, scope(DataScopeEnum.ALL, 1L, null, null));
 
         assertEquals(3, rows.size());
     }
 
     @Test
     void singleDeptFiltersByTenantColumn() throws Exception {
-        Long tableId = deptScopedTable("dsitsdept");
-        insertRows(tableId);
+        String tableCode = deptScopedTable("dsitsdept");
+        insertRows(tableCode);
 
-        List<Map<String, Object>> rows = listWithScope(tableId,
+        List<Map<String, Object>> rows = listWithScope(tableCode,
                 scope(DataScopeEnum.SINGLE_DEPT, 1L, 10L, null));
 
         assertEquals(2, rows.size());
@@ -89,10 +89,10 @@ class MetaTableDataScopeIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     void customDefineFiltersByDeptIdSet() throws Exception {
-        Long tableId = deptScopedTable("dsitcdef");
-        insertRows(tableId);
+        String tableCode = deptScopedTable("dsitcdef");
+        insertRows(tableCode);
 
-        List<Map<String, Object>> rows = listWithScope(tableId,
+        List<Map<String, Object>> rows = listWithScope(tableCode,
                 scope(DataScopeEnum.CUSTOM_DEFINE, 1L, null, Set.of(10L, 20L)));
 
         assertEquals(3, rows.size());
@@ -100,10 +100,10 @@ class MetaTableDataScopeIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     void customDefinePartialSetExcludesOtherDepts() throws Exception {
-        Long tableId = deptScopedTable("dsitcdefp");
-        insertRows(tableId);
+        String tableCode = deptScopedTable("dsitcdefp");
+        insertRows(tableCode);
 
-        List<Map<String, Object>> rows = listWithScope(tableId,
+        List<Map<String, Object>> rows = listWithScope(tableCode,
                 scope(DataScopeEnum.CUSTOM_DEFINE, 1L, null, Set.of(20L)));
 
         assertEquals(1, rows.size());
@@ -113,11 +113,11 @@ class MetaTableDataScopeIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     void deptScopeOnUnmarkedTableDegradesToCreator() throws Exception {
-        Long tableId = plainTable("dsitplain");
-        crudService.insert(tableId, Map.of("name", "mine"), 7L);
-        crudService.insert(tableId, Map.of("name", "theirs"), 8L);
+        String tableCode = plainTable("dsitplain");
+        crudService.insert(tableCode, Map.of("name", "mine"), 7L);
+        crudService.insert(tableCode, Map.of("name", "theirs"), 8L);
 
-        List<Map<String, Object>> rows = listWithScope(tableId,
+        List<Map<String, Object>> rows = listWithScope(tableCode,
                 scope(DataScopeEnum.SINGLE_DEPT, 7L, 10L, null));
 
         assertEquals(1, rows.size());
@@ -126,11 +126,11 @@ class MetaTableDataScopeIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     void onlySelfFallsBackToCreatorId() throws Exception {
-        Long tableId = plainTable("dsitself");
-        crudService.insert(tableId, Map.of("name", "mine"), 7L);
-        crudService.insert(tableId, Map.of("name", "theirs"), 8L);
+        String tableCode = plainTable("dsitself");
+        crudService.insert(tableCode, Map.of("name", "mine"), 7L);
+        crudService.insert(tableCode, Map.of("name", "theirs"), 8L);
 
-        List<Map<String, Object>> rows = listWithScope(tableId,
+        List<Map<String, Object>> rows = listWithScope(tableCode,
                 scope(DataScopeEnum.ONLY_SELF, 7L, null, null));
 
         assertEquals(1, rows.size());
@@ -139,11 +139,11 @@ class MetaTableDataScopeIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     void onlySelfUsesOwnerColumnWhenMarked() throws Exception {
-        Long tableId = ownerScopedTable("dsitown");
-        crudService.insert(tableId, Map.of("salesman_id", 7, "name", "assigned"), 1L);
-        crudService.insert(tableId, Map.of("salesman_id", 8, "name", "other"), 7L);
+        String tableCode = ownerScopedTable("dsitown");
+        crudService.insert(tableCode, Map.of("salesman_id", 7, "name", "assigned"), 1L);
+        crudService.insert(tableCode, Map.of("salesman_id", 8, "name", "other"), 7L);
 
-        List<Map<String, Object>> rows = listWithScope(tableId,
+        List<Map<String, Object>> rows = listWithScope(tableCode,
                 scope(DataScopeEnum.ONLY_SELF, 7L, null, null));
 
         assertEquals(1, rows.size());
@@ -152,13 +152,13 @@ class MetaTableDataScopeIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     void exportRespectsScope() throws Exception {
-        Long tableId = deptScopedTable("dsitexp");
-        insertRows(tableId);
+        String tableCode = deptScopedTable("dsitexp");
+        insertRows(tableCode);
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         ScopedValueContext.runInScope(new RequestContext("it-export"), () -> {
             DataScopeContextHolder.set(scope(DataScopeEnum.SINGLE_DEPT, 1L, 10L, null));
-            crudService.export(tableId, MetaDataFormat.CSV, out);
+            crudService.export(tableCode, MetaDataFormat.CSV, out);
         });
 
         String csv = out.toString(StandardCharsets.UTF_8);
@@ -171,87 +171,87 @@ class MetaTableDataScopeIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     void updateRespectsRowScope() throws Exception {
-        Long tableId = deptScopedTable("dsitupd");
-        Long inId = crudService.insert(tableId, Map.of("dept_id", 10, "name", "a"), 1L);
-        Long outId = crudService.insert(tableId, Map.of("dept_id", 20, "name", "b"), 1L);
+        String tableCode = deptScopedTable("dsitupd");
+        Long inId = crudService.insert(tableCode, Map.of("dept_id", 10, "name", "a"), 1L);
+        Long outId = crudService.insert(tableCode, Map.of("dept_id", 20, "name", "b"), 1L);
         DataScopeContext ctx = scope(DataScopeEnum.SINGLE_DEPT, 1L, 10L, null);
 
         boolean[] results = new boolean[2];
         ScopedValueContext.runInScope(new RequestContext("it-w"), () -> {
             DataScopeContextHolder.set(ctx);
-            results[0] = crudService.update(tableId, inId, Map.of("name", "a2"), 1L);
-            results[1] = crudService.update(tableId, outId, Map.of("name", "b2"), 1L);
+            results[0] = crudService.update(tableCode, inId, Map.of("name", "a2"), 1L);
+            results[1] = crudService.update(tableCode, outId, Map.of("name", "b2"), 1L);
         });
 
         assertTrue(results[0]);
         assertFalse(results[1]);
         // the out-of-scope row is untouched, not deleted
-        assertEquals(2, listWithScope(tableId, scope(DataScopeEnum.ALL, 1L, null, null)).size());
+        assertEquals(2, listWithScope(tableCode, scope(DataScopeEnum.ALL, 1L, null, null)).size());
     }
 
     @Test
     void updateRejectsMarkedValueOutsideScope() throws Exception {
-        Long tableId = deptScopedTable("dsitupdv");
-        Long inId = crudService.insert(tableId, Map.of("dept_id", 10, "name", "a"), 1L);
+        String tableCode = deptScopedTable("dsitupdv");
+        Long inId = crudService.insert(tableCode, Map.of("dept_id", 10, "name", "a"), 1L);
 
         assertThrows(MetaTableException.class, () -> ScopedValueContext.runInScope(new RequestContext("it-wv"), () -> {
             DataScopeContextHolder.set(scope(DataScopeEnum.SINGLE_DEPT, 1L, 10L, null));
-            crudService.update(tableId, inId, Map.of("dept_id", 20), 1L);
+            crudService.update(tableCode, inId, Map.of("dept_id", 20), 1L);
         }));
     }
 
     @Test
     void deleteRespectsRowScope() throws Exception {
-        Long tableId = deptScopedTable("dsitdel");
-        Long inId = crudService.insert(tableId, Map.of("dept_id", 10, "name", "a"), 1L);
-        Long outId = crudService.insert(tableId, Map.of("dept_id", 20, "name", "b"), 1L);
+        String tableCode = deptScopedTable("dsitdel");
+        Long inId = crudService.insert(tableCode, Map.of("dept_id", 10, "name", "a"), 1L);
+        Long outId = crudService.insert(tableCode, Map.of("dept_id", 20, "name", "b"), 1L);
         DataScopeContext ctx = scope(DataScopeEnum.SINGLE_DEPT, 1L, 10L, null);
 
         boolean[] results = new boolean[2];
         ScopedValueContext.runInScope(new RequestContext("it-wd"), () -> {
             DataScopeContextHolder.set(ctx);
-            results[0] = crudService.softDelete(tableId, inId, 1L);
-            results[1] = crudService.softDelete(tableId, outId, 1L);
+            results[0] = crudService.softDelete(tableCode, inId, 1L);
+            results[1] = crudService.softDelete(tableCode, outId, 1L);
         });
 
         assertTrue(results[0]);
         assertFalse(results[1]);
-        List<Map<String, Object>> remaining = listWithScope(tableId, scope(DataScopeEnum.ALL, 1L, null, null));
+        List<Map<String, Object>> remaining = listWithScope(tableCode, scope(DataScopeEnum.ALL, 1L, null, null));
         assertEquals(1, remaining.size());
         assertEquals(20L, ((Number) java.util.Objects.requireNonNull(remaining.get(0).get("dept_id"))).longValue());
     }
 
     @Test
     void insertOutsideScopeRejectedInsideAccepted() throws Exception {
-        Long tableId = deptScopedTable("dsitins");
+        String tableCode = deptScopedTable("dsitins");
         DataScopeContext ctx = scope(DataScopeEnum.SINGLE_DEPT, 1L, 10L, null);
 
         assertThrows(MetaTableException.class, () -> ScopedValueContext.runInScope(new RequestContext("it-wi"), () -> {
             DataScopeContextHolder.set(ctx);
-            crudService.insert(tableId, Map.of("dept_id", 30, "name", "x"), 1L);
+            crudService.insert(tableCode, Map.of("dept_id", 30, "name", "x"), 1L);
         }));
 
         Long[] newId = new Long[1];
         ScopedValueContext.runInScope(new RequestContext("it-wi2"), () -> {
             DataScopeContextHolder.set(ctx);
-            newId[0] = crudService.insert(tableId, Map.of("dept_id", 10, "name", "ok"), 1L);
+            newId[0] = crudService.insert(tableCode, Map.of("dept_id", 10, "name", "ok"), 1L);
         });
         assertNotNull(newId[0]);
     }
 
     @Test
     void onlySelfWriteFallsBackToCreatorId() throws Exception {
-        Long tableId = plainTable("dsitsw");
-        Long mine = crudService.insert(tableId, Map.of("name", "mine"), 7L);
-        Long theirs = crudService.insert(tableId, Map.of("name", "theirs"), 8L);
+        String tableCode = plainTable("dsitsw");
+        Long mine = crudService.insert(tableCode, Map.of("name", "mine"), 7L);
+        Long theirs = crudService.insert(tableCode, Map.of("name", "theirs"), 8L);
         DataScopeContext ctx = scope(DataScopeEnum.ONLY_SELF, 7L, null, null);
 
         boolean[] results = new boolean[3];
         ScopedValueContext.runInScope(new RequestContext("it-ws"), () -> {
             DataScopeContextHolder.set(ctx);
-            results[0] = crudService.update(tableId, mine, Map.of("name", "mine2"), 7L);
-            results[1] = crudService.update(tableId, theirs, Map.of("name", "hijack"), 7L);
-            results[2] = crudService.softDelete(tableId, theirs, 7L);
+            results[0] = crudService.update(tableCode, mine, Map.of("name", "mine2"), 7L);
+            results[1] = crudService.update(tableCode, theirs, Map.of("name", "hijack"), 7L);
+            results[2] = crudService.softDelete(tableCode, theirs, 7L);
         });
 
         assertTrue(results[0]);
@@ -261,13 +261,13 @@ class MetaTableDataScopeIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     void importCountsOutOfScopeRowsAsFailed() throws Exception {
-        Long tableId = deptScopedTable("dsitimp");
+        String tableCode = deptScopedTable("dsitimp");
         byte[] csv = "dept_id,name\n10,a\n99,b\n10,c\n".getBytes(StandardCharsets.UTF_8);
 
         ImportResponse[] holder = new ImportResponse[1];
         ScopedValueContext.runInScope(new RequestContext("it-wimp"), () -> {
             DataScopeContextHolder.set(scope(DataScopeEnum.SINGLE_DEPT, 1L, 10L, null));
-            holder[0] = crudService.importData(tableId, MetaDataFormat.CSV, new ByteArrayInputStream(csv), 1L);
+            holder[0] = crudService.importData(tableCode, MetaDataFormat.CSV, new ByteArrayInputStream(csv), 1L);
         });
 
         assertEquals(3, holder[0].getTotal());
@@ -277,30 +277,32 @@ class MetaTableDataScopeIntegrationTest extends AbstractIntegrationTest {
 
     // ---- fixtures ----
 
-    private Long deptScopedTable(String code) {
+    private String deptScopedTable(String code) {
         return createTable(code, tenantColumn("dept_id"), stringColumn("name"));
     }
 
-    private Long ownerScopedTable(String code) {
+    private String ownerScopedTable(String code) {
         return createTable(code, ownerColumn("salesman_id"), stringColumn("name"));
     }
 
-    private Long plainTable(String code) {
+    private String plainTable(String code) {
         return createTable(code, stringColumn("name"));
     }
 
-    private Long createTable(String code, MetaColumn... columns) {
+    /** Creates the table and returns its code — the runtime CRUD address. */
+    private String createTable(String code, MetaColumn... columns) {
         MetaTable table = new MetaTable();
         table.setTableCode(code);
         table.setTableName(code);
         table.setTablePrefix("meta_");
-        return adminService.create(table, new ArrayList<>(List.of(columns)));
+        adminService.create(table, new ArrayList<>(List.of(columns)));
+        return code;
     }
 
-    private void insertRows(Long tableId) {
-        crudService.insert(tableId, Map.of("dept_id", 10, "name", "r10a"), 1L);
-        crudService.insert(tableId, Map.of("dept_id", 10, "name", "r10b"), 2L);
-        crudService.insert(tableId, Map.of("dept_id", 20, "name", "r20"), 1L);
+    private void insertRows(String tableCode) {
+        crudService.insert(tableCode, Map.of("dept_id", 10, "name", "r10a"), 1L);
+        crudService.insert(tableCode, Map.of("dept_id", 10, "name", "r10b"), 2L);
+        crudService.insert(tableCode, Map.of("dept_id", 20, "name", "r20"), 1L);
     }
 
     private static MetaColumn tenantColumn(String code) {
@@ -339,11 +341,11 @@ class MetaTableDataScopeIntegrationTest extends AbstractIntegrationTest {
                 .build();
     }
 
-    private List<Map<String, Object>> listWithScope(Long tableId, DataScopeContext ctx) throws Exception {
+    private List<Map<String, Object>> listWithScope(String tableCode, DataScopeContext ctx) throws Exception {
         List<List<Map<String, Object>>> holder = new ArrayList<>();
         ScopedValueContext.runInScope(new RequestContext("it-scope"), () -> {
             DataScopeContextHolder.set(ctx);
-            MetaPageResponse<Map<String, Object>> page = crudService.list(tableId,
+            MetaPageResponse<Map<String, Object>> page = crudService.list(tableCode,
                     MetaDataQuery.of(Map.of(), 1, 50));
             holder.add(page.getList());
         });

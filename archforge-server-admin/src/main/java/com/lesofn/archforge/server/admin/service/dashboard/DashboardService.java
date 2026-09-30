@@ -1,7 +1,7 @@
 package com.lesofn.archforge.server.admin.service.dashboard;
 
 import com.lesofn.archforge.cms.api.dao.CmsArticleRepository;
-import com.lesofn.archforge.meta.table.api.dao.MetaTableRepository;
+import com.lesofn.archforge.meta.table.api.service.MetaDefinitionRegistry;
 import com.lesofn.archforge.user.api.dao.SysUserRepository;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -18,11 +18,11 @@ public class DashboardService {
 
     private final SysUserRepository userRepository;
     private final CmsArticleRepository articleRepository;
-    private final MetaTableRepository metaTableRepository;
+    private final MetaDefinitionRegistry metaDefinitionRegistry;
 
     public DashboardMetricsResponse metrics() {
         return new DashboardMetricsResponse(userRepository.countByDeletedFalse(), articleRepository
-                .countByDeletedFalse(), metaTableRepository.countByDeletedFalse(), 0L);
+                .countByDeletedFalse(), metaDefinitionRegistry.count(), 0L);
     }
 
     public List<DashboardTrendPoint> trends(int days) {
@@ -51,6 +51,6 @@ public class DashboardService {
         return List.of(
                 new DashboardTodo("Users", userRepository.countByDeletedFalse(), "/welcome"),
                 new DashboardTodo("Articles", articleRepository.countByDeletedFalse(), "/cms/article/index"),
-                new DashboardTodo("Meta tables", metaTableRepository.countByDeletedFalse(), "/metatable"));
+                new DashboardTodo("Meta tables", metaDefinitionRegistry.count(), "/metatable"));
     }
 }

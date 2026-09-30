@@ -19,8 +19,8 @@ import com.lesofn.archforge.meta.table.api.domain.MetaColumnType;
 import com.lesofn.archforge.meta.table.api.domain.MetaTable;
 import com.lesofn.archforge.meta.table.api.enums.MetaDataFormat;
 import com.lesofn.archforge.meta.table.api.errors.MetaTableException;
-import com.lesofn.archforge.meta.table.api.dao.MetaColumnRepository;
-import com.lesofn.archforge.meta.table.api.dao.MetaTableRepository;
+import com.lesofn.archforge.meta.table.api.service.MetaDefinitionRegistry;
+import com.lesofn.archforge.meta.table.api.service.MetaDefinitionRegistry.TableSnapshot;
 import com.lesofn.archforge.meta.table.internal.config.MetaTableTransferProperties;
 import com.lesofn.archforge.meta.table.internal.datascope.MetaDataScopeFilter;
 import com.lesofn.archforge.meta.table.internal.validator.MetaTableValidator;
@@ -48,22 +48,19 @@ class MetaTableDataExporterTest {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     private NamedParameterJdbcTemplate jdbcTemplate;
-    private MetaTableRepository metaTableRepository;
-    private MetaColumnRepository metaColumnRepository;
+    private MetaDefinitionRegistry registry;
     private MetaTableTransferProperties properties;
     private MetaTableDataExporter exporter;
 
     @BeforeEach
     void setUp() {
         jdbcTemplate = mock(NamedParameterJdbcTemplate.class);
-        metaTableRepository = mock(MetaTableRepository.class);
-        metaColumnRepository = mock(MetaColumnRepository.class);
+        registry = mock(MetaDefinitionRegistry.class);
         properties = new MetaTableTransferProperties();
         MetaDataScopeFilter dataScopeFilter = mock(MetaDataScopeFilter.class);
         when(dataScopeFilter.buildClause(any(), anyString(), any(MapSqlParameterSource.class))).thenReturn("");
-        exporter = new MetaTableDataExporter(jdbcTemplate, metaTableRepository, metaColumnRepository, new MetaTableValidator(), properties, dataScopeFilter);
-        when(metaTableRepository.findById(1L)).thenReturn(Optional.of(stubTable()));
-        when(metaColumnRepository.findByTableIdAndDeletedFalseOrderBySortAsc(1L)).thenReturn(nameColumns());
+        exporter = new MetaTableDataExporter(jdbcTemplate, registry, new MetaTableValidator(), properties, dataScopeFilter);
+        when(registry.find("t1")).thenReturn(Optional.of(new TableSnapshot(stubTable(), nameColumns())));
         when(jdbcTemplate.queryForObject(contains("COUNT(*)"), any(SqlParameterSource.class), eq(Long.class)))
                 .thenReturn(2L);
     }
@@ -76,7 +73,7 @@ class MetaTableDataExporterTest {
                 .thenReturn(List.of(row(3L, "plain")));
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        exporter.export(1L, MetaDataFormat.CSV, out);
+        exporter.export("t1", MetaDataFormat.CSV, out);
 
         String csv = out.toString(StandardCharsets.UTF_8);
         List<String> lines = csv.lines().collect(Collectors.toList());
@@ -102,7 +99,7 @@ class MetaTableDataExporterTest {
                 .thenReturn(List.of());
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        exporter.export(1L, MetaDataFormat.EXCEL, out);
+        exporter.export("t1", MetaDataFormat.EXCEL, out);
 
         try (ReadableWorkbook workbook = new ReadableWorkbook(new ByteArrayInputStream(out.toByteArray()))) {
             List<List<String>> grid;
@@ -126,7 +123,7 @@ class MetaTableDataExporterTest {
                 .thenReturn(List.of());
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        exporter.export(1L, MetaDataFormat.JSON, out);
+        exporter.export("t1", MetaDataFormat.JSON, out);
 
         JsonNode root = objectMapper.readTree(out.toByteArray());
         assertTrue(root.isArray());
@@ -142,7 +139,7 @@ class MetaTableDataExporterTest {
 
         MetaTableException e = assertThrows(
                 MetaTableException.class,
-                () -> exporter.export(1L, MetaDataFormat.CSV, new ByteArrayOutputStream()));
+                () -> exporter.export("t1", MetaDataFormat.CSV, new ByteArrayOutputStream()));
 
         assertTrue(String.valueOf(e.getMessage()).contains("超过上限 50000"));
         assertTrue(String.valueOf(e.getMessage()).contains("过滤条件"));

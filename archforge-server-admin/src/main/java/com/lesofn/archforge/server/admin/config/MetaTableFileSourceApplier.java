@@ -1,6 +1,7 @@
 package com.lesofn.archforge.server.admin.config;
 
 import com.lesofn.archforge.meta.table.api.definition.DefinitionSource;
+import com.lesofn.archforge.meta.table.api.service.MetaDefinitionRegistry;
 import com.lesofn.archforge.meta.table.api.service.MetaTableDefinitionService;
 import com.lesofn.archforge.meta.table.api.service.MetaTableDefinitionService.SyncReport;
 import java.nio.file.Path;
@@ -21,6 +22,8 @@ import org.springframework.stereotype.Component;
  * or invalid file, or an apply-lock timeout
  * ({@code arch-forge.meta.apply-lock-timeout}, default 60s) aborts startup
  * with the sync rolled back. Rollback of the mode itself: {@code source=db}.
+ * After a successful apply the runtime registry is pinned (F3, ADR-0008):
+ * request-time definition lookups are served from memory from then on.
  */
 @Slf4j
 @Component
@@ -32,6 +35,7 @@ public class MetaTableFileSourceApplier implements ApplicationRunner {
 
     private final Environment environment;
     private final MetaTableDefinitionService definitionService;
+    private final MetaDefinitionRegistry registry;
 
     @Override
     public void run(ApplicationArguments args) {
@@ -54,7 +58,8 @@ public class MetaTableFileSourceApplier implements ApplicationRunner {
                 log.info("  meta file-source: {}", line);
             }
         }
-        log.info("meta file-source: {} materialized — {}", source,
-                report.isEmpty() ? "DB mirror already in sync" : report.lines().size() + " line(s)");
+        registry.pin();
+        log.info("meta file-source: {} materialized — {}; {} definition(s) pinned", source,
+                report.isEmpty() ? "DB mirror already in sync" : report.lines().size() + " line(s)", registry.count());
     }
 }

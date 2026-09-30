@@ -270,6 +270,12 @@ public class MetaTableAdminServiceImpl implements MetaTableAdminService {
     }
 
     @Override
+    public MetaTable findByCode(String tableCode) {
+        return metaTableRepository.findByTableCodeAndDeletedFalse(tableCode)
+                .orElseThrow(() -> new MetaTableException(META_TABLE_NOT_EXISTS));
+    }
+
+    @Override
     public List<MetaColumn> findColumns(Long tableId) {
         return metaColumnRepository.findByTableIdAndDeletedFalseOrderBySortAsc(tableId);
     }

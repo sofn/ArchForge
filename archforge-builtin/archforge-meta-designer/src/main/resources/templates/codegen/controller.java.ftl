@@ -21,7 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("${basePath}")
 public class ${entityName}Controller {
 
-    private static final Long TABLE_ID = ${tableId?c}L;
+    private static final String TABLE_CODE = "${tableCode}";
 
     private final ${entityName}Service ${entityName?uncap_first}Service;
     private final MetaTableCrudService metaTableCrudService;
@@ -72,13 +72,13 @@ public class ${entityName}Controller {
             default -> "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
         };
         response.setContentType(contentType);
-        response.setHeader("Content-Disposition", "attachment; filename=${tableCode}_" + TABLE_ID + suffix);
-        metaTableCrudService.export(TABLE_ID, dataFormat, response.getOutputStream());
+        response.setHeader("Content-Disposition", "attachment; filename=" + TABLE_CODE + suffix);
+        metaTableCrudService.export(TABLE_CODE, dataFormat, response.getOutputStream());
     }
 
     @Operation(summary = "导入${tableName}数据")
     @PostMapping("/import")
     public ImportResponse importData(RequestContext rc, @RequestParam(defaultValue = "CSV") String format, @RequestPart("file") MultipartFile file) throws IOException {
-        return metaTableCrudService.importData(TABLE_ID, MetaDataFormat.of(format), file.getInputStream(), rc.getCurrentUid());
+        return metaTableCrudService.importData(TABLE_CODE, MetaDataFormat.of(format), file.getInputStream(), rc.getCurrentUid());
     }
 }

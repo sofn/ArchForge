@@ -36,7 +36,8 @@ import org.springframework.web.multipart.MultipartFile;
  * 元表格运行期数据接口（动态 CRUD / 导入导出）。
  *
  * <p>
- * 常驻装配——运行期能力（meta-runtime）。设计期端点（schema 管理 / 代码生成等）在
+ * 常驻装配——运行期能力（meta-runtime）。表以 {@code tableCode} 寻址（P3-4-3 F3：稳定身份键，
+ * 不暴露 DB 自增 id）。设计期端点（schema 管理 / 代码生成等）在
  * {@link MetaTableDesignerController}，由 {@code arch-forge.designer.enabled} 门控。
  */
 @Tag(name = "元表格数据")
@@ -53,9 +54,9 @@ public class MetaTableController {
     @Operation(summary = "获取元表格数据")
     @SaCheckPermission(value = "meta-table:list", type = StpAdminUtil.TYPE)
     @DataPermission
-    @PostMapping("/{id}/data")
+    @PostMapping("/{tableCode}/data")
     public AdminPageResponse<Map<String, Object>> listData(
-            @PathVariable Long id, @RequestBody MetaDataListRequest request) {
+            @PathVariable String tableCode, @RequestBody MetaDataListRequest request) {
         int currentPage = request.getCurrentPage() != null && request.getCurrentPage() > 0
                 ? request.getCurrentPage()
                 : 1;
@@ -66,7 +67,7 @@ public class MetaTableController {
         boolean skipCount = Boolean.TRUE.equals(request.getSkipCount());
         MetaDataQuery query = new MetaDataQuery(request.getFilters(), currentPage, pageSize, request.getOrderBy(), request
                 .getOrderDir(), skipCount);
-        MetaPageResponse<Map<String, Object>> result = metaTableCrudService.list(id, query);
+        MetaPageResponse<Map<String, Object>> result = metaTableCrudService.list(tableCode, query);
         return AdminPageResponse.of(result.getList(), result.getTotal(), result.getPageSize(), result.getCurrentPage());
     }
 
@@ -74,37 +75,37 @@ public class MetaTableController {
     @Operation(summary = "新增元表格数据")
     @SaCheckPermission(value = "meta-table:add", type = StpAdminUtil.TYPE)
     @DataPermission
-    @PostMapping("/{id}/data/create")
-    public Long createData(@PathVariable Long id, @RequestBody Map<String, Object> row) {
-        return metaTableCrudService.insert(id, row, LoginContext.getAdminUserId());
+    @PostMapping("/{tableCode}/data/create")
+    public Long createData(@PathVariable String tableCode, @RequestBody Map<String, Object> row) {
+        return metaTableCrudService.insert(tableCode, row, LoginContext.getAdminUserId());
     }
 
     @Log
     @Operation(summary = "修改元表格数据")
     @SaCheckPermission(value = "meta-table:edit", type = StpAdminUtil.TYPE)
     @DataPermission
-    @PutMapping("/{id}/data/{dataId}")
+    @PutMapping("/{tableCode}/data/{dataId}")
     public Boolean updateData(
-            @PathVariable Long id,
+            @PathVariable String tableCode,
             @PathVariable Long dataId,
             @RequestBody Map<String, Object> row) {
-        return metaTableCrudService.update(id, dataId, row, LoginContext.getAdminUserId());
+        return metaTableCrudService.update(tableCode, dataId, row, LoginContext.getAdminUserId());
     }
 
     @Log
     @Operation(summary = "删除元表格数据")
     @SaCheckPermission(value = "meta-table:remove", type = StpAdminUtil.TYPE)
     @DataPermission
-    @PostMapping("/{id}/data/{dataId}/delete")
-    public Boolean deleteData(@PathVariable Long id, @PathVariable Long dataId) {
-        return metaTableCrudService.softDelete(id, dataId, LoginContext.getAdminUserId());
+    @PostMapping("/{tableCode}/data/{dataId}/delete")
+    public Boolean deleteData(@PathVariable String tableCode, @PathVariable Long dataId) {
+        return metaTableCrudService.softDelete(tableCode, dataId, LoginContext.getAdminUserId());
     }
 
     @Operation(summary = "导出元表格数据")
     @DataPermission
-    @GetMapping("/{id}/export")
+    @GetMapping("/{tableCode}/export")
     public void export(
-            @PathVariable Long id,
+            @PathVariable String tableCode,
             @RequestParam(defaultValue = "EXCEL") String format,
             HttpServletResponse response) throws IOException {
         MetaDataFormat dataFormat = MetaDataFormat.of(format);
@@ -118,22 +119,23 @@ public class MetaTableController {
             case JSON -> "application/json";
             default -> "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
         };
-        String fileName = "meta_table_" + id + suffix;
+        String fileName = "meta_table_" + tableCode + suffix;
         response.setContentType(contentType);
         response.setHeader("Content-Disposition", "attachment; filename=" + fileName);
-        metaTableCrudService.export(id, dataFormat, response.getOutputStream());
+        metaTableCrudService.export(tableCode, dataFormat, response.getOutputStream());
     }
 
     @Log
     @Operation(summary = "导入元表格数据")
     @SaCheckPermission(value = "meta-table:add", type = StpAdminUtil.TYPE)
     @DataPermission
-    @PostMapping("/{id}/import")
+    @PostMapping("/{tableCode}/import")
     public ImportResponse importData(
-            @PathVariable Long id,
+            @PathVariable String tableCode,
             @RequestParam(defaultValue = "CSV") String format,
             @RequestPart("file") MultipartFile file) throws IOException {
         MetaDataFormat dataFormat = MetaDataFormat.of(format);
-        return metaTableCrudService.importData(id, dataFormat, file.getInputStream(), LoginContext.getAdminUserId());
+        return metaTableCrudService.importData(tableCode, dataFormat, file.getInputStream(), LoginContext
+                .getAdminUserId());
     }
 }

@@ -12,8 +12,8 @@ import com.lesofn.archforge.meta.table.api.dto.ImportResponse;
 import com.lesofn.archforge.meta.table.api.enums.MetaDataFormat;
 import com.lesofn.archforge.meta.table.api.errors.MetaTableErrorCode;
 import com.lesofn.archforge.meta.table.api.errors.MetaTableException;
-import com.lesofn.archforge.meta.table.api.dao.MetaColumnRepository;
-import com.lesofn.archforge.meta.table.api.dao.MetaTableRepository;
+import com.lesofn.archforge.meta.table.api.service.MetaDefinitionRegistry;
+import com.lesofn.archforge.meta.table.api.service.MetaDefinitionRegistry.TableSnapshot;
 import com.lesofn.archforge.meta.table.internal.config.MetaTableTransferProperties;
 import com.lesofn.archforge.meta.table.internal.datascope.MetaDataScopeFilter;
 import com.lesofn.archforge.meta.table.internal.util.SqlIdentifier;
@@ -37,6 +37,7 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.jspecify.annotations.Nullable;
+import org.springframework.beans.BeanUtils;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -50,21 +51,20 @@ public class MetaTableDataImporter {
 
     private static final int READ_BUFFER_SIZE = 8192;
 
-    private final MetaTableRepository metaTableRepository;
-    private final MetaColumnRepository metaColumnRepository;
+    private final MetaDefinitionRegistry registry;
     private final NamedParameterJdbcTemplate jdbcTemplate;
     private final MetaTableValidator validator;
     private final MetaTableTransferProperties transferProperties;
     private final MetaDataScopeFilter dataScopeFilter;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public ImportResponse importData(Long tableId, MetaDataFormat format, InputStream in, Long currentUid) {
+    public ImportResponse importData(String tableCode, MetaDataFormat format, InputStream in, Long currentUid) {
         byte[] payload = readPayload(in);
         if (format == MetaDataFormat.CSV) {
-            return importCsv(tableId, payload, currentUid);
+            return importCsv(tableCode, payload, currentUid);
         }
         if (format == MetaDataFormat.JSON) {
-            return importJson(tableId, payload, currentUid);
+            return importJson(tableCode, payload, currentUid);
         }
         throw new MetaTableException(MetaTableErrorCode.META_COLUMN_VALUE_INVALID, "不支持的导入格式: " + format);
     }
@@ -87,8 +87,8 @@ public class MetaTableDataImporter {
         return buffer.toByteArray();
     }
 
-    private ImportResponse importCsv(Long tableId, byte[] payload, Long currentUid) {
-        ImportContext ctx = newContext(tableId, currentUid);
+    private ImportResponse importCsv(String tableCode, byte[] payload, Long currentUid) {
+        ImportContext ctx = newContext(tableCode, currentUid);
         try (InputStreamReader reader = new InputStreamReader(new ByteArrayInputStream(payload), StandardCharsets.UTF_8);
                 CSVParser parser = new CSVParser(reader, CSVFormat.DEFAULT.builder().setHeader().setSkipHeaderRecord(true)
                         .build())) {
@@ -115,8 +115,8 @@ public class MetaTableDataImporter {
         return finish(ctx);
     }
 
-    private ImportResponse importJson(Long tableId, byte[] payload, Long currentUid) {
-        ImportContext ctx = newContext(tableId, currentUid);
+    private ImportResponse importJson(String tableCode, byte[] payload, Long currentUid) {
+        ImportContext ctx = newContext(tableCode, currentUid);
         try {
             JsonNode root = objectMapper.readTree(new ByteArrayInputStream(payload));
             if (!root.isArray()) {
@@ -142,10 +142,10 @@ public class MetaTableDataImporter {
         return finish(ctx);
     }
 
-    private ImportContext newContext(Long tableId, Long currentUid) {
-        MetaTable table = loadTable(tableId);
-        List<MetaColumn> columns = metaColumnRepository.findByTableIdAndDeletedFalseOrderBySortAsc(tableId);
-        return new ImportContext(table, columns, currentUid, transferProperties);
+    private ImportContext newContext(String tableCode, Long currentUid) {
+        TableSnapshot definition = registry.find(tableCode)
+                .orElseThrow(() -> new MetaTableException(META_TABLE_NOT_EXISTS));
+        return new ImportContext(definition.table(), definition.columns(), currentUid, transferProperties);
     }
 
     private void processRow(ImportContext ctx, Map<String, Object> row, int rowNum) {
@@ -342,23 +342,21 @@ public class MetaTableDataImporter {
             this.maxRows = properties.getMaxImportRows();
             this.maxErrors = properties.getMaxErrorList();
             this.batchSize = properties.getImportBatchSize();
-            // findColumns 每次返回全新实体，就地改写仅影响本次导入；
-            // REFERENCE 存在性由 checkReferences 缓存校验，校验阶段按 INTEGER 只做数值解析避免逐行 COUNT
+            // REFERENCE 存在性由 checkReferences 缓存校验，校验阶段按 INTEGER 只做数值解析避免逐行 COUNT。
+            // 定义可能是 registry 的共享快照（pin 后跨请求复用）——只改副本，绝不就地改写。
             this.referenceColumns = columns.stream()
                     .filter(c -> c.getDataType() == MetaColumnType.REFERENCE)
                     .toList();
-            for (MetaColumn column : columns) {
-                if (column.getDataType() == MetaColumnType.REFERENCE) {
-                    column.setDataType(MetaColumnType.INTEGER);
-                }
-            }
-            this.columns = columns;
+            this.columns = columns.stream()
+                    .map(c -> c.getDataType() == MetaColumnType.REFERENCE ? asInteger(c) : c)
+                    .toList();
         }
-    }
 
-    private MetaTable loadTable(Long tableId) {
-        return metaTableRepository.findById(tableId)
-                .filter(t -> !Boolean.TRUE.equals(t.getDeleted()))
-                .orElseThrow(() -> new MetaTableException(META_TABLE_NOT_EXISTS));
+        private static MetaColumn asInteger(MetaColumn reference) {
+            MetaColumn copy = new MetaColumn();
+            BeanUtils.copyProperties(reference, copy);
+            copy.setDataType(MetaColumnType.INTEGER);
+            return copy;
+        }
     }
 }

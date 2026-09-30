@@ -609,6 +609,10 @@ Full stack includes: PostgreSQL + Redis + Application + Nginx reverse proxy.
     with `10415`.
 
   Physical DDL for a file-defined table still comes from Flyway.
+- Runtime reads go through `MetaDefinitionRegistry` (ADR-0008). In `file`
+  mode it is pinned in memory after the apply. Tables are addressed by
+  `tableCode` (`/admin/meta-table/{tableCode}/**`, `MetaTableCrudService`);
+  never expose or hard-code DB ids.
 
 ### 6.5 Health Checks
 

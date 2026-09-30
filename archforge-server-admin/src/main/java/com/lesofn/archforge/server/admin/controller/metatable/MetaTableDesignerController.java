@@ -63,7 +63,8 @@ import org.springframework.web.bind.annotation.RestController;
  *
  * <p>
  * 仅当 {@code arch-forge.designer.enabled=true} 时装配——生产环境默认关闭，设计工具不暴露
- * HTTP 面（P0-K）。运行期数据 CRUD 端点见 {@link MetaTableController}。
+ * HTTP 面（P0-K）。运行期数据 CRUD 端点见 {@link MetaTableController}。表以 {@code tableCode}
+ * 寻址（P3-4-3 F3），DB 自增 id 仅在服务层内部使用。
  */
 @Tag(name = "元表格设计器")
 @SaCheckLogin(type = StpAdminUtil.TYPE)
@@ -124,10 +125,10 @@ public class MetaTableDesignerController {
     }
 
     @Operation(summary = "获取元表格详情")
-    @GetMapping("/{id}")
-    public MetaTableResponse detail(@PathVariable Long id) {
-        MetaTable table = metaTableAdminService.findById(id);
-        List<MetaColumn> columns = metaTableAdminService.findColumns(id);
+    @GetMapping("/{tableCode}")
+    public MetaTableResponse detail(@PathVariable String tableCode) {
+        MetaTable table = metaTableAdminService.findByCode(tableCode);
+        List<MetaColumn> columns = metaTableAdminService.findColumns(idOf(table));
         return MetaTableResponse.of(table, columns);
     }
 
@@ -148,34 +149,35 @@ public class MetaTableDesignerController {
     @Log
     @Operation(summary = "更新元表格（结构变更，columns 必填；仅改元信息用 PATCH）")
     @SaCheckPermission(value = "meta-table:edit", type = StpAdminUtil.TYPE)
-    @PutMapping("/{id}")
-    public Boolean update(@PathVariable Long id, @RequestBody @Valid MetaTableUpdateRequest request) {
+    @PutMapping("/{tableCode}")
+    public Boolean update(@PathVariable String tableCode, @RequestBody @Valid MetaTableUpdateRequest request) {
         MetaTable table = request.toTable();
         table.setUpdaterId(LoginContext.getAdminUserId());
         List<MetaColumn> columns = request.toColumns();
         if (columns == null || columns.isEmpty()) {
             throw new MetaTableException(MetaTableErrorCode.META_TABLE_COLUMNS_REQUIRED);
         }
-        metaTableAdminService.update(id, table, columns, LoginContext.getAdminUserId());
+        metaTableAdminService.update(idOf(tableCode), table, columns, LoginContext.getAdminUserId());
         return true;
     }
 
     @Log
     @Operation(summary = "更新元表格元信息（仅名称/描述/状态，不动表结构）")
     @SaCheckPermission(value = "meta-table:edit", type = StpAdminUtil.TYPE)
-    @PatchMapping("/{id}")
-    public Boolean updateMeta(@PathVariable Long id, @RequestBody @Valid MetaTableUpdateRequest request) {
+    @PatchMapping("/{tableCode}")
+    public Boolean updateMeta(@PathVariable String tableCode, @RequestBody @Valid MetaTableUpdateRequest request) {
         MetaTable table = request.toTable();
         table.setUpdaterId(LoginContext.getAdminUserId());
-        metaTableAdminService.updateMeta(id, table, LoginContext.getAdminUserId());
+        metaTableAdminService.updateMeta(idOf(tableCode), table, LoginContext.getAdminUserId());
         return true;
     }
 
     @Operation(summary = "预览 Schema 变更（diff + 违规行数 + DDL，不执行）")
     @SaCheckPermission(value = "meta-table:edit", type = StpAdminUtil.TYPE)
-    @PostMapping("/{id}/schema-preview")
-    public SchemaPreview schemaPreview(@PathVariable Long id, @RequestBody @Valid MetaTableUpdateRequest request) {
-        return metaTableAdminService.previewSchema(id, request.toTable(), request.toColumns());
+    @PostMapping("/{tableCode}/schema-preview")
+    public SchemaPreview schemaPreview(@PathVariable String tableCode,
+            @RequestBody @Valid MetaTableUpdateRequest request) {
+        return metaTableAdminService.previewSchema(idOf(tableCode), request.toTable(), request.toColumns());
     }
 
     @Operation(summary = "列出可导入的物理表")
@@ -205,9 +207,9 @@ public class MetaTableDesignerController {
     @Log
     @Operation(summary = "复制元表格")
     @SaCheckPermission(value = "meta-table:add", type = StpAdminUtil.TYPE)
-    @PostMapping("/{id}/copy")
-    public Long copy(@PathVariable Long id) {
-        return metaTableAdminService.copy(id);
+    @PostMapping("/{tableCode}/copy")
+    public Long copy(@PathVariable String tableCode) {
+        return metaTableAdminService.copy(idOf(tableCode));
     }
 
     @Log
@@ -215,12 +217,12 @@ public class MetaTableDesignerController {
     @SaCheckPermission(value = "meta-table:edit", type = StpAdminUtil.TYPE)
     @com.lesofn.archforge.infrastructure.annotation.RateLimit(key = "meta-table-generate", time = 60, maxCount = 5,
             limitType = com.lesofn.archforge.infrastructure.annotation.RateLimit.LimitType.USER)
-    @PostMapping("/{id}/generate")
-    public MetaTableGenerateResponse generate(@PathVariable Long id, @RequestBody @Valid MetaTableGenerateRequest request) {
-        MetaTable table = metaTableAdminService.findById(id);
-        List<MetaColumn> columns = metaTableAdminService.findColumns(id);
+    @PostMapping("/{tableCode}/generate")
+    public MetaTableGenerateResponse generate(@PathVariable String tableCode,
+            @RequestBody @Valid MetaTableGenerateRequest request) {
+        MetaTable table = metaTableAdminService.findByCode(tableCode);
+        List<MetaColumn> columns = metaTableAdminService.findColumns(idOf(table));
 
-        String tableCode = table.getTableCode();
         Path projectRoot = codeGenWorkspaceResolver.resolve();
 
         Path backendDir = codeGenWorkspaceResolver.resolveBackendDir(request.getBackendDir(), tableCode);
@@ -249,34 +251,42 @@ public class MetaTableDesignerController {
     }
 
     @Operation(summary = "检查删除元表格")
-    @GetMapping("/{id}/delete-check")
-    public Long deleteCheck(@PathVariable Long id) {
-        return metaTableAdminService.checkDelete(id);
+    @GetMapping("/{tableCode}/delete-check")
+    public Long deleteCheck(@PathVariable String tableCode) {
+        return metaTableAdminService.checkDelete(idOf(tableCode));
     }
 
     @Log
     @Operation(summary = "删除元表格")
     @SaCheckPermission(value = "meta-table:remove", type = StpAdminUtil.TYPE)
-    @DeleteMapping("/{id}")
-    public Boolean delete(@PathVariable Long id, @RequestParam(defaultValue = "false") Boolean force) {
-        metaTableAdminService.delete(id, Boolean.TRUE.equals(force));
+    @DeleteMapping("/{tableCode}")
+    public Boolean delete(@PathVariable String tableCode, @RequestParam(defaultValue = "false") Boolean force) {
+        metaTableAdminService.delete(idOf(tableCode), Boolean.TRUE.equals(force));
         return true;
     }
 
     @Operation(summary = "获取元表格 Schema 迁移历史")
-    @GetMapping("/{id}/migrations")
-    public List<MetaTableMigration> migrations(@PathVariable Long id) {
-        return metaTableMigrationService.listByTableId(id);
+    @GetMapping("/{tableCode}/migrations")
+    public List<MetaTableMigration> migrations(@PathVariable String tableCode) {
+        return metaTableMigrationService.listByTableId(idOf(tableCode));
     }
 
     @Log
     @Operation(summary = "导出元表格 Schema 迁移为 Flyway SQL")
-    @GetMapping("/{id}/export-migration")
-    public String exportMigration(@PathVariable Long id) throws IOException {
+    @GetMapping("/{tableCode}/export-migration")
+    public String exportMigration(@PathVariable String tableCode) throws IOException {
         Path projectRoot = codeGenWorkspaceResolver.resolve();
         Path outputDir = projectRoot.resolve(
                 "archforge-builtin/archforge-meta-runtime/src/main/resources/db/migration/meta-table");
-        Path file = metaTableMigrationExporter.export(id, outputDir);
+        Path file = metaTableMigrationExporter.export(idOf(tableCode), outputDir);
         return file.toString();
+    }
+
+    private Long idOf(String tableCode) {
+        return idOf(metaTableAdminService.findByCode(tableCode));
+    }
+
+    private static Long idOf(MetaTable table) {
+        return java.util.Objects.requireNonNull(table.getId());
     }
 }

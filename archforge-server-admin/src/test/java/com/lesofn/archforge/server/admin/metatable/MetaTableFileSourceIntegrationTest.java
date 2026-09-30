@@ -3,6 +3,7 @@ package com.lesofn.archforge.server.admin.metatable;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.lesofn.archforge.common.persistence.testsupport.AbstractIntegrationTest;
 import com.lesofn.archforge.meta.table.api.dao.MetaTableRepository;
@@ -11,6 +12,7 @@ import com.lesofn.archforge.meta.table.api.domain.MetaColumnType;
 import com.lesofn.archforge.meta.table.api.domain.MetaTable;
 import com.lesofn.archforge.meta.table.api.errors.MetaTableErrorCode;
 import com.lesofn.archforge.meta.table.api.errors.MetaTableException;
+import com.lesofn.archforge.meta.table.api.service.MetaDefinitionRegistry;
 import com.lesofn.archforge.meta.table.api.service.MetaTableAdminService;
 import com.lesofn.archforge.server.admin.Application;
 import com.lesofn.archforge.server.admin.config.EnumOptionsMigrationRunner;
@@ -32,9 +34,10 @@ import org.springframework.web.client.RestClient;
 import tools.jackson.databind.ObjectMapper;
 
 /**
- * {@code arch-forge.meta.source=file} end to end (P3-4-3 F2): the context boots
- * with the definition files materialized, designer writes are rejected with
- * 10415 (service and HTTP envelope), and the legacy options runner is absent.
+ * {@code arch-forge.meta.source=file} end to end (P3-4-3 F2/F3): the context
+ * boots with the definition files materialized and the runtime registry
+ * pinned, designer writes are rejected with 10415 (service and HTTP
+ * envelope), and the legacy options runner is absent.
  */
 @SpringBootTest(classes = {
         Application.class
@@ -71,6 +74,9 @@ class MetaTableFileSourceIntegrationTest extends AbstractIntegrationTest {
     private MetaTableAdminService adminService;
 
     @Autowired
+    private MetaDefinitionRegistry registry;
+
+    @Autowired
     private ApplicationContext context;
 
     @Test
@@ -92,7 +98,7 @@ class MetaTableFileSourceIntegrationTest extends AbstractIntegrationTest {
         MetaTableException e = assertThrows(MetaTableException.class, () -> adminService.create(table, List.of(column)));
 
         assertEquals(MetaTableErrorCode.META_DEFINITION_FILE_MANAGED.getCode(), e.getErrorInfo().getCode());
-        assertEquals(true, tableRepository.findByTableCodeAndDeletedFalse("fsrc_designer").isEmpty());
+        assertTrue(tableRepository.findByTableCodeAndDeletedFalse("fsrc_designer").isEmpty());
     }
 
     @Test
@@ -113,6 +119,20 @@ class MetaTableFileSourceIntegrationTest extends AbstractIntegrationTest {
                 .retrieve().body(String.class), Map.class);
 
         assertEquals(MetaTableErrorCode.META_DEFINITION_FILE_MANAGED.getCode(), resp.get("code"));
+    }
+
+    @Test
+    void runtimeReadsThePinnedViewNotTheMirror() {
+        assertTrue(registry.find("fsrc_boot").isPresent());
+        MetaTable late = new MetaTable();
+        late.setTableCode("fsrc_late");
+        late.setTableName("启动后直写");
+        late.setTablePrefix("meta_");
+        late.setStatus(1);
+        tableRepository.save(late); // behind the registry's back, after the startup pin
+
+        assertTrue(tableRepository.findByTableCodeAndDeletedFalse("fsrc_late").isPresent());
+        assertTrue(registry.find("fsrc_late").isEmpty(), "pinned view must not see later mirror writes");
     }
 
     @Test

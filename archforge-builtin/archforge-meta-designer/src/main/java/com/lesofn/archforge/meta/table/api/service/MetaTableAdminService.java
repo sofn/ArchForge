@@ -34,6 +34,9 @@ public interface MetaTableAdminService {
 
     MetaTable findById(Long id);
 
+    /** Live table by its stable identity key — the REST address since P3-4-3 F3. */
+    MetaTable findByCode(String tableCode);
+
     List<MetaColumn> findColumns(Long tableId);
 
     Page<MetaTable> list(String keyword, Pageable pageable);

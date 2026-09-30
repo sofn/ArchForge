@@ -84,18 +84,18 @@ class MetaTableImportIntegrationTest extends AbstractIntegrationTest {
             assertEquals("goods_name", columns.get(0).getColumnCode());
             assertTrue(columns.get(0).getRequired());
 
-            Long rowId = crudService.insert(tableId, Map.of("goods_name", "apple", "price", "3.5"), 7L);
+            Long rowId = crudService.insert("legacy_goods", Map.of("goods_name", "apple", "price", "3.5"), 7L);
             assertNotNull(rowId);
 
-            MetaPageResponse<Map<String, Object>> page = crudService.list(tableId, MetaDataQuery.of(Map.of(), 1, 10));
+            MetaPageResponse<Map<String, Object>> page = crudService.list("legacy_goods", MetaDataQuery.of(Map.of(), 1, 10));
             assertEquals(1, page.getTotal());
             assertEquals("apple", page.getList().get(0).get("goods_name"));
             assertEquals(0,
                     ((Number) java.util.Objects.requireNonNull(page.getList().get(0).get("stock"))).intValue());
 
-            assertTrue(crudService.update(tableId, rowId, Map.of("goods_name", "pear"), 7L));
-            assertTrue(crudService.softDelete(tableId, rowId, 7L));
-            assertEquals(0, crudService.list(tableId, MetaDataQuery.of(Map.of(), 1, 10)).getTotal());
+            assertTrue(crudService.update("legacy_goods", rowId, Map.of("goods_name", "pear"), 7L));
+            assertTrue(crudService.softDelete("legacy_goods", rowId, 7L));
+            assertEquals(0, crudService.list("legacy_goods", MetaDataQuery.of(Map.of(), 1, 10)).getTotal());
         } finally {
             adminService.delete(tableId, true);
         }
@@ -116,7 +116,7 @@ class MetaTableImportIntegrationTest extends AbstractIntegrationTest {
 
         Long tableId = importService.importTable("legacy_stock", null, null, 1L);
         try {
-            MetaPageResponse<Map<String, Object>> page = crudService.list(tableId, MetaDataQuery.of(Map.of(), 1, 10));
+            MetaPageResponse<Map<String, Object>> page = crudService.list("legacy_stock", MetaDataQuery.of(Map.of(), 1, 10));
             assertEquals(2, page.getTotal());
         } finally {
             adminService.delete(tableId, true);

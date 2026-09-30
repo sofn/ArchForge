@@ -100,12 +100,12 @@ class MetaTableDdlMatrixIntegrationTest extends AbstractIntegrationTest {
 
         assertPhysicalType(table.physicalTableName(), type);
 
-        Long rowId = crudService.insert(java.util.Objects.requireNonNull(table.getId()), Map.of("payload", expected), 1L);
+        Long rowId = crudService.insert(table.getTableCode(), Map.of("payload", expected), 1L);
         Object actual = readScalar(table.physicalTableName(), "payload", rowId);
         assertRoundTrip(type, expected, java.util.Objects.requireNonNull(actual));
 
         if (type == MetaColumnType.REFERENCE) {
-            List<Map<String, Object>> rows = crudService.list(java.util.Objects.requireNonNull(table.getId()), MetaDataQuery.of(
+            List<Map<String, Object>> rows = crudService.list(table.getTableCode(), MetaDataQuery.of(
                     Map.of(), 1, 10)).getList();
             assertEquals("T-001", rows.get(0).get("payload_display"));
         }
@@ -114,7 +114,7 @@ class MetaTableDdlMatrixIntegrationTest extends AbstractIntegrationTest {
     @Test
     void renameColumnPreservesData() {
         MetaTable table = createTable("ddlmtrn" + SEQ.incrementAndGet(), "改名矩阵", column("origin", MetaColumnType.STRING));
-        Long rowId = crudService.insert(java.util.Objects.requireNonNull(table.getId()), Map.of("origin", "keep-me"), 1L);
+        Long rowId = crudService.insert(table.getTableCode(), Map.of("origin", "keep-me"), 1L);
 
         updateColumns(table, columns -> columns.get(0).setColumnCode("renamed"));
 
@@ -128,7 +128,7 @@ class MetaTableDdlMatrixIntegrationTest extends AbstractIntegrationTest {
         MetaColumn narrow = column("payload", MetaColumnType.STRING);
         narrow.setLength(50);
         MetaTable table = createTable("ddlmtww" + SEQ.incrementAndGet(), "加宽矩阵", narrow);
-        Long rowId = crudService.insert(java.util.Objects.requireNonNull(table.getId()), Map.of("payload", "加宽保留 widen"), 1L);
+        Long rowId = crudService.insert(table.getTableCode(), Map.of("payload", "加宽保留 widen"), 1L);
 
         updateColumns(table, columns -> {
             columns.get(0).setDataType(MetaColumnType.TEXT);
@@ -142,7 +142,7 @@ class MetaTableDdlMatrixIntegrationTest extends AbstractIntegrationTest {
     @Test
     void lossyTextToIntegerAlterFailsAtomically() {
         MetaTable table = createTable("ddlmtls" + SEQ.incrementAndGet(), "收窄矩阵", column("payload", MetaColumnType.TEXT));
-        Long rowId = crudService.insert(java.util.Objects.requireNonNull(table.getId()), Map.of("payload", "abc-not-numeric"),
+        Long rowId = crudService.insert(table.getTableCode(), Map.of("payload", "abc-not-numeric"),
                 1L);
         Integer versionBefore = adminService.findById(java.util.Objects.requireNonNull(table.getId())).getSchemaVersion();
 
@@ -178,7 +178,7 @@ class MetaTableDdlMatrixIntegrationTest extends AbstractIntegrationTest {
     @Test
     void nullableToggleOnPopulatedColumn() {
         MetaTable table = createTable("ddlmtnl" + SEQ.incrementAndGet(), "空值矩阵", column("payload", MetaColumnType.STRING));
-        crudService.insert(java.util.Objects.requireNonNull(table.getId()), Map.of("payload", "x"), 1L);
+        crudService.insert(table.getTableCode(), Map.of("payload", "x"), 1L);
 
         updateColumns(table, columns -> columns.get(0).setNullable(false));
         assertEquals("NO", physicalIsNullable(table.physicalTableName(), "payload"));
@@ -190,7 +190,7 @@ class MetaTableDdlMatrixIntegrationTest extends AbstractIntegrationTest {
     @Test
     void requiredAloneDoesNotDriveDdl() {
         MetaTable table = createTable("ddlmtreq" + SEQ.incrementAndGet(), "必填不动DDL", column("payload", MetaColumnType.STRING));
-        crudService.insert(java.util.Objects.requireNonNull(table.getId()), Map.of("payload", "x"), 1L);
+        crudService.insert(table.getTableCode(), Map.of("payload", "x"), 1L);
 
         // required 只是表单级必填校验，不再决定物理可空性（nullable 是 DDL 真源）
         updateColumns(table, columns -> columns.get(0).setRequired(true));
@@ -202,7 +202,7 @@ class MetaTableDdlMatrixIntegrationTest extends AbstractIntegrationTest {
             return;
         }
         MetaTable target = createTable("ddlmtxtgt" + SEQ.incrementAndGet(), "引用目标", column("code", MetaColumnType.STRING));
-        referenceTargetRowId = crudService.insert(java.util.Objects.requireNonNull(target.getId()), Map.of("code", "T-001"),
+        referenceTargetRowId = crudService.insert(target.getTableCode(), Map.of("code", "T-001"),
                 1L);
         referenceTargetTableId = java.util.Objects.requireNonNull(target.getId());
     }
@@ -370,7 +370,7 @@ class MetaTableDdlMatrixIntegrationTest extends AbstractIntegrationTest {
     }
 
     private Long insertEmptyRow(MetaTable table) {
-        return crudService.insert(java.util.Objects.requireNonNull(table.getId()), Map.of(), 1L);
+        return crudService.insert(table.getTableCode(), Map.of(), 1L);
     }
 
     private boolean physicalColumnExists(String physicalName, String columnName) {

@@ -99,7 +99,7 @@ export function use${className}() {
       const link = document.createElement("a");
       link.href = window.URL.createObjectURL(blob);
       const suffix = format.toLowerCase() === "csv" ? ".csv" : format.toLowerCase() === "json" ? ".json" : ".xlsx";
-      link.download = "${tableCode}_${tableId?c}" + suffix;
+      link.download = "${tableCode}" + suffix;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);

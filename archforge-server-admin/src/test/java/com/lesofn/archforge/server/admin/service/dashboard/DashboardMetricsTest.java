@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
 import com.lesofn.archforge.cms.api.dao.CmsArticleRepository;
-import com.lesofn.archforge.meta.table.api.dao.MetaTableRepository;
+import com.lesofn.archforge.meta.table.api.service.MetaDefinitionRegistry;
 import com.lesofn.archforge.user.api.dao.SysUserRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,7 +22,7 @@ class DashboardMetricsTest {
     private CmsArticleRepository articleRepository;
 
     @Mock
-    private MetaTableRepository metaTableRepository;
+    private MetaDefinitionRegistry metaDefinitionRegistry;
 
     @InjectMocks
     private DashboardService dashboardService;
@@ -31,7 +31,7 @@ class DashboardMetricsTest {
     void metricsAggregatesExistingCounts() {
         when(userRepository.countByDeletedFalse()).thenReturn(12L);
         when(articleRepository.countByDeletedFalse()).thenReturn(4L);
-        when(metaTableRepository.countByDeletedFalse()).thenReturn(3L);
+        when(metaDefinitionRegistry.count()).thenReturn(3L);
 
         DashboardMetricsResponse metrics = dashboardService.metrics();
 

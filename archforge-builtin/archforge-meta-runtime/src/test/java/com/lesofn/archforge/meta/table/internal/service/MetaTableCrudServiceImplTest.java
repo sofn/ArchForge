@@ -17,8 +17,8 @@ import com.lesofn.archforge.meta.table.api.domain.MetaTable;
 import com.lesofn.archforge.meta.table.api.dto.MetaDataQuery;
 import com.lesofn.archforge.meta.table.api.dto.MetaPageResponse;
 import com.lesofn.archforge.meta.table.api.errors.MetaTableException;
-import com.lesofn.archforge.meta.table.api.dao.MetaColumnRepository;
-import com.lesofn.archforge.meta.table.api.dao.MetaTableRepository;
+import com.lesofn.archforge.meta.table.api.service.MetaDefinitionRegistry;
+import com.lesofn.archforge.meta.table.api.service.MetaDefinitionRegistry.TableSnapshot;
 import com.lesofn.archforge.meta.table.internal.datascope.MetaDataScopeFilter;
 import com.lesofn.archforge.meta.table.internal.validator.MetaTableValidator;
 import java.util.List;
@@ -34,18 +34,16 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 class MetaTableCrudServiceImplTest {
 
     private NamedParameterJdbcTemplate jdbcTemplate;
-    private MetaTableRepository metaTableRepository;
-    private MetaColumnRepository metaColumnRepository;
+    private MetaDefinitionRegistry registry;
     private MetaTableCrudServiceImpl service;
 
     @BeforeEach
     void setUp() {
         jdbcTemplate = mock(NamedParameterJdbcTemplate.class);
-        metaTableRepository = mock(MetaTableRepository.class);
-        metaColumnRepository = mock(MetaColumnRepository.class);
+        registry = mock(MetaDefinitionRegistry.class);
         MetaDataScopeFilter dataScopeFilter = mock(MetaDataScopeFilter.class);
         when(dataScopeFilter.buildClause(any(), anyString(), any(MapSqlParameterSource.class))).thenReturn("");
-        service = new MetaTableCrudServiceImpl(jdbcTemplate, metaTableRepository, metaColumnRepository, mock(
+        service = new MetaTableCrudServiceImpl(jdbcTemplate, registry, mock(
                 MetaTableValidator.class), mock(
                         MetaTableDataInserter.class), mock(MetaTableDataExporter.class), mock(
                                 MetaTableDataImporter.class), dataScopeFilter);
@@ -57,7 +55,7 @@ class MetaTableCrudServiceImplTest {
         when(jdbcTemplate.queryForList(anyString(), any(MapSqlParameterSource.class)))
                 .thenReturn(List.of());
 
-        service.list(1L, MetaDataQuery.of(Map.of("extra.a'b OR 1=1--", "x"), 1, 10));
+        service.list("testtable", MetaDataQuery.of(Map.of("extra.a'b OR 1=1--", "x"), 1, 10));
 
         assertEquals("a''b OR 1=1--", capturedJsonPathLiteral());
     }
@@ -68,7 +66,7 @@ class MetaTableCrudServiceImplTest {
         when(jdbcTemplate.queryForList(anyString(), any(MapSqlParameterSource.class)))
                 .thenReturn(List.of());
 
-        service.list(1L, MetaDataQuery.of(Map.of("extra.a'.b'", "x"), 1, 10));
+        service.list("testtable", MetaDataQuery.of(Map.of("extra.a'.b'", "x"), 1, 10));
 
         String sql = capturedSql();
         int start = sql.indexOf("#>> ARRAY[");
@@ -83,7 +81,7 @@ class MetaTableCrudServiceImplTest {
         when(jdbcTemplate.queryForList(anyString(), any(MapSqlParameterSource.class)))
                 .thenReturn(List.of());
 
-        service.list(1L, new MetaDataQuery(Map.of(), 1, 10, "extra", "asc", false));
+        service.list("testtable", new MetaDataQuery(Map.of(), 1, 10, "extra", "asc", false));
 
         assertTrue(capturedSql().contains("ORDER BY main.\"extra\" ASC"));
     }
@@ -94,7 +92,7 @@ class MetaTableCrudServiceImplTest {
         when(jdbcTemplate.queryForList(anyString(), any(MapSqlParameterSource.class)))
                 .thenReturn(List.of());
 
-        service.list(1L, new MetaDataQuery(Map.of(), 1, 10, "create_time", null, false));
+        service.list("testtable", new MetaDataQuery(Map.of(), 1, 10, "create_time", null, false));
 
         assertTrue(capturedSql().contains("ORDER BY main.\"create_time\" DESC"));
     }
@@ -105,7 +103,7 @@ class MetaTableCrudServiceImplTest {
         when(jdbcTemplate.queryForList(anyString(), any(MapSqlParameterSource.class)))
                 .thenReturn(List.of());
 
-        service.list(1L, MetaDataQuery.of(Map.of(), 1, 10));
+        service.list("testtable", MetaDataQuery.of(Map.of(), 1, 10));
 
         assertTrue(capturedSql().contains("ORDER BY main.\"id\" DESC"));
     }
@@ -115,7 +113,7 @@ class MetaTableCrudServiceImplTest {
         stubTableWithJsonColumn();
 
         assertThrows(MetaTableException.class,
-                () -> service.list(1L, new MetaDataQuery(Map.of(), 1, 10, "secret_col", "ASC", false)));
+                () -> service.list("testtable", new MetaDataQuery(Map.of(), 1, 10, "secret_col", "ASC", false)));
     }
 
     @Test
@@ -123,7 +121,7 @@ class MetaTableCrudServiceImplTest {
         stubTableWithJsonColumn();
 
         assertThrows(MetaTableException.class,
-                () -> service.list(1L, new MetaDataQuery(Map.of(), 1, 10, "id; DROP TABLE x", "ASC", false)));
+                () -> service.list("testtable", new MetaDataQuery(Map.of(), 1, 10, "id; DROP TABLE x", "ASC", false)));
     }
 
     @Test
@@ -131,7 +129,7 @@ class MetaTableCrudServiceImplTest {
         stubTableWithJsonColumn();
 
         assertThrows(MetaTableException.class,
-                () -> service.list(1L, new MetaDataQuery(Map.of(), 1, 10, "id", "DESC; DROP TABLE x", false)));
+                () -> service.list("testtable", new MetaDataQuery(Map.of(), 1, 10, "id", "DESC; DROP TABLE x", false)));
     }
 
     @Test
@@ -140,7 +138,8 @@ class MetaTableCrudServiceImplTest {
         when(jdbcTemplate.queryForList(anyString(), any(MapSqlParameterSource.class)))
                 .thenReturn(List.of());
 
-        MetaPageResponse<Map<String, Object>> result = service.list(1L, new MetaDataQuery(Map.of(), 2, 20, null, null, true));
+        MetaPageResponse<Map<String, Object>> result = service.list("testtable", new MetaDataQuery(Map
+                .of(), 2, 20, null, null, true));
 
         verify(jdbcTemplate, never()).queryForObject(anyString(), any(MapSqlParameterSource.class), eq(Long.class));
         assertEquals(-1L, result.getTotal());
@@ -152,7 +151,7 @@ class MetaTableCrudServiceImplTest {
         when(jdbcTemplate.queryForList(anyString(), any(MapSqlParameterSource.class)))
                 .thenReturn(List.of());
 
-        service.list(1L, MetaDataQuery.of(Map.of(), 1, 10));
+        service.list("testtable", MetaDataQuery.of(Map.of(), 1, 10));
 
         verify(jdbcTemplate).queryForObject(anyString(), any(MapSqlParameterSource.class), eq(Long.class));
     }
@@ -191,12 +190,11 @@ class MetaTableCrudServiceImplTest {
         MetaTable table = new MetaTable();
         table.setTableCode("testtable");
         table.setTablePrefix("meta_");
-        when(metaTableRepository.findById(1L)).thenReturn(Optional.of(table));
         MetaColumn column = new MetaColumn();
         column.setColumnCode("extra");
         column.setDataType(MetaColumnType.JSON);
         column.setSearchable(true);
-        when(metaColumnRepository.findByTableIdAndDeletedFalseOrderBySortAsc(1L)).thenReturn(List.of(column));
+        when(registry.find("testtable")).thenReturn(Optional.of(new TableSnapshot(table, List.of(column))));
         when(jdbcTemplate.queryForObject(anyString(), any(MapSqlParameterSource.class), eq(Long.class)))
                 .thenReturn(0L);
     }

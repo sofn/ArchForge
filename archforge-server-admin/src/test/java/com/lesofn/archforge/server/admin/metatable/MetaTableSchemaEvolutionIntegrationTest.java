@@ -118,7 +118,7 @@ class MetaTableSchemaEvolutionIntegrationTest extends AbstractIntegrationTest {
     @Test
     void setNotNullWithoutDefaultIsRejectedWhenNullsExist() {
         Long id = createTable("p1itnotnull", stringColumn("city", null));
-        crudService.insert(id, row(), 1L);
+        crudService.insert("p1itnotnull", row(), 1L);
 
         List<MetaColumn> columns = adminService.findColumns(id);
         columns.forEach(c -> c.setNullable(false));
@@ -135,7 +135,7 @@ class MetaTableSchemaEvolutionIntegrationTest extends AbstractIntegrationTest {
     @Test
     void setNotNullWithDefaultBackfillsNullsThenAppliesConstraint() {
         Long id = createTable("p1itbackfill", stringColumn("grade", "A"));
-        crudService.insert(id, row(), 1L);
+        crudService.insert("p1itbackfill", row(), 1L);
 
         List<MetaColumn> columns = adminService.findColumns(id);
         columns.forEach(c -> c.setNullable(false));
@@ -151,7 +151,7 @@ class MetaTableSchemaEvolutionIntegrationTest extends AbstractIntegrationTest {
     @Test
     void incompatibleTypeChangeIsRejectedByLossPreflight() {
         Long id = createTable("p1itlossy", textColumn());
-        crudService.insert(id, row("note", "abc"), 1L);
+        crudService.insert("p1itlossy", row("note", "abc"), 1L);
 
         List<MetaColumn> columns = adminService.findColumns(id);
         columns.forEach(c -> c.setDataType(MetaColumnType.INTEGER));
@@ -167,7 +167,7 @@ class MetaTableSchemaEvolutionIntegrationTest extends AbstractIntegrationTest {
     @Test
     void compatibleWidenSucceedsWithData() {
         Long id = createTable("p1itwiden", stringColumn("note", null));
-        crudService.insert(id, row("note", "hello"), 1L);
+        crudService.insert("p1itwiden", row("note", "hello"), 1L);
 
         List<MetaColumn> columns = adminService.findColumns(id);
         columns.forEach(c -> c.setLength(300));
@@ -182,11 +182,11 @@ class MetaTableSchemaEvolutionIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     void partialUniqueIndexAllowsReinsertAfterSoftDelete() {
-        Long id = createTable("p1ituq", uniqueStringColumn("tag"));
-        Long first = crudService.insert(id, row("tag", "X"), 1L);
-        assertTrue(crudService.softDelete(id, first, 1L));
+        createTable("p1ituq", uniqueStringColumn("tag"));
+        Long first = crudService.insert("p1ituq", row("tag", "X"), 1L);
+        assertTrue(crudService.softDelete("p1ituq", first, 1L));
 
-        Long second = crudService.insert(id, row("tag", "X"), 1L);
+        Long second = crudService.insert("p1ituq", row("tag", "X"), 1L);
 
         assertNotEquals(first, second);
         Integer duplicates = jdbc.getJdbcOperations().queryForObject(
@@ -212,7 +212,7 @@ class MetaTableSchemaEvolutionIntegrationTest extends AbstractIntegrationTest {
     @Test
     void multiChangeUpdateWritesSingleMigrationRow() {
         Long id = createTable("p1itmulti", stringColumn("grade", null));
-        crudService.insert(id, row(), 1L);
+        crudService.insert("p1itmulti", row(), 1L);
 
         // 一次 update 产生 ALTER_DEFAULT + ALTER_NULL 两条 change ——
         // 回归：uq_meta_table_migration_version 要求一版本一记录（聚合为 MULTI）

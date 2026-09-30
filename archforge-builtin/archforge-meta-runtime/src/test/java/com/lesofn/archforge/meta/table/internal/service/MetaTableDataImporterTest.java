@@ -18,8 +18,8 @@ import com.lesofn.archforge.meta.table.api.domain.MetaTable;
 import com.lesofn.archforge.meta.table.api.dto.ImportResponse;
 import com.lesofn.archforge.meta.table.api.enums.MetaDataFormat;
 import com.lesofn.archforge.meta.table.api.errors.MetaTableException;
-import com.lesofn.archforge.meta.table.api.dao.MetaColumnRepository;
-import com.lesofn.archforge.meta.table.api.dao.MetaTableRepository;
+import com.lesofn.archforge.meta.table.api.service.MetaDefinitionRegistry;
+import com.lesofn.archforge.meta.table.api.service.MetaDefinitionRegistry.TableSnapshot;
 import com.lesofn.archforge.meta.table.internal.config.MetaTableTransferProperties;
 import com.lesofn.archforge.meta.table.internal.datascope.MetaDataScopeFilter;
 import com.lesofn.archforge.meta.table.internal.validator.MetaTableValidator;
@@ -39,18 +39,16 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 class MetaTableDataImporterTest {
 
     private NamedParameterJdbcTemplate jdbcTemplate;
-    private MetaTableRepository metaTableRepository;
-    private MetaColumnRepository metaColumnRepository;
+    private MetaDefinitionRegistry registry;
     private MetaTableTransferProperties properties;
     private MetaTableDataImporter importer;
 
     @BeforeEach
     void setUp() {
         jdbcTemplate = mock(NamedParameterJdbcTemplate.class);
-        metaTableRepository = mock(MetaTableRepository.class);
-        metaColumnRepository = mock(MetaColumnRepository.class);
+        registry = mock(MetaDefinitionRegistry.class);
         properties = new MetaTableTransferProperties();
-        importer = new MetaTableDataImporter(metaTableRepository, metaColumnRepository, jdbcTemplate, new MetaTableValidator(), properties, mock(
+        importer = new MetaTableDataImporter(registry, jdbcTemplate, new MetaTableValidator(), properties, mock(
                 MetaDataScopeFilter.class));
     }
 
@@ -181,6 +179,21 @@ class MetaTableDataImporterTest {
     }
 
     @Test
+    void importNeverMutatesTheDefinitionColumns() {
+        // Definitions can be a pinned snapshot shared by every request (MetaDefinitionRegistry).
+        List<MetaColumn> columns = refColumns();
+        when(jdbcTemplate.queryForObject(anyString(), anyMap(), eq(Integer.class)))
+                .thenReturn(1);
+
+        importCsv(columns, """
+                ref,name
+                7,a
+                """);
+
+        assertEquals(MetaColumnType.REFERENCE, columns.get(0).getDataType());
+    }
+
+    @Test
     void jsonArrayPayloadImportsAndNonArrayRootIsRejected() {
         ImportResponse response = importJson("""
                 [{"name":"a","age":1},{"name":"b","age":2}]
@@ -199,10 +212,9 @@ class MetaTableDataImporterTest {
     }
 
     private ImportResponse doImport(MetaDataFormat format, List<MetaColumn> columns, String payload) {
-        when(metaTableRepository.findById(1L)).thenReturn(Optional.of(stubTable()));
-        when(metaColumnRepository.findByTableIdAndDeletedFalseOrderBySortAsc(1L)).thenReturn(columns);
+        when(registry.find("t1")).thenReturn(Optional.of(new TableSnapshot(stubTable(), columns)));
         return importer.importData(
-                1L,
+                "t1",
                 format,
                 new ByteArrayInputStream(payload.getBytes(StandardCharsets.UTF_8)),
                 9L);
