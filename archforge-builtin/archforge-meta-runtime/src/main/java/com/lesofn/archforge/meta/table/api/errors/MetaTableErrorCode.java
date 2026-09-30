@@ -23,7 +23,8 @@ public enum MetaTableErrorCode implements ErrorCode {
     META_QUERY_PARAM_INVALID(11, "查询参数非法：{0}"),
     META_DATA_SCOPE_DENIED(12, "数据超出数据范围：{0}"),
     META_TABLE_IMPORT_INCOMPATIBLE(13, "物理表不满足纳管条件：{0}"),
-    META_TABLE_COLUMNS_REQUIRED(14, "字段列表不能为空；仅更新元信息请使用 PATCH /meta-table/{id}");
+    META_TABLE_COLUMNS_REQUIRED(14, "字段列表不能为空；仅更新元信息请使用 PATCH /meta-table/{id}"),
+    META_DEFINITION_FILE_MANAGED(15, "元表格定义由定义文件管理（arch-forge.meta.source=file）：请修改定义 YAML 后重启");
 
     private final int nodeNum;
     private final String msg;

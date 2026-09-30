@@ -12,6 +12,9 @@ public interface MetaTableRepository extends JpaRepository<MetaTable, Long>, Jpa
 
     Optional<MetaTable> findByTableCodeAndDeletedFalse(String tableCode);
 
+    /** Any row holding the code, soft-deleted included — {@code table_code} is globally unique. */
+    Optional<MetaTable> findByTableCode(String tableCode);
+
     boolean existsByTableCodeAndDeletedFalse(String tableCode);
 
     long countByDeletedFalse();

@@ -18,6 +18,7 @@ import com.lesofn.archforge.meta.table.api.dao.MetaTableRepository;
 import com.lesofn.archforge.meta.table.api.domain.MetaColumn;
 import com.lesofn.archforge.meta.table.api.domain.MetaColumnType;
 import com.lesofn.archforge.meta.table.api.domain.MetaTable;
+import com.lesofn.archforge.meta.table.api.errors.MetaTableErrorCode;
 import com.lesofn.archforge.meta.table.api.errors.MetaTableException;
 import com.lesofn.archforge.meta.table.api.service.MetaTableMigrationService;
 import com.lesofn.archforge.meta.table.internal.ddl.AlterTableDdlGenerator;
@@ -32,10 +33,12 @@ import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 import org.mockito.InOrder;
 import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.mock.env.MockEnvironment;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 
 /** Unit coverage for optimistic-lock error mapping and evolution pre-flight orchestration. */
@@ -70,12 +73,35 @@ class MetaTableAdminServiceImplTest {
         when(metaColumnRepository.findByTableIdAndDeletedFalseOrderBySortAsc(TABLE_ID))
                 .thenReturn(List.of(existingColumn()));
 
+        service = serviceWith(new MockEnvironment());
+    }
+
+    private MetaTableAdminServiceImpl serviceWith(MockEnvironment environment) {
         NamedParameterJdbcTemplate jdbcTemplate = mock(NamedParameterJdbcTemplate.class);
         when(jdbcTemplate.getJdbcOperations()).thenReturn(jdbcOperations);
-
-        service = new MetaTableAdminServiceImpl(metaTableRepository, metaColumnRepository, mock(
+        return new MetaTableAdminServiceImpl(metaTableRepository, metaColumnRepository, mock(
                 MetaTableDdlGenerator.class), mock(
-                        MetaTableValidator.class), jdbcTemplate, schemaDiffEngine, alterTableDdlGenerator, migrationService);
+                        MetaTableValidator.class), jdbcTemplate, schemaDiffEngine, alterTableDdlGenerator, migrationService, new DefinitionWriteGuard(environment));
+    }
+
+    @Test
+    void fileSourceRejectsEveryDefinitionWrite() {
+        MetaTableAdminServiceImpl guarded = serviceWith(
+                new MockEnvironment().withProperty("arch-forge.meta.source", "file"));
+        List<Executable> writes = List.of(
+                () -> guarded.create(incoming(), List.of(newColumn())),
+                () -> guarded.update(TABLE_ID, incoming(), List.of(newColumn()), 1L),
+                () -> guarded.updateMeta(TABLE_ID, incoming(), 1L),
+                () -> guarded.copy(TABLE_ID),
+                () -> guarded.delete(TABLE_ID, true));
+
+        for (Executable write : writes) {
+            MetaTableException e = assertThrows(MetaTableException.class, write);
+            assertEquals(MetaTableErrorCode.META_DEFINITION_FILE_MANAGED.getCode(), e.getErrorInfo().getCode());
+        }
+        verify(metaTableRepository, never()).save(any());
+        verify(metaTableRepository, never()).saveAndFlush(any());
+        verify(jdbcOperations, never()).execute(anyString());
     }
 
     @Test

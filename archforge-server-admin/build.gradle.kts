@@ -40,6 +40,14 @@ tasks.jar {
     archiveVersion.set("")
 }
 
+// Packaged mirror of the meta definition files: the classpath fallback of
+// arch-forge.meta.source=shadow|file when no definition dir exists on disk.
+tasks.processResources {
+    from(rootDir.resolve("project-definition/meta")) {
+        into("archforge/meta")
+    }
+}
+
 // JDK 25: enable preview features (StructuredTaskScope) + suppress Netty native-access warning
 tasks.bootRun {
     // Gradle 9 up-to-date checks can skip bootRun; an app must always run.

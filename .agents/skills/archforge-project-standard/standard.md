@@ -600,8 +600,15 @@ Full stack includes: PostgreSQL + Redis + Application + Nginx reverse proxy.
   via a one-shot CLI runner (`MetaTableSyncCliRunner`, gated on
   `arch-forge.meta.sync.*`). YAML contract: `spec/schemas/meta/table.schema.json`;
   exported files carry a `yaml-language-server` schema hint. `removedColumns` is
-  the only column-delete mechanism. The DB remains runtime truth — files are a
-  reviewable mirror until the file-first flip is decided.
+  the only column-delete mechanism.
+- Write authority is `arch-forge.meta.source` (ADR-0007):
+  - `db` (default): the DB is the truth.
+  - `shadow`: startup diff, WARN only.
+  - `file`: the files are the truth. They are materialized at startup, with
+    fail-fast and an advisory lock, and designer/import writes are rejected
+    with `10415`.
+
+  Physical DDL for a file-defined table still comes from Flyway.
 
 ### 6.5 Health Checks
 

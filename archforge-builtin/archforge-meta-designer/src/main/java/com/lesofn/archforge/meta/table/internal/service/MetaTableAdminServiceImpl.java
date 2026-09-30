@@ -58,10 +58,12 @@ public class MetaTableAdminServiceImpl implements MetaTableAdminService {
     private final SchemaDiffEngine schemaDiffEngine;
     private final AlterTableDdlGenerator alterTableDdlGenerator;
     private final MetaTableMigrationService migrationService;
+    private final DefinitionWriteGuard writeGuard;
 
     @Override
     @Transactional
     public Long create(MetaTable table, List<MetaColumn> columns) {
+        writeGuard.check();
         if (metaTableRepository.existsByTableCodeAndDeletedFalse(table.getTableCode())) {
             throw new MetaTableException(META_TABLE_CODE_EXISTS);
         }
@@ -94,6 +96,7 @@ public class MetaTableAdminServiceImpl implements MetaTableAdminService {
     @Override
     @Transactional
     public void updateMeta(Long id, MetaTable table, Long operatorId) {
+        writeGuard.check();
         MetaTable existing = findById(id);
         existing.setUpdaterId(operatorId);
         existing.setTableName(table.getTableName());
@@ -107,6 +110,7 @@ public class MetaTableAdminServiceImpl implements MetaTableAdminService {
     @Override
     @Transactional
     public void update(Long id, MetaTable table, List<MetaColumn> columns, Long operatorId) {
+        writeGuard.check();
         if (columns == null || columns.isEmpty()) {
             throw new MetaTableException(META_TABLE_COLUMNS_REQUIRED);
         }
@@ -299,6 +303,7 @@ public class MetaTableAdminServiceImpl implements MetaTableAdminService {
     @Override
     @Transactional
     public void delete(Long id, boolean force) {
+        writeGuard.check();
         MetaTable table = findById(id);
         long dataCount = checkDelete(id);
         if (dataCount > 0 && !force) {

@@ -1,6 +1,7 @@
 package com.lesofn.archforge.meta.table.api.definition;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -148,6 +149,91 @@ class MetaTableDefinitionCodecTest {
                         "persistent field " + f.getName() + " missing from TableDefinition");
             }
         }
+    }
+
+    @Test
+    void columnMatchesTreatsAbsentFileKeysAsUnmanaged() {
+        ColumnDefinition file = column("title", "标题");
+        ColumnDefinition db = column("title", "标题");
+        db.setSearchable(true);
+        db.setLength(0);
+        db.setIndexType("BTREE");
+        assertTrue(MetaTableDefinitionCodec.matches(file, db));
+    }
+
+    @Test
+    void columnMatchesDetectsPresentKeyMismatch() {
+        ColumnDefinition file = column("title", "大标题");
+        ColumnDefinition db = column("title", "标题");
+        assertFalse(MetaTableDefinitionCodec.matches(file, db));
+
+        file.setColumnName("标题");
+        file.setSearchable(false);
+        db.setSearchable(true);
+        assertFalse(MetaTableDefinitionCodec.matches(file, db));
+    }
+
+    @Test
+    void tableMatchesIgnoresColumnsAndAbsentKeys() {
+        TableDefinition file = new TableDefinition();
+        file.setTableCode("t");
+        file.setTableName("T");
+        file.setColumns(List.of(column("a", "A")));
+        TableDefinition db = new TableDefinition();
+        db.setTableCode("t");
+        db.setTableName("T");
+        db.setDescription("");
+        db.setTablePrefix("meta_");
+        db.setStatus(1);
+        assertTrue(MetaTableDefinitionCodec.matches(file, db));
+
+        file.setStatus(0);
+        assertFalse(MetaTableDefinitionCodec.matches(file, db));
+    }
+
+    @Test
+    void applyToKeepsIdentityAuditAndUnmanagedFields() {
+        MetaColumn managed = new MetaColumn();
+        managed.setId(9L);
+        managed.setCreatorId(5L);
+        managed.setColumnCode("title");
+        managed.setColumnName("标题");
+        managed.setDataType(MetaColumnType.STRING);
+        managed.setSearchable(true);
+        ColumnDefinition file = column("title", "大标题");
+        file.setRequired(true);
+
+        MetaTableDefinitionCodec.applyTo(file, managed);
+
+        assertEquals("大标题", managed.getColumnName());
+        assertEquals(true, managed.getRequired());
+        assertEquals(Long.valueOf(9L), managed.getId());
+        assertEquals(Long.valueOf(5L), managed.getCreatorId());
+        assertEquals(true, managed.getSearchable());
+
+        MetaTable table = new MetaTable();
+        table.setId(3L);
+        table.setVersion(4);
+        table.setCreatorId(5L);
+        table.setDescription("kept");
+        TableDefinition def = new TableDefinition();
+        def.setTableCode("t");
+        def.setTableName("新名");
+
+        MetaTableDefinitionCodec.applyTo(def, table);
+
+        assertEquals("新名", table.getTableName());
+        assertEquals("kept", table.getDescription());
+        assertEquals(Integer.valueOf(4), table.getVersion());
+        assertEquals(Long.valueOf(5L), table.getCreatorId());
+    }
+
+    private static ColumnDefinition column(String code, String name) {
+        ColumnDefinition col = new ColumnDefinition();
+        col.setColumnCode(code);
+        col.setColumnName(name);
+        col.setDataType("STRING");
+        return col;
     }
 
     @Test

@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -15,6 +16,7 @@ import com.lesofn.archforge.meta.table.api.dao.MetaTableRepository;
 import com.lesofn.archforge.meta.table.api.domain.MetaColumn;
 import com.lesofn.archforge.meta.table.api.domain.MetaTable;
 import com.lesofn.archforge.meta.table.api.dto.TableImportPreview;
+import com.lesofn.archforge.meta.table.api.errors.MetaTableErrorCode;
 import com.lesofn.archforge.meta.table.api.errors.MetaTableException;
 import com.lesofn.archforge.meta.table.internal.introspect.PostgresSchemaIntrospector;
 import com.lesofn.archforge.meta.table.internal.introspect.PostgresSchemaIntrospector.ColumnInfo;
@@ -24,6 +26,7 @@ import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.springframework.mock.env.MockEnvironment;
 
 /** Compatibility matrix for {@link MetaTableImportServiceImpl}. */
 class MetaTableImportServiceImplTest {
@@ -38,7 +41,19 @@ class MetaTableImportServiceImplTest {
         introspector = mock(PostgresSchemaIntrospector.class);
         metaTableRepository = mock(MetaTableRepository.class);
         metaColumnRepository = mock(MetaColumnRepository.class);
-        service = new MetaTableImportServiceImpl(introspector, metaTableRepository, metaColumnRepository);
+        service = new MetaTableImportServiceImpl(introspector, metaTableRepository, metaColumnRepository, new DefinitionWriteGuard(new MockEnvironment()));
+    }
+
+    @Test
+    void fileSourceRejectsImport() {
+        MetaTableImportServiceImpl guarded = new MetaTableImportServiceImpl(introspector, metaTableRepository, metaColumnRepository, new DefinitionWriteGuard(new MockEnvironment()
+                .withProperty("arch-forge.meta.source", "file")));
+
+        MetaTableException e = assertThrows(MetaTableException.class,
+                () -> guarded.importTable("orders", null, null, 1L));
+
+        assertEquals(MetaTableErrorCode.META_DEFINITION_FILE_MANAGED.getCode(), e.getErrorInfo().getCode());
+        verify(metaTableRepository, never()).save(org.mockito.ArgumentMatchers.any());
     }
 
     // ---- fixtures ----

@@ -3,6 +3,7 @@ package com.lesofn.archforge.server.admin.config;
 import com.lesofn.archforge.meta.table.api.service.MetaTableDefinitionService;
 import com.lesofn.archforge.meta.table.api.service.MetaTableDefinitionService.SyncReport;
 import java.nio.file.Path;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
@@ -45,7 +46,7 @@ public class MetaTableSyncCliRunner implements CommandLineRunner {
 
         int exitCode = switch (mode) {
             case "export" -> {
-                var written = definitionService.exportTo(Path.of(dir), table);
+                List<Path> written = definitionService.exportTo(Path.of(dir), table);
                 log.info("meta export: {} definition file(s) under {}", written.size(), dir);
                 yield 0;
             }

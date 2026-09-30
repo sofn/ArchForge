@@ -57,18 +57,32 @@ orthogonal axis decides **who ships to production** and **who is publishable**:
   that generate `spec/openapi.yaml` and host the integration/ArchUnit testbed.
   They are not "the framework itself"; physical extraction to an `examples/`
   repo is deferred until a real external consumer exists (P3).
-- **Project Definition files** (P3-4): meta-table definitions have a file form —
-  `project-definition/meta/<tableCode>.yaml`, contract
-  `spec/schemas/meta/table.schema.json`. `archforge meta export|import|check`
-  syncs DB ↔ YAML (`MetaTableDefinitionCodec`/`Service` in designer, strict
-  parsing, dry-run diff by default, `removedColumns` = the only column delete;
-  `check` exits non-zero on drift). Source-of-truth flip roadmap
-  (`arch-forge.meta.source=db|shadow|file`): **db** = today; **shadow** = startup
-  diff-only WARN (dev/test profiles); **file** = startup apply + designer writes
-  disabled (F2). Definition-write surface under file mode: `MetaTableAdminService`
-  + `MetaTableImportService` (disabled), `EnumOptionsMigrationRunner`
-  (code-derived options — pending per-field decision), `syncFrom` (the only
-  legitimate materializer).
+- **Project Definition files** (P3-4): meta-table definitions have a file form:
+  `project-definition/meta/<tableCode>.yaml`, packaged into the server-admin
+  jar as `classpath:archforge/meta/`, with the contract
+  `spec/schemas/meta/table.schema.json`.
+  - `archforge meta export|import|check` syncs DB ↔ YAML through
+    `MetaTableDefinitionService` in designer.
+  - Parsing is strict. Keys present in a file are assertions; absent keys are
+    unmanaged.
+  - Import is a dry-run diff by default. An applying sync validates every
+    table it touches and rolls back entirely on failure.
+  - Nothing is deleted implicitly: `removedColumns` is the only column delete,
+    and orphan columns/tables are only reported.
+  - `check` exits non-zero on drift.
+- Write authority is `arch-forge.meta.source` (ADR-0007):
+  - **db** (default): the DB is the truth.
+  - **shadow** (dev/test): startup diff, WARN only, never writes or blocks.
+  - **file**: the YAML is the truth. `MetaTableFileSourceApplier` materializes
+    it at startup in one transaction, holding advisory lock
+    `MetaTableDefinitionService.APPLY_LOCK_KEY` and waiting at most
+    `arch-forge.meta.apply-lock-timeout`. Any failure aborts startup.
+    `MetaTableAdminService`/`MetaTableImportService` writes are rejected with
+    `10415`, and `EnumOptionsMigrationRunner` is not assembled.
+
+  Both `shadow` and `file` find their source in this order:
+  `arch-forge.meta.definition-dir`, then walk-up `project-definition/meta` or
+  `archforge/meta`, then the packaged classpath mirror.
 
 ## Data layer
 

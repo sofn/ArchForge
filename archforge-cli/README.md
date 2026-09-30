@@ -30,8 +30,9 @@ Global flags: `--verbose` echoes every external command; `-h/--help` and
 ./archforge module new <name>   # add archforge-module-<name> inside a project
                                 # (auto-included by flat-prefix scan)
 ./archforge meta export         # DB → project-definition/meta/*.yaml
-./archforge meta import         # YAML → DB (dry-run diff; --apply writes)
-./archforge meta check          # file ↔ DB drift gate (exit 1 on drift)
+./archforge meta import         # YAML → DB (dry-run diff; --apply writes + validates)
+./archforge meta check          # file ↔ DB drift gate (exit 1 on drift / orphan tables)
+                                # (one-shot runs pin arch-forge.meta.source=db)
 ```
 
 ### All-in-one image (`archforge:allinone`)

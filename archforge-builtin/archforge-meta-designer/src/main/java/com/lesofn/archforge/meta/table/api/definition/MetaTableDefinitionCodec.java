@@ -5,8 +5,12 @@ import com.lesofn.archforge.meta.table.api.domain.MetaColumnType;
 import com.lesofn.archforge.meta.table.api.domain.MetaTable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.function.Consumer;
 import org.jspecify.annotations.Nullable;
+import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.DeserializationFeature;
 import tools.jackson.dataformat.yaml.YAMLMapper;
 
@@ -20,6 +24,12 @@ public final class MetaTableDefinitionCodec {
     private static final YAMLMapper MAPPER = YAMLMapper.builder()
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, true)
             .build();
+
+    private static final TypeReference<Map<String, Object>> KEY_MAP = new TypeReference<>() {
+    };
+
+    /** Table-level keys holding children — compared per column, not as a table field. */
+    private static final Set<String> TABLE_CHILD_KEYS = Set.of("columns", "removedColumns");
 
     private MetaTableDefinitionCodec() {
     }
@@ -40,7 +50,7 @@ public final class MetaTableDefinitionCodec {
         return def;
     }
 
-    private static ColumnDefinition toDefinition(MetaColumn column) {
+    public static ColumnDefinition toDefinition(MetaColumn column) {
         ColumnDefinition def = new ColumnDefinition();
         def.setColumnCode(column.getColumnCode());
         def.setColumnName(column.getColumnName());
@@ -79,15 +89,10 @@ public final class MetaTableDefinitionCodec {
         return MAPPER.readValue(yaml, TableDefinition.class);
     }
 
-    /** Definition → entity shape (id/audit fields untouched — set by the caller). */
+    /** Definition → new entity (id/audit fields unset — assigned by the caller). */
     public static MetaTable toTableEntity(TableDefinition definition) {
         MetaTable table = new MetaTable();
-        table.setTableCode(definition.getTableCode());
-        table.setTableName(definition.getTableName());
-        setIfPresent(definition.getDescription(), table::setDescription);
-        setIfPresent(definition.getTablePrefix(), table::setTablePrefix);
-        setIfPresent(definition.getStatus(), table::setStatus);
-        setIfPresent(definition.getSchemaVersion(), table::setSchemaVersion);
+        applyTo(definition, table);
         return table;
     }
 
@@ -95,23 +100,43 @@ public final class MetaTableDefinitionCodec {
     public static List<MetaColumn> toColumnEntities(TableDefinition definition) {
         List<MetaColumn> columns = new ArrayList<>(definition.getColumns().size());
         for (ColumnDefinition def : definition.getColumns()) {
-            columns.add(toColumnEntity(def));
+            MetaColumn column = new MetaColumn();
+            applyTo(def, column);
+            columns.add(column);
         }
         return columns;
     }
 
     /**
-     * Definition fields are all nullable (absent key = untouched); entity setters
-     * are non-null — only apply what the file actually carries.
+     * Assertion-style comparison: every table-level key the file carries must
+     * equal the DB value; keys absent from the file are unmanaged (the DB keeps
+     * its column default / previous value). Columns are compared separately.
      */
-    private static <T> void setIfPresent(@Nullable T value, Consumer<T> setter) {
-        if (value != null) {
-            setter.accept(value);
-        }
+    public static boolean matches(TableDefinition file, TableDefinition db) {
+        return assertedKeysMatch(file, db, TABLE_CHILD_KEYS);
     }
 
-    private static MetaColumn toColumnEntity(ColumnDefinition def) {
-        MetaColumn column = new MetaColumn();
+    /** Column counterpart of {@link #matches(TableDefinition, TableDefinition)}. */
+    public static boolean matches(ColumnDefinition file, ColumnDefinition db) {
+        return assertedKeysMatch(file, db, Set.of());
+    }
+
+    /**
+     * Copy the keys the file carries onto an existing (possibly JPA-managed)
+     * entity. Absent keys, id, version and audit fields stay untouched — so
+     * re-applying an unchanged file never dirties the entity.
+     */
+    public static void applyTo(TableDefinition definition, MetaTable target) {
+        target.setTableCode(definition.getTableCode());
+        target.setTableName(definition.getTableName());
+        setIfPresent(definition.getDescription(), target::setDescription);
+        setIfPresent(definition.getTablePrefix(), target::setTablePrefix);
+        setIfPresent(definition.getStatus(), target::setStatus);
+        setIfPresent(definition.getSchemaVersion(), target::setSchemaVersion);
+    }
+
+    /** Column counterpart of {@link #applyTo(TableDefinition, MetaTable)}. */
+    public static void applyTo(ColumnDefinition def, MetaColumn column) {
         column.setColumnCode(def.getColumnCode());
         column.setColumnName(def.getColumnName());
         column.setDataType(MetaColumnType.valueOf(def.getDataType()));
@@ -137,6 +162,23 @@ public final class MetaTableDefinitionCodec {
         setIfPresent(def.getArrayElementType(), column::setArrayElementType);
         setIfPresent(def.getSearchType(), column::setSearchType);
         setIfPresent(def.getDictCode(), column::setDictCode);
-        return column;
+    }
+
+    /** Null-omitting (NON_NULL) maps of both sides: the file's keys ⊆ the DB's keys with equal values. */
+    private static boolean assertedKeysMatch(Object file, Object db, Set<String> ignoredKeys) {
+        Map<String, Object> dbKeys = MAPPER.convertValue(db, KEY_MAP);
+        return MAPPER.convertValue(file, KEY_MAP).entrySet().stream()
+                .filter(e -> !ignoredKeys.contains(e.getKey()))
+                .allMatch(e -> Objects.equals(e.getValue(), dbKeys.get(e.getKey())));
+    }
+
+    /**
+     * Definition fields are all nullable (absent key = untouched); entity setters
+     * are non-null — only apply what the file actually carries.
+     */
+    private static <T> void setIfPresent(@Nullable T value, Consumer<T> setter) {
+        if (value != null) {
+            setter.accept(value);
+        }
     }
 }

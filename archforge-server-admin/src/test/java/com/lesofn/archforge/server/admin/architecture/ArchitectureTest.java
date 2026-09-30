@@ -37,8 +37,10 @@ class ArchitectureTest {
             "com.lesofn.archforge.meta.table.api.service.MetaTableImportService",
             "com.lesofn.archforge.meta.table.api.service.MetaTableMigrationService",
             "com.lesofn.archforge.meta.table.api.service.MetaTableMigrationExporter",
+            "com.lesofn.archforge.meta.table.api.service.MetaTableDefinitionService",
             "com.lesofn.archforge.meta.table.internal.service.MetaTableAdminServiceImpl",
-            "com.lesofn.archforge.meta.table.internal.service.MetaTableImportServiceImpl");
+            "com.lesofn.archforge.meta.table.internal.service.MetaTableImportServiceImpl",
+            "com.lesofn.archforge.meta.table.internal.service.MetaTableDefinitionServiceImpl");
 
     private static JavaClasses classes;
 

@@ -46,6 +46,11 @@ arch-forge:
   rsa-private-key: ${ARCH_FORGE_RSA_PRIVATE_KEY}
   flyway:
     enabled: true
+  # 元表格定义写权（ADR-0007）：db（默认，DB 为真源）| shadow（启动比对告警）|
+  # file（定义文件为真源：启动物化 + 设计器写拒绝；定义随 jar 打包于 classpath:archforge/meta/）
+  # meta:
+  #   source: file
+  #   apply-lock-timeout: 60s
   jwt:
     secret: ${JWT_SECRET}
     expire-seconds: 3600

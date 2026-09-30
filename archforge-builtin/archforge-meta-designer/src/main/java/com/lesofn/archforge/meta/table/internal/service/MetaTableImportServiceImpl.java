@@ -53,6 +53,7 @@ public class MetaTableImportServiceImpl implements MetaTableImportService {
     private final PostgresSchemaIntrospector introspector;
     private final MetaTableRepository metaTableRepository;
     private final MetaColumnRepository metaColumnRepository;
+    private final DefinitionWriteGuard writeGuard;
 
     @Override
     @Transactional(readOnly = true)
@@ -111,6 +112,7 @@ public class MetaTableImportServiceImpl implements MetaTableImportService {
     @Transactional
     public Long importTable(String tableName, @Nullable String displayName, @Nullable String description,
             Long operatorId) {
+        writeGuard.check();
         // 独立 fail-fast 守卫：不依赖兼容判定链，防后续重构绕过
         if (isPlatformTable(tableName)) {
             throw new MetaTableException(META_TABLE_IMPORT_INCOMPATIBLE, "平台保留表，禁止导入: " + tableName);

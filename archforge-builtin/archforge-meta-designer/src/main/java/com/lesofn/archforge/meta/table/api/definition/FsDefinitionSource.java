@@ -34,4 +34,9 @@ public class FsDefinitionSource implements DefinitionSource {
         }
         return out;
     }
+
+    @Override
+    public String toString() {
+        return dir.toString();
+    }
 }

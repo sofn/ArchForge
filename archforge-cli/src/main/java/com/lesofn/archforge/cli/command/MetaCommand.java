@@ -119,8 +119,11 @@ public class MetaCommand implements Callable<Integer> {
             return 1;
         }
 
+        // source=db: a one-shot sync process must neither shadow-verify nor
+        // file-materialize before the requested mode runs (that would mask drift).
         List<String> args = new ArrayList<>(List.of(
                 "--spring.main.web-application-type=none",
+                "--arch-forge.meta.source=db",
                 "--arch-forge.meta.sync.mode=" + mode,
                 "--arch-forge.meta.sync.dir=" + dir));
         if (options.table != null) {

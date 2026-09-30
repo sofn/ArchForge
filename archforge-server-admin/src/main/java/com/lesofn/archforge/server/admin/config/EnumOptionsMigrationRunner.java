@@ -14,6 +14,7 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -22,10 +23,12 @@ import org.springframework.stereotype.Component;
 /**
  * 开发/非 Flyway 环境下，将历史 MetaColumn.options 迁移为字典配置。
  * 幂等：只处理 dict_code 为空的 ENUM 列。
+ * {@code arch-forge.meta.source=file} 时不装配：定义只经定义文件物化写入（P3-4-3 F2）。
  */
 @Slf4j
 @Component
 @RequiredArgsConstructor
+@ConditionalOnExpression("!'${arch-forge.meta.source:db}'.equalsIgnoreCase('file')")
 public class EnumOptionsMigrationRunner implements ApplicationRunner {
 
     @Qualifier("metaTableJdbcTemplate")

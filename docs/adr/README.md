@@ -37,3 +37,4 @@ test additions.
 | 0004 | [NullAway enforced at ERROR on all source sets](0004-nullaway-error.md) | accepted |
 | 0005 | [Service placement: api.service + internal.service, runtime via ports](0005-service-placement.md) | accepted |
 | 0006 | [Dual-process topology + all-in-one packaging](0006-dual-process-topology.md) | accepted |
+| 0007 | [Meta definitions: file-first write authority via startup materialization](0007-meta-definition-file-first-write-authority.md) | accepted |
