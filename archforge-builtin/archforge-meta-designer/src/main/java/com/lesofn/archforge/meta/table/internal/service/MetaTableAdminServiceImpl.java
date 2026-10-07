@@ -1,5 +1,6 @@
 package com.lesofn.archforge.meta.table.internal.service;
 
+import static com.lesofn.archforge.meta.table.api.errors.MetaTableErrorCode.META_PHYSICAL_TABLE_EXISTS;
 import static com.lesofn.archforge.meta.table.api.errors.MetaTableErrorCode.META_TABLE_CODE_EXISTS;
 import static com.lesofn.archforge.meta.table.api.errors.MetaTableErrorCode.META_TABLE_COLUMNS_REQUIRED;
 import static com.lesofn.archforge.meta.table.api.errors.MetaTableErrorCode.META_TABLE_CONCURRENT_MODIFY;
@@ -22,6 +23,7 @@ import com.lesofn.archforge.meta.table.internal.ddl.SchemaDdl;
 import com.lesofn.archforge.meta.table.internal.schema.SchemaChange;
 import com.lesofn.archforge.meta.table.internal.schema.SchemaChangeType;
 import com.lesofn.archforge.meta.table.internal.schema.SchemaDiffEngine;
+import com.lesofn.archforge.meta.table.internal.util.SqlIdentifier;
 import com.lesofn.archforge.meta.table.internal.validator.MetaTableValidator;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -67,10 +69,11 @@ public class MetaTableAdminServiceImpl implements MetaTableAdminService {
         if (metaTableRepository.existsByTableCodeAndDeletedFalse(table.getTableCode())) {
             throw new MetaTableException(META_TABLE_CODE_EXISTS);
         }
-        validator.validate(table, columns);
         if (table.getTablePrefix() == null || table.getTablePrefix().isEmpty()) {
             table.setTablePrefix("meta_");
         }
+        validator.validate(table, columns);
+        ensurePhysicalTableAbsent(table);
         table.setStatus(1);
         table.setSchemaVersion(1);
         if (table.getUpdaterId() == null && table.getCreatorId() != null) {
@@ -300,7 +303,7 @@ public class MetaTableAdminServiceImpl implements MetaTableAdminService {
     public long checkDelete(Long id) {
         MetaTable table = findById(id);
         Long count = jdbcTemplate.queryForObject(
-                "SELECT COUNT(*) FROM " + quotePhysical(table) + " WHERE deleted = 0",
+                "SELECT COUNT(*) FROM " + SqlIdentifier.quote(table.physicalTableName()) + " WHERE deleted = 0",
                 Map.of(),
                 Long.class);
         return count == null ? 0L : count;
@@ -316,6 +319,8 @@ public class MetaTableAdminServiceImpl implements MetaTableAdminService {
             throw new MetaTableException(META_TABLE_HAS_DATA, dataCount);
         }
 
+        // 存量登记行可能早于前缀校验：绝不 DROP 平台保留名的物理表
+        SqlIdentifier.validatePhysicalTableName(table.getTablePrefix(), table.getTableCode());
         jdbcTemplate.getJdbcOperations().execute(ddlGenerator.generateDropTable(table.physicalTableName()));
 
         // 软删列与表（物理表已 DROP）：硬删会撞 sys_meta_table_migration 的外键
@@ -408,8 +413,15 @@ public class MetaTableAdminServiceImpl implements MetaTableAdminService {
         return copy;
     }
 
-    private String quotePhysical(MetaTable table) {
-        return "\"" + table.physicalTableName().replace("\"", "\"\"") + "\"";
+    /**
+     * 建表走 {@code CREATE TABLE IF NOT EXISTS}：若物理表已存在会被静默"收编"（连同它的数据与约束），
+     * 而随后删除登记又会 DROP 它。已有物理表请走「导入已有表」流程，这里直接拒绝。
+     */
+    private void ensurePhysicalTableAbsent(MetaTable table) {
+        String physicalName = table.physicalTableName();
+        if (PhysicalTables.exists(jdbcTemplate.getJdbcOperations(), physicalName)) {
+            throw new MetaTableException(META_PHYSICAL_TABLE_EXISTS, physicalName);
+        }
     }
 
     /**

@@ -1,6 +1,7 @@
 package com.lesofn.archforge.meta.table.internal.validator;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -10,6 +11,7 @@ import com.lesofn.archforge.meta.table.api.dao.MetaTableRepository;
 import com.lesofn.archforge.meta.table.api.domain.MetaColumn;
 import com.lesofn.archforge.meta.table.api.domain.MetaColumnType;
 import com.lesofn.archforge.meta.table.api.domain.MetaTable;
+import com.lesofn.archforge.meta.table.api.errors.MetaTableErrorCode;
 import com.lesofn.archforge.meta.table.api.errors.MetaTableException;
 import java.util.HashMap;
 import java.util.List;
@@ -43,6 +45,100 @@ class MetaTableValidatorTest {
         amount.setPrecision(10);
 
         assertDoesNotThrow(() -> validator.validate(table(), List.of(amount)));
+    }
+
+    @Test
+    void unquotedDefaultValuesAreRejectedBeforeStorage() {
+        for (MetaColumnType type : List.of(MetaColumnType.INTEGER, MetaColumnType.DECIMAL, MetaColumnType.FILE,
+                MetaColumnType.IMAGE)) {
+            MetaColumn column = column("amount", type);
+            column.setDefaultValue("0, CONSTRAINT chk_probe CHECK (amount >= 0)");
+
+            MetaTableException e = assertThrows(MetaTableException.class,
+                    () -> validator.validate(table(), List.of(column)), type.name());
+            assertEquals(MetaTableErrorCode.META_COLUMN_VALUE_INVALID.getCode(), e.getErrorInfo().getCode(), type.name());
+        }
+    }
+
+    @Test
+    void arrayElementDefaultsAreTypeChecked() {
+        for (String elementType : List.of("INTEGER", "DECIMAL", "BOOLEAN")) {
+            MetaColumn column = column("tags", MetaColumnType.ARRAY);
+            column.setArrayElementType(elementType);
+            column.setDefaultValue("[1]::bigint[]); DROP TABLE sys_user; --]");
+
+            assertThrows(MetaTableException.class, () -> validator.validate(table(), List.of(column)), elementType);
+        }
+    }
+
+    @Test
+    void wellFormedDefaultValuesPass() {
+        MetaColumn integer = column("qty", MetaColumnType.INTEGER);
+        integer.setDefaultValue("7");
+        MetaColumn decimal = column("price", MetaColumnType.DECIMAL);
+        decimal.setDefaultValue("0.50");
+        MetaColumn text = column("note", MetaColumnType.STRING);
+        text.setDefaultValue("it's fine; -- really");
+        MetaColumn ints = column("ids", MetaColumnType.ARRAY);
+        ints.setArrayElementType("INTEGER");
+        ints.setDefaultValue("[1, 2, 3]");
+        MetaColumn day = column("since", MetaColumnType.DATE);
+        day.setDefaultValue("2020-01-01");
+
+        assertDoesNotThrow(() -> validator.validate(table(), List.of(integer, decimal, text, ints, day)));
+    }
+
+    @Test
+    void displayExpressionFunctionCallsAreRejected() {
+        for (String expression : List.of("pg_sleep(5)", "current_setting('server_version')", "version()",
+                "CASE WHEN 1=1 THEN ref.id ELSE 0 END")) {
+            assertDisplayExpressionRejected(expression);
+        }
+    }
+
+    /** The old blacklist used String.matches(".*KEYWORD.*"), which cannot cross a line break. */
+    @Test
+    void displayExpressionLineBreakCannotHideASubquery() {
+        assertDisplayExpressionRejected("ref.id ||\n(SELECT password FROM sys_user LIMIT 1)");
+        assertDisplayExpressionRejected("ref.id\r\n|| (select 1)");
+    }
+
+    @Test
+    void displayExpressionWithinTheGrammarPasses() {
+        MetaColumn ok = referenceColumn("order_ref", "id");
+        ok.setDisplayExpression("ref.id || ' / ' || ref.id::text");
+
+        assertDoesNotThrow(() -> validator.validate(table(), List.of(ok)));
+    }
+
+    private void assertDisplayExpressionRejected(String expression) {
+        MetaColumn column = referenceColumn("order_ref", "id");
+        column.setDisplayExpression(expression);
+
+        MetaTableException e = assertThrows(MetaTableException.class,
+                () -> validator.validate(table(), List.of(column)), expression);
+        assertEquals(MetaTableErrorCode.META_COLUMN_VALUE_INVALID.getCode(), e.getErrorInfo().getCode(), expression);
+    }
+
+    @Test
+    void tablePrefixCannotTurnACodeIntoAPlatformTable() {
+        for (String prefix : List.of("sys_", "pg_", "qrtz_", "flyway_", "Meta_", "meta-")) {
+            MetaTable table = table();
+            table.setTableCode("menu");
+            table.setTablePrefix(prefix);
+
+            assertThrows(MetaTableException.class,
+                    () -> validator.validate(table, List.of(column("name", MetaColumnType.STRING))), prefix);
+        }
+    }
+
+    @Test
+    void emptyPrefixKeepsWorkingForAdoptedPhysicalTables() {
+        MetaTable adopted = table();
+        adopted.setTableCode("legacy_goods");
+        adopted.setTablePrefix("");
+
+        assertDoesNotThrow(() -> validator.validate(adopted, List.of(column("name", MetaColumnType.STRING))));
     }
 
     @Test
@@ -156,6 +252,14 @@ class MetaTableValidatorTest {
         column.setColumnName(code);
         column.setDataType(MetaColumnType.STRING);
         column.setRequired(true);
+        return column;
+    }
+
+    private MetaColumn column(String code, MetaColumnType type) {
+        MetaColumn column = new MetaColumn();
+        column.setColumnCode(code);
+        column.setColumnName(code);
+        column.setDataType(type);
         return column;
     }
 

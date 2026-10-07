@@ -11,6 +11,7 @@ import com.lesofn.archforge.meta.table.api.domain.OptionItem;
 import com.lesofn.archforge.meta.table.api.errors.MetaTableErrorCode;
 import com.lesofn.archforge.meta.table.api.errors.MetaTableException;
 import com.lesofn.archforge.meta.table.api.service.DictionaryProvider;
+import com.lesofn.archforge.meta.table.internal.util.DisplayExpression;
 import com.lesofn.archforge.meta.table.internal.util.SqlIdentifier;
 import java.math.BigDecimal;
 import java.sql.Array;
@@ -66,6 +67,8 @@ public class MetaTableValidator {
         this.metaColumnRepository = metaColumnRepository;
     }
 
+    private static final int MAX_DEFAULT_DECIMAL_DIGITS = 100;
+    private static final Set<String> TYPED_ARRAY_ELEMENTS = Set.of("INTEGER", "DECIMAL", "BOOLEAN");
     private static final String DATE_PATTERN = "yyyy-MM-dd";
     private static final String DATE_TIME_PATTERN = "yyyy-MM-dd HH:mm:ss";
     private static final String TIMESTAMPTZ_PATTERN = "yyyy-MM-dd HH:mm:ssXXX";
@@ -78,6 +81,7 @@ public class MetaTableValidator {
             throw new MetaTableException(MetaTableErrorCode.META_TABLE_CODE_INVALID);
         }
         SqlIdentifier.validateTableCode(table.getTableCode());
+        SqlIdentifier.validatePhysicalTableName(table.getTablePrefix(), table.getTableCode());
 
         if (columns == null || columns.isEmpty()) {
             throw new MetaTableException(MetaTableErrorCode.META_COLUMN_TYPE_INVALID, "至少需要定义一个字段");
@@ -119,6 +123,7 @@ public class MetaTableValidator {
 
     private void validateColumnConfig(MetaColumn column) {
         MetaColumnType type = column.getDataType();
+        validateDefaultValue(column);
         if (type == MetaColumnType.DECIMAL) {
             if (column.getPrecision() != null && column.getScale() != null && column.getPrecision() < column
                     .getScale()) {
@@ -158,31 +163,45 @@ public class MetaTableValidator {
         }
     }
 
-    private static final Set<String> FORBIDDEN_EXPRESSION_KEYWORDS = Set.of(
-            "SELECT", "FROM", "WHERE", "JOIN", "UNION", "INTERSECT", "EXCEPT", "WITH",
-            "INSERT", "UPDATE", "DELETE", "DROP", "CREATE", "ALTER", "TRUNCATE", "GRANT", "REVOKE",
-            "EXEC", "EXECUTE");
-
-    private void validateDisplayExpression(String expression) {
-        if (expression == null || expression.isBlank()) {
+    /**
+     * 默认值会被拼进 DDL。带引号的分支由 ColumnTypeResolver 转义；不带引号的分支（整数/小数/文件/关联、
+     * 数组数值与布尔元素）必须在落库前就按类型解析，非法值直接拒绝，而不是等到执行 DDL。
+     */
+    private void validateDefaultValue(MetaColumn column) {
+        String value = column.getDefaultValue();
+        if (value == null || value.isEmpty()) {
             return;
         }
-        String noStrings = expression.replaceAll("'(?:''|[^'])*'", "''");
-        String upper = noStrings.toUpperCase(Locale.ROOT);
-        if (upper.contains("--") || upper.contains("/*") || upper.contains("*/") || upper.contains(";")) {
-            throw new MetaTableException(MetaTableErrorCode.META_COLUMN_TYPE_INVALID, "显示表达式包含非法字符");
-        }
-        for (String keyword : FORBIDDEN_EXPRESSION_KEYWORDS) {
-            if (upper.matches(".*\\b" + keyword + "\\b.*")) {
-                throw new MetaTableException(MetaTableErrorCode.META_COLUMN_TYPE_INVALID, "显示表达式不允许使用关键字: " + keyword);
+        try {
+            switch (column.getDataType()) {
+                case INTEGER, FILE, IMAGE, REFERENCE -> Long.parseLong(value.trim());
+                case DECIMAL -> {
+                    BigDecimal decimal = new BigDecimal(value.trim());
+                    if (decimal.scale() > MAX_DEFAULT_DECIMAL_DIGITS || decimal.precision() - decimal
+                            .scale() > MAX_DEFAULT_DECIMAL_DIGITS) {
+                        throw new IllegalArgumentException("decimal too long");
+                    }
+                }
+                case ARRAY -> {
+                    String elementType = column.getArrayElementType() == null ? "STRING"
+                            : column.getArrayElementType().toUpperCase(Locale.ROOT);
+                    if (TYPED_ARRAY_ELEMENTS.contains(elementType)) {
+                        validateArray(column, value);
+                    }
+                }
+                default -> {
+                    // 带引号的分支：由 ColumnTypeResolver 双写单引号，无需在此限制格式
+                }
             }
+        } catch (IllegalArgumentException e) {
+            throw new MetaTableException(MetaTableErrorCode.META_COLUMN_VALUE_INVALID, "字段 " + column.getColumnCode() +
+                    " 的默认值与类型 " + column.getDataType() + " 不匹配");
         }
-        if (upper.matches(".*\\b(COUNT|SUM|AVG|MIN|MAX)\\s*\\(.*")) {
-            throw new MetaTableException(MetaTableErrorCode.META_COLUMN_TYPE_INVALID, "显示表达式不允许使用聚合函数");
-        }
-        if (upper.matches(".*\\(\\s*(SELECT|WITH)\\b.*")) {
-            throw new MetaTableException(MetaTableErrorCode.META_COLUMN_TYPE_INVALID, "显示表达式不允许包含子查询");
-        }
+    }
+
+    /** 显示表达式走白名单文法（见 {@link DisplayExpression}），运行期渲染用的是同一份解析。 */
+    private void validateDisplayExpression(String expression) {
+        DisplayExpression.render(expression, "ref");
     }
 
     private void validateReferenceTargets(MetaTable table, List<MetaColumn> columns) {

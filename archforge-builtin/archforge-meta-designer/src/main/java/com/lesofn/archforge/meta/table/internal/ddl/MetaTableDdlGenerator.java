@@ -35,6 +35,7 @@ public class MetaTableDdlGenerator {
     /** 生成创建物理表的 SQL 与索引 SQL。 */
     public DdlResult generateCreateTable(MetaTable table, List<MetaColumn> columns) {
         SqlIdentifier.validateTableCode(table.getTableCode());
+        SqlIdentifier.validatePhysicalTableName(table.getTablePrefix(), table.getTableCode());
         String physicalName = SqlIdentifier.quote(physicalTableName(table));
 
         StringBuilder createSql = new StringBuilder();
