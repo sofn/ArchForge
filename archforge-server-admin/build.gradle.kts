@@ -164,7 +164,6 @@ dependencies {
     api("org.springframework.boot:spring-boot-starter-log4j2") {
         exclude(group = "org.apache.logging.log4j", module = "log4j-to-slf4j")
     }
-    api("org.jolokia:jolokia-core")
     
     // Redis
     api("org.springframework.boot:spring-boot-starter-data-redis")

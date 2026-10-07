@@ -2,7 +2,7 @@
 
 ## Domain module layout
 
-Every domain module (`admin-user`, `blog`, `meta-table`) has exactly two
+Every domain module (`admin-user`, `module-cms`, `meta-table`) has exactly two
 top-level packages — `api` (published contract, `@NamedInterface` per
 package) and `internal` (implementation). See
 [ADR-0001](../adr/0001-api-internal-layout.md).
@@ -24,7 +24,7 @@ package) and `internal` (implementation). See
 | Prefix | Owner | Examples |
 |--------|-------|----------|
 | `sys_` | Platform / admin-user / meta | `sys_user`, `sys_role`, `sys_menu`, `sys_dept`, `sys_dict_type`, `sys_meta_table` |
-| `blog_` | Blog bounded context | `blog_article`, `blog_category` |
+| `cms_` | CMS bounded context (`archforge-module-cms`; was `blog_` before the rename) | `cms_article`, `cms_category` |
 
 New tables keep the prefix of their bounded context. Do not create unprefixed platform tables.
 

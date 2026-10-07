@@ -44,7 +44,6 @@ dependencies {
         // Web相关
         api("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.3")
 
-        api("org.jolokia:jolokia-core:1.7.2")
 
         // Sa-Token
         api("cn.dev33:sa-token-spring-boot3-starter:1.45.0")

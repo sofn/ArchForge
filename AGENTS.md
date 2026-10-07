@@ -20,6 +20,18 @@ For every new requirement:
 6. **Evidence** — append `execution-log.md` entries with real commands and
    outputs; never claim "passed" without evidence
 
+## Breaking Changes (recent)
+
+Read before touching the affected area; each entry links the record.
+
+- **Meta tables are addressed by `tableCode`**, never by database id: every
+  `/admin/meta-table/{tableCode}` path, generated code, and the `copy` response
+  (string). Old `?id=` admin links show a notice — [ADR-0008](docs/adr/0008-meta-runtime-registry-tablecode-identity.md).
+- **staging/prod actuator is on a management port** (admin 8089, web 8091);
+  probes are `/livez` and `/readyz` on the business port — [ADR-0009](docs/adr/0009-actuator-management-port-and-sql-hardening.md).
+- **`AESEncrypter.getInstance()` is gone** — use `AESEncrypter.of(base64Key)` (AES-GCM, no built-in key).
+- **`archforge init` without `--write` is a pure dry-run**; `JWT_SECRET` / `arch-forge.jwt.*` no longer exist.
+
 ## AI Asset Map
 
 All AI-facing assets live in **`.agents/`** — the single canonical location.
@@ -124,7 +136,7 @@ Every code edit must be verified BEFORE moving on — "configured" is not
    (runs every gate across all modules and prints a normalized PASS/FAIL
    banner; Docker-less environments: `./gradlew verify -PexcludeTags=slow`
    skips Testcontainers ITs while pure contract tests still run).
-5. **Never batch unverified edits** — fix loop violations immediately while
+7. **Never batch unverified edits** — fix loop violations immediately while
    the context is small; do not park them for a "final pass".
 
 Known sandbox caveat: `build`/`test` require Docker (Testcontainers). In

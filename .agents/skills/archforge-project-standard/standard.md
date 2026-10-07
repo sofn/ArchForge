@@ -668,7 +668,7 @@ management:
 
 ### 7.1 BOM Structure
 
-All third-party versions are declared in `dependencies/build.gradle.kts` as a `java-platform`:
+All third-party versions are declared in `archforge-dependencies/build.gradle.kts` as a `java-platform`:
 
 ```kotlin
 plugins {
@@ -697,7 +697,7 @@ dependencies {
 
 ### 7.2 Adding a New Dependency
 
-1. Add the version constraint to `dependencies/build.gradle.kts`
+1. Add the version constraint to `archforge-dependencies/build.gradle.kts`
 2. Reference the dependency **without version** in the consuming module's `build.gradle.kts`
 3. Never specify versions in individual module build files
 
@@ -707,7 +707,7 @@ dependencies {
 
 - [ ] Module follows the standard structure (`server-<name>`, `domain/<context>`)
 - [ ] `settings.gradle.kts` updated with new module includes
-- [ ] `dependencies/build.gradle.kts` updated if new libraries introduced
+- [ ] `archforge-dependencies/build.gradle.kts` updated if new libraries introduced
 - [ ] `package-info.java` with `@NullMarked` in every package
 - [ ] Spotless configured (inherited from root `build.gradle.kts`)
 - [ ] JDK 25 toolchain configured (inherited from root)

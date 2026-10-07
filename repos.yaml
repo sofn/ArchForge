@@ -37,6 +37,7 @@ repos:
       - archforge-starters/archforge-lock-starter
       - archforge-starters/archforge-redisson-starter
       - archforge-starters/archforge-trace-starter
+      - archforge-starters/archforge-request-log-starter
       - archforge-dependencies
     owns:
       - spec/openapi.yaml

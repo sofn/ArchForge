@@ -136,7 +136,7 @@ Default admin login is `admin / admin123` (captcha is on in `dev`). C-end API:
 | `archforge-infrastructure` | sa-token config, Redis, dynamic datasources, security filters |
 | `archforge-server-admin` | B-end application (`:8080`) |
 | `archforge-server-web` | C-end application (`:8081`) |
-| `archforge-starters/*` | cache / lock / redisson / trace starters |
+| `archforge-starters/*` | cache / lock / redisson / trace / request-log starters |
 | `archforge-cli` | `./archforge` developer CLI + MCP server |
 | `archforge-dependencies` | version platform (BOM) |
 

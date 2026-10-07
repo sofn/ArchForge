@@ -52,3 +52,10 @@ the pattern before it.
 
 When adding a new version, never reuse V5 or V19; next `__root` file is **V28**.
 Module-local migrations version independently (next `cms`/`task` file is V2).
+
+## Known stale comment: `V23`
+
+`V23__replace_quartz_with_db_scheduler.sql` still says the REST path "stays `/quartz`"; `V24` renamed it to
+`/admin/scheduler-job`. **Do not fix the comment.** Flyway checksums the whole file, comments included — editing an
+applied migration makes every existing database fail `validateOnMigrate` at startup. The current truth lives in
+`standard.md` §3.8.

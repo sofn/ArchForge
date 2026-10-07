@@ -36,7 +36,7 @@ ArchForge/
 ├── archforge-server-admin                   # Admin API :8080
 ├── archforge-server-web                     # C-end API :8081
 ├── archforge-cli                            # Developer CLI (picocli)
-├── archforge-starters/                      # cache / lock / redisson / trace
+├── archforge-starters/                      # cache / lock / redisson / trace / request-log
 └── archforge-dependencies                   # Centralized BOM (java-platform)
 ```
 

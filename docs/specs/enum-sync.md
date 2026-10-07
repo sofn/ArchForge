@@ -57,7 +57,7 @@ Admin `src/views/system/menu/utils/enums.ts` (`menuTypeOptions`) **must stay ali
 
 - `StatusEnum`: `0` disable / `1` enable
 - `UserStatus`: `1` normal / `2` disabled / `3` frozen
-- `BlogArticleStatus`: `0` draft / `1` published / `2` offline
+- `CmsArticleStatus`: `0` draft / `1` published / `2` offline
 - `NoticeTypeEnum`: `1` notification / `2` announcement
 - `NoticeStatusEnum`: `0` close / `1` open
 - `GenderEnum`: `0` male / `1` female / `2` unknown

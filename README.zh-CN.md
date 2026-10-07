@@ -140,7 +140,7 @@ FILE_STORAGE_TYPE=local ./gradlew :archforge-server-admin:bootRun
 | `archforge-infrastructure` | sa-token 配置、Redis、动态数据源、安全过滤器 |
 | `archforge-server-admin` | B 端应用（`:8080`） |
 | `archforge-server-web` | C 端应用（`:8081`） |
-| `archforge-starters/*` | cache / lock / redisson / trace 启动器 |
+| `archforge-starters/*` | cache / lock / redisson / trace / request-log 启动器 |
 | `archforge-cli` | `./archforge` 开发者 CLI + MCP server |
 | `archforge-dependencies` | 版本平台（BOM） |
 
