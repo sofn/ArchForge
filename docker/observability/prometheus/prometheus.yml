@@ -21,12 +21,16 @@ scrape_configs:
   # 生产/预发把 actuator 放在独立管理端口（admin 8089 / web 8091，不发布到宿主机）。
   # 用 DNS 服务发现而不是写死 targets：各套 compose 的服务名不同（archforge / backend / backend-web），
   # 静态 targets 里不存在的名字会让 up==0 永远成立，ApplicationDown 就永久告警。
+  # Every ArchForge target carries app=admin|web, so rules can ask "is any admin up?" across jobs.
   - job_name: 'archforge-admin'
     metrics_path: '/actuator/prometheus'
     dns_sd_configs:
       - names: [ 'archforge', 'backend' ]
         type: A
         port: 8089
+    relabel_configs:
+      - target_label: app
+        replacement: admin
     scrape_interval: 15s
 
   - job_name: 'archforge-web'
@@ -35,14 +39,24 @@ scrape_configs:
       - names: [ 'backend-web' ]
         type: A
         port: 8091
+    relabel_configs:
+      - target_label: app
+        replacement: web
     scrape_interval: 15s
 
+  # Local bootRun on the host (dev profile: actuator on the business port). Unreachable outside dev — the alert
+  # rules ignore env="dev" targets being down.
   - job_name: 'archforge-host'
     metrics_path: '/actuator/prometheus'
     static_configs:
       - targets: [ 'host.docker.internal:8080' ]
         labels:
           env: 'dev'
+          app: 'admin'
+      - targets: [ 'host.docker.internal:8081' ]
+        labels:
+          env: 'dev'
+          app: 'web'
     scrape_interval: 15s
 
   - job_name: 'jaeger'

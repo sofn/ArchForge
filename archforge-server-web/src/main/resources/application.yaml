@@ -40,6 +40,10 @@ management:
     web:
       exposure:
         include: health,info,metrics,prometheus
+  metrics:
+    tags:
+      # alert rules aggregate by application; without the tag web's series fell into an empty label
+      application: ${spring.application.name}
   endpoint:
     health:
       probes:

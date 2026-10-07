@@ -54,6 +54,14 @@ class NonDevProfilesHardeningTest {
         }
     }
 
+    /** Origins come from the environment (fail-fast when unset); never a wildcard baked into the profile. */
+    @Test
+    void stagingAndProdTakeCorsOriginsFromTheEnvironment() throws IOException {
+        for (String file : List.of("application-staging.yaml", "application-prod.yaml")) {
+            assertEquals("${CORS_ALLOWED_ORIGINS}", text(load(file), "arch-forge.cors.allowed-origins"), file);
+        }
+    }
+
     @Test
     void prodAuthenticatesToRedis() throws IOException {
         assertEquals("${REDIS_PASSWORD:}", text(load("application-prod.yaml"), "spring.data.redis.password"));

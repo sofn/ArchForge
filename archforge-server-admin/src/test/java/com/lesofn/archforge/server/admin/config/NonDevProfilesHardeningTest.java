@@ -54,6 +54,22 @@ class NonDevProfilesHardeningTest {
         }
     }
 
+    /** Origins come from the environment (fail-fast when unset); never a wildcard baked into the profile. */
+    @Test
+    void stagingAndProdTakeCorsOriginsFromTheEnvironment() throws IOException {
+        for (String file : List.of("application-staging.yaml", "application-prod.yaml")) {
+            assertEquals("${CORS_ALLOWED_ORIGINS}", text(load(file), "arch-forge.cors.allowed-origins"), file);
+        }
+    }
+
+    /** Full sampling floods the collector under real traffic: staging/prod default to 10%. */
+    @Test
+    void stagingAndProdSampleTenPercentOfTracesByDefault() throws IOException {
+        for (String file : List.of("application-staging.yaml", "application-prod.yaml")) {
+            assertEquals("${SAMPLING_PROBABILITY:0.1}", text(load(file), "management.tracing.sampling.probability"), file);
+        }
+    }
+
     @Test
     void prodAuthenticatesToRedis() throws IOException {
         assertEquals("${REDIS_PASSWORD:}", text(load("application-prod.yaml"), "spring.data.redis.password"));

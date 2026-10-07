@@ -94,11 +94,35 @@ groups:
           summary: "Database connection pool nearly full"
           description: "Pool {{ $labels.pool }} has been more than 90% busy for 5 minutes."
 
+      # A discovered target that stops answering. The dev host targets are excluded: outside dev they never answer,
+      # which used to keep this alert firing forever.
       - alert: ApplicationDown
-        expr: up{job=~"archforge.*"} == 0
+        expr: up{app=~"admin|web", env!="dev"} == 0
         for: 1m
         labels:
           severity: critical
         annotations:
-          summary: "ArchForge application is down"
-          description: "Prometheus can not scrape the ArchForge actuator endpoint."
+          summary: "ArchForge {{ $labels.app }} is down"
+          description: "Prometheus can not scrape {{ $labels.instance }}."
+
+      # DNS service discovery drops a container that is gone, so its `up` series disappears instead of turning 0 —
+      # ApplicationDown cannot see that. Alert when no instance of an app is up at all.
+      - alert: ApplicationMissing
+        expr: absent(up{app="admin"} == 1)
+        for: 2m
+        labels:
+          severity: critical
+          app: admin
+        annotations:
+          summary: "No ArchForge admin instance is up"
+          description: "No admin target answers (container gone or never discovered)."
+
+      - alert: ApplicationMissing
+        expr: absent(up{app="web"} == 1)
+        for: 2m
+        labels:
+          severity: critical
+          app: web
+        annotations:
+          summary: "No ArchForge web instance is up"
+          description: "No web target answers (container gone or never discovered)."
