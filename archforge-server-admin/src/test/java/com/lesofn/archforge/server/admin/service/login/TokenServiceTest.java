@@ -7,6 +7,9 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import cn.dev33.satoken.SaManager;
+import cn.dev33.satoken.dao.SaTokenDao;
+import cn.dev33.satoken.dao.SaTokenDaoDefaultImpl;
 import cn.dev33.satoken.context.mock.SaTokenContextMockUtil;
 import com.lesofn.archforge.common.auth.SystemLoginUser;
 import com.lesofn.archforge.infrastructure.auth.stp.LoginSessionKeys;
@@ -45,8 +48,13 @@ class TokenServiceTest {
     @InjectMocks
     private TokenService tokenService;
 
+    /** sa-token keeps its DAO in a static; whatever Spring context set it may since have been paused (Redis stopped). */
+    private SaTokenDao previousDao;
+
     @BeforeEach
     void setUp() {
+        previousDao = SaManager.getSaTokenDao();
+        SaManager.setSaTokenDao(new SaTokenDaoDefaultImpl());
         SaTokenContextMockUtil.setMockContext();
         when(redisCacheService.getRefreshTokenCache()).thenReturn(refreshTokenCache);
     }
@@ -55,6 +63,7 @@ class TokenServiceTest {
     void tearDown() {
         StpAdminUtil.logout();
         SaTokenContextMockUtil.clearContext();
+        SaManager.setSaTokenDao(previousDao);
     }
 
     @Test
