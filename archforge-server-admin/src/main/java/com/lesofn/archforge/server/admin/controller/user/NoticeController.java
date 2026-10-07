@@ -41,6 +41,7 @@ public class NoticeController {
     private final SysNoticeService noticeService;
 
     @Operation(summary = "获取通知公告列表")
+    @SaCheckPermission(value = "system:notice:list", type = StpAdminUtil.TYPE)
     @PostMapping
     public AdminPageResponse<NoticeResponse> getNoticeList(@RequestBody BasePageRequest request) {
         int currentPage = request.getCurrentPage() != null ? request.getCurrentPage() : 1;

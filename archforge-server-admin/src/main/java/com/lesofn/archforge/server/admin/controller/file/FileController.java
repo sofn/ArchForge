@@ -120,6 +120,7 @@ public class FileController {
     }
 
     @Operation(summary = "获取文件列表")
+    @SaCheckPermission(value = "tool:file:list", type = StpAdminUtil.TYPE)
     @GetMapping
     public AdminPageResponse<FileResponse> listFiles(FileListRequest params) {
         int currentPage = params.getCurrentPage() != null ? params.getCurrentPage() : 1;
@@ -142,6 +143,7 @@ public class FileController {
     }
 
     @Operation(summary = "下载文件")
+    @SaCheckPermission(value = "tool:file:download", type = StpAdminUtil.TYPE)
     @GetMapping("/download/{fileId}")
     public ResponseEntity<Resource> downloadFile(@PathVariable Long fileId) {
         SysFile sysFile = fileService.findById(fileId).orElse(null);

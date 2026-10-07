@@ -33,12 +33,14 @@ public class ChatAiController {
     private final ChatAiService chatAiService;
 
     @Operation(summary = "LLM 配置状态（不含密钥）")
+    @SaCheckPermission(value = "chatai:use", type = StpAdminUtil.TYPE)
     @GetMapping("/config")
     public Map<String, Object> config() {
         return chatAiService.configStatus();
     }
 
     @Operation(summary = "会话列表")
+    @SaCheckPermission(value = "chatai:use", type = StpAdminUtil.TYPE)
     @GetMapping("/sessions")
     public List<Map<String, Object>> sessions() {
         return chatAiService.listSessions();
@@ -52,6 +54,7 @@ public class ChatAiController {
     }
 
     @Operation(summary = "会话消息")
+    @SaCheckPermission(value = "chatai:use", type = StpAdminUtil.TYPE)
     @GetMapping("/sessions/{id}/messages")
     public List<Map<String, String>> messages(@PathVariable String id) {
         return chatAiService.messages(id);

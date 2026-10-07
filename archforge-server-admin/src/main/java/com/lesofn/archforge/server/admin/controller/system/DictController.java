@@ -138,6 +138,7 @@ public class DictController {
 
     @Log(module = "字典配置", summary = "更新字典项")
     @Operation(summary = "更新字典项")
+    @SaCheckPermission(value = "system:dict:edit", type = StpAdminUtil.TYPE)
     @PutMapping("/item/{id}")
     public Boolean updateItem(@PathVariable Long id, @RequestBody @Valid DictItemRequest request) {
         Optional<SysDictItem> opt = dictService.findItemById(id);
@@ -155,6 +156,7 @@ public class DictController {
 
     @Log(module = "字典配置", summary = "删除字典项")
     @Operation(summary = "删除字典项")
+    @SaCheckPermission(value = "system:dict:remove", type = StpAdminUtil.TYPE)
     @DeleteMapping("/item/{id}")
     public Boolean deleteItem(@PathVariable Long id) {
         dictService.deleteItem(id);

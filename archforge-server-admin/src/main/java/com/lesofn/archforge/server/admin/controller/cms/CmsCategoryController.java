@@ -38,6 +38,7 @@ public class CmsCategoryController {
     private final CmsArticleService articleService;
     private final AdminCmsConvertor adminCmsMapper;
 
+    @SaCheckPermission(value = "cms:category:list", type = StpAdminUtil.TYPE)
     @PostMapping
     public AdminPageResponse<AdminCmsCategoryResponse> list(@RequestBody @Valid AdminCmsCategoryListRequest request) {
         PageRequest pageRequest = PageRequest.of(

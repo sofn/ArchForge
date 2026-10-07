@@ -41,6 +41,7 @@ public class ConfigController {
     private final SysConfigService configService;
 
     @Operation(summary = "获取参数列表")
+    @SaCheckPermission(value = "system:config:list", type = StpAdminUtil.TYPE)
     @PostMapping
     public AdminPageResponse<ConfigResponse> getConfigList(@RequestBody BasePageRequest request) {
         int currentPage = request.getCurrentPage() != null ? request.getCurrentPage() : 1;

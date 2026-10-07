@@ -1,5 +1,6 @@
 package com.lesofn.archforge.server.admin.controller.user;
 
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import com.lesofn.archforge.user.api.service.UserExportService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -31,6 +32,7 @@ public class UserExportController {
     private final UserExportService userExportService;
 
     @Operation(summary = "导出用户列表为 xlsx")
+    @SaCheckPermission(value = "system:user:export", type = StpAdminUtil.TYPE)
     @GetMapping("/export")
     public void export(HttpServletResponse response) throws IOException {
         response.setContentType(

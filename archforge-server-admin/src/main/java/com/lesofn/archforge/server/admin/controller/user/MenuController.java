@@ -39,6 +39,7 @@ public class MenuController {
     private final AdminMenuConvertor menuMapper;
 
     @Operation(summary = "获取全量菜单列表")
+    @SaCheckPermission(value = "system:menu:list", type = StpAdminUtil.TYPE)
     @PostMapping
     public List<AdminMenuDTO> getMenuList() {
         List<SysMenu> allMenus = menuService.findAllActiveMenus();

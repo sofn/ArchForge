@@ -1,5 +1,6 @@
 package com.lesofn.archforge.server.admin.controller.user;
 
+import cn.dev33.satoken.annotation.SaMode;
 import com.lesofn.archforge.infrastructure.annotation.Log;
 import com.lesofn.archforge.server.admin.dto.AdminDeptDTO;
 import com.lesofn.archforge.server.admin.dto.request.DeptCreateRequest;
@@ -37,6 +38,9 @@ public class DeptController {
     private final SysDeptService deptService;
 
     @Operation(summary = "获取全量部门列表")
+    @SaCheckPermission(value = {
+            "system:dept:list", "system:user:list", "system:role:list"
+    }, mode = SaMode.OR, type = StpAdminUtil.TYPE)
     @PostMapping
     public List<AdminDeptDTO> getDeptList() {
         List<SysDept> allDepts = deptService.findAll();

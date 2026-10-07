@@ -48,6 +48,7 @@ public class CmsArticleController {
     @Value("${arch-forge.web.public-url:http://localhost:8081}")
     private String webPublicUrl;
 
+    @SaCheckPermission(value = "cms:article:list", type = StpAdminUtil.TYPE)
     @PostMapping
     public AdminPageResponse<AdminCmsArticleResponse> list(@RequestBody @Valid AdminCmsArticleListRequest request) {
         PageRequest pageRequest = PageRequest.of(

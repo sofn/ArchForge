@@ -67,6 +67,7 @@ public class RoleController {
     }
 
     @Operation(summary = "获取角色列表")
+    @SaCheckPermission(value = "system:role:list", type = StpAdminUtil.TYPE)
     @PostMapping
     public AdminPageResponse<AdminRoleDTO> getRoleList(@RequestBody AdminRoleListRequest request) {
         int currentPage = request.getCurrentPage() != null && request.getCurrentPage() > 0 ? request.getCurrentPage() : 1;

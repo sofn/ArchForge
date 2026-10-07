@@ -1,5 +1,6 @@
 package com.lesofn.archforge.server.admin.controller.dashboard;
 
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import com.lesofn.archforge.infrastructure.auth.stp.StpAdminUtil;
 import com.lesofn.archforge.server.admin.service.dashboard.DashboardActivity;
@@ -26,24 +27,28 @@ public class DashboardController {
     private final DashboardService dashboardService;
 
     @Operation(summary = "仪表盘指标")
+    @SaCheckPermission(value = "dashboard:view", type = StpAdminUtil.TYPE)
     @GetMapping("/metrics")
     public DashboardMetricsResponse metrics() {
         return dashboardService.metrics();
     }
 
     @Operation(summary = "仪表盘趋势")
+    @SaCheckPermission(value = "dashboard:view", type = StpAdminUtil.TYPE)
     @GetMapping("/trends")
     public List<DashboardTrendPoint> trends(@RequestParam(name = "days", defaultValue = "7") int days) {
         return dashboardService.trends(days);
     }
 
     @Operation(summary = "最近动态")
+    @SaCheckPermission(value = "dashboard:view", type = StpAdminUtil.TYPE)
     @GetMapping("/recent-activities")
     public List<DashboardActivity> recentActivities() {
         return dashboardService.recentActivities();
     }
 
     @Operation(summary = "待办聚合")
+    @SaCheckPermission(value = "dashboard:view", type = StpAdminUtil.TYPE)
     @GetMapping("/todo")
     public List<DashboardTodo> todo() {
         return dashboardService.todo();
