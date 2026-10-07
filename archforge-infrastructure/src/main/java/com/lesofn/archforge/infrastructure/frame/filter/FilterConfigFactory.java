@@ -1,10 +1,12 @@
 package com.lesofn.archforge.infrastructure.frame.filter;
 
 import io.micrometer.observation.ObservationRegistry;
+import io.micrometer.tracing.Tracer;
 import jakarta.servlet.DispatcherType;
 import jakarta.servlet.Filter;
 import java.util.EnumSet;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,11 +19,12 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class FilterConfigFactory implements WebMvcConfigurer {
 
     private final ObservationRegistry observationRegistry;
+    private final ObjectProvider<Tracer> tracer;
 
     @Bean
     public FilterRegistrationBean<Filter> requestLogChain() {
         FilterRegistrationBean<Filter> registration = new FilterRegistrationBean<>();
-        Filter headerFilter = new RequestLogFilter(observationRegistry);
+        Filter headerFilter = new RequestLogFilter(observationRegistry, tracer.getIfAvailable());
         registration.setFilter(headerFilter);
         registration.setOrder(Ordered.HIGHEST_PRECEDENCE);
         // 拦截错误转发

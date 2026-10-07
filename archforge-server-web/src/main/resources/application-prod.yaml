@@ -32,6 +32,7 @@ spring:
     redis:
       host: ${REDIS_HOST:redis}
       port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
       database: 0
       timeout: 10s
       lettuce:
@@ -42,10 +43,14 @@ spring:
           max-wait: 1s
 
 management:
+  server:
+    # 指标/健康放在独立管理端口：它不发布到宿主机，也不经前端 nginx 的 /api 代理，
+    # 公网拿不到 /actuator/prometheus；编排器探针用业务端口上的 /livez /readyz
+    port: ${MANAGEMENT_SERVER_PORT:8091}
   endpoints:
     web:
       exposure:
-        include: health,info
+        include: health,info,prometheus
 
 springdoc:
   api-docs:
@@ -54,6 +59,10 @@ springdoc:
     enabled: false
 
 arch-forge:
+  # 请求/响应体里有会话 token 与 PII：非 dev 环境不落盘载荷（只保留 api/method/状态/耗时）；排障需要时用环境变量临时打开
+  request-log:
+    include-request-payload: false
+    include-response-payload: false
   # 与 server-admin 共享 archforge 库与 flyway_schema_history；双写安全（DB 锁串行化）
   flyway:
     enabled: true

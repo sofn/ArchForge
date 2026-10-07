@@ -39,7 +39,19 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      probes:
+        enabled: true
+        # /livez 与 /readyz 同时挂在业务端口上：prod 把 actuator 挪去独立管理端口后，编排器仍有探针可用
+        add-additional-paths: true
+      group:
+        # liveness 只看进程本身：Redis/DB 抖动不能让编排器把实例重启
+        liveness:
+          include: livenessState
+        readiness:
+          include: readinessState,db,redis
 
 sa-token:
   token-name: Authorization

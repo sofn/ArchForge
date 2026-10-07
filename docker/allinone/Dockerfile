@@ -42,8 +42,8 @@ COPY nginx.conf /etc/nginx/conf.d/allinone.conf
 EXPOSE 80 8088
 
 HEALTHCHECK --interval=15s --timeout=5s --start-period=90s --retries=5 \
-    CMD curl -fsS http://localhost:8080/actuator/health >/dev/null \
-    && curl -fsS http://localhost:8081/actuator/health >/dev/null \
+    CMD curl -fsS http://localhost:8080/livez >/dev/null \
+    && curl -fsS http://localhost:8081/livez >/dev/null \
     && curl -fsS http://localhost:80/ >/dev/null \
     || exit 1
 

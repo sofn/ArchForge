@@ -19,8 +19,12 @@ services:
 
   redis:
     image: redis:7-alpine
+    # 无密码的 Redis 对同一 Docker 网络内的任何容器都是敞开的（缓存/会话/限流/分布式锁全在里面）
+    command: ["sh", "-c", "exec redis-server --requirepass \"$$REDIS_PASSWORD\""]
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:?Set REDIS_PASSWORD}
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ["CMD-SHELL", "REDISCLI_AUTH=\"$$REDIS_PASSWORD\" redis-cli ping | grep -q PONG"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -36,6 +40,7 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: prod
       REDIS_HOST: redis
+      REDIS_PASSWORD: ${REDIS_PASSWORD:?Set REDIS_PASSWORD}
       DB_MASTER_URL: jdbc:postgresql://postgres:5432/archforge
       DB_USERNAME: ${DB_USERNAME:-archforge}
       DB_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD}
@@ -68,6 +73,7 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: prod
       REDIS_HOST: redis
+      REDIS_PASSWORD: ${REDIS_PASSWORD:?Set REDIS_PASSWORD}
       DB_MASTER_URL: jdbc:postgresql://postgres:5432/archforge
       DB_USERNAME: ${DB_USERNAME:-archforge}
       DB_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD}
@@ -79,6 +85,9 @@ services:
       S3_BUCKET: ${S3_BUCKET}
     volumes:
       - ./logs:/app/logs-web
+    networks:
+      - default
+      - observability
     restart: always
 
   frontend:

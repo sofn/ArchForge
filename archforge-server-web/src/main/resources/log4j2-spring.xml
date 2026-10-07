@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration status="WARN" monitorInterval="30">
     <properties>
-        <property name="LOG_PATTERN">%d{yyyy-MM-dd HH:mm:ss.SSS} %level %logger:%line %msg%n</property>
+        <!-- [traceId,requestId]：traceId 由 Micrometer Tracing 放进 MDC，日志里能直接拿它去 Jaeger 查链路 -->
+        <property name="LOG_PATTERN">%d{yyyy-MM-dd HH:mm:ss.SSS} %level [%X{traceId},%X{requestId}] %logger:%line %msg%n</property>
         <property name="LOGS_PATH">${sys:LOG_PATH:-logs}</property>
     </properties>
 

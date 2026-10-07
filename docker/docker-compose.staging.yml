@@ -76,6 +76,9 @@ services:
       S3_BUCKET: ${S3_BUCKET:-archforge}
     volumes:
       - ./logs:/app/logs-web
+    networks:
+      - default
+      - observability
     restart: unless-stopped
 
   frontend:

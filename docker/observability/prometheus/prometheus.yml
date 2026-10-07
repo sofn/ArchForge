@@ -18,12 +18,23 @@ scrape_configs:
     static_configs:
       - targets: [ 'localhost:9090' ]
 
-  - job_name: 'archforge'
+  # 生产/预发把 actuator 放在独立管理端口（admin 8089 / web 8091，不发布到宿主机）。
+  # 用 DNS 服务发现而不是写死 targets：各套 compose 的服务名不同（archforge / backend / backend-web），
+  # 静态 targets 里不存在的名字会让 up==0 永远成立，ApplicationDown 就永久告警。
+  - job_name: 'archforge-admin'
     metrics_path: '/actuator/prometheus'
-    static_configs:
-      - targets:
-          - 'archforge:8080'
-          - 'backend:8080'
+    dns_sd_configs:
+      - names: [ 'archforge', 'backend' ]
+        type: A
+        port: 8089
+    scrape_interval: 15s
+
+  - job_name: 'archforge-web'
+    metrics_path: '/actuator/prometheus'
+    dns_sd_configs:
+      - names: [ 'backend-web' ]
+        type: A
+        port: 8091
     scrape_interval: 15s
 
   - job_name: 'archforge-host'
@@ -36,5 +47,5 @@ scrape_configs:
 
   - job_name: 'jaeger'
     static_configs:
-      - targets: [ 'jaeger:16686' ]
+      - targets: [ 'jaeger:14269' ]
     metrics_path: '/metrics'

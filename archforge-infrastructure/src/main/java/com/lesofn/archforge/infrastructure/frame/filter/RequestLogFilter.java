@@ -8,6 +8,8 @@ import com.lesofn.archforge.infrastructure.frame.context.RequestIDGenerator;
 import com.lesofn.archforge.infrastructure.frame.context.ScopedValueContext;
 import io.micrometer.observation.Observation;
 import io.micrometer.observation.ObservationRegistry;
+import io.micrometer.tracing.Span;
+import io.micrometer.tracing.Tracer;
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.FilterConfig;
@@ -16,18 +18,23 @@ import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.Strings;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.MDC;
 import jakarta.servlet.ServletException;
 
 @Slf4j
-@RequiredArgsConstructor
 public class RequestLogFilter implements Filter {
+
+    public RequestLogFilter(ObservationRegistry observationRegistry, @Nullable Tracer tracer) {
+        this.observationRegistry = observationRegistry;
+        this.tracer = tracer;
+    }
 
     private static final RequestIDGenerator REQUEST_ID_GENERATOR = RequestIDGenerator.getInstance();
     private final ObservationRegistry observationRegistry;
+    private final @Nullable Tracer tracer;
 
     @Override
     public void doFilter(
@@ -53,6 +60,8 @@ public class RequestLogFilter implements Filter {
             throw new ServletException(e);
         } finally {
             MDC.remove("requestId");
+            MDC.remove("traceId");
+            MDC.remove("spanId");
         }
     }
 
@@ -68,10 +77,14 @@ public class RequestLogFilter implements Filter {
             return;
         }
 
-        Observation observation = Observation.start("http.server.requests", observationRegistry);
-        try {
+        // 不能叫 http.server.requests：那是 Spring Boot 自己的 HTTP 指标名，重名会让每个请求在 sum()/告警比值里算两遍。
+        // 原始路径（含 id）只作 trace 属性（高基数），绝不能成为指标标签。
+        Observation observation = Observation.start("archforge.request", observationRegistry);
+        // scope 打开后本请求的 span 才是 current：下游日志/子 span 才能关联到它
+        try (Observation.Scope ignored = observation.openScope()) {
             observation.lowCardinalityKeyValue("http.method", request.getMethod());
-            observation.lowCardinalityKeyValue("http.path", path);
+            observation.highCardinalityKeyValue("http.path", path);
+            bindTraceIds();
             filterChain.doFilter(request, response);
         } catch (Exception e) {
             observation.error(e);
@@ -92,6 +105,15 @@ public class RequestLogFilter implements Filter {
             observation.lowCardinalityKeyValue(
                     "http.status", String.valueOf(response.getStatus()));
             observation.stop();
+        }
+    }
+
+    /** 把当前 span 的 traceId/spanId 放进 MDC，log4j2 pattern 里的 %X{traceId} 才有值。 */
+    private void bindTraceIds() {
+        Span span = tracer == null ? null : tracer.currentSpan();
+        if (span != null) {
+            MDC.put("traceId", span.context().traceId());
+            MDC.put("spanId", span.context().spanId());
         }
     }
 
