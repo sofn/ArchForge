@@ -25,7 +25,9 @@ public class AdminCorsConfig {
         List<String> allowedOrigins = Objects.requireNonNullElse(corsConfig.getAllowedOrigins(), List.of());
 
         // 只有本地 profile 允许回落到"放行所有来源"；staging 以前就这样静默全开
-        if (!environment.matchesProfiles("dev", "test") && (allowedOrigins.isEmpty() || allowedOrigins.contains("*"))) {
+        // 未设置的 ${CORS_ALLOWED_ORIGINS} 会按字面值绑定进来，悄悄挡掉所有来源
+        if (!environment.matchesProfiles("dev", "test") && (allowedOrigins.isEmpty() || allowedOrigins.contains("*") ||
+                allowedOrigins.stream().anyMatch(origin -> origin.contains("${")))) {
             throw new IllegalStateException("非本地环境 CORS 必须配置具体的 allowedOrigins（arch-forge.cors.allowed-origins），不允许使用通配符 *");
         }
 

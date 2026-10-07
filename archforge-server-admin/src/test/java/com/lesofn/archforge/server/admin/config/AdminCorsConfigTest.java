@@ -25,6 +25,12 @@ class AdminCorsConfigTest {
         assertThrows(IllegalStateException.class, () -> config(List.of("*"), "staging").corsFilter());
     }
 
+    /** An unset env var binds as the literal "${CORS_ALLOWED_ORIGINS}" — CORS would silently block every origin. */
+    @Test
+    void anUnresolvedPlaceholderIsNotAnOrigin() {
+        assertThrows(IllegalStateException.class, () -> config(List.of("${CORS_ALLOWED_ORIGINS}"), "staging").corsFilter());
+    }
+
     @Test
     void prodStillRequiresExplicitOrigins() {
         assertThrows(IllegalStateException.class, () -> config(List.of(), "prod").corsFilter());
