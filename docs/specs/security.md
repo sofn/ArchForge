@@ -88,7 +88,7 @@ Do **not** commit secrets. Use environment / profile files:
 Local templates stay as `.env.example` / `application-*.yaml.example`. Production values come from the environment, never from git.
 
 Production must inject `ARCH_FORGE_RSA_PRIVATE_KEY`, `DB_PASSWORD` and `REDIS_PASSWORD` (the prod compose starts Redis
-with `--requirepass` and both apps read `spring.data.redis.password`). Missing RSA in `prod` fails fast at startup. Docker Compose files require `${DB_PASSWORD:?…}` / `${JWT_SECRET:?…}` with no baked-in defaults.
+with `--requirepass` and both apps read `spring.data.redis.password`). Missing RSA in `prod` fails fast at startup. Docker Compose files require `${DB_PASSWORD:?…}` with no baked-in default. There is no JWT signing key: auth is sa-token (opaque tokens in Redis), so `JWT_SECRET` / `arch-forge.jwt.*` were removed as dead configuration.
 
 ## Actuator
 

@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
+import io.micrometer.core.instrument.MeterRegistry;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
@@ -16,6 +17,9 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jspecify.annotations.Nullable;
 import org.springframework.beans.TypeMismatchException;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -35,6 +39,24 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class ErrorExceptionHandle {
     public static final Joiner.MapJoiner JOINER = Joiner.on(",").withKeyValueSeparator(": ");
+
+    /** 业务错误按错误码计数：业务错误沿用 HTTP 200（契约），按状态码统计的监控看不到它们。 */
+    static final String BUSINESS_ERRORS_METRIC = "archforge.business.errors";
+
+    /** 500 是否回显异常类名与根因消息（SQL、表名等）。只有 dev/test 打开。 */
+    private final boolean exposeDetails;
+    private final @Nullable MeterRegistry meterRegistry;
+
+    @Autowired
+    public ErrorExceptionHandle(@Value("${arch-forge.error.expose-details:false}") boolean exposeDetails,
+            ObjectProvider<MeterRegistry> meterRegistry) {
+        this(exposeDetails, meterRegistry.getIfAvailable());
+    }
+
+    ErrorExceptionHandle(boolean exposeDetails, @Nullable MeterRegistry meterRegistry) {
+        this.exposeDetails = exposeDetails;
+        this.meterRegistry = meterRegistry;
+    }
 
     @ExceptionHandler(value = Throwable.class)
     public ProblemDetail processException(HttpServletRequest request, Exception e) {
@@ -56,6 +78,9 @@ public class ErrorExceptionHandle {
             }
             ErrorInfo errorInfo = errorCodeEx.getErrorInfo();
             if (errorInfo != null) {
+                if (meterRegistry != null) {
+                    meterRegistry.counter(BUSINESS_ERRORS_METRIC, "code", String.valueOf(errorInfo.getCode())).increment();
+                }
                 ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.OK, errorInfo.getMsg());
                 problem.setTitle("Business Error");
                 problem.setProperty("code", errorInfo.getCode());
@@ -63,15 +88,17 @@ public class ErrorExceptionHandle {
                 return problem;
             }
             ProblemDetail problem = ProblemDetail.forStatusAndDetail(
-                    HttpStatus.INTERNAL_SERVER_ERROR, pair.getRight());
+                    HttpStatus.INTERNAL_SERVER_ERROR, exposeDetails ? pair.getRight() : SystemErrorCode.SYSTEM_ERROR.getMsg());
             problem.setTitle("System Error");
             problem.setProperty("code", SystemErrorCode.SYSTEM_ERROR.getCode());
             return problem;
         }
         log.error("error, request: {}", parseParam(request), e);
+        // 原始异常只进日志；客户端只拿到通用消息（除非 dev/test 显式打开 expose-details）
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(
                 HttpStatus.INTERNAL_SERVER_ERROR,
-                pair.getLeft().getClass().getSimpleName() + ": " + pair.getRight());
+                exposeDetails ? pair.getLeft().getClass().getSimpleName() + ": " + pair.getRight()
+                        : SystemErrorCode.SYSTEM_ERROR.getMsg());
         problem.setTitle("System Error");
         problem.setProperty("code", SystemErrorCode.SYSTEM_ERROR.getCode());
         problem.setInstance(URI.create(request.getRequestURI()));

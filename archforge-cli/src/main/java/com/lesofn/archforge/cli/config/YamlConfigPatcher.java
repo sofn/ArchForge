@@ -33,7 +33,6 @@ public final class YamlConfigPatcher {
         try {
             String original = Files.readString(file, StandardCharsets.UTF_8);
             String updated = original;
-            updated = replaceJwtSecret(updated);
             updated = replaceEnvDefault(updated, "DB_PASSWORD", "archforge");
             if (includeDevFixes) {
                 if (!updated.contains("open-in-view:")) {
@@ -57,23 +56,6 @@ public final class YamlConfigPatcher {
         } catch (IOException e) {
             throw new IllegalStateException("Failed to patch " + file, e);
         }
-    }
-
-    static String replaceJwtSecret(String yaml) {
-        String marker = "  jwt:\n    secret:";
-        int jwt = yaml.indexOf(marker);
-        if (jwt < 0) {
-            jwt = yaml.indexOf("jwt:\n    secret:");
-        }
-        if (jwt < 0) {
-            return yaml;
-        }
-        int secretLine = yaml.indexOf("secret:", jwt);
-        int lineEnd = yaml.indexOf('\n', secretLine);
-        if (lineEnd < 0) {
-            lineEnd = yaml.length();
-        }
-        return yaml.substring(0, secretLine) + "secret: ${JWT_SECRET:}" + yaml.substring(lineEnd);
     }
 
     static String replaceEnvDefault(String yaml, String envKey, String defaultValue) {

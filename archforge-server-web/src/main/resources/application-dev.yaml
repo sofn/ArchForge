@@ -43,6 +43,9 @@ spring:
           max-wait: -1ms
 
 arch-forge:
+  # 500 响应回显异常类名与根因（仅本地/测试；staging/prod 默认关闭，只返回通用消息）
+  error:
+    expose-details: true
   # 与 server-admin 共享 archforge 库；schema 由 Flyway 迁移（common.persistence.FlywayConfig）独占管理
   flyway:
     enabled: true

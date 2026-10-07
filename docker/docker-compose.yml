@@ -43,8 +43,8 @@ services:
       - "8080:8080"
     environment:
       SPRING_PROFILES_ACTIVE: prod
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:8848}
       REDIS_HOST: redis
-      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET}
       DB_MASTER_URL: jdbc:postgresql://postgres:5432/archforge
       DB_USERNAME: ${DB_USERNAME:-archforge}
       DB_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD}

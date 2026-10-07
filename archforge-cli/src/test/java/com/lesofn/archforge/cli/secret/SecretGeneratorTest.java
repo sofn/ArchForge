@@ -20,29 +20,29 @@ class SecretGeneratorTest {
     @Test
     void generatesRequiredSecrets() {
         Map<String, String> secrets = SecretGenerator.generate();
-        assertTrue(secrets.containsKey("JWT_SECRET"));
+        // auth is sa-token (opaque tokens in Redis) — there is no JWT signing key to generate
+        assertFalse(secrets.containsKey("JWT_SECRET"));
         assertTrue(secrets.containsKey("DB_PASSWORD"));
         assertTrue(secrets.containsKey("RSA_PUBLIC_KEY"));
         assertTrue(secrets.containsKey("RSA_PRIVATE_KEY"));
         assertTrue(secrets.containsKey("ARCH_FORGE_RSA_PRIVATE_KEY"));
         assertEquals(secrets.get("RSA_PRIVATE_KEY"), secrets.get("ARCH_FORGE_RSA_PRIVATE_KEY"));
         assertTrue(secrets.containsKey("AES_KEY"));
-        assertTrue(secrets.get("JWT_SECRET").length() >= 32);
         assertTrue(secrets.get("DB_PASSWORD").length() >= 16);
     }
 
     @Test
     void writeSkipsExistingKeys() throws Exception {
         Path envFile = tempDir.resolve(".env");
-        Files.writeString(envFile, "JWT_SECRET=existing-secret\n");
+        Files.writeString(envFile, "DB_PASSWORD=existing-secret\n");
 
         Map<String, String> written = SecretGenerator.writeIdempotent(envFile);
         String content = Files.readString(envFile);
 
-        assertEquals("existing-secret", readEnv(content, "JWT_SECRET"));
-        assertTrue(content.contains("DB_PASSWORD="));
-        assertFalse(written.containsKey("JWT_SECRET"));
-        assertTrue(written.containsKey("DB_PASSWORD"));
+        assertEquals("existing-secret", readEnv(content, "DB_PASSWORD"));
+        assertTrue(content.contains("AES_KEY="));
+        assertFalse(written.containsKey("DB_PASSWORD"));
+        assertTrue(written.containsKey("AES_KEY"));
     }
 
     private static @Nullable String readEnv(String content, String key) {

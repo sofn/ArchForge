@@ -35,6 +35,9 @@ management:
         include: health,info
 
 arch-forge:
+  # 500 响应回显异常类名与根因（仅本地/测试；staging/prod 默认关闭，只返回通用消息）
+  error:
+    expose-details: true
   # 依赖服务（PostgreSQL / Redis）由 common-jpa testFixtures 的 testsupport.AbstractIntegrationTest 提供；
   # schema 由 Flyway 迁移建立（migrations 在 common-jpa classpath 上）。
   flyway:
@@ -42,10 +45,6 @@ arch-forge:
     baseline-on-migrate: true
     locations: classpath:db/migration/__root
     default-schema: public
-  jwt:
-    secret: ${JWT_SECRET:test-jwt-secret-for-integration-only}
-  token:
-    secret: ${JWT_SECRET:test-jwt-secret-for-integration-only}
   mock-auth:
     enabled: true
   file-storage:

@@ -84,9 +84,6 @@ arch-forge:
     enabled: true
   web:
     public-url: ${WEB_PUBLIC_URL}
-  jwt:
-    secret: ${JWT_SECRET}
-    expire-seconds: 604800
   llm:
     provider: ${LLM_PROVIDER:openai}
     base-url: ${LLM_BASE_URL:https://api.openai.com/v1}

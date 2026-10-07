@@ -24,8 +24,9 @@ public class AdminCorsConfig {
         ArchForgeProperties.Cors corsConfig = archForgeConfig.getCors();
         List<String> allowedOrigins = Objects.requireNonNullElse(corsConfig.getAllowedOrigins(), List.of());
 
-        if (environment.matchesProfiles("prod") && (allowedOrigins.isEmpty() || allowedOrigins.contains("*"))) {
-            throw new IllegalStateException("生产环境 CORS 必须配置具体的 allowedOrigins（arch-forge.cors.allowed-origins），不允许使用通配符 *");
+        // 只有本地 profile 允许回落到"放行所有来源"；staging 以前就这样静默全开
+        if (!environment.matchesProfiles("dev", "test") && (allowedOrigins.isEmpty() || allowedOrigins.contains("*"))) {
+            throw new IllegalStateException("非本地环境 CORS 必须配置具体的 allowedOrigins（arch-forge.cors.allowed-origins），不允许使用通配符 *");
         }
 
         config.setAllowCredentials(corsConfig.isAllowCredentials());

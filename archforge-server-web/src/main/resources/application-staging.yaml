@@ -53,6 +53,8 @@ management:
         include: health,info,prometheus
 
 arch-forge:
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS}
   # 请求/响应体里有会话 token 与 PII：非 dev 环境不落盘载荷（只保留 api/method/状态/耗时）；排障需要时用环境变量临时打开
   request-log:
     include-request-payload: false

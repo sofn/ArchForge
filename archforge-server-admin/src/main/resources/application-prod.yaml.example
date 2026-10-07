@@ -51,9 +51,6 @@ arch-forge:
   # meta:
   #   source: file
   #   apply-lock-timeout: 60s
-  jwt:
-    secret: ${JWT_SECRET}
-    expire-seconds: 3600
   captcha:
     enabled: true
   # 登录安全策略（防暴力破解）

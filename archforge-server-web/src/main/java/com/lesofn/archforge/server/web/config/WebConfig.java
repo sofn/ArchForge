@@ -69,8 +69,9 @@ public class WebConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         List<String> allowedOrigins = Objects.requireNonNullElse(
                 archForgeConfig.getCors().getAllowedOrigins(), List.of());
-        if (environment.matchesProfiles("prod") && (allowedOrigins.isEmpty() || allowedOrigins.contains("*"))) {
-            throw new IllegalStateException("生产环境 CORS 必须配置具体的 allowedOrigins（arch-forge.cors.allowed-origins）");
+        // 只有本地 profile 允许回落到"放行所有来源"；staging 以前就这样静默全开
+        if (!environment.matchesProfiles("dev", "test") && (allowedOrigins.isEmpty() || allowedOrigins.contains("*"))) {
+            throw new IllegalStateException("非本地环境 CORS 必须配置具体的 allowedOrigins（arch-forge.cors.allowed-origins）");
         }
         org.springframework.web.servlet.config.annotation.CorsRegistration registration = registry.addMapping("/**")
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
