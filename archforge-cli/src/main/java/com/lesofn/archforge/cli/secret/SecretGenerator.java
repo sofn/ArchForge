@@ -23,8 +23,7 @@ public final class SecretGenerator {
             "DB_PASSWORD",
             "RSA_PUBLIC_KEY",
             "RSA_PRIVATE_KEY",
-            "ARCH_FORGE_RSA_PRIVATE_KEY",
-            "AES_KEY"
+            "ARCH_FORGE_RSA_PRIVATE_KEY"
     };
 
     private static final SecureRandom RANDOM = new SecureRandom();
@@ -44,7 +43,6 @@ public final class SecretGenerator {
         } catch (Exception e) {
             throw new IllegalStateException("Failed to generate RSA key pair", e);
         }
-        secrets.put("AES_KEY", randomBase64(32));
         return secrets;
     }
 

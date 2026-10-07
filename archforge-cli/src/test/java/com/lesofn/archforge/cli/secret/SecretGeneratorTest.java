@@ -27,7 +27,8 @@ class SecretGeneratorTest {
         assertTrue(secrets.containsKey("RSA_PRIVATE_KEY"));
         assertTrue(secrets.containsKey("ARCH_FORGE_RSA_PRIVATE_KEY"));
         assertEquals(secrets.get("RSA_PRIVATE_KEY"), secrets.get("ARCH_FORGE_RSA_PRIVATE_KEY"));
-        assertTrue(secrets.containsKey("AES_KEY"));
+        // nothing in ArchForge reads an AES key: generating one only invited a hard-coded fallback "to make it work"
+        assertFalse(secrets.containsKey("AES_KEY"));
         assertTrue(secrets.get("DB_PASSWORD").length() >= 16);
     }
 
@@ -40,9 +41,9 @@ class SecretGeneratorTest {
         String content = Files.readString(envFile);
 
         assertEquals("existing-secret", readEnv(content, "DB_PASSWORD"));
-        assertTrue(content.contains("AES_KEY="));
+        assertTrue(content.contains("ARCH_FORGE_RSA_PRIVATE_KEY="));
         assertFalse(written.containsKey("DB_PASSWORD"));
-        assertTrue(written.containsKey("AES_KEY"));
+        assertTrue(written.containsKey("ARCH_FORGE_RSA_PRIVATE_KEY"));
     }
 
     private static @Nullable String readEnv(String content, String key) {
