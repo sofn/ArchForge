@@ -94,6 +94,17 @@ tasks.withType<Test> {
     environment("SPRING_PROFILES_ACTIVE", "test")
 }
 
+// DeploymentArtifactsConsistencyTest reads deployment files outside this module. Declare them, otherwise a change
+// there is served a cached (green) test result instead of re-running the check.
+tasks.named<Test>("test") {
+    inputs.files(
+        fileTree("${rootDir}/docker") { include("*.yml") },
+        fileTree("${rootDir}/scripts") { include("**/*.sh") },
+        fileTree("${rootDir}/archforge-server-web/src/main/resources") { include("application*.yaml") },
+        file("${rootDir}/repos.yaml"),
+    ).withPropertyName("deploymentArtifacts").withPathSensitivity(PathSensitivity.RELATIVE)
+}
+
 // Exports the live springdoc OpenAPI document to build/openapi/live-openapi.json.
 val exportOpenApi = tasks.register<Test>("exportOpenApi") {
     description = "Exports server-admin's live OpenAPI document to build/openapi/live-openapi.json."

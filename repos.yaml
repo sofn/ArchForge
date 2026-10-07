@@ -48,10 +48,10 @@ repos:
       - .agents/skills/
       - repos.yaml
     notes:
-      - Canonical backend standard: .agents/skills/archforge-project-standard/standard.md
-      - Auth: sa-token (StpAdminUtil / StpWebUtil), not Spring Security JWT
-      - Contract sync: spec/openapi.yaml is GENERATED — after API changes run
-        ./gradlew generateOpenApi and commit the result in the same change
+      - "Canonical backend standard: .agents/skills/archforge-project-standard/standard.md"
+      - "Auth: sa-token (StpAdminUtil / StpWebUtil), not Spring Security JWT"
+      - "Contract sync: spec/openapi.yaml is GENERATED — after API changes run ./gradlew generateOpenApi and commit
+        the result in the same change"
 
   - name: ArchForgeAdmin
     path: ../ArchForgeAdmin
@@ -80,8 +80,16 @@ repos:
       auth: sa-token cookies (token, tokenName, refreshToken)
       errors: RFC 9457 ProblemDetail
 
-# ArchForgeSpec and ArchForgeDocs are retired: ArchForgeSpec's contents moved
-# into spec/ + docs/specs/ + .agents/skills/ here; ArchForgeDocs never existed.
+  - name: ArchForgeDocs
+    path: ../ArchForgeDocs
+    role: docs-site
+    can_modify: [docs-site]
+    description: Public documentation site (VitePress, EN + ZH, deployed to GitHub Pages). Describes the other three
+      repos; it is never a contract source — when it disagrees with spec/ or the code, the docs are wrong.
+
+# Retired: ArchForgeSpec. Its contents moved into spec/ + docs/specs/ + .agents/skills/ here. The old repository is
+# frozen (DEPRECATED.md at its root) and still carries pre-merge contracts (archforge-domain/, BlogArticleStatus) —
+# never read it as a source of truth.
 
 ports:
   server-admin: 8080

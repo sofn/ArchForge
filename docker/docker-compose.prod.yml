@@ -44,6 +44,10 @@ services:
       DB_MASTER_URL: jdbc:postgresql://postgres:5432/archforge
       DB_USERNAME: ${DB_USERNAME:-archforge}
       DB_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD}
+      # application-prod.yaml has no defaults for these — without them the admin refuses to start
+      ARCH_FORGE_RSA_PRIVATE_KEY: ${ARCH_FORGE_RSA_PRIVATE_KEY:?Set ARCH_FORGE_RSA_PRIVATE_KEY}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:?Set CORS_ALLOWED_ORIGINS}
+      WEB_PUBLIC_URL: ${WEB_PUBLIC_URL:?Set WEB_PUBLIC_URL}
       S3_ENDPOINT: ${S3_ENDPOINT}
       S3_ACCESS_KEY: ${S3_ACCESS_KEY}
       S3_SECRET_KEY: ${S3_SECRET_KEY}
