@@ -2,6 +2,7 @@ package com.lesofn.archforge.cli.command;
 
 import com.lesofn.archforge.cli.config.DbPasswordResolver;
 import com.lesofn.archforge.cli.config.ProjectPaths;
+import com.lesofn.archforge.cli.db.FlywayMigration;
 import com.lesofn.archforge.cli.docker.ComposeSupport;
 import com.lesofn.archforge.cli.proc.ProcessRunner;
 import java.io.BufferedReader;
@@ -60,11 +61,7 @@ public class DbCommand implements Callable<Integer> {
                 return up;
             }
             compose.syncDbPassword(DbPasswordResolver.resolveDbUsername(root), password.value());
-            return runner.run(
-                    List.of("./gradlew", ":archforge-server-admin:flywayMigrate", "-x", "test"),
-                    root,
-                    Map.of(),
-                    true);
+            return FlywayMigration.run(runner, root);
         }
     }
 
@@ -78,12 +75,7 @@ public class DbCommand implements Callable<Integer> {
     static class Migrate implements Callable<Integer> {
         @Override
         public Integer call() {
-            return new ProcessRunner()
-                    .run(
-                            List.of("./gradlew", ":archforge-server-admin:flywayMigrate", "-x", "test"),
-                            ProjectPaths.repoRoot(),
-                            Map.of(),
-                            true);
+            return FlywayMigration.run(new ProcessRunner(), ProjectPaths.repoRoot());
         }
     }
 

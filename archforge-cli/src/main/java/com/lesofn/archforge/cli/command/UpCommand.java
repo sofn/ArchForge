@@ -3,6 +3,7 @@ package com.lesofn.archforge.cli.command;
 import com.lesofn.archforge.cli.config.DbPasswordResolver;
 import com.lesofn.archforge.cli.config.Profile;
 import com.lesofn.archforge.cli.config.ProjectPaths;
+import com.lesofn.archforge.cli.db.FlywayMigration;
 import com.lesofn.archforge.cli.docker.ComposeSupport;
 import com.lesofn.archforge.cli.proc.ProcessRunner;
 import java.nio.file.Path;
@@ -27,11 +28,22 @@ public class UpCommand implements Callable<Integer> {
             description = "Stack profile: ${COMPLETION-CANDIDATES} (default: ${DEFAULT-VALUE})")
     Profile profile;
 
+    private final Path repoRoot;
+    private final ProcessRunner runner;
+
+    public UpCommand() {
+        this(ProjectPaths.repoRoot(), new ProcessRunner());
+    }
+
+    UpCommand(Path repoRoot, ProcessRunner runner) {
+        this.repoRoot = repoRoot;
+        this.runner = runner;
+    }
+
     @Override
     public Integer call() {
-        Path root = ProjectPaths.repoRoot();
-        ComposeSupport compose = new ComposeSupport(new ProcessRunner(), root);
-        ProcessRunner runner = new ProcessRunner();
+        Path root = repoRoot;
+        ComposeSupport compose = new ComposeSupport(runner, root);
         DbPasswordResolver.Result password = DbPasswordResolver.resolve(root, null);
         Map<String, String> env = Map.of(
                 "DB_PASSWORD", password.value(),
@@ -46,13 +58,10 @@ public class UpCommand implements Callable<Integer> {
             return infra;
         }
         compose.syncDbPassword(DbPasswordResolver.resolveDbUsername(root), password.value());
-        int migrate = runner.run(
-                List.of("./gradlew", ":archforge-server-admin:flywayMigrate", "-x", "test"),
-                root,
-                Map.of(),
-                true);
+        int migrate = FlywayMigration.run(runner, root);
         if (migrate != 0) {
-            System.err.println("flywayMigrate returned " + migrate);
+            // 迁移失败就不再起应用容器：它们会拿着旧 schema 启动，报错更晚、更难查
+            return migrate;
         }
         return compose.upStack(profile, env);
     }

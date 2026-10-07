@@ -1,3 +1,5 @@
+import org.flywaydb.gradle.task.FlywayMigrateTask
+
 plugins {
     id("org.springframework.boot") version "4.1.0"
     id("org.graalvm.buildtools.native")
@@ -253,9 +255,14 @@ val buildMinimalJre by tasks.registering(Exec::class) {
 }
 
 
-// Flyway Gradle 插件配置（archforge db init/update → :archforge-server-admin:flywayMigrate）
-// 递归扫 db/migration（__root + 各模块目录）。CLI 场景下全部记入共享历史表——模块历史表
-// 由运行时 FlywayConfig 在首次启动时补建并重放（模块迁移均为幂等写法）。
+// Flyway Gradle 插件配置（archforge db init/update → :archforge-server-admin:flywayMigrateAll）
+//
+// 与运行时 FlywayConfig.FlywayModuleOrchestrator 保持同一套命名空间：
+//   * flyway{} / flywayMigrate 只管共享存量序列 db/migration/__root（默认历史表 flyway_schema_history）；
+//   * 每个 archforge-module-*/…/db/migration/<module>/ 单独一个任务 flywayMigrate<Module>，
+//     独立历史表 flyway_schema_history_<module>（模块内版本号自增，cms/V1 与 task/V1 并存）；
+//   * flywayMigrateAll 按 __root → 各模块（按名排序）依次执行。
+// 以前把三个目录拍平进一个 locations，__root/V1 与 cms/V1 撞版本号，`archforge db migrate` 从未成功过。
 flyway {
     driver = "org.postgresql.Driver"
     url = providers.environmentVariable("DB_MASTER_URL")
@@ -265,9 +272,7 @@ flyway {
     schemas = arrayOf("public")
     defaultSchema = "public"
     locations = arrayOf(
-        "filesystem:${rootDir}/archforge-common/archforge-common-jpa/src/main/resources/db/migration",
-        "filesystem:${rootDir}/archforge-module-cms/src/main/resources/db/migration",
-        "filesystem:${rootDir}/archforge-module-task/src/main/resources/db/migration"
+        "filesystem:${rootDir}/archforge-common/archforge-common-jpa/src/main/resources/db/migration/__root"
     )
     baselineOnMigrate = true
     baselineVersion = "0"
@@ -275,3 +280,30 @@ flyway {
     outOfOrder = false
     validateOnMigrate = true
 }
+
+val moduleMigrationDirs: Map<String, File> = (rootDir.listFiles { f -> f.isDirectory && f.name.startsWith("archforge-module-") }
+    ?.sortedBy { it.name } ?: emptyList())
+    .flatMap { moduleDir ->
+        File(moduleDir, "src/main/resources/db/migration").listFiles { f -> f.isDirectory }?.toList() ?: emptyList()
+    }
+    .associateBy { it.name }
+    .toSortedMap()
+
+val moduleMigrateTasks = moduleMigrationDirs.map { (module, dir) ->
+    tasks.register<FlywayMigrateTask>("flywayMigrate" + module.split('-', '_').joinToString("") { it.replaceFirstChar(Char::uppercase) }) {
+        // FlywayMigrateTask.group is Flyway's own boolean ("group pending migrations in one transaction") — go through Task
+        (this as Task).group = "flyway"
+        description = "Apply db/migration/$module with its own history table (mirrors FlywayModuleOrchestrator)"
+        locations = arrayOf("filesystem:${dir.absolutePath}")
+        table = "flyway_schema_history_" + module.replace('-', '_')
+        mustRunAfter(tasks.named("flywayMigrate"))
+    }
+}
+
+tasks.register("flywayMigrateAll") {
+    group = "flyway"
+    description = "Apply __root, then every module's migrations (what `archforge db migrate` runs)"
+    dependsOn(tasks.named("flywayMigrate"), moduleMigrateTasks)
+}
+// module tasks run in name order, after __root
+moduleMigrateTasks.zipWithNext().forEach { (a, b) -> b.configure { mustRunAfter(a) } }

@@ -41,7 +41,7 @@ public class DoctorCommand implements Callable<Integer> {
             System.out.println("doctor: all checks passed.");
             return 0;
         }
-        System.out.println("doctor: " + failures + " problem(s) found — fix the ✗ items above.");
+        System.out.println(summaryLine(failures));
         return 1;
     }
 
@@ -52,7 +52,7 @@ public class DoctorCommand implements Callable<Integer> {
         if (major >= 25) {
             ok("java " + major + " (need >= 25)");
         } else {
-            fail("java " + major + " — need JDK 25+ on PATH (or fix JAVA_HOME)");
+            fail("java " + major + " - need JDK 25+ on PATH (or fix JAVA_HOME)");
         }
         if (version.exitCode() != 0) {
             fail("java not runnable: exit " + version.exitCode());
@@ -101,7 +101,7 @@ public class DoctorCommand implements Callable<Integer> {
             if (major >= minMajor) {
                 ok(label + " " + result.stdout().trim());
             } else {
-                fail(label + " " + result.stdout().trim() + " — need >= " + minMajor);
+                fail(label + " " + result.stdout().trim() + " - need >= " + minMajor);
             }
         } catch (IllegalStateException e) {
             fail(label + " not found on PATH");
@@ -144,12 +144,25 @@ public class DoctorCommand implements Callable<Integer> {
         }
     }
 
+    // ASCII only: the Windows console is usually GBK, where U+2713/U+2717 print as "?" and pass/fail look identical
+    static String okLine(String item) {
+        return "  [ OK ] " + item;
+    }
+
+    static String failLine(String item) {
+        return "  [FAIL] " + item;
+    }
+
+    static String summaryLine(int failures) {
+        return "doctor: " + failures + " problem(s) found - fix the [FAIL] items above.";
+    }
+
     private void ok(String item) {
-        System.out.println("  ✓ " + item);
+        System.out.println(okLine(item));
     }
 
     private void fail(String item) {
         failures++;
-        System.out.println("  ✗ " + item);
+        System.out.println(failLine(item));
     }
 }

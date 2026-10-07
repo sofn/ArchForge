@@ -3,6 +3,7 @@ package com.lesofn.archforge.cli.command;
 import com.lesofn.archforge.cli.config.DbPasswordResolver;
 import com.lesofn.archforge.cli.config.ProjectPaths;
 import com.lesofn.archforge.cli.config.YamlConfigPatcher;
+import com.lesofn.archforge.cli.db.FlywayMigration;
 import com.lesofn.archforge.cli.docker.ComposeSupport;
 import com.lesofn.archforge.cli.proc.ProcessRunner;
 import com.lesofn.archforge.cli.secret.SecretGenerator;
@@ -58,11 +59,9 @@ public class InitCommand implements Callable<Integer> {
                 return infra;
             }
             compose.syncDbPassword(DbPasswordResolver.resolveDbUsername(repoRoot), password.value());
-            int migrate = processRunner.run(
-                    List.of("./gradlew", ":archforge-server-admin:flywayMigrate", "-x", "test"),
-                    repoRoot, Map.of(), true);
+            int migrate = FlywayMigration.run(processRunner, repoRoot);
             if (migrate != 0) {
-                System.err.println("flywayMigrate returned " + migrate + " (ok if Flyway plugin is not wired yet).");
+                return migrate;
             }
         } else {
             System.out.println("Profile " + profile + ": skipped docker and data import.");
