@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,6 +32,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/web")
@@ -75,7 +77,7 @@ public class WebCmsController {
     @GetMapping("/articles/{slug}")
     public WebArticleDetailResponse getArticle(@PathVariable String slug) {
         CmsArticle article = articleService.findPublishedBySlug(slug)
-                .orElseThrow(() -> new RuntimeException("文章不存在"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "文章不存在"));
         CmsCategory category = categoryService.findById(article.getCategoryId()).orElse(null);
         return toDetailResponse(article, category);
     }

@@ -33,6 +33,14 @@ class WebClientErrorStatusIntegrationTest extends AbstractWebIntegrationTest {
         assertEquals(405, response.statusCode(), response.body());
     }
 
+    /** A stale or mistyped article link is not a server failure (crawlers hit these all day; 5xx would page). */
+    @Test
+    void unknownArticleSlugIsNotFound() throws Exception {
+        HttpResponse<String> response = send("GET", "/web/articles/no-such-article-slug");
+
+        assertEquals(404, response.statusCode(), response.body());
+    }
+
     private HttpResponse<String> send(String method, String path) throws Exception {
         HttpRequest request = HttpRequest.newBuilder(URI.create("http://localhost:" + port + path))
                 .method(method, HttpRequest.BodyPublishers.noBody())
