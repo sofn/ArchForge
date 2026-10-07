@@ -215,20 +215,28 @@ public class MetaTableValidator {
             String refTable = column.getReferenceTable();
             String refColumn = column.getReferenceColumn() == null ? "id" : column.getReferenceColumn();
             boolean selfReference = table != null && refTable != null && refTable.equals(table.physicalTableName());
-            MetaColumn target = null;
+            // 只能关联本表或已登记的元表格：以前指向 id 就放行任意物理表（sys_user + ref.password 可读出口令哈希）
+            MetaTable referenced = selfReference || refTable == null ? null
+                    : metaTableRepository.findAllByDeletedFalse()
+                            .stream()
+                            .filter(t -> refTable.equals(t.physicalTableName()))
+                            .findFirst()
+                            .orElse(null);
+            if (!selfReference && referenced == null) {
+                throw new MetaTableException(MetaTableErrorCode.META_COLUMN_TYPE_INVALID, "关联表必须是本表或已登记的元表格: " +
+                        refTable);
+            }
+            MetaColumn target;
             if (selfReference) {
                 target = columns.stream()
                         .filter(c -> c.getColumnCode().equals(refColumn))
                         .findFirst()
                         .orElse(null);
-            } else if (refTable != null) {
-                target = metaTableRepository.findAllByDeletedFalse().stream()
-                        .filter(t -> refTable.equals(t.physicalTableName()))
+            } else {
+                target = metaColumnRepository.findByTableIdAndDeletedFalseOrderBySortAsc(java.util.Objects.requireNonNull(
+                        java.util.Objects.requireNonNull(referenced).getId())).stream()
+                        .filter(c -> c.getColumnCode().equals(refColumn))
                         .findFirst()
-                        .flatMap(t -> metaColumnRepository.findByTableIdAndDeletedFalseOrderBySortAsc(java.util.Objects
-                                .requireNonNull(t.getId())).stream()
-                                .filter(c -> c.getColumnCode().equals(refColumn))
-                                .findFirst())
                         .orElse(null);
             }
             boolean primaryKeyRef = "id".equals(refColumn);

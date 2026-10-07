@@ -63,6 +63,11 @@ public final class SqlIdentifier {
         }
     }
 
+    /** 平台/系统物理表（{@code sys_}、{@code qrtz_}、{@code pg_}、{@code flyway_} …）：元表格既不能建、也不能关联它们。 */
+    public static boolean isPlatformTableName(@Nullable String physicalName) {
+        return physicalName != null && RESERVED_PHYSICAL_PREFIXES.stream().anyMatch(physicalName::startsWith);
+    }
+
     /**
      * 校验物理表名 = 前缀 + 编码 整体。
      *

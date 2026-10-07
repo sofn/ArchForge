@@ -105,10 +105,26 @@ class MetaTableValidatorTest {
 
     @Test
     void displayExpressionWithinTheGrammarPasses() {
-        MetaColumn ok = referenceColumn("order_ref", "id");
+        when(metaTableRepository.findAllByDeletedFalse()).thenReturn(List.of(targetTable()));
+        MetaColumn ok = referenceColumn("meta_orders", "id");
         ok.setDisplayExpression("ref.id || ' / ' || ref.id::text");
 
         assertDoesNotThrow(() -> validator.validate(table(), List.of(ok)));
+    }
+
+    /** Pointing at {@code id} used to skip every check: {@code sys_user} + {@code ref.password} read password hashes. */
+    @Test
+    void referenceMustTargetThisTableOrARegisteredMetaTable() {
+        when(metaTableRepository.findAllByDeletedFalse()).thenReturn(List.of(targetTable()));
+
+        for (String target : List.of("sys_user", "sys_config", "cms_article")) {
+            MetaColumn leak = referenceColumn(target, "id");
+            leak.setDisplayExpression("ref.id");
+
+            MetaTableException e = assertThrows(MetaTableException.class,
+                    () -> validator.validate(table(), List.of(leak)), target);
+            assertEquals(MetaTableErrorCode.META_COLUMN_TYPE_INVALID.getCode(), e.getErrorInfo().getCode(), target);
+        }
     }
 
     private void assertDisplayExpressionRejected(String expression) {

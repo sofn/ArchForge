@@ -50,7 +50,7 @@ public final class ReferenceDisplayBuilder {
     public static List<String> buildJoins(List<MetaColumn> columns, String mainAlias) {
         List<String> joins = new ArrayList<>();
         for (MetaColumn column : columns) {
-            if (!isReference(column)) {
+            if (!joinable(column)) {
                 continue;
             }
             String refAlias = refAlias(column.getColumnCode());
@@ -71,7 +71,7 @@ public final class ReferenceDisplayBuilder {
             return null;
         }
         String displayExpression = column.getDisplayExpression();
-        if (displayExpression == null || displayExpression.isBlank()) {
+        if (displayExpression == null || displayExpression.isBlank() || !joinable(column)) {
             return quoteAlias(mainAlias, column.getColumnCode());
         }
         try {
@@ -93,6 +93,26 @@ public final class ReferenceDisplayBuilder {
 
     private static boolean isReference(MetaColumn column) {
         return column.getDataType() == MetaColumnType.REFERENCE;
+    }
+
+    /**
+     * 只关联普通业务表。存量定义可能指向平台表（{@code sys_user} 配 {@code ref.password} 会把口令哈希带进列表）：
+     * 不 JOIN、显示列退回原值，每条定义每个进程告警一次。{@link #buildJoins} 与 {@link #buildDisplayExpression}
+     * 用同一个判断，免得显示表达式引用一个没有 JOIN 的别名。
+     */
+    private static boolean joinable(MetaColumn column) {
+        if (!isReference(column)) {
+            return false;
+        }
+        String refTable = column.getReferenceTable();
+        if (refTable == null || SqlIdentifier.isPlatformTableName(refTable)) {
+            if (WARNED.add(column.getColumnCode() + "|ref|" + refTable)) {
+                log.warn("meta column {} references {} - not a joinable business table, showing the raw value",
+                        column.getColumnCode(), refTable);
+            }
+            return false;
+        }
+        return true;
     }
 
     private static String quoteAlias(String alias, String column) {

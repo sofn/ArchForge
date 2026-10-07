@@ -124,6 +124,37 @@ class MetaTableInjectionIntegrationTest extends AbstractIntegrationTest {
         assertNoTraceOf("inj_expr");
     }
 
+    /**
+     * A REFERENCE column used to accept any physical table as long as it pointed at {@code id}: referenceTable
+     * {@code sys_user} plus display expression {@code ref.password} put the password hashes into every list row.
+     */
+    @Test
+    void referenceCannotTargetATableThatIsNotARegisteredMetaTable() {
+        MetaColumn leak = column("owner_ref", MetaColumnType.REFERENCE);
+        leak.setReferenceTable("sys_user");
+        leak.setDisplayExpression("ref.password");
+
+        MetaTableException e = assertThrows(MetaTableException.class,
+                () -> adminService.create(table("inj_ref", "meta_"), List.of(leak)));
+
+        assertEquals(MetaTableErrorCode.META_COLUMN_TYPE_INVALID.getCode(), e.getErrorInfo().getCode());
+        assertNoTraceOf("inj_ref");
+    }
+
+    @Test
+    void referenceToARegisteredMetaTableStillWorks() {
+        Long target = adminService.create(table("inj_ref_target", "meta_"), List.of(column("name", MetaColumnType.STRING)));
+        MetaColumn owner = column("target_ref", MetaColumnType.REFERENCE);
+        owner.setReferenceTable("meta_inj_ref_target");
+        owner.setDisplayExpression("ref.name");
+
+        Long source = adminService.create(table("inj_ref_source", "meta_"), List.of(owner));
+
+        assertTrue(exists("meta_inj_ref_source"));
+        adminService.delete(source, true);
+        adminService.delete(target, true);
+    }
+
     @Test
     void platformPrefixCannotAdoptASystemTable() {
         MetaTableException e = assertThrows(MetaTableException.class,

@@ -48,6 +48,16 @@ class ReferenceDisplayBuilderTest {
         assertFalse(columns.stream().anyMatch(c -> c.contains("SELECT")), columns.toString());
     }
 
+    /** Legacy rows may still point at a platform table: never join it (sys_user.password must not leak). */
+    @Test
+    void referenceToAPlatformTableIsNeitherJoinedNorRendered() {
+        MetaColumn column = reference("owner_id", "ref.password");
+        column.setReferenceTable("sys_user");
+
+        assertEquals(List.of(), ReferenceDisplayBuilder.buildJoins(List.of(column), "main"));
+        assertEquals("main.\"owner_id\"", ReferenceDisplayBuilder.buildDisplayExpression(column, "main"));
+    }
+
     private MetaColumn reference(String code, @Nullable String expression) {
         MetaColumn column = new MetaColumn();
         column.setColumnCode(code);
