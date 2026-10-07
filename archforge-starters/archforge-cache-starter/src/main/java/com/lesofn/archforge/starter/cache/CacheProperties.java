@@ -1,6 +1,8 @@
 package com.lesofn.archforge.starter.cache;
 
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -33,4 +35,11 @@ public class CacheProperties {
 
     /** Redis L2 default entry TTL. */
     private Duration redisTtl = Duration.ofMinutes(30);
+
+    /**
+     * Extra class-name prefixes (for example "com.acme.order.") whose types may be restored from the L2 cache.
+     * Project types, collections, maps, numbers, strings and java.time values are always allowed; any other class
+     * the stored JSON names through its type marker is refused.
+     */
+    private List<String> allowedTypePrefixes = new ArrayList<>();
 }

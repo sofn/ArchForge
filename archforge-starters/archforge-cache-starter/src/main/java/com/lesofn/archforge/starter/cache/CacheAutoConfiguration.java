@@ -1,6 +1,7 @@
 package com.lesofn.archforge.starter.cache;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.lesofn.archforge.starter.redisson.RedisJsonSerializers;
 import org.redisson.api.RedissonClient;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -48,9 +49,8 @@ public class CacheAutoConfiguration {
     @ConditionalOnMissingBean(name = "redisCacheManager")
     public RedisCacheManager redisCacheManager(RedisConnectionFactory connectionFactory,
             CacheProperties cacheProperties) {
-        GenericJacksonJsonRedisSerializer valueSerializer = GenericJacksonJsonRedisSerializer.builder()
-                .enableUnsafeDefaultTyping()
-                .build();
+        GenericJacksonJsonRedisSerializer valueSerializer = RedisJsonSerializers.safeJson(
+                cacheProperties.getAllowedTypePrefixes());
 
         RedisCacheConfiguration config = RedisCacheConfiguration.defaultCacheConfig()
                 .entryTtl(cacheProperties.getRedisTtl())
