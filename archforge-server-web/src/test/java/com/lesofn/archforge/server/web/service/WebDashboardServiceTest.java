@@ -2,6 +2,8 @@ package com.lesofn.archforge.server.web.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 import com.lesofn.archforge.server.web.dto.WebDashboardMetricsResponse;
@@ -41,10 +43,14 @@ class WebDashboardServiceTest {
         when(sysOperLogRepository.count(ArgumentMatchers.<Specification<SysOperLog>> any()))
                 .thenReturn(9L);
 
-        WebDashboardMetricsResponse metrics = service.metrics();
+        WebDashboardService spied = spy(service);
+        doReturn(7L).when(spied).onlineSessions();
+
+        WebDashboardMetricsResponse metrics = spied.metrics();
 
         assertEquals(42L, metrics.getUserTotal());
-        assertEquals(42L, metrics.getOnlineNow());
+        // used to be the same query as userTotal — every registered user counted as "online"
+        assertEquals(7L, metrics.getOnlineNow());
         assertEquals(5L, metrics.getTodayLogin());
         assertEquals(9L, metrics.getTodayOperation());
     }
