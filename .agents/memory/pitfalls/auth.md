@@ -6,3 +6,13 @@
 - **Resolving uid without request context**: `StpAdminUtil.STP_LOGIC.getLoginIdByToken(token)` hits the dao token→loginId mapping — works outside request scope.
 - **Captcha codes live in Redis**: `captcha:<uuid>` → JSON string; strip quotes before building the login request body.
 - **Dead `/proxy` endpoint was an open redirect** — legacy `redirect:` + arbitrary url param. Deleted with the auth dead-code cleanup (commit 032fe8a7).
+- **`@DataPermission` used to fail open**: the aspect skipped the scope when the user could not be resolved, and
+  `MetaDataScopeProviderImpl` reads "no scope" as `all()`. The aspect now sets ONLY_SELF without a user id (= no rows).
+  The scope lives in the request `RequestContext` — outside a request scope `DataScopeContextHolder.set` is a no-op, so
+  tests must run inside `ScopedValueContext.runInScope`.
+- **sa-token keeps its DAO in a static**, overwritten by each Spring test context that starts; Spring Framework 7 *pauses*
+  idle cached contexts (stops SmartLifecycle beans such as `LettuceConnectionFactory`). A plain unit test touching
+  `StpAdminUtil` can therefore inherit a stopped Redis connection — give it its own `SaTokenDaoDefaultImpl` and restore.
+- **An interceptor that needs the cached body must walk the wrapper chain** (`WebUtils.getNativeRequest(request,
+  RepeatableRequestWrapper.class)`): the request-log filter wraps the caching wrapper again, so `instanceof` misses it
+  (broke API signatures and the repeat-submit fingerprint).

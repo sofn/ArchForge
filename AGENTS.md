@@ -30,7 +30,13 @@ Read before touching the affected area; each entry links the record.
 - **staging/prod actuator is on a management port** (admin 8089, web 8091);
   probes are `/livez` and `/readyz` on the business port — [ADR-0009](docs/adr/0009-actuator-management-port-and-sql-hardening.md).
 - **`AESEncrypter.getInstance()` is gone** — use `AESEncrypter.of(base64Key)` (AES-GCM, no built-in key).
-- **`archforge init` without `--write` is a pure dry-run**; `JWT_SECRET` / `arch-forge.jwt.*` no longer exist.
+- **`archforge init` without `--write` is a pure dry-run**; `JWT_SECRET` / `arch-forge.jwt.*` no longer exist,
+  and `init` no longer generates `AES_KEY` (nothing reads it — see `docs/specs/security.md`).
+- **REFERENCE columns may only target the table itself or a registered meta table**; platform tables are never
+  joined. **`@DataPermission` fails closed** (no resolvable user = no rows). Generated controllers check
+  `<tableCode>:*` permissions — `docs/specs/security.md` (Dynamic SQL, Data scope).
+- **`docker-compose.prod.yml` requires** `ARCH_FORGE_RSA_PRIVATE_KEY`, `CORS_ALLOWED_ORIGINS`, `WEB_PUBLIC_URL`
+  (plus the DB/Redis passwords); `DeploymentArtifactsConsistencyTest` keeps compose and profiles in step.
 
 ## AI Asset Map
 

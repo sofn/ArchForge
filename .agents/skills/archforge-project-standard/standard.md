@@ -55,37 +55,39 @@ ArchForge/
 ├── archforge-server-web/          # C-end API :8081
 ├── archforge-cli/
 ├── docker/
-│   ├── jvm/Dockerfile             # JVM mode (jlink + Leyden CDS)
-│   ├── native/Dockerfile          # GraalVM Native Image mode
-│   ├── docker-compose.yml
-│   ├── docker-compose.native.yml
-│   ├── nginx/
-│   └── start.sh                   # One-click: ./start.sh jvm | native
+│   ├── fulljre/ jlink/ native/ allinone/   # image variants (Dockerfiles)
+│   ├── docker-compose.infra.yml   # dev dependencies: PostgreSQL + Redis
+│   ├── docker-compose{,.prod,.staging,.fulljre,.jlink,.native,.allinone}.yml
+│   ├── observability/             # Prometheus / Grafana / Jaeger / Alertmanager
+│   └── start.sh
 ├── project-definition/meta/       # Meta-table definitions as YAML (archforge meta export/import)
 ├── build.gradle.kts               # Root: repositories, Spotless, Java toolchain
 ├── settings.gradle.kts            # Module includes
-└── skills/                        # Reusable Devin skills
+└── .agents/                       # AI assets: skills, memory, changes, knowledge
 ```
 
 ### Module Dependency Rules
 
 ```
-archforge-server-* → archforge-domain/* → archforge-common/archforge-common-base
+archforge-server-* → archforge-module-* / archforge-builtin/* → archforge-common/{base,error,jpa}
 archforge-server-* → archforge-infrastructure → archforge-common/{base,error,jpa}
 ```
 
 - **`archforge-common-base`**: No Spring dependencies. Pure Java utilities, base classes, constants.
 - **`archforge-common-error`**: Error code enums, exception base classes, standard API response wrappers.
 - **`archforge-infrastructure/`**: Spring-aware cross-cutting concerns — sa-token, filters, file storage, observability.
-- **`archforge-domain/<context>/`**: Business logic with DDD patterns. Depends on common-base/jpa.
+- **`archforge-module-<name>/`** (business domains, flat at the repo root) and **`archforge-builtin/<name>/`**
+  (platform capabilities): DDD business logic, `api` / `internal` packages. Depend on common-base/jpa. There is no
+  `archforge-domain/` directory — see `docs/specs/module-governance.md`.
 - **`archforge-server-*`**: Thin web layer — controllers, DTOs, Spring Boot entry point.
 - **`archforge-dependencies/`**: `java-platform` BOM. Every other module applies `platform(project(":archforge-dependencies"))`.
 
 ### Adding a New Bounded Context
 
-1. Create `domain/<context-name>/build.gradle.kts`
-2. Add `include("domain:<context-name>")` to `settings.gradle.kts`
-3. Add dependency in the server module: `implementation(project(":domain:<context-name>"))`
+1. Run `./archforge module new <name>` — it creates `archforge-module-<name>/` (api / internal layout) and registers
+   it in `settings.gradle.kts` and server-admin (modules are assembled into server-admin by default)
+2. Put business logic under `api` (published interfaces) and `internal` (implementation)
+3. Do not hand-create `domain/<name>` or `archforge-domain/<name>` directories — that layout no longer exists
 4. Create Flyway migrations under the module's own `src/main/resources/db/migration/<module>/` (module-local V1..Vn) if the context introduces new tables; shared/platform tables go to common-jpa `db/migration/__root/`
 
 ---
@@ -335,7 +337,7 @@ contribute no predicate. This means a fully-null criteria object returns an unco
 
 **Boundary between layers:** the criteria DTO lives in `server-admin` (transport concern).
 `SysUserService.findAll(Specification<SysUser>, Pageable)` accepts a `Specification` so
-`domain/admin-user` has no dependency on `server-admin` types. The translation from DTO →
+`archforge-builtin/archforge-admin-user` has no dependency on `server-admin` types. The translation from DTO →
 `Specification` happens in the controller.
 
 ---
@@ -705,7 +707,7 @@ dependencies {
 
 ## 8. Checklist for New Services
 
-- [ ] Module follows the standard structure (`server-<name>`, `domain/<context>`)
+- [ ] Module follows the standard structure (`archforge-server-<name>`, `archforge-module-<name>` / `archforge-builtin/<name>`)
 - [ ] `settings.gradle.kts` updated with new module includes
 - [ ] `archforge-dependencies/build.gradle.kts` updated if new libraries introduced
 - [ ] `package-info.java` with `@NullMarked` in every package

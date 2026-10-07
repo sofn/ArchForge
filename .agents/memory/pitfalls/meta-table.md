@@ -8,3 +8,6 @@
 - **Never validate SQL fragments with a blacklist regex**: the old display-expression check used `String.matches(".*SELECT.*")`; `.` does not match a newline, so `ref.id ||\n(SELECT …)` passed (2026-10, fixed by the `DisplayExpression` whitelist grammar). Same trap for any `matches(".*X.*")` guard.
 - **`validateTableCode(code)` is not a physical-name check**: the table is `prefix + code`, and `CREATE TABLE IF NOT EXISTS` silently *adopts* an existing relation (`sys_` + `menu` → the system table, later `DROP … CASCADE`). Validate the whole name (`validatePhysicalTableName`) and refuse existing relations in `create`.
 - **Unquoted DDL fragments must be re-printed from a parsed value**, not passed through (`DEFAULT <value>` for numbers/arrays). Quoted ones must double `'`.
+- **A REFERENCE column could join any physical table** (fixed 2026-10): pointing `referenceColumn` at `id` skipped every
+  check, so `referenceTable: sys_user` + `ref.password` listed password hashes. The target must be the table itself or a
+  registered meta table (design time), and `ReferenceDisplayBuilder` never joins a platform table (runtime, for legacy rows).

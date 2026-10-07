@@ -121,6 +121,17 @@ rendered strictly — validation alone is not trusted:
   is `[a-z][a-z0-9_]{0,31}`, the result may not start with `sys_ qrtz_ pg_ sql_ information_schema_ flyway_`, and an
   empty prefix (adopted tables) may not start with `meta_`. `create` refuses a name that already exists
   (`META_PHYSICAL_TABLE_EXISTS`) — adoption is the import flow's job — and `delete` re-validates before `DROP`.
+- **REFERENCE targets** must be the table itself or a registered meta table (`MetaTableValidator`); at runtime
+  `ReferenceDisplayBuilder` never joins a platform table (`SqlIdentifier.isPlatformTableName`) and shows the raw value
+  for such legacy definitions. Otherwise a display expression such as `ref.password` reads any platform column.
+
+## Data scope
+
+Row-level scope exists only inside a `@DataPermission` call (`DataScopeAspect` → `DataScopeContextHolder`). It fails
+closed: a call whose user cannot be resolved gets ONLY_SELF without a user id — no rows. Without the annotation the
+meta-table filter sees no scope and returns every row, so `MetaTableDataScopeCoverageTest` requires it on every
+`MetaTableController` handler. Generated module controllers check their `<tableCode>:*` permissions (seeded by the
+generated menu SQL) and run export/import under `@DataPermission`.
 
 ## Redis value serialization
 
@@ -131,9 +142,14 @@ application types are added through `arch-forge.cache.composite.allowed-type-pre
 
 ## Encryption helper
 
-`AESEncrypter` has no built-in key: `AESEncrypter.of(<Base64 key>)` (16/24/32 bytes — the `AES_KEY` that
-`archforge init` generates), AES-GCM, random IV per message, hex(IV‖ciphertext‖tag). Error messages never contain
-plaintext, ciphertext or key.
+`AESEncrypter` has no built-in key: `AESEncrypter.of(<Base64 key>)` (16/24/32 bytes), AES-GCM, random IV per message,
+hex(IV‖ciphertext‖tag). Error messages never contain plaintext, ciphertext or key.
+
+Nothing in ArchForge encrypts with it, so there is no `AES_KEY` setting and `archforge init` does not generate one. An
+application that uses the helper owns its key: read it from its own environment variable, fail at startup when it is
+missing, and never fall back to a literal. Data encrypted by the old helper (ECB, built-in key) used a key that is
+public in the git history — treat it as plaintext: decrypt it once in a migration outside the library and re-encrypt
+with `AESEncrypter.of(...)`. The old key must not come back into the code.
 
 ## Request log
 

@@ -11,3 +11,8 @@
 - **Moving the actuator to `management.server.port` also moves `/actuator/health`**: keep a probe on the business port (`management.endpoint.health.probes.add-additional-paths=true` → `/livez`, `/readyz`) and add it to `AdminSaTokenConfig.PUBLIC_PATHS`, or orchestrator probes get 401.
 - **`Observation.start(...)` without `openScope()` creates a span that is never *current***: `tracer.currentSpan()` is null for the whole request and MDC `traceId` stays empty. The hand-rolled `OtelTracer` in trace-starter also passes a no-op event publisher, so Boot's `Slf4JEventListener` never populates MDC — `RequestLogFilter` sets `traceId`/`spanId` itself.
 - **Do not reuse Spring Boot's metric names for custom observations** (`http.server.requests`): two families with different tag sets double every `sum()` and put raw paths into labels.
+- **A test that reads files outside its module must declare them as task inputs**: with `org.gradle.caching=true` a change
+  to `docker/*.yml` or `scripts/*.sh` alone is served the cached (green) result of `DeploymentArtifactsConsistencyTest`
+  — server-admin's `test` task lists them under `deploymentArtifacts`.
+- **`@ConfigurationProperties` binding keeps an unresolved `${VAR}` as literal text** instead of failing: a missing
+  `CORS_ALLOWED_ORIGINS` bound the origin `"${CORS_ALLOWED_ORIGINS}"`. Fail-fast checks must reject values containing `${`.

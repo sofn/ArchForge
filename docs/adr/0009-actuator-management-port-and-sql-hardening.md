@@ -26,7 +26,8 @@ real and share a root cause — a value, an endpoint or a port that was trusted 
 - **Allow-listed Redis polymorphic typing** (`RedisJsonSerializers.safeJson`) replaces `enableUnsafeDefaultTyping`;
   the prod compose starts Redis with `--requirepass`.
 - **`AESEncrypter` loses its built-in key** (`getInstance()` removed, `of(base64Key)` added, AES-GCM). It had no
-  in-repo callers, so the break is contained to the published `common-base` API.
+  in-repo callers, so the break is contained to the published `common-base` API. Follow-up: `archforge init` no
+  longer generates an `AES_KEY` nobody reads; the migration path for old ECB data is in `docs/specs/security.md`.
 - `mask-fields` entries become key fragments; staging/prod stop logging payloads.
 - Error-code templates use slf4j `{}` (the `ErrorInfo` formatter); `{0}` never rendered.
 
