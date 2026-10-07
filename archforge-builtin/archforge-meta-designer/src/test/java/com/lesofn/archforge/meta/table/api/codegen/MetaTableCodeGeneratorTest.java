@@ -83,6 +83,12 @@ class MetaTableCodeGeneratorTest {
         String controllerContent = Files.readString(controllerFile);
         assertThat(controllerContent).contains("@GetMapping(\"/export\")");
         assertThat(controllerContent).contains("@PostMapping(\"/import\")");
+        // the generated menu SQL seeds <tableCode>:list/add/edit/remove/export/import — the API must check them
+        // (it used to check nothing: UI-only authorization), and the meta-runtime export/import honour the data scope
+        for (String permission : List.of("list", "add", "edit", "remove", "export", "import")) {
+            assertThat(controllerContent).contains("@SaCheckPermission(value = \"demo_project:" + permission + "\"");
+        }
+        assertThat(controllerContent.split("@DataPermission", -1)).hasSize(3);
 
         String buildGradleContent = Files.readString(buildGradleFile);
         assertThat(buildGradleContent).contains("api(project(\":archforge-builtin:archforge-meta-runtime\"))");

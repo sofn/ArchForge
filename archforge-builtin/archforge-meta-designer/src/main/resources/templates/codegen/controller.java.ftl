@@ -2,7 +2,10 @@ package ${packageBase}.rest;
 
 import ${packageBase}.dto.*;
 import ${packageBase}.service.${entityName}Service;
+import cn.dev33.satoken.annotation.SaCheckPermission;
+import com.lesofn.archforge.infrastructure.auth.stp.StpAdminUtil;
 import com.lesofn.archforge.infrastructure.frame.context.RequestContext;
+import com.lesofn.archforge.infrastructure.security.datascope.DataPermission;
 import com.lesofn.archforge.meta.table.api.dto.ImportResponse;
 import com.lesofn.archforge.meta.table.api.enums.MetaDataFormat;
 import com.lesofn.archforge.meta.table.api.service.MetaTableCrudService;
@@ -27,18 +30,21 @@ public class ${entityName}Controller {
     private final MetaTableCrudService metaTableCrudService;
 
     @Operation(summary = "获取${tableName}列表")
+    @SaCheckPermission(value = "${tableCode}:list", type = StpAdminUtil.TYPE)
     @PostMapping
     public ${entityName}PageResult<${entityName}Response> list(@RequestBody @Valid ${entityName}ListRequest request) {
         return ${entityName?uncap_first}Service.list(request);
     }
 
     @Operation(summary = "创建${tableName}")
+    @SaCheckPermission(value = "${tableCode}:add", type = StpAdminUtil.TYPE)
     @PostMapping("/create")
     public Long create(@RequestBody @Valid ${entityName}CreateRequest request) {
         return ${entityName?uncap_first}Service.create(request);
     }
 
     @Operation(summary = "更新${tableName}")
+    @SaCheckPermission(value = "${tableCode}:edit", type = StpAdminUtil.TYPE)
     @PutMapping("/{id}")
     public Boolean update(@PathVariable Long id, @RequestBody @Valid ${entityName}UpdateRequest request) {
         request.setId(id);
@@ -46,18 +52,22 @@ public class ${entityName}Controller {
     }
 
     @Operation(summary = "删除${tableName}")
+    @SaCheckPermission(value = "${tableCode}:remove", type = StpAdminUtil.TYPE)
     @DeleteMapping("/{id}")
     public Boolean delete(@PathVariable Long id) {
         return ${entityName?uncap_first}Service.delete(id);
     }
 
     @Operation(summary = "获取${tableName}详情")
+    @SaCheckPermission(value = "${tableCode}:list", type = StpAdminUtil.TYPE)
     @GetMapping("/{id}")
     public ${entityName}Response detail(@PathVariable Long id) {
         return ${entityName?uncap_first}Service.detail(id);
     }
 
     @Operation(summary = "导出${tableName}数据")
+    @SaCheckPermission(value = "${tableCode}:export", type = StpAdminUtil.TYPE)
+    @DataPermission
     @GetMapping("/export")
     public void export(@RequestParam(defaultValue = "EXCEL") String format, HttpServletResponse response) throws IOException {
         MetaDataFormat dataFormat = MetaDataFormat.of(format);
@@ -77,6 +87,8 @@ public class ${entityName}Controller {
     }
 
     @Operation(summary = "导入${tableName}数据")
+    @SaCheckPermission(value = "${tableCode}:import", type = StpAdminUtil.TYPE)
+    @DataPermission
     @PostMapping("/import")
     public ImportResponse importData(RequestContext rc, @RequestParam(defaultValue = "CSV") String format, @RequestPart("file") MultipartFile file) throws IOException {
         return metaTableCrudService.importData(TABLE_CODE, MetaDataFormat.of(format), file.getInputStream(), rc.getCurrentUid());

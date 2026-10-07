@@ -1,6 +1,5 @@
 package com.lesofn.archforge.infrastructure.security.datascope;
 
-import org.jspecify.annotations.Nullable;
 import com.lesofn.archforge.infrastructure.auth.LoginContext;
 import com.lesofn.archforge.common.auth.SystemLoginUser;
 import com.lesofn.archforge.common.auth.DataScopeEnum;
@@ -30,10 +29,7 @@ public class DataScopeAspect {
 
     @Around("@annotation(dataPermission)")
     public Object around(ProceedingJoinPoint point, DataPermission dataPermission) throws Throwable {
-        DataScopeContext context = buildContext(dataPermission);
-        if (context != null) {
-            DataScopeContextHolder.set(context);
-        }
+        DataScopeContextHolder.set(buildContext(dataPermission));
         try {
             return point.proceed();
         } finally {
@@ -41,16 +37,23 @@ public class DataScopeAspect {
         }
     }
 
-    private @Nullable DataScopeContext buildContext(DataPermission dataPermission) {
-        SystemLoginUser user;
+    private DataScopeContext buildContext(DataPermission dataPermission) {
+        SystemLoginUser user = null;
         try {
             user = LoginContext.getAdminUser();
         } catch (Exception e) {
-            log.debug("No authenticated user, skip data scope: {}", e.getMessage());
-            return null;
+            log.debug("No authenticated user for a data-scoped call: {}", e.getMessage());
         }
         if (user == null) {
-            return null;
+            // 失败关闭：标了 @DataPermission 却解析不出用户，以前直接不设范围——所有行都可见。
+            // ONLY_SELF + 无用户 id 在 JPA 规格与元表格过滤里都等价于"一行都不给"。
+            log.warn("@DataPermission call without a resolvable user - denying all rows");
+            return DataScopeContext.builder()
+                    .dataScope(DataScopeEnum.ONLY_SELF)
+                    .customDeptIds(new HashSet<>())
+                    .deptAlias(dataPermission.deptAlias())
+                    .userAlias(dataPermission.userAlias())
+                    .build();
         }
 
         DataScopeEnum dataScope = DataScopeEnum.ALL;
