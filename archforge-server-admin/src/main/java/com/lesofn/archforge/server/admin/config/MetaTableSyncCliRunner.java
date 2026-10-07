@@ -2,8 +2,14 @@ package com.lesofn.archforge.server.admin.config;
 
 import com.lesofn.archforge.meta.table.api.service.MetaTableDefinitionService;
 import com.lesofn.archforge.meta.table.api.service.MetaTableDefinitionService.SyncReport;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
@@ -48,7 +54,15 @@ public class MetaTableSyncCliRunner implements CommandLineRunner {
         int exitCode = switch (mode) {
             case "export" -> {
                 List<Path> written = definitionService.exportTo(Path.of(dir), table);
-                log.info("meta export: {} definition file(s) under {}", written.size(), dir);
+                log.info("meta export: wrote {} definition file(s) from the registered tables into {}", written.size(), dir);
+                if (table == null) {
+                    // files the DB knows nothing about: `meta check` reports them as drift, so say it here too
+                    List<String> orphans = orphanDefinitionFiles(Path.of(dir), written);
+                    if (!orphans.isEmpty()) {
+                        log.warn("meta export: {} file(s) under {} have no registered table: {} — delete them, or " +
+                                "`meta import --apply` them if they are meant to exist", orphans.size(), dir, orphans);
+                    }
+                }
                 yield 0;
             }
             case "import" -> {
@@ -85,5 +99,17 @@ public class MetaTableSyncCliRunner implements CommandLineRunner {
         // because this bean only exists under the explicit sync property.
         int finalExitCode = exitCode;
         System.exit(SpringApplication.exit(applicationContext, () -> finalExitCode));
+    }
+
+    private static List<String> orphanDefinitionFiles(Path dir, List<Path> written) {
+        Set<String> exported = written.stream().map(path -> String.valueOf(path.getFileName())).collect(Collectors.toSet());
+        try (Stream<Path> files = Files.list(dir)) {
+            return files.map(path -> String.valueOf(path.getFileName()))
+                    .filter(name -> name.endsWith(".yaml") && !exported.contains(name))
+                    .sorted()
+                    .toList();
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
     }
 }

@@ -15,14 +15,15 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
 @Command(mixinStandardHelpOptions = true, name = "init",
-        description = "One-time setup: generate secrets (dry-run unless --write), patch yaml, " +
-                "start postgres/redis, apply Flyway migrations")
+        description = "One-time setup: generate secrets into .env, patch dev/test yaml and — for dev — start " +
+                "postgres/redis, sync the DB role password and apply Flyway migrations. Without --write it only " +
+                "reports what it would do and changes nothing.")
 public class InitCommand implements Callable<Integer> {
 
     @Option(names = "--profile", defaultValue = "dev", description = "dev|test|staging|prod")
     String profile;
 
-    @Option(names = "--write", description = "Persist generated secrets into .env (default is dry-run)")
+    @Option(names = "--write", description = "Actually do it (default: dry-run report, nothing is changed)")
     boolean write;
 
     private final Path repoRoot;
@@ -39,13 +40,19 @@ public class InitCommand implements Callable<Integer> {
 
     @Override
     public Integer call() {
-        Map<String, String> generated = SecretGenerator.generate();
-        if (write) {
-            Map<String, String> written = SecretGenerator.writeIdempotent(ProjectPaths.envFile(repoRoot));
-            System.out.println("Wrote " + written.size() + " new secret(s) to .env (existing keys kept).");
-        } else {
-            System.out.println("Dry-run: would generate " + generated.size() + " secrets. Re-run with --write to persist.");
+        if (!write) {
+            // a dry-run must not touch anything: no .env, no yaml, no containers, no ALTER ROLE, no migration
+            System.out.println("Dry-run — nothing was changed. With --write, init would:");
+            System.out.println("  - write " + SecretGenerator.generate().size() + " secret(s) to .env (existing keys kept)");
+            System.out.println("  - patch application-dev/test yaml placeholders where needed");
+            if ("dev".equals(profile)) {
+                System.out.println("  - start postgres/redis, sync the DB role password, apply Flyway migrations");
+            }
+            System.out.println("Re-run with --write to apply.");
+            return 0;
         }
+        Map<String, String> written = SecretGenerator.writeIdempotent(ProjectPaths.envFile(repoRoot));
+        System.out.println("Wrote " + written.size() + " new secret(s) to .env (existing keys kept).");
 
         YamlConfigPatcher.patchDevAndTest(repoRoot);
         System.out.println("Patched application-dev/test yaml placeholders where needed.");

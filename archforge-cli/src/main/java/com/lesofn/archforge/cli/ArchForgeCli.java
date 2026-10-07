@@ -18,6 +18,7 @@ import com.lesofn.archforge.cli.command.StatusCommand;
 import com.lesofn.archforge.cli.command.UpCommand;
 import com.lesofn.archforge.cli.mcp.McpServerMode;
 import com.lesofn.archforge.cli.proc.ProcessRunner;
+import java.util.Objects;
 import picocli.AutoComplete;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
@@ -90,9 +91,14 @@ public class ArchForgeCli implements Runnable {
     }
 
     public static void main(String[] args) {
-        int code = new CommandLine(new ArchForgeCli())
-                .setCommandName("archforge")
-                .execute(args);
+        CommandLine cli = new CommandLine(new ArchForgeCli()).setCommandName("archforge");
+        // picocli's own text talks about $YOUR_APP_HOME/bin, which does not exist here
+        Objects.requireNonNull(cli.getSubcommands().get("generate-completion")).getCommandSpec().usageMessage().description(
+                "Print a bash/zsh completion script for `archforge` (needs archforge on PATH, e.g. an alias).",
+                "Current shell:  source <(./archforge generate-completion)",
+                "Permanently:    ./archforge generate-completion > ~/.archforge-completion.bash && " +
+                        "echo 'source ~/.archforge-completion.bash' >> ~/.bashrc");
+        int code = cli.execute(args);
         System.exit(code);
     }
 

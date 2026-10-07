@@ -31,6 +31,11 @@ public class StatusCommand implements Callable<Integer> {
         DevStack.status(root);
         ComposeSupport compose = new ComposeSupport(new ProcessRunner(), root);
         System.out.println();
+        if (profile == Profile.dev && compose.stackFileExists(profile)) {
+            // dev's stack file and the infra file are one compose project: two listings were the same containers twice
+            System.out.println("Containers (dev — infra and app share one compose project):");
+            return compose.psStack(profile);
+        }
         System.out.println("Infra containers:");
         int code = compose.psInfra();
         if (compose.stackFileExists(profile)) {

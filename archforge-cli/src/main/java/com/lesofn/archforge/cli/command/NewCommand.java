@@ -25,13 +25,17 @@ import picocli.CommandLine.Parameters;
 @Command(
         mixinStandardHelpOptions = true,
         name = "new",
-        description = "Create a new ArchForge-based project skeleton")
+        description = {
+                "Create a new ArchForge-based project skeleton.",
+                "Example: archforge new order-app -d ~/projects   (creates ~/projects/order-app)"
+        })
 public class NewCommand implements Callable<Integer> {
 
     private static final Pattern NAME_PATTERN = Pattern.compile("[a-z][a-z0-9-]*");
     private static final String TEMPLATE_ROOT = "/templates/new/";
 
-    @Parameters(index = "0", description = "Project name (lowercase, digits, dashes)")
+    @Parameters(index = "0", description = "Project NAME, not a path (lowercase letters, digits, dashes); " +
+            "use -d for the parent directory")
     String name;
 
     @Option(names = {

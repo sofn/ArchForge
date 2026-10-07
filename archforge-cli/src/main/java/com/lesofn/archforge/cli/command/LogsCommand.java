@@ -48,6 +48,9 @@ public class LogsCommand implements Callable<Integer> {
     @Option(names = "--stack", description = "Show compose stack logs instead of dev logs")
     boolean stack;
 
+    @Option(names = "--debug", description = "Include debug.log (startup stack traces, library banners)")
+    boolean debug;
+
     @Override
     public Integer call() throws IOException {
         Path root = ProjectPaths.repoRoot();
@@ -74,6 +77,7 @@ public class LogsCommand implements Callable<Integer> {
         try (Stream<Path> stream = Files.list(logs)) {
             stream.filter(p -> String.valueOf(p.getFileName()).endsWith(".log"))
                     .filter(p -> service == null || String.valueOf(p.getFileName()).startsWith(service))
+                    .filter(p -> debug || !"debug.log".equals(String.valueOf(p.getFileName())))
                     .forEach(p -> files.add(p.toString()));
         }
         if (files.isEmpty()) {
