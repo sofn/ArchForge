@@ -56,4 +56,21 @@ class MetaTablePermissionCoverageTest {
         assertEquals(List.of("meta-table:export"), Arrays.asList(permission.value()));
         assertEquals(StpAdminUtil.TYPE, permission.type());
     }
+
+    /** The menu seed (id 93) and the admin UI both say meta-table:generate; the endpoint used to check meta-table:edit. */
+    @Test
+    void generateRequiresTheGeneratePermission() {
+        Method generate = Arrays.stream(MetaTableDesignerController.class.getDeclaredMethods())
+                .filter(m -> m.getName().equals("generate"))
+                .findFirst()
+                .orElseThrow();
+
+        assertEquals(List.of("meta-table:generate"), Arrays.asList(generate.getAnnotation(SaCheckPermission.class).value()));
+    }
+
+    /** tableCode is the public identity (ADR-0008) — copy must not hand out the environment-specific database id. */
+    @Test
+    void copyAnswersWithTheNewTableCode() throws NoSuchMethodException {
+        assertEquals(String.class, MetaTableDesignerController.class.getMethod("copy", String.class).getReturnType());
+    }
 }

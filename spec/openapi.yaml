@@ -4097,8 +4097,7 @@ paths:
           content:
             application/json:
               schema:
-                format: "int64"
-                type: "integer"
+                type: "string"
           description: "OK"
         "4XX":
           $ref: "#/components/responses/Error"

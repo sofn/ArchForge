@@ -209,13 +209,14 @@ public class MetaTableDesignerController {
     @Operation(summary = "复制元表格")
     @SaCheckPermission(value = "meta-table:add", type = StpAdminUtil.TYPE)
     @PostMapping("/{tableCode}/copy")
-    public Long copy(@PathVariable String tableCode) {
-        return metaTableAdminService.copy(idOf(tableCode));
+    public String copy(@PathVariable String tableCode) {
+        // tableCode is the public identity (ADR-0008); the database id differs per environment
+        return metaTableAdminService.findById(metaTableAdminService.copy(idOf(tableCode))).getTableCode();
     }
 
     @Log
     @Operation(summary = "生成元表格代码")
-    @SaCheckPermission(value = "meta-table:edit", type = StpAdminUtil.TYPE)
+    @SaCheckPermission(value = "meta-table:generate", type = StpAdminUtil.TYPE)
     @com.lesofn.archforge.infrastructure.annotation.RateLimit(key = "meta-table-generate", time = 60, maxCount = 5,
             limitType = com.lesofn.archforge.infrastructure.annotation.RateLimit.LimitType.USER)
     @PostMapping("/{tableCode}/generate")
