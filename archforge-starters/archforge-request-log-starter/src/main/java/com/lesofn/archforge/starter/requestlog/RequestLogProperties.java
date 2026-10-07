@@ -27,9 +27,13 @@ public class RequestLogProperties {
     /** 单条日志最大长度；超过则降级为摘要行（不打印参数与响应体）。 */
     private int maxPayloadLength = 2048;
 
-    /** 需要脱敏的字段名（不区分大小写），命中后值替换为 ***。 */
+    /**
+     * 需要脱敏的字段名片段：字段名（忽略大小写、下划线与连字符）包含任一片段即命中，值替换为 ***。
+     * 片段匹配（而非整词）是刻意的：例如登录响应里的 accessToken、refreshToken 靠片段 token 覆盖。
+     */
     private List<String> maskFields = new ArrayList<>(List.of(
-            "password", "old_password", "pwd", "secret", "token", "authorization"));
+            "password", "passwd", "pwd", "secret", "token", "authorization", "apikey", "privatekey", "credential",
+            "captcha", "verification", "smscode", "idcard", "bankcard", "mobile", "phone"));
 
     /** 不参与日志记录的路径前缀/后缀匹配（静态资源、文档、二进制下载）。 */
     private List<String> excludePatterns = new ArrayList<>(List.of(

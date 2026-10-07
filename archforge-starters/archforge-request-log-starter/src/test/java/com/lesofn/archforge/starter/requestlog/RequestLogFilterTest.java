@@ -77,6 +77,70 @@ class RequestLogFilterTest {
         assertTrue(java.util.Objects.requireNonNull(record.getResponse()).contains("\"token\":\"***\""));
     }
 
+    /** maskFields used to be exact key names: "token" never matched "accessToken", so login sessions leaked into info.log. */
+    @Test
+    void masksCredentialVariantsByKeyFragment() throws Exception {
+        MockHttpServletRequest request = new MockHttpServletRequest("POST", "/admin/auth/login");
+        request.setContentType("application/json");
+        request.setContent(("{\"username\":\"u\",\"newPassword\":\"n1\",\"confirm_password\":\"n1\"," +
+                "\"captchaCode\":\"1234\",\"clientSecret\":\"cs\",\"api_key\":\"ak\",\"idCard\":\"110101\"}")
+                        .getBytes(StandardCharsets.UTF_8));
+        request.setParameter("access_token", "AT-9");
+        request.setParameter("page", "2");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        FilterChain chain = (req, res) -> {
+            res.setContentType("application/json");
+            res.getWriter().write("{\"code\":0,\"data\":{\"accessToken\":\"AT-1\",\"refreshToken\":\"RT-1\"," +
+                    "\"id_token\":\"IT-1\",\"userId\":7,\"nickname\":\"Tom\"}}");
+        };
+
+        filter.doFilter(request, response, chain);
+
+        RequestLogRecord record = captured.get(0);
+        String payload = java.util.Objects.requireNonNull(record.getPayload());
+        String body = java.util.Objects.requireNonNull(record.getResponse());
+        for (String secret : List.of("n1", "1234", "\"cs\"", "\"ak\"", "110101")) {
+            assertFalse(payload.contains(secret), secret + " leaked: " + payload);
+        }
+        for (String secret : List.of("AT-1", "RT-1", "IT-1")) {
+            assertFalse(body.contains(secret), secret + " leaked: " + body);
+        }
+        assertTrue(payload.contains("\"username\":\"u\""), payload);
+        assertTrue(body.contains("\"userId\":7") && body.contains("\"nickname\":\"Tom\""), body);
+        assertEquals("***", java.util.Objects.requireNonNull(record.getParameters().get("access_token"))[0]);
+        assertEquals("2", java.util.Objects.requireNonNull(record.getParameters().get("page"))[0]);
+    }
+
+    @Test
+    void masksCredentialVariantsInFormBodies() throws Exception {
+        MockHttpServletRequest request = new MockHttpServletRequest("POST", "/auth/password");
+        request.setContentType("application/x-www-form-urlencoded");
+        request.setContent("username=u&newPassword=zzz&refresh_token=rrr".getBytes(StandardCharsets.UTF_8));
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        filter.doFilter(request, response, (req, res) -> {
+        });
+
+        String payload = java.util.Objects.requireNonNull(captured.get(0).getPayload());
+        assertFalse(payload.contains("zzz") || payload.contains("rrr"), payload);
+        assertTrue(payload.contains("username=u"), payload);
+    }
+
+    @Test
+    void oversizedPayloadsAreOmittedNeverLoggedUnmasked() throws Exception {
+        MockHttpServletRequest request = new MockHttpServletRequest("POST", "/import");
+        request.setContentType("application/json");
+        String huge = "{\"password\":\"s3cr3t\",\"blob\":\"" + "x".repeat(200_000) + "\"}";
+        request.setContent(huge.getBytes(StandardCharsets.UTF_8));
+
+        filter.doFilter(request, new MockHttpServletResponse(), (req, res) -> {
+        });
+
+        String payload = java.util.Objects.requireNonNull(captured.get(0).getPayload());
+        assertEquals("[" + huge.length() + " chars omitted]", payload);
+        assertFalse(payload.contains("s3cr3t"));
+    }
+
     @Test
     void requestBodyRemainsReadableDownstream() throws Exception {
         MockHttpServletRequest request = new MockHttpServletRequest("POST", "/echo");

@@ -6,13 +6,16 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.Strings;
 import org.jspecify.annotations.Nullable;
@@ -27,24 +30,46 @@ import org.springframework.web.filter.OncePerRequestFilter;
  * <p>
  * 载荷捕获自包含：请求体经 {@link RequestLogRequestWrapper} eager 缓存后可重读；
  * 响应体经 {@link RequestLogResponseWrapper} tee 镜像。敏感字段按
- * {@code arch-forge.request-log.mask-fields} 脱敏为 {@code ***}。
+ * {@code arch-forge.request-log.mask-fields} 脱敏为 {@code ***}：字段名（忽略大小写、下划线与连字符）
+ * <b>包含</b>任一片段即命中，所以 {@code token} 能盖住 {@code accessToken} / {@code refresh_token}。
  */
 @Slf4j
 public class RequestLogFilter extends OncePerRequestFilter {
 
     private static final String MASK = "***";
+    /** 脱敏的载荷长度下限（字符）；更大的载荷整体省略。 */
+    private static final int MIN_MASK_LIMIT = 64 * 1024;
     private static final String ERROR_URI_ATTRIBUTE = "jakarta.servlet.error.request_uri";
 
     private final RequestLogProperties properties;
     private final ObjectProvider<RequestLogEnricher> enrichers;
     private final Consumer<RequestLogRecord> sink;
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
+    /** 归一化（小写、去 _ -）后的敏感片段；字段名包含任一片段即脱敏。 */
+    private final Set<String> maskFragments;
+    private final List<Pattern> jsonMaskPatterns = new ArrayList<>();
+    private final List<Pattern> formMaskPatterns = new ArrayList<>();
 
     public RequestLogFilter(RequestLogProperties properties, ObjectProvider<RequestLogEnricher> enrichers,
             Consumer<RequestLogRecord> sink) {
         this.properties = properties;
         this.enrichers = enrichers;
         this.sink = sink;
+        this.maskFragments = new HashSet<>();
+        for (String field : properties.getMaskFields()) {
+            String fragment = normalizeKey(field);
+            if (fragment.isEmpty() || !maskFragments.add(fragment)) {
+                continue;
+            }
+            // 片段的相邻字符间允许出现 _ 或 -，且前后可带任意键名字符：api_key / apiKey / API-KEY / x_apikey_v2 都命中
+            String keyPattern = fragment.chars().mapToObj(c -> Pattern.quote(String.valueOf((char) c)))
+                    .collect(Collectors.joining("[_-]*"));
+            jsonMaskPatterns.add(Pattern.compile(
+                    "(\"[^\"\\\\]*" + keyPattern + "[^\"\\\\]*\"\\s*:\\s*)(\"(?:[^\"\\\\]|\\\\.)*\"|-?[\\d.]+|true|false|null)",
+                    Pattern.CASE_INSENSITIVE));
+            formMaskPatterns.add(Pattern.compile("((?:^|[&?\\s])[\\w.\\-]*" + keyPattern + "[\\w.\\-]*=)[^&\\s]*",
+                    Pattern.CASE_INSENSITIVE));
+        }
     }
 
     /** 保留旧语义：/error 转发也产一条记录（api 回填原始 URI）。 */
@@ -138,43 +163,49 @@ public class RequestLogFilter extends OncePerRequestFilter {
     }
 
     private Map<String, String[]> maskParameters(Map<String, String[]> parameters) {
-        Set<String> maskKeys = maskKeys();
         Map<String, String[]> masked = new HashMap<>(parameters.size());
         for (Map.Entry<String, String[]> entry : parameters.entrySet()) {
-            masked.put(entry.getKey(),
-                    maskKeys.contains(entry.getKey().toLowerCase(Locale.ROOT))
-                            ? new String[] {
-                                    MASK
-                            }
-                            : entry.getValue());
+            masked.put(entry.getKey(), isSensitiveKey(entry.getKey()) ? new String[] {
+                    MASK
+            } : entry.getValue());
         }
         return masked;
+    }
+
+    private boolean isSensitiveKey(String key) {
+        String normalized = normalizeKey(key);
+        for (String fragment : maskFragments) {
+            if (normalized.contains(fragment)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static String normalizeKey(String key) {
+        return key.toLowerCase(Locale.ROOT).replace("_", "").replace("-", "");
     }
 
     private @Nullable String maskPayload(@Nullable String payload) {
         if (payload == null) {
             return null;
         }
+        // 每个敏感片段各扫一遍载荷：超大载荷既贵又无意义（默认 sink 对超长记录本就降级为摘要行），
+        // 也绝不能原样放行未脱敏的内容——直接只留长度。
+        int limit = Math.max(MIN_MASK_LIMIT, properties.getMaxPayloadLength());
+        if (payload.length() > limit) {
+            return "[" + payload.length() + " chars omitted]";
+        }
         String masked = payload;
-        for (String field : properties.getMaskFields()) {
+        for (Pattern json : jsonMaskPatterns) {
             // JSON 字段值："key":"v" / "key":123 / "key":true
-            masked = Pattern
-                    .compile(String.format("(\"%s\"\\s*:\\s*)(\"(?:[^\"\\\\]|\\\\.)*\"|-?[\\d.]+|true|false|null)",
-                            Pattern.quote(field)), Pattern.CASE_INSENSITIVE)
-                    .matcher(masked).replaceAll("$1\"" + MASK + "\"");
+            masked = json.matcher(masked).replaceAll("$1\"" + MASK + "\"");
+        }
+        for (Pattern form : formMaskPatterns) {
             // 表单字段值：key=v&
-            masked = Pattern.compile(String.format("((?:^|[&?\\s])%s=)[^&\\s]*", Pattern.quote(field)),
-                    Pattern.CASE_INSENSITIVE).matcher(masked).replaceAll("$1" + MASK);
+            masked = form.matcher(masked).replaceAll("$1" + MASK);
         }
         return masked;
-    }
-
-    private Set<String> maskKeys() {
-        Set<String> keys = new HashSet<>();
-        for (String field : properties.getMaskFields()) {
-            keys.add(field.toLowerCase(Locale.ROOT));
-        }
-        return keys;
     }
 
     /** TSV 单列约束：载荷里的制表/换行会破坏日志列对齐，折叠为空格。 */
