@@ -90,7 +90,7 @@ public class MetaCommand implements Callable<Integer> {
     @Command(
             mixinStandardHelpOptions = true,
             name = "check",
-            description = "Compare definition YAML files against the DB (exit 1 on drift)")
+            description = "Compare definition YAML files against the DB (exit 1 on drift or on registered tables without a physical table)")
     static class Check implements Callable<Integer> {
 
         @picocli.CommandLine.Mixin
