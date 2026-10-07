@@ -9,6 +9,8 @@ import com.github.kagkarlsson.scheduler.Scheduler;
 import com.github.kagkarlsson.scheduler.task.helper.RecurringTaskWithPersistentSchedule;
 import com.github.kagkarlsson.scheduler.task.helper.Tasks;
 import com.github.kagkarlsson.scheduler.task.schedule.Schedules;
+import com.lesofn.archforge.common.persistence.FlywayConfig;
+import com.lesofn.archforge.common.persistence.FlywayProperties;
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -16,7 +18,6 @@ import java.sql.ResultSet;
 import java.time.Duration;
 import java.util.List;
 import java.util.Locale;
-import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.sql.DataSource;
 import org.flywaydb.core.Flyway;
@@ -24,38 +25,55 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
+import org.jspecify.annotations.Nullable;
 import org.postgresql.ds.PGSimpleDataSource;
 import org.springframework.core.io.support.EncodedResource;
 import org.springframework.jdbc.datasource.init.ScriptUtils;
+import org.testcontainers.postgresql.PostgreSQLContainer;
+import org.testcontainers.utility.DockerImageName;
 
 /**
- * Local PostgreSQL smoke test for the Quartz → db-scheduler migration. Runs ONLY when
- * {@code ARCHFORGE_LOCAL_PG=true} (CI skips it — Testcontainers integration tests cover the same
- * paths there; this exists because the dev sandbox has no Docker).
+ * db-scheduler migration + live scheduling smoke test against real PostgreSQL.
  *
- * Covers what unit tests cannot: the V23 migration SQL against (a) a fresh database and (b) a
- * simulated Quartz-era database, plus live scheduling behavior — recurring execution, reschedule
- * (cron change), pause via cancel, and the persistence of schedule+data in task_data.
+ * <p>
+ * Covers what unit tests cannot: the V23 migration SQL against (a) a fresh database migrated the way the
+ * application does it at startup ({@link FlywayConfig.FlywayModuleOrchestrator}: {@code __root} first, then every
+ * module with its own history table) and (b) a simulated Quartz-era database, plus live scheduling behavior —
+ * recurring execution, reschedule (cron change), pause via cancel, and the persistence of schedule+data in
+ * {@code task_data}.
  *
- * Start a local PG (e.g. zonky binaries) and run:
- * {@code ARCHFORGE_LOCAL_PG=true ARCHFORGE_SMOKE_PG_URL=jdbc:postgresql://localhost:54329/smoke
- * ./gradlew :archforge-server-admin:test --tests '*DbSchedulerLocalPgSmokeTest*'}
+ * <p>
+ * It used to be gated on {@code ARCHFORGE_LOCAL_PG=true} and therefore never ran in CI — it silently rotted: the
+ * default Flyway scan flattened {@code __root/V1} and {@code cms/V1} into one version sequence and every run died on
+ * "Found more than one migration with version 1". Now it runs with the other slow integration tests on a
+ * Testcontainers PostgreSQL. Docker-less sandboxes can still point it at a local superuser connection:
+ * {@code ARCHFORGE_SMOKE_PG_URL=jdbc:postgresql://localhost:54329/smoke?user=postgres&password=postgres}.
  */
-@EnabledIfEnvironmentVariable(named = "ARCHFORGE_LOCAL_PG", matches = "true")
+@Tag("slow")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class DbSchedulerLocalPgSmokeTest {
 
-    private static final String URL = Optional.ofNullable(System.getenv("ARCHFORGE_SMOKE_PG_URL"))
-            .orElse("jdbc:postgresql://localhost:54329/smoke?user=postgres&password=postgres");
     private static final String FRESH_DB = "archforge_fresh";
     private static final String LEGACY_DB = "archforge_legacy";
 
+    private static @Nullable PostgreSQLContainer container;
+    private static String url = "";
+
     @BeforeAll
     static void prepareDatabases() throws Exception {
-        try (Connection admin = DriverManager.getConnection(URL);
+        String override = System.getenv("ARCHFORGE_SMOKE_PG_URL");
+        if (override != null) {
+            url = override;
+        } else {
+            container = new PostgreSQLContainer(DockerImageName.parse("postgres:17-alpine"))
+                    .withDatabaseName("smoke").withUsername("postgres").withPassword("postgres");
+            container.start();
+            url = container.getJdbcUrl() + "&user=postgres&password=postgres";
+        }
+        try (Connection admin = DriverManager.getConnection(url);
                 java.sql.Statement stmt = admin.createStatement()) {
             for (String db : new String[] {
                     FRESH_DB, LEGACY_DB
@@ -68,20 +86,24 @@ class DbSchedulerLocalPgSmokeTest {
 
     @AfterAll
     static void cleanup() throws Exception {
-        try (Connection admin = DriverManager.getConnection(URL);
+        try (Connection admin = DriverManager.getConnection(url);
                 java.sql.Statement stmt = admin.createStatement()) {
             for (String db : new String[] {
                     FRESH_DB, LEGACY_DB
             }) {
                 stmt.execute("DROP DATABASE IF EXISTS " + db);
             }
+        } finally {
+            if (container != null) {
+                container.stop();
+            }
         }
     }
 
     @SuppressWarnings("StringSplitter") // 取首段即可，split() 语义最贴合
     private static DataSource ds(String db) {
-        String base = URL.split("\\?")[0];
-        String query = URL.contains("?") ? URL.substring(URL.indexOf('?')) : "";
+        String base = url.split("\\?")[0];
+        String query = url.contains("?") ? url.substring(url.indexOf('?')) : "";
         PGSimpleDataSource dataSource = new PGSimpleDataSource();
         dataSource.setURL(base.substring(0, base.lastIndexOf('/') + 1) + db + query);
         return dataSource;
@@ -96,10 +118,8 @@ class DbSchedulerLocalPgSmokeTest {
     @Test
     @Order(1)
     void freshDatabaseMigratesCleanlyWithoutQuartzTables() {
-        Flyway.configure()
-                .dataSource(ds(FRESH_DB))
-                .load()
-                .migrate();
+        // exactly what the application does at startup: __root, then each module (own history table)
+        new FlywayConfig.FlywayModuleOrchestrator(ds(FRESH_DB), new FlywayProperties()).migrate();
 
         try (Connection c = ds(FRESH_DB).getConnection()) {
             assertTrue(tableExists(c, "scheduled_tasks"), "db-scheduler table must exist");
@@ -137,9 +157,11 @@ class DbSchedulerLocalPgSmokeTest {
                     c,
                     new EncodedResource(new org.springframework.core.io.ClassPathResource("db/legacy-quartz-fixture.sql"), StandardCharsets.UTF_8));
         }
-        // 2. Baseline at 22 (the pre-V23 chain is "already applied"); migrate then runs V23,
-        //    which carries the Quartz→db-scheduler conversion.
-        Flyway.configure().dataSource(legacy).baselineOnMigrate(true).baselineVersion("22").load().migrate();
+        // 2. Baseline at 22 (the pre-V23 chain is "already applied") and stop at V23, which carries the
+        //    Quartz→db-scheduler conversion. Later migrations (V24+) assume the full V1-V22 schema (meta tables, ...)
+        //    that this minimal fixture deliberately does not recreate.
+        Flyway.configure().dataSource(legacy).locations("classpath:db/migration/__root")
+                .baselineOnMigrate(true).baselineVersion("22").target("23").load().migrate();
         // 4. Assertions
         try (Connection c = legacy.getConnection()) {
             assertFalse(tableExists(c, "qrtz_triggers"));
