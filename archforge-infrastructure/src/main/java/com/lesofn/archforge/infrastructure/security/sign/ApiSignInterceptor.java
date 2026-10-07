@@ -15,8 +15,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RBucket;
 import org.redisson.api.RedissonClient;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.util.WebUtils;
 
 /**
  * API 签名拦截器。
@@ -98,11 +100,17 @@ public class ApiSignInterceptor implements HandlerInterceptor {
     }
 
     private String resolveBody(HttpServletRequest request) throws Exception {
-        if (request instanceof RepeatableRequestWrapper) {
-            byte[] body = request.getInputStream().readAllBytes();
-            return body.length == 0 ? "" : new String(body, StandardCharsets.UTF_8);
+        // 过滤器会层层包装（请求日志过滤器又包在 RepeatableRequestWrapper 外面）：顺着包装链找缓存了 body 的那层，
+        // 只看最外层会把 body 当成空串验签——合法客户端被拒，签空串的请求却能带任意 body
+        RepeatableRequestWrapper repeatable = WebUtils.getNativeRequest(request, RepeatableRequestWrapper.class);
+        if (repeatable != null) {
+            return new String(repeatable.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
         }
-        // 非可重复读取请求，默认空 body；实际签名场景多为 JSON，已由 RepeatableFilter 包装
+        if (request.getContentLengthLong() > 0 || request.getHeader(HttpHeaders.TRANSFER_ENCODING) != null) {
+            // 有 body 却拿不到原文：失败关闭，绝不按空串验签
+            log.warn("Signed request body cannot be re-read for: {}", request.getRequestURI());
+            throw new SecurityException(SecurityErrorCode.SIGN_INVALID);
+        }
         return "";
     }
 
