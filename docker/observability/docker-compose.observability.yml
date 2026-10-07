@@ -46,6 +46,14 @@ services:
   alertmanager:
     image: prom/alertmanager:v0.28.0
     container_name: archforge-alertmanager
+    environment:
+      # Where alerts go. Unset = the placeholder receiver below, which accepts nothing (alerts are evaluated, not delivered).
+      ALERT_WEBHOOK_URL: ${ALERT_WEBHOOK_URL:-http://127.0.0.1:5001/webhook}
+    entrypoint: [ "/bin/sh", "-c" ]
+    command:
+      - >-
+        sed "s|__ALERT_WEBHOOK_URL__|$$ALERT_WEBHOOK_URL|" /etc/alertmanager/alertmanager.yml > /tmp/alertmanager.yml
+        && exec /bin/alertmanager --config.file=/tmp/alertmanager.yml --storage.path=/alertmanager
     volumes:
       - ./alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
       - alertmanager-data:/alertmanager

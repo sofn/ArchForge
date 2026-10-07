@@ -1,22 +1,24 @@
+# Rendered at container start: __ALERT_WEBHOOK_URL__ is replaced with $ALERT_WEBHOOK_URL (see
+# docker-compose.observability.yml). The payload is Alertmanager's standard webhook JSON — WeCom / DingTalk / Feishu
+# robots need an adapter in front (e.g. prometheus-webhook-dingtalk); point ALERT_WEBHOOK_URL at the adapter.
 global:
   resolve_timeout: 5m
 
 route:
   receiver: 'default'
+  group_by: [ 'alertname', 'application' ]
   group_wait: 30s
   group_interval: 5m
   repeat_interval: 4h
 
 receivers:
   - name: 'default'
-    # 示例 webhook 接收器，请替换为真实通知地址
     webhook_configs:
-      - url: 'http://127.0.0.1:5001/webhook'
+      - url: '__ALERT_WEBHOOK_URL__'
         send_resolved: true
 
 inhibit_rules:
-  - source_match:
-      severity: 'critical'
-    target_match:
-      severity: 'warning'
-    equal: [ 'alertname', 'cluster', 'service' ]
+  # A critical alert silences the warning of the same alert on the same target (e.g. the two DiskSpaceLow tiers).
+  - source_matchers: [ 'severity="critical"' ]
+    target_matchers: [ 'severity="warning"' ]
+    equal: [ 'alertname', 'application', 'instance' ]

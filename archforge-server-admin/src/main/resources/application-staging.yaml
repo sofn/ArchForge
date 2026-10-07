@@ -46,7 +46,7 @@ management:
   tracing:
     enabled: true
     sampling:
-      probability: ${SAMPLING_PROBABILITY:1.0}
+      probability: ${SAMPLING_PROBABILITY:0.1}   # 全量采样会打满 collector 与存储
     otlp:
       endpoint: ${OTEL_EXPORTER_OTLP_ENDPOINT:http://localhost:4318/v1/traces}
   server:

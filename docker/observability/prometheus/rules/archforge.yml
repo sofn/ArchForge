@@ -1,11 +1,15 @@
 groups:
   - name: archforge
     rules:
+      # Per application, and only with real traffic (>= ~6 req/min): one 5xx on an idle instance is not "100%".
       - alert: HighErrorRate
         expr: |
-          sum(rate(http_server_requests_seconds_count{status=~"5.."}[5m]))
-          /
-          sum(rate(http_server_requests_seconds_count[5m])) > 0.01
+          (
+            sum by (application) (rate(http_server_requests_seconds_count{status=~"5.."}[5m]))
+            /
+            sum by (application) (rate(http_server_requests_seconds_count[5m]))
+          ) > 0.01
+          and sum by (application) (rate(http_server_requests_seconds_count[5m])) > 0.1
         for: 2m
         labels:
           severity: critical
@@ -16,7 +20,7 @@ groups:
       - alert: HighLatency
         expr: |
           histogram_quantile(0.99,
-            sum(rate(http_server_requests_seconds_bucket[5m])) by (le)
+            sum by (le, application) (rate(http_server_requests_seconds_bucket[5m]))
           ) > 2
         for: 5m
         labels:
@@ -25,11 +29,13 @@ groups:
           summary: "High HTTP request latency"
           description: "P99 latency is above 2 seconds for more than 5 minutes."
 
+      # Whole heap per instance. Per pool (the old expression) Eden is "full" all the time, and pools without a
+      # max report -1.
       - alert: JvmHeapHigh
         expr: |
-          jvm_memory_used_bytes{area="heap"}
+          sum by (application, instance) (jvm_memory_used_bytes{area="heap"})
           /
-          jvm_memory_max_bytes{area="heap"} * 100 > 85
+          sum by (application, instance) (jvm_memory_max_bytes{area="heap"} > 0) * 100 > 85
         for: 5m
         labels:
           severity: warning
@@ -55,6 +61,38 @@ groups:
         annotations:
           summary: "Disk space low"
           description: "Free disk space is below 15%."
+
+      - alert: DiskSpaceLow
+        expr: |
+          disk_free_bytes / disk_total_bytes * 100 < 5
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Disk space almost exhausted"
+          description: "Free disk space is below 5% — logs, uploads and PostgreSQL will start failing."
+
+      # Threads are queueing for a JDBC connection (the integration suite has hit max_connections before).
+      - alert: DbPoolExhausted
+        expr: max by (application, instance, pool) (hikaricp_connections_pending) > 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Database connection pool exhausted"
+          description: "Requests have been waiting for a connection from pool {{ $labels.pool }} for 2 minutes."
+
+      - alert: DbPoolSaturated
+        expr: |
+          max by (application, instance, pool) (hikaricp_connections_active)
+          /
+          max by (application, instance, pool) (hikaricp_connections_max) > 0.9
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Database connection pool nearly full"
+          description: "Pool {{ $labels.pool }} has been more than 90% busy for 5 minutes."
 
       - alert: ApplicationDown
         expr: up{job=~"archforge.*"} == 0
