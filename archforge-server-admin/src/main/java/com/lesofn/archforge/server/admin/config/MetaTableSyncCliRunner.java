@@ -20,7 +20,8 @@ import org.springframework.stereotype.Component;
  * Activated by {@code --arch-forge.meta.sync.mode=export|import|check} plus
  * {@code .dir} (default {@code archforge/meta}), {@code .table} (optional
  * single-table filter) and {@code .apply} (import actually writes; default is
- * a dry-run diff report). {@code check} exits non-zero on any file↔DB drift.
+ * a dry-run diff report). {@code check} exits non-zero on any file↔DB drift
+ * and on any registered table whose physical table does not exist.
  * One-shot process: exits via {@code System.exit}
  * after running, so later unordered runners never see a closed context.
  */
@@ -55,14 +56,24 @@ public class MetaTableSyncCliRunner implements CommandLineRunner {
                 report.lines().forEach(line -> log.info("  {}", line));
                 log.info("meta import {}: {}", apply ? "applied" : "dry-run",
                         report.isEmpty() ? "no changes" : report.lines().size() + " change line(s)");
+                if (report.hasMissingPhysicalTables()) {
+                    // import registers definitions only — it never runs DDL (ADR-0007); say so instead of staying silent
+                    log.warn("meta import: {} registered table(s) have NO physical table — they will fail at runtime until " +
+                            "a Flyway migration (or the designer) creates them", report.missingPhysicalTables().size());
+                }
                 yield 0;
             }
             case "check" -> {
                 // Drift gate: same diff as import dry-run, but non-zero exit on any drift.
                 SyncReport report = definitionService.syncFrom(Path.of(dir), table, false);
                 report.lines().forEach(line -> log.info("  {}", line));
-                log.info("meta check: {}", report.isEmpty() ? "in sync" : "DRIFT — " + report.lines().size() + " line(s)");
-                yield report.isEmpty() ? 0 : 1;
+                boolean drift = !report.isEmpty();
+                boolean missingPhysical = report.hasMissingPhysicalTables();
+                log.info("meta check: {}", drift ? "DRIFT — " + report.lines().size() + " line(s)"
+                        : missingPhysical ? "MISSING PHYSICAL TABLE — " + report.missingPhysicalTables().size() +
+                                " registered table(s) have no physical table"
+                                : "in sync");
+                yield drift || missingPhysical ? 1 : 0;
             }
             default -> throw new IllegalArgumentException("unknown arch-forge.meta.sync.mode=" + mode +
                     " (export|import|check)");

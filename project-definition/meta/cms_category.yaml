@@ -1,7 +1,7 @@
 # yaml-language-server: $schema=../../spec/schemas/meta/table.schema.json
 ---
-tableCode: "blog_category"
-tableName: "博客分类"
+tableCode: "cms_category"
+tableName: "内容分类"
 description: "导入已有物理表演示"
 tablePrefix: ""
 status: 1

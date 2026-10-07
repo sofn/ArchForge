@@ -8,7 +8,7 @@ import org.jspecify.annotations.Nullable;
 
 /**
  * Source of meta-table definition YAML documents — file name (e.g.
- * {@code blog_category.yaml}) mapped to raw YAML text. Implementations read
+ * {@code cms_category.yaml}) mapped to raw YAML text. Implementations read
  * from a filesystem directory or from classpath resources; the codec turns the
  * text into {@link TableDefinition}s.
  */

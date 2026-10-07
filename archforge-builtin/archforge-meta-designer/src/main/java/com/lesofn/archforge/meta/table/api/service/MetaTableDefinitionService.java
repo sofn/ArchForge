@@ -32,11 +32,21 @@ public interface MetaTableDefinitionService {
             List<String> changedColumns,
             List<String> orphanColumns,
             List<String> removedColumns,
-            List<String> orphanTables) {
+            List<String> orphanTables,
+            List<String> missingPhysicalTables) {
 
+        /** No definition ↔ DB drift. Missing physical tables are a separate problem — see {@link #hasMissingPhysicalTables}. */
         public boolean isEmpty() {
             return createdTables.isEmpty() && updatedTables.isEmpty() && newColumns.isEmpty() && changedColumns.isEmpty() &&
                     orphanColumns.isEmpty() && removedColumns.isEmpty() && orphanTables.isEmpty();
+        }
+
+        /**
+         * Registered (in the DB or in a file) but the physical table does not exist: the registry says it is there,
+         * every runtime query on it fails. Physical DDL is deliberately outside the sync (Flyway / the designer).
+         */
+        public boolean hasMissingPhysicalTables() {
+            return !missingPhysicalTables.isEmpty();
         }
 
         public List<String> lines() {
@@ -48,6 +58,8 @@ public interface MetaTableDefinitionService {
             orphanColumns.forEach(c -> out.add("! orphan " + c + " (in DB, absent from file — kept)"));
             removedColumns.forEach(c -> out.add("- column " + c + " (removedColumns — soft-deleted)"));
             orphanTables.forEach(c -> out.add("! orphan table " + c + " (in DB, no definition file — kept)"));
+            missingPhysicalTables.forEach(c -> out.add("! missing physical table " + c +
+                    " (registered, but no such table — add the Flyway migration or recreate it in the designer)"));
             return out;
         }
     }

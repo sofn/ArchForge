@@ -53,6 +53,10 @@ public class MetaTableShadowVerifier implements ApplicationRunner {
         SyncReport report = definitionService.syncFrom(source, null, false);
         if (report.isEmpty()) {
             log.info("meta shadow: {} is in sync with DB", source);
+            // "in sync" says nothing about the physical tables — surface registered-but-missing ones
+            if (report.hasMissingPhysicalTables()) {
+                report.lines().forEach(line -> log.warn("  meta shadow: {}", line));
+            }
             return;
         }
         log.warn("meta shadow: {} drift line(s) between {} and DB", report.lines().size(), source);

@@ -19,12 +19,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.TreeMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
@@ -119,7 +121,31 @@ public class MetaTableDefinitionServiceImpl implements MetaTableDefinitionServic
         if (apply) {
             validate(touched);
         }
+        // 与 DB 漂移无关的另一类问题：登记了、物理表却不在（DDL 不归同步管，见 ADR-0007）
+        diff.missingPhysicalTables.addAll(missingPhysicalTables(definitions.values(), tableCode == null));
         return diff.report();
+    }
+
+    private List<String> missingPhysicalTables(Collection<TableDefinition> definitions, boolean includeRegistered) {
+        // code → physical name; the file's prefix wins (it is the state after an apply)
+        Map<String, String> physicalByCode = new TreeMap<>();
+        for (TableDefinition def : definitions) {
+            MetaTable probe = new MetaTable();
+            MetaTableDefinitionCodec.applyTo(def, probe);
+            physicalByCode.put(def.getTableCode(), probe.physicalTableName());
+        }
+        if (includeRegistered) {
+            tableRepository.findAllByDeletedFalse()
+                    .forEach(t -> physicalByCode.putIfAbsent(t.getTableCode(), t.physicalTableName()));
+        }
+        List<String> missing = new ArrayList<>();
+        // ponytail: one round-trip per registered table — fine for tens of tables on a CLI/startup path; batch with ANY(?) if it grows
+        physicalByCode.forEach((code, physical) -> {
+            if (!PhysicalTables.exists(jdbcTemplate.getJdbcOperations(), physical)) {
+                missing.add(code + " (" + physical + ")");
+            }
+        });
+        return missing;
     }
 
     @Override
@@ -260,10 +286,12 @@ public class MetaTableDefinitionServiceImpl implements MetaTableDefinitionServic
         final List<String> orphanColumns = new ArrayList<>();
         final List<String> removedColumns = new ArrayList<>();
         final List<String> orphanTables = new ArrayList<>();
+        final List<String> missingPhysicalTables = new ArrayList<>();
 
         SyncReport report() {
             return new SyncReport(List.copyOf(createdTables), List.copyOf(updatedTables), List.copyOf(newColumns), List.copyOf(
-                    changedColumns), List.copyOf(orphanColumns), List.copyOf(removedColumns), List.copyOf(orphanTables));
+                    changedColumns), List.copyOf(orphanColumns), List.copyOf(removedColumns), List.copyOf(orphanTables), List
+                            .copyOf(missingPhysicalTables));
         }
     }
 }

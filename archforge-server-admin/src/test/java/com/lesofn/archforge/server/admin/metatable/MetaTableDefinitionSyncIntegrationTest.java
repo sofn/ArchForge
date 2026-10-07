@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.lesofn.archforge.common.persistence.testsupport.AbstractIntegrationTest;
 import com.lesofn.archforge.meta.table.api.dao.MetaColumnRepository;
 import com.lesofn.archforge.meta.table.api.dao.MetaTableRepository;
+import com.lesofn.archforge.meta.table.api.definition.ColumnDefinition;
 import com.lesofn.archforge.meta.table.api.definition.FsDefinitionSource;
 import com.lesofn.archforge.meta.table.api.definition.MetaTableDefinitionCodec;
 import com.lesofn.archforge.meta.table.api.definition.TableDefinition;
@@ -71,6 +72,16 @@ class MetaTableDefinitionSyncIntegrationTest extends AbstractIntegrationTest {
                 });
     }
 
+    private ColumnDefinition columnDefinition(String code) {
+        ColumnDefinition column = new ColumnDefinition();
+        column.setColumnCode(code);
+        column.setColumnName(code);
+        column.setDataType("STRING");
+        column.setLength(100);
+        column.setSort(1);
+        return column;
+    }
+
     private MetaTable seedTable(String code) {
         MetaTable table = new MetaTable();
         table.setTableCode(code);
@@ -122,6 +133,55 @@ class MetaTableDefinitionSyncIntegrationTest extends AbstractIntegrationTest {
         // Round-trip: importing the just-exported file must produce no changes.
         SyncReport report = definitionService.syncFrom(dir, "defsync_rt", false);
         assertTrue(report.isEmpty(), "expected clean report, got: " + report.lines());
+    }
+
+    /** Physical DDL is outside the sync, so "in sync" must not be read as "usable": the registry may point at nothing. */
+    @Test
+    void registeredTableWithoutAPhysicalTableIsReportedApartFromDrift() throws Exception {
+        seedTable("defsync_ghost"); // registry rows only — meta_defsync_ghost was never created
+        definitionService.exportTo(dir, "defsync_ghost");
+
+        SyncReport report = definitionService.syncFrom(dir, null, false);
+
+        assertTrue(report.hasMissingPhysicalTables());
+        assertTrue(report.missingPhysicalTables().contains("defsync_ghost (meta_defsync_ghost)"),
+                String.valueOf(report.missingPhysicalTables()));
+        assertTrue(report.lines().stream().anyMatch(l -> l.contains("missing physical table defsync_ghost")),
+                String.valueOf(report.lines()));
+        assertFalse(report.createdTables().contains("defsync_ghost"), "no file↔DB drift for it");
+        assertFalse(report.updatedTables().contains("defsync_ghost"));
+    }
+
+    @Test
+    void tableWhosePhysicalTableExistsIsNotReported() throws Exception {
+        seedTable("defsync_real");
+        definitionService.exportTo(dir, "defsync_real");
+        try (Connection connection = dataSource.getConnection(); Statement statement = connection.createStatement()) {
+            statement.execute("CREATE TABLE IF NOT EXISTS meta_defsync_real (id BIGSERIAL PRIMARY KEY)");
+            try {
+                SyncReport report = definitionService.syncFrom(dir, "defsync_real", false);
+
+                assertFalse(report.hasMissingPhysicalTables(), String.valueOf(report.missingPhysicalTables()));
+            } finally {
+                statement.execute("DROP TABLE IF EXISTS meta_defsync_real");
+            }
+        }
+    }
+
+    @Test
+    void applyingADefinitionWarnsWhenItsPhysicalTableDoesNotExist() throws Exception {
+        TableDefinition def = new TableDefinition();
+        def.setTableCode("defsync_new");
+        def.setTableName("新表");
+        def.setTablePrefix("meta_");
+        def.setColumns(List.of(columnDefinition("title")));
+        Files.writeString(dir.resolve("defsync_new.yaml"), MetaTableDefinitionCodec.toYaml(def));
+
+        SyncReport report = definitionService.syncFrom(dir, "defsync_new", true);
+
+        assertTrue(report.createdTables().contains("defsync_new"));
+        assertTrue(report.missingPhysicalTables().contains("defsync_new (meta_defsync_new)"),
+                "import --apply registers the table but creates no DDL — it has to say so");
     }
 
     @Test
