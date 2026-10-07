@@ -104,6 +104,7 @@ public class MetaTableController {
     }
 
     @Operation(summary = "导出元表格数据")
+    @SaCheckPermission(value = "meta-table:export", type = StpAdminUtil.TYPE)
     @DataPermission
     @GetMapping("/{tableCode}/export")
     public void export(

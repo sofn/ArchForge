@@ -125,6 +125,7 @@ public class MetaTableDesignerController {
     }
 
     @Operation(summary = "获取元表格详情")
+    @SaCheckPermission(value = "meta-table:list", type = StpAdminUtil.TYPE)
     @GetMapping("/{tableCode}")
     public MetaTableResponse detail(@PathVariable String tableCode) {
         MetaTable table = metaTableAdminService.findByCode(tableCode);
@@ -251,6 +252,7 @@ public class MetaTableDesignerController {
     }
 
     @Operation(summary = "检查删除元表格")
+    @SaCheckPermission(value = "meta-table:remove", type = StpAdminUtil.TYPE)
     @GetMapping("/{tableCode}/delete-check")
     public Long deleteCheck(@PathVariable String tableCode) {
         return metaTableAdminService.checkDelete(idOf(tableCode));
@@ -266,6 +268,7 @@ public class MetaTableDesignerController {
     }
 
     @Operation(summary = "获取元表格 Schema 迁移历史")
+    @SaCheckPermission(value = "meta-table:list", type = StpAdminUtil.TYPE)
     @GetMapping("/{tableCode}/migrations")
     public List<MetaTableMigration> migrations(@PathVariable String tableCode) {
         return metaTableMigrationService.listByTableId(idOf(tableCode));
@@ -273,6 +276,7 @@ public class MetaTableDesignerController {
 
     @Log
     @Operation(summary = "导出元表格 Schema 迁移为 Flyway SQL")
+    @SaCheckPermission(value = "meta-table:edit", type = StpAdminUtil.TYPE)
     @GetMapping("/{tableCode}/export-migration")
     public String exportMigration(@PathVariable String tableCode) throws IOException {
         Path projectRoot = codeGenWorkspaceResolver.resolve();
