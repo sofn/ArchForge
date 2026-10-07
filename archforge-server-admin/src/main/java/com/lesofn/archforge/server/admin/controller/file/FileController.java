@@ -67,7 +67,7 @@ public class FileController {
 
     @Log
     @Operation(summary = "上传文件")
-    @SaCheckPermission(value = "system:file:add", type = StpAdminUtil.TYPE)
+    @SaCheckPermission(value = "tool:file:upload", type = StpAdminUtil.TYPE)
     @com.lesofn.archforge.infrastructure.annotation.RateLimit(key = "file-upload", time = 60, maxCount = 20,
             limitType = com.lesofn.archforge.infrastructure.annotation.RateLimit.LimitType.IP)
     @PostMapping("/upload")
@@ -78,7 +78,7 @@ public class FileController {
 
     @Log
     @Operation(summary = "上传图片（头像等）")
-    @SaCheckPermission(value = "system:file:add", type = StpAdminUtil.TYPE)
+    @SaCheckPermission(value = "tool:file:upload", type = StpAdminUtil.TYPE)
     @PostMapping("/upload-image")
     @RepeatSubmit
     public UploadFileResponse uploadImage(@RequestParam("file") MultipartFile file) {
@@ -166,7 +166,7 @@ public class FileController {
 
     @Log
     @Operation(summary = "删除文件")
-    @SaCheckPermission(value = "system:file:remove", type = StpAdminUtil.TYPE)
+    @SaCheckPermission(value = "tool:file:delete", type = StpAdminUtil.TYPE)
     @DeleteMapping("/{fileId}")
     public Boolean deleteFile(@PathVariable Long fileId) {
         SysFile sysFile = fileService.findById(fileId).orElse(null);

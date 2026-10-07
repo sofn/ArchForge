@@ -53,7 +53,7 @@ public class SchedulerJobController {
     private final SysScheduledJobService jobService;
 
     @Operation(summary = "查询定时任务列表")
-    @SaCheckPermission(value = "monitor:job:list", type = StpAdminUtil.TYPE)
+    @SaCheckPermission(value = "system:scheduler-job:list", type = StpAdminUtil.TYPE)
     @GetMapping
     public AdminPageResponse<SchedulerJobResponse> list(SchedulerJobListRequest query) {
         int currentPage = query.getCurrentPage() != null && query.getCurrentPage() > 0
@@ -75,7 +75,7 @@ public class SchedulerJobController {
 
     @Log
     @Operation(summary = "新增定时任务")
-    @SaCheckPermission(value = "monitor:job:add", type = StpAdminUtil.TYPE)
+    @SaCheckPermission(value = "system:scheduler-job:add", type = StpAdminUtil.TYPE)
     @PostMapping("/add")
     public Long add(@RequestBody SchedulerJobUpsertRequest req) {
         return jobService.add(toEntity(new SysScheduledJob(), req));
@@ -83,7 +83,7 @@ public class SchedulerJobController {
 
     @Log
     @Operation(summary = "更新定时任务")
-    @SaCheckPermission(value = "monitor:job:edit", type = StpAdminUtil.TYPE)
+    @SaCheckPermission(value = "system:scheduler-job:edit", type = StpAdminUtil.TYPE)
     @PutMapping("/update/{id}")
     public void update(@PathVariable Long id, @RequestBody SchedulerJobUpsertRequest req) {
         jobService.update(id, toEntity(new SysScheduledJob(), req));
@@ -91,7 +91,7 @@ public class SchedulerJobController {
 
     @Log
     @Operation(summary = "删除定时任务")
-    @SaCheckPermission(value = "monitor:job:remove", type = StpAdminUtil.TYPE)
+    @SaCheckPermission(value = "system:scheduler-job:remove", type = StpAdminUtil.TYPE)
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {
         jobService.delete(id);
@@ -99,7 +99,7 @@ public class SchedulerJobController {
 
     @Log
     @Operation(summary = "暂停定时任务")
-    @SaCheckPermission(value = "monitor:job:edit", type = StpAdminUtil.TYPE)
+    @SaCheckPermission(value = "system:scheduler-job:edit", type = StpAdminUtil.TYPE)
     @PostMapping("/pause/{id}")
     public void pause(@PathVariable Long id) {
         jobService.pause(id);
@@ -107,7 +107,7 @@ public class SchedulerJobController {
 
     @Log
     @Operation(summary = "恢复定时任务")
-    @SaCheckPermission(value = "monitor:job:edit", type = StpAdminUtil.TYPE)
+    @SaCheckPermission(value = "system:scheduler-job:edit", type = StpAdminUtil.TYPE)
     @PostMapping("/resume/{id}")
     public void resume(@PathVariable Long id) {
         jobService.resume(id);
@@ -115,14 +115,14 @@ public class SchedulerJobController {
 
     @Log
     @Operation(summary = "立即执行一次")
-    @SaCheckPermission(value = "monitor:job:edit", type = StpAdminUtil.TYPE)
+    @SaCheckPermission(value = "system:scheduler-job:edit", type = StpAdminUtil.TYPE)
     @PostMapping("/run/{id}")
     public void run(@PathVariable Long id) {
         jobService.runOnce(id);
     }
 
     @Operation(summary = "查询任务执行日志")
-    @SaCheckPermission(value = "monitor:job:list", type = StpAdminUtil.TYPE)
+    @SaCheckPermission(value = "system:scheduler-job:list", type = StpAdminUtil.TYPE)
     @GetMapping("/log")
     public AdminPageResponse<SchedulerLogResponse> logList(SchedulerLogListRequest body) {
         Long jobId = body.getJobId();
@@ -142,7 +142,7 @@ public class SchedulerJobController {
     }
 
     @Operation(summary = "校验 cron 表达式")
-    @SaCheckPermission(value = "monitor:job:list", type = StpAdminUtil.TYPE)
+    @SaCheckPermission(value = "system:scheduler-job:list", type = StpAdminUtil.TYPE)
     @PostMapping("/validate-cron")
     public boolean validateCron(@RequestBody CronValidateRequest body) {
         return jobService.validateCron(body.getCron());

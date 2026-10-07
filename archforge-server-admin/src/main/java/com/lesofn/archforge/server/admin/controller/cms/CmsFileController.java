@@ -3,6 +3,7 @@ package com.lesofn.archforge.server.admin.controller.cms;
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.dev33.satoken.annotation.SaCheckRole;
+import cn.dev33.satoken.annotation.SaMode;
 import com.lesofn.archforge.infrastructure.auth.stp.StpAdminUtil;
 import com.lesofn.archforge.infrastructure.file.FileStorageService;
 import com.lesofn.archforge.user.api.domain.SysFile;
@@ -40,7 +41,10 @@ public class CmsFileController {
     @Value("${arch-forge.web.public-url:http://localhost:8081}")
     private String webPublicUrl;
 
-    @SaCheckPermission(value = "cms:file:add", type = StpAdminUtil.TYPE)
+    // images uploaded from the article editor: whoever may write articles may upload for them
+    @SaCheckPermission(value = {
+            "cms:article:add", "cms:article:edit"
+    }, mode = SaMode.OR, type = StpAdminUtil.TYPE)
     @PostMapping("/upload")
     public ResponseEntity<Map<String, Object>> uploadMarkdownImage(
             @RequestParam("file[]") MultipartFile[] files) throws IOException {

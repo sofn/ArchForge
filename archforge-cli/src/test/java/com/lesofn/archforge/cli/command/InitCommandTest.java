@@ -32,8 +32,8 @@ class InitCommandTest {
 
     @Test
     void dryRunChangesNothing() throws IOException {
-        Path devYaml = root.resolve("archforge-server-admin/src/main/resources/application-dev.yaml");
-        Files.createDirectories(devYaml.getParent());
+        Path resources = Files.createDirectories(root.resolve("archforge-server-admin/src/main/resources"));
+        Path devYaml = resources.resolve("application-dev.yaml");
         Files.writeString(devYaml, "spring:\n  jpa:\n    hibernate:\n      ddl-auto: update\n");
         RecordingProcessRunner runner = RecordingProcessRunner.succeeding();
 

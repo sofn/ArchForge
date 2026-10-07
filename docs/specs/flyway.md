@@ -1,7 +1,7 @@
 # Flyway history gaps
 
 `archforge-common/archforge-common-jpa/src/main/resources/db/migration/__root/` currently has
-**V1–V4, V6–V18, V20–V27**. There is **no V5 and no V19** in the repository.
+**V1–V4, V6–V18, V20–V28**. There is **no V5 and no V19** in the repository.
 
 `db/migration/` is split per directory: `__root/` holds the shared legacy
 sequence (written to the default `flyway_schema_history`, runs first), and every
@@ -50,7 +50,7 @@ environment has migrated past V23** (V23 deletes the stale history rows, after
 which "missing" is never reported). Remove the key at that point; do not widen
 the pattern before it.
 
-When adding a new version, never reuse V5 or V19; next `__root` file is **V28**.
+When adding a new version, never reuse V5 or V19; next `__root` file is **V29**.
 Module-local migrations version independently (next `cms`/`task` file is V2).
 
 ## Known stale comment: `V23`
