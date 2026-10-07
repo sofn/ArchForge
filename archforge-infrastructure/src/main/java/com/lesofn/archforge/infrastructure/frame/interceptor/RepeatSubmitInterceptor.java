@@ -23,6 +23,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.util.WebUtils;
 
 @Slf4j
 @Component
@@ -53,12 +54,11 @@ public class RepeatSubmitInterceptor implements HandlerInterceptor {
 
     @SuppressWarnings("unchecked")
     private boolean isRepeatSubmit(HttpServletRequest request, RepeatSubmit annotation) throws IOException {
-        String nowParams;
-        if (request instanceof RepeatableRequestWrapper) {
-            nowParams = new String(request.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
-        } else {
-            nowParams = JsonUtil.to(request.getParameterMap());
-        }
+        // 缓存 body 的那层不一定在最外面（请求日志过滤器又包了一层）：顺着包装链找，与签名校验同一做法
+        RepeatableRequestWrapper repeatable = WebUtils.getNativeRequest(request, RepeatableRequestWrapper.class);
+        String nowParams = repeatable != null
+                ? new String(repeatable.getInputStream().readAllBytes(), StandardCharsets.UTF_8)
+                : JsonUtil.to(request.getParameterMap());
 
         Map<String, Object> nowDataMap = new HashMap<>();
         nowDataMap.put(REPEAT_PARAMS, nowParams);
