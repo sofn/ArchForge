@@ -592,7 +592,12 @@ Full stack includes: PostgreSQL + Redis + Application + Nginx reverse proxy.
   `FlywayConfig` orchestrator runs `__root` first, then modules in name order.
 - Wiring: `FlywayConfig` + `FlywayDependencyBeanFactoryPostProcessor` in
   `common.persistence`, gated on `arch-forge.flyway.enabled` (see `docs/specs/flyway.md`).
-- CLI: `archforge db init` / `archforge db update` run `./gradlew :archforge-server-admin:flywayMigrate`.
+- CLI: `archforge init` / `db init` / `db update` / `up` run `./gradlew :archforge-server-admin:flywayMigrateAll`
+  (`cli.db.FlywayMigration`, which also passes `DB_PASSWORD` / `DB_USERNAME` to Gradle and propagates a failure
+  instead of swallowing it). `flywayMigrateAll` mirrors the startup orchestrator: `__root` (default
+  `flyway_schema_history`) first, then one `flywayMigrate<Module>` per `archforge-module-*/…/db/migration/<module>/`
+  with its own `flyway_schema_history_<module>`. Never flatten these locations into one Flyway run —
+  `__root/V1` and `cms/V1` collide.
 - Flyway runs automatically on application startup (can be disabled per profile).
 - Meta-table **definitions** (not DDL) also have a file form: `archforge meta export`
   writes `project-definition/meta/<tableCode>.yaml` from the DB;
@@ -618,29 +623,44 @@ Full stack includes: PostgreSQL + Redis + Application + Nginx reverse proxy.
 
 | Endpoint | Purpose |
 |----------|---------|
-| `/actuator/health` | Liveness / readiness probe |
-| `/actuator/metrics` | Application metrics |
+| `/livez`, `/readyz` | Orchestrator probes **on the business port** (`probes.add-additional-paths`); liveness looks at the process only, readiness adds `db` + `redis` |
+| `/actuator/health[/liveness\|/readiness]` | Aggregate health and the probe groups |
 | `/actuator/prometheus` | Prometheus scrape endpoint |
-| `/actuator/info` | Application info |
+| `/actuator/metrics`, `/actuator/info` | dev / default profile only |
 
-Exposed via management configuration:
+`dev`/default keep everything on the business port. **`staging` and `prod` move the actuator to a separate
+management port** (`MANAGEMENT_SERVER_PORT`, default admin `8089` / web `8091`) and expose only
+`health,info,prometheus` there: the port is never published and never proxied by the frontend nginx `/api`,
+so `/actuator/prometheus` is unreachable from outside. Orchestrator probes use `/livez` / `/readyz` on
+`8080` / `8081`. The admin login-free list (`AdminSaTokenConfig.PUBLIC_PATHS`) contains only real endpoints;
+`AdminPublicPathConsistencyTest` fails if a `/admin/auth/**` entry has no controller behind it.
 
 ```yaml
 management:
+  server:
+    port: ${MANAGEMENT_SERVER_PORT:8089}   # staging / prod only
   endpoints:
     web:
       exposure:
-        include: health,info,metrics,prometheus
+        include: health,info,prometheus
 ```
 
 ### 6.6 Observability
 
-- **Tracing**: Micrometer Tracing bridge to OpenTelemetry, OTLP exporter to Jaeger.
-- **Metrics**: Micrometer with Prometheus scrape endpoint (`/actuator/prometheus`).
+- **Tracing**: Micrometer Tracing bridge to OpenTelemetry, OTLP exporter to Jaeger. `RequestLogFilter`
+  (outermost filter) opens the `archforge.request` observation **scope** and puts `traceId` / `spanId` into MDC,
+  so the log pattern `[%X{traceId},%X{requestId}]` correlates every log line with its trace. The observation
+  must not be named `http.server.requests` (Spring Boot's own HTTP metric — duplicates double every `sum()` and
+  alert ratio) and the raw path is a *high*-cardinality value (trace attribute only, never a metric label).
+- **Metrics**: Micrometer with Prometheus scrape endpoint (`/actuator/prometheus`). Prometheus finds the
+  admin/web containers by DNS service discovery on the management ports (`docker/observability/prometheus`).
 - **Dashboards**: Pre-configured Grafana dashboards for JVM, HTTP, and system metrics.
 - **Alerts**: Prometheus alert rules for error rate, latency, JVM heap, CPU, disk, and availability.
 - **Sampling**: Configurable via `SAMPLING_PROBABILITY` environment variable (default 1.0 in dev, 0.1 in production Docker Compose).
 - **Endpoint**: Configurable via `OTEL_EXPORTER_OTLP_ENDPOINT` environment variable (default `http://localhost:4318/v1/traces`).
+- **Request log**: `arch-forge.request-log.mask-fields` entries are **key fragments** (case-insensitive, `_`/`-`
+  ignored): any key *containing* one is masked, so `token` covers `accessToken` / `refresh_token`. `staging` and
+  `prod` set `include-request-payload` / `include-response-payload` to `false` — bodies carry session tokens and PII.
 
 ---
 

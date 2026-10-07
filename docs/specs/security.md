@@ -32,6 +32,11 @@ Permission strings come from `sys_menu.permission` and must match Admin `v-perms
 
 - New mutating admin APIs need a permission (or an explicit documented exemption).
 - Do not invent permission codes in the frontend only.
+- **Every `/admin/meta-table/**` handler carries its own `@SaCheckPermission("meta-table:…")`** (list / add / edit /
+  remove / export). They read, rewrite and export arbitrary business tables, so the class-level role check is not
+  enough; `MetaTablePermissionCoverageTest` fails on any handler without one.
+- Do not pre-open login-free paths for endpoints that do not exist (`/admin/auth/register` was one); the list is
+  `AdminSaTokenConfig.PUBLIC_PATHS` and `AdminPublicPathConsistencyTest` checks it against the controller.
 
 Auth failures: HTTP 401 / 403 ProblemDetail (`AdminAuthExceptionHandler`).
 
@@ -82,16 +87,55 @@ Do **not** commit secrets. Use environment / profile files:
 
 Local templates stay as `.env.example` / `application-*.yaml.example`. Production values come from the environment, never from git.
 
-Production must inject `ARCH_FORGE_RSA_PRIVATE_KEY` and `DB_PASSWORD`. Missing RSA in `prod` fails fast at startup. Docker Compose files require `${DB_PASSWORD:?…}` / `${JWT_SECRET:?…}` with no baked-in defaults.
+Production must inject `ARCH_FORGE_RSA_PRIVATE_KEY`, `DB_PASSWORD` and `REDIS_PASSWORD` (the prod compose starts Redis
+with `--requirepass` and both apps read `spring.data.redis.password`). Missing RSA in `prod` fails fast at startup. Docker Compose files require `${DB_PASSWORD:?…}` / `${JWT_SECRET:?…}` with no baked-in defaults.
 
 ## Actuator
 
 Keep the exposure allow-list small.
 
-| Profile | `management.endpoints.web.exposure.include` |
-|---------|-----------------------------------------------|
-| admin default | `health,info,metrics,prometheus` |
-| admin prod | `health,info` |
-| web | `health,info` |
+| Profile | `management.endpoints.web.exposure.include` | Port |
+|---------|-----------------------------------------------|------|
+| admin / web default (dev) | `health,info,metrics,prometheus` | business port |
+| admin / web `staging`, `prod` | `health,info,prometheus` | **separate management port** (`MANAGEMENT_SERVER_PORT`; admin `8089`, web `8091`), not published, not behind the frontend `/api` proxy |
+
+Probes for orchestrators are `/livez` and `/readyz` on the business port (no login). Prometheus scrapes the
+management port over the internal observability network.
 
 Do not expose `env`, `beans`, `heapdump`, or `mappings` without an explicit Spec change.
+
+## Dynamic SQL (meta-table)
+
+The meta-table designer is an entry point that executes DDL, so every value that reaches SQL is validated *and*
+rendered strictly — validation alone is not trusted:
+
+- **Column default values** are rendered by `ColumnTypeResolver.formatDefaultValue`: quoted branches double the
+  single quote; unquoted branches (INTEGER/DECIMAL/FILE/IMAGE/REFERENCE and numeric/boolean array elements) are
+  parsed as the target type and re-printed canonically, anything else throws. The validator rejects the same inputs
+  before anything is stored.
+- **REFERENCE display expressions** follow a whitelist grammar (`DisplayExpression`): `ref.<column>[::text]`,
+  `'string literals'`, joined with `||`. No functions, operators, parentheses, comments or sub-queries. Validation
+  and runtime rendering share the one parser; a stored expression that does not parse degrades to the raw reference
+  value and logs a warning instead of being executed.
+- **Physical table name = prefix + code**, validated as a whole (`SqlIdentifier.validatePhysicalTableName`): the prefix
+  is `[a-z][a-z0-9_]{0,31}`, the result may not start with `sys_ qrtz_ pg_ sql_ information_schema_ flyway_`, and an
+  empty prefix (adopted tables) may not start with `meta_`. `create` refuses a name that already exists
+  (`META_PHYSICAL_TABLE_EXISTS`) — adoption is the import flow's job — and `delete` re-validates before `DROP`.
+
+## Redis value serialization
+
+`GenericJacksonJsonRedisSerializer.enableUnsafeDefaultTyping()` lets whoever can write a Redis value pick the class
+that is instantiated when it is read back. Use `RedisJsonSerializers.safeJson(extraPrefixes)` (redisson-starter): it
+resolves only `com.lesofn.archforge.*`, collections, maps, numbers, strings, booleans, `java.time`, UUIDs and arrays;
+application types are added through `arch-forge.cache.composite.allowed-type-prefixes`.
+
+## Encryption helper
+
+`AESEncrypter` has no built-in key: `AESEncrypter.of(<Base64 key>)` (16/24/32 bytes — the `AES_KEY` that
+`archforge init` generates), AES-GCM, random IV per message, hex(IV‖ciphertext‖tag). Error messages never contain
+plaintext, ciphertext or key.
+
+## Request log
+
+`arch-forge.request-log.mask-fields` are key *fragments* — a key containing one is masked (`token` ⇒ `accessToken`,
+`refresh_token`, …). `staging` / `prod` do not log request or response bodies at all.

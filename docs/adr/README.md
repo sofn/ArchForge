@@ -39,3 +39,4 @@ test additions.
 | 0006 | [Dual-process topology + all-in-one packaging](0006-dual-process-topology.md) | accepted |
 | 0007 | [Meta definitions: file-first write authority via startup materialization](0007-meta-definition-file-first-write-authority.md) | accepted |
 | 0008 | [Meta runtime: definition registry + `tableCode` as the public identity](0008-meta-runtime-registry-tablecode-identity.md) | accepted |
+| 0009 | [Staging/prod actuator on a management port; meta-table SQL and secrets hardening](0009-actuator-management-port-and-sql-hardening.md) | accepted |
