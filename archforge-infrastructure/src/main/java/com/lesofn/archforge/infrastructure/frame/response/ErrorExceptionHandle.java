@@ -14,9 +14,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.jspecify.annotations.Nullable;
+import org.springframework.beans.TypeMismatchException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -34,6 +38,15 @@ public class ErrorExceptionHandle {
 
     @ExceptionHandler(value = Throwable.class)
     public ProblemDetail processException(HttpServletRequest request, Exception e) {
+        ProblemDetail clientError = clientError(e);
+        if (clientError != null) {
+            // 客户端的错误（路径不存在、方法不对、参数缺失/类型不对、请求体读不了）不是服务端故障：
+            // 用它自己的 4xx，不打 ERROR 堆栈（server-web 没开 Boot 的 problemdetails，之前全成了 500）
+            log.info("{} {} -> {}: {}", request.getMethod(), request.getRequestURI(), clientError.getStatus(), e.getMessage());
+            clientError.setProperty("code", clientError.getStatus());
+            clientError.setInstance(URI.create(request.getRequestURI()));
+            return clientError;
+        }
         Pair<Throwable, String> pair = getExceptionMessage(e);
         if (e instanceof IErrorCodeException errorCodeEx) {
             if (e.getCause() != null) {
@@ -63,6 +76,22 @@ public class ErrorExceptionHandle {
         problem.setProperty("code", SystemErrorCode.SYSTEM_ERROR.getCode());
         problem.setInstance(URI.create(request.getRequestURI()));
         return problem;
+    }
+
+    /** Spring MVC 自身抛出的客户端错误；其余异常返回 null，按服务端错误处理。 */
+    private static @Nullable ProblemDetail clientError(Throwable e) {
+        if (e instanceof ErrorResponse errorResponse && errorResponse.getStatusCode().is4xxClientError()) {
+            return errorResponse.getBody();
+        }
+        if (e instanceof HttpMessageNotReadableException) {
+            // 不回显解析器细节（行列号、源片段）
+            return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Failed to read request");
+        }
+        if (e instanceof TypeMismatchException mismatch) {
+            String name = mismatch.getPropertyName() == null ? "parameter" : mismatch.getPropertyName();
+            return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Invalid value for '" + name + "'");
+        }
+        return null;
     }
 
     /** 请求参数异常 */

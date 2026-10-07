@@ -48,6 +48,11 @@ C-end **errors** are RFC 9457 ProblemDetail:
 
 ArchForgeWeb must read `detail` (and fall back to `message` only if present). Do not assume `{code, message, data}` on error responses.
 
+Client mistakes keep their own 4xx status — never 500: unmapped path `404`, wrong method `405`, missing / mistyped
+parameter or unreadable body `400` (`code` = the HTTP status). `500` is reserved for real server failures. The shared
+`ErrorExceptionHandle` maps Spring MVC's client errors itself, because server-web does not enable Spring Boot's
+`spring.mvc.problemdetails` handler.
+
 Successful C-end JSON may still pass through the shared wrapper. Clients should:
 
 1. If HTTP is not 2xx → parse ProblemDetail (`detail`).
