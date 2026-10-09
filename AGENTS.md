@@ -37,6 +37,12 @@ Read before touching the affected area; each entry links the record.
   `<tableCode>:*` permissions — `docs/specs/security.md` (Dynamic SQL, Data scope).
 - **`docker-compose.prod.yml` requires** `ARCH_FORGE_RSA_PRIVATE_KEY`, `CORS_ALLOWED_ORIGINS`, `WEB_PUBLIC_URL`
   (plus the DB/Redis passwords); `DeploymentArtifactsConsistencyTest` keeps compose and profiles in step.
+  **staging now requires `REDIS_PASSWORD`** as well (Redis runs with `--requirepass`).
+- **Repositories are internal** (`<module>.internal.dao`) — other modules use `api` service methods;
+  ArchUnit ARCH-015 / ARCH-102 enforce it ([ADR-0010](docs/adr/0010-repositories-are-internal.md)).
+  `MetaTableMigrationService` / `MetaTableMigrationExporter` are interfaces now (impls in `internal.service`).
+- **`common.constant.Constants` is gone** (it was unused); `archforge-module-task` depends on infrastructure with
+  `implementation`.
 
 ## AI Asset Map
 

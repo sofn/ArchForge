@@ -86,7 +86,8 @@ archforge-server-* → archforge-infrastructure → archforge-common/{base,error
 
 1. Run `./archforge module new <name>` — it creates `archforge-module-<name>/` (api / internal layout) and registers
    it in `settings.gradle.kts` and server-admin (modules are assembled into server-admin by default)
-2. Put business logic under `api` (published interfaces) and `internal` (implementation)
+2. Put business logic under `api` (published interfaces) and `internal` (implementation). Repositories live in
+   `internal.dao`; other modules get what they need through an `api` service method (ADR-0010, ArchUnit ARCH-015)
 3. Do not hand-create `domain/<name>` or `archforge-domain/<name>` directories — that layout no longer exists
 4. Create Flyway migrations under the module's own `src/main/resources/db/migration/<module>/` (module-local V1..Vn) if the context introduces new tables; shared/platform tables go to common-jpa `db/migration/__root/`
 

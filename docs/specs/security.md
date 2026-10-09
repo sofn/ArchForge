@@ -155,3 +155,7 @@ with `AESEncrypter.of(...)`. The old key must not come back into the code.
 
 `arch-forge.request-log.mask-fields` are key *fragments* — a key containing one is masked (`token` ⇒ `accessToken`,
 `refresh_token`, …). `staging` / `prod` do not log request or response bodies at all.
+
+The logged client IP follows the rate limiter's rule (`IpUtil.getClientIp`): forwarding headers count only when the
+peer is listed in `arch-forge.security.trusted-proxies`, and then the client is the right-most `X-Forwarded-For`
+entry that is not a trusted proxy. Without trusted proxies the peer address is logged.
