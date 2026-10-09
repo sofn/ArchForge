@@ -63,6 +63,18 @@ class DeploymentArtifactsConsistencyTest {
         assertEquals(List.of(), missing);
     }
 
+    /** An unauthenticated Redis is open to every container on the network (sessions, caches, locks, rate limits). */
+    @Test
+    @SuppressWarnings("unchecked")
+    void prodAndStagingRedisRequireAPassword() throws IOException {
+        for (String file : List.of("docker-compose.prod.yml", "docker-compose.staging.yml")) {
+            Map<String, Object> compose = new Yaml().load(Files.readString(REPO.resolve("docker/" + file)));
+            Map<String, Object> services = (Map<String, Object>) Objects.requireNonNull(compose.get("services"), "services");
+            Map<String, Object> redis = (Map<String, Object>) Objects.requireNonNull(services.get("redis"), file);
+            assertTrue(String.valueOf(redis.get("command")).contains("--requirepass"), file + " starts Redis without a password");
+        }
+    }
+
     @Test
     void deployScriptsOnlyReferenceExistingRepositoryPaths() throws IOException {
         List<String> broken = new ArrayList<>();

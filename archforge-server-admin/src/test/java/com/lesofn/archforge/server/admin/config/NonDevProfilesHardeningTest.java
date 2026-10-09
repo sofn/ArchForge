@@ -71,7 +71,9 @@ class NonDevProfilesHardeningTest {
     }
 
     @Test
-    void prodAuthenticatesToRedis() throws IOException {
-        assertEquals("${REDIS_PASSWORD:}", text(load("application-prod.yaml"), "spring.data.redis.password"));
+    void stagingAndProdAuthenticateToRedis() throws IOException {
+        for (String file : List.of("application-staging.yaml", "application-prod.yaml")) {
+            assertEquals("${REDIS_PASSWORD:}", text(load(file), "spring.data.redis.password"), file);
+        }
     }
 }
