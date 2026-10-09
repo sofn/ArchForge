@@ -68,6 +68,13 @@ public class MetaTableValidator {
     }
 
     private static final int MAX_DEFAULT_DECIMAL_DIGITS = 100;
+
+    /** PostgreSQL limits: {@code varchar(n)} ≤ 10485760, {@code numeric(p, s)} p ≤ 1000. The DDL defaults apply ≤ 0. */
+    private static final int MAX_VARCHAR_LENGTH = 10_485_760;
+    private static final int MAX_NUMERIC_PRECISION = 1000;
+    private static final int DEFAULT_NUMERIC_PRECISION = 18;
+    /** Element types the DDL resolver knows — anything else used to become TEXT[] without a word. */
+    private static final Set<String> ARRAY_ELEMENT_TYPES = Set.of("STRING", "INTEGER", "DECIMAL", "BOOLEAN");
     private static final Set<String> TYPED_ARRAY_ELEMENTS = Set.of("INTEGER", "DECIMAL", "BOOLEAN");
     private static final String DATE_PATTERN = "yyyy-MM-dd";
     private static final String DATE_TIME_PATTERN = "yyyy-MM-dd HH:mm:ss";
@@ -124,11 +131,14 @@ public class MetaTableValidator {
     private void validateColumnConfig(MetaColumn column) {
         MetaColumnType type = column.getDataType();
         validateDefaultValue(column);
-        if (type == MetaColumnType.DECIMAL) {
-            if (column.getPrecision() != null && column.getScale() != null && column.getPrecision() < column
-                    .getScale()) {
-                throw new MetaTableException(MetaTableErrorCode.META_COLUMN_TYPE_INVALID, "精度必须大于等于小数位数");
-            }
+        String elementType = type == MetaColumnType.ARRAY && column.getArrayElementType() != null ? column
+                .getArrayElementType().toUpperCase(Locale.ROOT) : null;
+        if (type == MetaColumnType.STRING || (type == MetaColumnType.ARRAY && (elementType == null || "STRING".equals(
+                elementType)))) {
+            validateLength(column);
+        }
+        if (type == MetaColumnType.DECIMAL || "DECIMAL".equals(elementType)) {
+            validatePrecisionAndScale(column);
         }
         if (type == MetaColumnType.ENUM && (column.getDictCode() == null || column.getDictCode().isEmpty())) {
             throw new MetaTableException(MetaTableErrorCode.META_COLUMN_TYPE_INVALID, "枚举类型必须选择字典");
@@ -147,6 +157,10 @@ public class MetaTableValidator {
         }
         if (type == MetaColumnType.ARRAY && (column.getArrayElementType() == null || column.getArrayElementType().isEmpty())) {
             throw new MetaTableException(MetaTableErrorCode.META_COLUMN_TYPE_INVALID, "ARRAY 类型必须配置元素类型");
+        }
+        if (elementType != null && !ARRAY_ELEMENT_TYPES.contains(elementType)) {
+            throw new MetaTableException(MetaTableErrorCode.META_COLUMN_TYPE_INVALID, "ARRAY 元素类型只能是 " +
+                    ARRAY_ELEMENT_TYPES.stream().sorted().toList() + "：" + column.getArrayElementType());
         }
         if (column.getSearchType() != null && !column.getSearchType().isEmpty()) {
             Set<String> validSearchTypes = Set.of("EXACT", "LIKE", "RANGE");
@@ -196,6 +210,27 @@ public class MetaTableValidator {
         } catch (IllegalArgumentException e) {
             throw new MetaTableException(MetaTableErrorCode.META_COLUMN_VALUE_INVALID, "字段 " + column.getColumnCode() +
                     " 的默认值与类型 " + column.getDataType() + " 不匹配");
+        }
+    }
+
+    private static void validateLength(MetaColumn column) {
+        Integer length = column.getLength();
+        if (length != null && length > MAX_VARCHAR_LENGTH) {
+            throw new MetaTableException(MetaTableErrorCode.META_COLUMN_TYPE_INVALID, "字段 " + column.getColumnCode() +
+                    " 的长度不能超过 " + MAX_VARCHAR_LENGTH);
+        }
+    }
+
+    private static void validatePrecisionAndScale(MetaColumn column) {
+        Integer precision = column.getPrecision();
+        if (precision != null && precision > MAX_NUMERIC_PRECISION) {
+            throw new MetaTableException(MetaTableErrorCode.META_COLUMN_TYPE_INVALID, "字段 " + column.getColumnCode() +
+                    " 的精度不能超过 " + MAX_NUMERIC_PRECISION);
+        }
+        Integer scale = column.getScale();
+        int effectivePrecision = precision == null || precision <= 0 ? DEFAULT_NUMERIC_PRECISION : precision;
+        if (scale != null && (scale < 0 || scale > effectivePrecision)) {
+            throw new MetaTableException(MetaTableErrorCode.META_COLUMN_TYPE_INVALID, "精度必须大于等于小数位数，且小数位数不能为负");
         }
     }
 

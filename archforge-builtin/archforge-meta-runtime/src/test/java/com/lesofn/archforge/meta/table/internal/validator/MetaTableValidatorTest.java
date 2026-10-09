@@ -136,6 +136,49 @@ class MetaTableValidatorTest {
         assertEquals(MetaTableErrorCode.META_COLUMN_VALUE_INVALID.getCode(), e.getErrorInfo().getCode(), expression);
     }
 
+    /** Out-of-range sizes used to reach the database (a 500 from CREATE TABLE) instead of failing validation. */
+    @Test
+    void columnSizesStayWithinWhatPostgresAccepts() {
+        MetaColumn hugeVarchar = column("title", MetaColumnType.STRING);
+        hugeVarchar.setLength(10_485_761);
+        MetaColumn hugePrecision = column("amount", MetaColumnType.DECIMAL);
+        hugePrecision.setPrecision(1001);
+        MetaColumn negativeScale = column("ratio", MetaColumnType.DECIMAL);
+        negativeScale.setPrecision(10);
+        negativeScale.setScale(-1);
+        MetaColumn arrayOfHugeVarchar = column("tags", MetaColumnType.ARRAY);
+        arrayOfHugeVarchar.setArrayElementType("STRING");
+        arrayOfHugeVarchar.setLength(10_485_761);
+
+        for (MetaColumn invalid : List.of(hugeVarchar, hugePrecision, negativeScale, arrayOfHugeVarchar)) {
+            MetaTableException e = assertThrows(MetaTableException.class,
+                    () -> validator.validate(table(), List.of(invalid)), invalid.getColumnCode());
+            assertEquals(MetaTableErrorCode.META_COLUMN_TYPE_INVALID.getCode(), e.getErrorInfo().getCode(), invalid
+                    .getColumnCode());
+        }
+    }
+
+    @Test
+    void columnSizesAtTheLimitsAreAccepted() {
+        MetaColumn maxVarchar = column("title", MetaColumnType.STRING);
+        maxVarchar.setLength(10_485_760);
+        MetaColumn maxPrecision = column("amount", MetaColumnType.DECIMAL);
+        maxPrecision.setPrecision(1000);
+        maxPrecision.setScale(1000);
+
+        assertDoesNotThrow(() -> validator.validate(table(), List.of(maxVarchar, maxPrecision)));
+    }
+
+    /** An unknown element type silently became TEXT[] in the DDL. */
+    @Test
+    void arrayElementTypeMustBeKnown() {
+        MetaColumn array = column("tags", MetaColumnType.ARRAY);
+        array.setArrayElementType("UUID");
+
+        MetaTableException e = assertThrows(MetaTableException.class, () -> validator.validate(table(), List.of(array)));
+        assertEquals(MetaTableErrorCode.META_COLUMN_TYPE_INVALID.getCode(), e.getErrorInfo().getCode());
+    }
+
     @Test
     void tablePrefixCannotTurnACodeIntoAPlatformTable() {
         for (String prefix : List.of("sys_", "pg_", "qrtz_", "flyway_", "Meta_", "meta-")) {
