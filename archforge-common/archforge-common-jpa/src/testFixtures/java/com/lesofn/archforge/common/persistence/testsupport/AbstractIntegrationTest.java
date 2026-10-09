@@ -6,6 +6,7 @@ import org.springframework.test.context.DynamicPropertySource;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import org.junit.jupiter.api.Tag;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.HttpWaitStrategy;
 import org.testcontainers.postgresql.PostgreSQLContainer;
@@ -27,6 +28,8 @@ import org.testcontainers.utility.DockerImageName;
  *
  * @author sofn
  */
+// Inherited by every subclass: ./gradlew verify -PexcludeTags=slow skips all container-backed tests.
+@Tag("slow")
 public abstract class AbstractIntegrationTest {
 
     @SuppressWarnings("unchecked")

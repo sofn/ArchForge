@@ -433,6 +433,31 @@ tasks.register<JacocoReport>("jacocoAggregateReport") {
     }
 }
 
+// Docker-less runs (-PexcludeTags=slow) rely on every container-backed test being tagged "slow". The shared base
+// AbstractIntegrationTest carries the tag (inherited); a test that starts containers itself must say so directly.
+val checkSlowTags = tasks.register("checkSlowTags") {
+    group = "verification"
+    description = "Tests that use Testcontainers directly must carry @Tag(\"slow\")."
+    val sources = fileTree(rootDir) {
+        include("**/src/test/**/*.java", "**/src/test/**/*.groovy", "**/src/testFixtures/**/*.java")
+        exclude("**/build/**", "**/node_modules/**")
+    }
+    inputs.files(sources).withPathSensitivity(PathSensitivity.RELATIVE)
+    doLast {
+        val untagged = sources.files.filter { file ->
+            val text = file.readText()
+            val runsTests = text.contains("@Test") || Regex("""def\s+"""").containsMatchIn(text)
+            runsTests && text.contains("org.testcontainers") && !text.contains("@Tag(\"slow\")")
+        }.map { it.relativeTo(rootDir).path }.sorted()
+        if (untagged.isNotEmpty()) {
+            throw GradleException("Container-backed tests without @Tag(\"slow\"):\n  " + untagged.joinToString("\n  "))
+        }
+    }
+}
+subprojects {
+    tasks.matching { it.name == "check" }.configureEach { dependsOn(checkSlowTags) }
+}
+
 // Single agent-facing entry point: runs every gate (compile, all static
 // analysis, all tests, archunit, coverage floors) across all modules.
 // Docker-less environments: ./gradlew verify -PexcludeTags=slow

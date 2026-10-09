@@ -15,6 +15,8 @@ dependencies {
     "testFixturesApi"("org.testcontainers:testcontainers-postgresql")
     "testFixturesApi"("org.springframework:spring-test")
     "testFixturesApi"("org.jspecify:jspecify")
+    // @Tag("slow") on the base class — every Testcontainers IT inherits it
+    "testFixturesApi"("org.junit.jupiter:junit-jupiter-api")
 
     // JPA / 数据库 (Spring Boot BOM 和自定义 BOM 管理的版本)
     api("org.springframework.boot:spring-boot-starter-data-jpa") {
