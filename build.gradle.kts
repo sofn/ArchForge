@@ -136,7 +136,7 @@ subprojects {
             "archforge-redisson-starter" to "0.85",
             "archforge-request-log-starter" to "0.54",
             "archforge-trace-starter" to "0.92",
-            "archforge-module-task" to "0.0", // no floor yet
+            "archforge-module-task" to "0.75", // 2026-10-08: 78.7% measured
         )
         coverageFloors[name]?.let { floor ->
             tasks.named<org.gradle.testing.jacoco.tasks.JacocoCoverageVerification>(
