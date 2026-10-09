@@ -1,10 +1,11 @@
 name: CI
 
+# Trunk-based like the other three repositories (see CONTRIBUTING.md): pull requests to main, and main itself.
 on:
   push:
-    branches: [ main, dev, feature/* ]
+    branches: [ main ]
   pull_request:
-    branches: [ main, dev ]
+    branches: [ main ]
 
 permissions:
   contents: read
