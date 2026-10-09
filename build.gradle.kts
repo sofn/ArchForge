@@ -124,7 +124,7 @@ subprojects {
             "archforge-common-base" to "0.45",
             "archforge-common-error" to "0.42",
             "archforge-common-jpa" to "0.49",
-            "archforge-admin-user" to "0.04",
+            "archforge-admin-user" to "0.28", // 2026-10-08: 30.7% measured
             "archforge-module-cms" to "0.28",
             "archforge-meta-runtime" to "0.5",
             "archforge-meta-designer" to "0.5",
