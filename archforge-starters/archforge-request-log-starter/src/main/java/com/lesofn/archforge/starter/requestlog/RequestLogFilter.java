@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.Strings;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.MDC;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -50,8 +51,17 @@ public class RequestLogFilter extends OncePerRequestFilter {
     private final List<Pattern> jsonMaskPatterns = new ArrayList<>();
     private final List<Pattern> formMaskPatterns = new ArrayList<>();
 
+    /** Proxies whose X-Forwarded-For entries are believed ({@code arch-forge.security.trusted-proxies}). */
+    private final List<String> trustedProxies;
+
     public RequestLogFilter(RequestLogProperties properties, ObjectProvider<RequestLogEnricher> enrichers,
             Consumer<RequestLogRecord> sink) {
+        this(properties, enrichers, sink, List.of());
+    }
+
+    public RequestLogFilter(RequestLogProperties properties, ObjectProvider<RequestLogEnricher> enrichers,
+            Consumer<RequestLogRecord> sink, List<String> trustedProxies) {
+        this.trustedProxies = List.copyOf(trustedProxies);
         this.properties = properties;
         this.enrichers = enrichers;
         this.sink = sink;
@@ -218,16 +228,27 @@ public class RequestLogFilter extends OncePerRequestFilter {
         return out.toString();
     }
 
-    private static @Nullable String realIp(HttpServletRequest request) {
-        String ip = request.getHeader("X-Forwarded-For");
-        if (ip != null && !ip.isEmpty() && !"unknown".equalsIgnoreCase(ip)) {
-            int comma = ip.indexOf(',');
-            return comma > 0 ? ip.substring(0, comma).trim() : ip.trim();
+    /**
+     * Same rule as {@code IpUtil.getClientIp} (rate limiting): forwarding headers count only when the peer is a
+     * trusted proxy, and then the client is the right-most X-Forwarded-For entry that is not a trusted proxy. The
+     * left-most entry is whatever the client chose to send — trusting it made the audit IP forgeable.
+     */
+    private @Nullable String realIp(HttpServletRequest request) {
+        String remote = request.getRemoteAddr();
+        if (remote == null || !trustedProxies.contains(remote)) {
+            return remote;
         }
-        ip = request.getHeader("X-Real-IP");
-        if (ip != null && !ip.isEmpty() && !"unknown".equalsIgnoreCase(ip)) {
-            return ip;
+        String forwarded = request.getHeader("X-Forwarded-For");
+        if (forwarded != null && !forwarded.isBlank()) {
+            String[] hops = StringUtils.split(forwarded, ',');
+            for (int i = hops.length - 1; i >= 0; i--) {
+                String hop = hops[i].trim();
+                if (!hop.isEmpty() && !trustedProxies.contains(hop)) {
+                    return hop;
+                }
+            }
         }
-        return request.getRemoteAddr();
+        String realIp = request.getHeader("X-Real-IP");
+        return realIp != null && !realIp.isBlank() ? realIp.trim() : remote;
     }
 }

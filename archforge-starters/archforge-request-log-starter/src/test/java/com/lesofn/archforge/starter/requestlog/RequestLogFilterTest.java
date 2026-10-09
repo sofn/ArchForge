@@ -36,6 +36,38 @@ class RequestLogFilterTest {
         filter = new RequestLogFilter(properties, enrichers, captured::add);
     }
 
+    /** The audit IP must not be whatever the client writes into X-Forwarded-For. */
+    @Test
+    void forgedForwardedForFromAnUntrustedClientIsIgnored() throws Exception {
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/demo/list");
+        request.setRemoteAddr("203.0.113.7");
+        request.addHeader("X-Forwarded-For", "6.6.6.6");
+        request.addHeader("X-Real-IP", "6.6.6.6");
+
+        filter.doFilter(request, new MockHttpServletResponse(), (req, res) -> {
+        });
+
+        assertEquals("203.0.113.7", captured.get(0).getIp());
+    }
+
+    /** Behind a trusted proxy the client is the right-most address the proxies did not add themselves. */
+    @Test
+    void trustedProxyChainResolvesTheRealClient() throws Exception {
+        @SuppressWarnings("unchecked")
+        ObjectProvider<RequestLogEnricher> none = mock(ObjectProvider.class);
+        when(none.orderedStream()).thenReturn(Stream.empty());
+        RequestLogFilter behindProxy = new RequestLogFilter(properties, none, captured::add, List.of("10.0.0.2"));
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/demo/list");
+        request.setRemoteAddr("10.0.0.2");
+        request.addHeader("X-Forwarded-For", "6.6.6.6, 198.51.100.9");
+
+        behindProxy.doFilter(request, new MockHttpServletResponse(), (req, res) -> {
+        });
+
+        // 6.6.6.6 was sent by the client itself; 198.51.100.9 is what the trusted proxy saw
+        assertEquals("198.51.100.9", captured.get(0).getIp());
+    }
+
     @Test
     void logsParametersAndJsonResponse() throws Exception {
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/demo/list");
