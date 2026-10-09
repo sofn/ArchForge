@@ -41,3 +41,6 @@ test additions.
 | 0008 | [Meta runtime: definition registry + `tableCode` as the public identity](0008-meta-runtime-registry-tablecode-identity.md) | accepted |
 | 0009 | [Staging/prod actuator on a management port; meta-table SQL and secrets hardening](0009-actuator-management-port-and-sql-hardening.md) | accepted |
 | 0010 | [Repositories are internal; other modules read through api services](0010-repositories-are-internal.md) | accepted |
+| 0011 | [sa-token instead of Spring Security + JWT](0011-sa-token-not-spring-security-jwt.md) | accepted |
+| 0012 | [Four sibling repositories, not a monorepo](0012-sibling-repositories.md) | accepted |
+| 0013 | [Spring Data JPA + static metamodel instead of MyBatis](0013-jpa-static-metamodel.md) | accepted |

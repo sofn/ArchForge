@@ -50,6 +50,12 @@ environment has migrated past V23** (V23 deletes the stale history rows, after
 which "missing" is never reported). Remove the key at that point; do not widen
 the pattern before it.
 
+Recent `__root` versions that change permissions (seed data, not schema):
+
+- **V28** — buttons `system:scheduler-job:add` / `edit` / `remove` under the scheduler menu, granted to the admin
+  role only (jobs invoke bean methods reflectively). The scheduler endpoints used to check `monitor:job:*`, which no
+  menu ever granted; `PermissionSeedConsistencyIntegrationTest` now fails on any checked permission no menu grants.
+
 When adding a new version, never reuse V5 or V19; next `__root` file is **V29**.
 Module-local migrations version independently (next `cms`/`task` file is V2).
 
