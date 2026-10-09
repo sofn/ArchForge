@@ -43,6 +43,12 @@ spring:
           max-wait: 1s
 
 management:
+  tracing:
+    enabled: true
+    sampling:
+      probability: ${SAMPLING_PROBABILITY:0.1}   # the trace starter would export every request otherwise
+    otlp:
+      endpoint: ${OTEL_EXPORTER_OTLP_ENDPOINT:http://localhost:4318/v1/traces}
   server:
     # 指标/健康放在独立管理端口：它不发布到宿主机，也不经前端 nginx 的 /api 代理，
     # 公网拿不到 /actuator/prometheus；编排器探针用业务端口上的 /livez /readyz

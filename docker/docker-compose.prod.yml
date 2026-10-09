@@ -74,6 +74,8 @@ services:
     ports:
       - "8081:8081"
     environment:
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://jaeger:4318/v1/traces
+      SAMPLING_PROBABILITY: "0.1"
       SPRING_PROFILES_ACTIVE: prod
       REDIS_HOST: redis
       REDIS_PASSWORD: ${REDIS_PASSWORD:?Set REDIS_PASSWORD}

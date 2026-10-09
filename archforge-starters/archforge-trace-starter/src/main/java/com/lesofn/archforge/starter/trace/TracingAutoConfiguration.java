@@ -37,11 +37,12 @@ public class TracingAutoConfiguration {
     public OpenTelemetry openTelemetry(
             @Value("${management.tracing.otlp.endpoint:${OTEL_EXPORTER_OTLP_ENDPOINT:" + DEFAULT_ENDPOINT +
                     "}}") String endpoint,
-            @Value("${management.tracing.sampling.probability:${SAMPLING_PROBABILITY:1.0}}") double probability) {
+            @Value("${management.tracing.sampling.probability:${SAMPLING_PROBABILITY:1.0}}") double probability,
+            @Value("${spring.application.name:" + SERVICE_NAME + "}") String serviceName) {
         OtlpHttpSpanExporter spanExporter = OtlpHttpSpanExporter.builder().setEndpoint(endpoint).build();
         BatchSpanProcessor spanProcessor = BatchSpanProcessor.builder(spanExporter).build();
         Resource resource = Resource.getDefault()
-                .merge(Resource.create(Attributes.of(AttributeKey.stringKey("service.name"), SERVICE_NAME)));
+                .merge(Resource.create(Attributes.of(AttributeKey.stringKey("service.name"), serviceName)));
         SdkTracerProvider tracerProvider = SdkTracerProvider.builder()
                 .addSpanProcessor(spanProcessor)
                 .setSampler(Sampler.traceIdRatioBased(probability))

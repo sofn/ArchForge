@@ -54,6 +54,14 @@ class NonDevProfilesHardeningTest {
         }
     }
 
+    /** server-web exported every request (the trace starter defaults to 100%) — staging/prod sample 10% like admin. */
+    @Test
+    void stagingAndProdSampleTenPercentOfTracesByDefault() throws IOException {
+        for (String file : List.of("application-staging.yaml", "application-prod.yaml")) {
+            assertEquals("${SAMPLING_PROBABILITY:0.1}", text(load(file), "management.tracing.sampling.probability"), file);
+        }
+    }
+
     /** Origins come from the environment (fail-fast when unset); never a wildcard baked into the profile. */
     @Test
     void stagingAndProdTakeCorsOriginsFromTheEnvironment() throws IOException {
