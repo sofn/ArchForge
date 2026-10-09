@@ -210,8 +210,10 @@ jobs:
         include:
           - module: server-admin
             port: 8080
+            management-port: 8089
           - module: server-web
             port: 8081
+            management-port: 8091
     defaults:
       run:
         working-directory: ArchForge
@@ -259,9 +261,49 @@ jobs:
           tail -120 /tmp/app.log
           exit 1
 
+      # The dev profile serves the actuator on the business port; staging/prod move it to a management port and
+      # expose /livez and /readyz instead. Boot the same jar with the prod profile so that topology is covered too.
+      - name: Boot with the prod profile (management port, probes)
+        env:
+          SPRING_PROFILES_ACTIVE: prod
+          DB_MASTER_URL: jdbc:postgresql://localhost:5432/archforge
+          DB_SLAVE_URL: jdbc:postgresql://localhost:5432/archforge
+          DB_USERNAME: archforge
+          REDIS_HOST: localhost
+          CORS_ALLOWED_ORIGINS: https://ci.example.com
+          WEB_PUBLIC_URL: https://ci.example.com
+          FILE_STORAGE_TYPE: local
+          S3_ENDPOINT: http://localhost:9000
+          S3_ACCESS_KEY: ci
+          S3_SECRET_KEY: ci
+          S3_BUCKET: ci
+        run: |
+          ARCH_FORGE_RSA_PRIVATE_KEY="$(openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 -outform DER 2>/dev/null | base64 -w0)"
+          export ARCH_FORGE_RSA_PRIVATE_KEY
+          java --enable-preview --enable-native-access=ALL-UNNAMED \
+            -jar archforge-${{ matrix.module }}/build/libs/archforge-${{ matrix.module }}.jar \
+            --arch-forge.file-storage.local-dir=/tmp/smoke-uploads > /tmp/app-prod.log 2>&1 &
+          APP_PID=$!
+          for i in $(seq 1 60); do
+            curl -sf http://localhost:${{ matrix.port }}/livez >/dev/null && break
+            if ! kill -0 "$APP_PID" 2>/dev/null; then
+              echo "app process exited — log tail:"; tail -120 /tmp/app-prod.log; exit 1
+            fi
+            sleep 2
+          done
+          curl -sf http://localhost:${{ matrix.port }}/livez >/dev/null \
+            || { echo "/livez never answered — log tail:"; tail -120 /tmp/app-prod.log; exit 1; }
+          curl -sf http://localhost:${{ matrix.port }}/readyz >/dev/null || { echo "/readyz is not ready"; exit 1; }
+          code=$(curl -s -o /dev/null -w '%{http_code}' http://localhost:${{ matrix.port }}/actuator/health)
+          [ "$code" = 404 ] || { echo "business port still serves /actuator/health (HTTP $code)"; exit 1; }
+          curl -sf http://localhost:${{ matrix.management-port }}/actuator/prometheus | grep -q '^jvm_' \
+            || { echo "no metrics on management port ${{ matrix.management-port }}"; exit 1; }
+          echo "prod topology OK: probes on :${{ matrix.port }}, metrics on :${{ matrix.management-port }}"
+          kill "$APP_PID" || true
+
       - name: Dump app log on failure
         if: failure()
-        run: tail -200 /tmp/app.log || true
+        run: tail -200 /tmp/app.log /tmp/app-prod.log || true
 
   # OWASP Dependency Check: CVE scan of the runtime classpath (transitives included).
   # Split into a dedicated job because the NVD data sync is heavy; keyed by the
