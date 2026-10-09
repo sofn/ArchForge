@@ -2,12 +2,12 @@ package com.lesofn.archforge.user.internal.menu;
 
 import com.lesofn.archforge.common.auth.SystemLoginUser;
 import com.lesofn.archforge.common.enums.common.StatusEnum;
-import com.lesofn.archforge.user.api.dao.SysRoleMenuRepository;
+import com.lesofn.archforge.user.internal.dao.SysRoleMenuRepository;
 import com.lesofn.archforge.user.api.domain.SysMenu;
 import com.lesofn.archforge.user.api.menu.SysMenuService;
 import com.lesofn.archforge.user.api.menu.dto.MetaDTO;
 import com.lesofn.archforge.user.api.menu.dto.RouterDTO;
-import com.lesofn.archforge.user.api.menu.repository.SysMenuRepository;
+import com.lesofn.archforge.user.internal.dao.SysMenuRepository;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayDeque;

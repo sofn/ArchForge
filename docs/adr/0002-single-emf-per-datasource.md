@@ -22,7 +22,8 @@ entities carry domain behavior directly (rich entities, e.g.
 
 - No second persistence context can silently diverge — a single table is
   mapped by a single entity.
-- Repository = `api.dao` Spring-Data interface; services call it directly.
+- Repository = Spring-Data interface; services call it directly. (Location superseded by ADR-0010: repositories
+  live in the module's `internal.dao`, not `api.dao`.)
 - Re-adding a PO/aggregate layer for the same table is a violation.
 
 ## Alternatives considered

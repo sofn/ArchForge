@@ -8,8 +8,8 @@ import static com.lesofn.archforge.meta.table.api.errors.MetaTableErrorCode.META
 import static com.lesofn.archforge.meta.table.api.errors.MetaTableErrorCode.META_TABLE_HAS_DATA;
 import static com.lesofn.archforge.meta.table.api.errors.MetaTableErrorCode.META_TABLE_NOT_EXISTS;
 
-import com.lesofn.archforge.meta.table.api.dao.MetaColumnRepository;
-import com.lesofn.archforge.meta.table.api.dao.MetaTableRepository;
+import com.lesofn.archforge.meta.table.internal.dao.MetaColumnRepository;
+import com.lesofn.archforge.meta.table.internal.dao.MetaTableRepository;
 import com.lesofn.archforge.meta.table.api.domain.MetaColumn;
 import com.lesofn.archforge.meta.table.api.domain.MetaTable;
 import com.lesofn.archforge.meta.table.api.domain.MetaTableMigration;

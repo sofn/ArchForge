@@ -6,6 +6,7 @@ import com.lesofn.archforge.cms.api.enums.CmsArticleStatus;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import java.util.List;
 
 public interface CmsArticleService {
 
@@ -29,4 +30,10 @@ public interface CmsArticleService {
     CmsArticle publish(Long id);
 
     CmsArticle offline(Long id);
+
+    /** Articles that are not soft-deleted. */
+    long countNotDeleted();
+
+    /** The {@code limit} most recently created articles (highest id first). */
+    List<CmsArticle> latest(int limit);
 }

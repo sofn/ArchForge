@@ -11,8 +11,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.lesofn.archforge.meta.table.api.dao.MetaColumnRepository;
-import com.lesofn.archforge.meta.table.api.dao.MetaTableRepository;
+import com.lesofn.archforge.meta.table.internal.dao.MetaColumnRepository;
+import com.lesofn.archforge.meta.table.internal.dao.MetaTableRepository;
 import com.lesofn.archforge.meta.table.api.domain.MetaColumn;
 import com.lesofn.archforge.meta.table.api.domain.MetaTable;
 import com.lesofn.archforge.meta.table.api.dto.TableImportPreview;

@@ -1,7 +1,7 @@
 package com.lesofn.archforge.user.internal.service;
 
 import com.lesofn.archforge.user.api.service.SysLoginLogService;
-import com.lesofn.archforge.user.api.dao.SysLoginLogRepository;
+import com.lesofn.archforge.user.internal.dao.SysLoginLogRepository;
 import com.lesofn.archforge.user.api.domain.SysLoginLog;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -42,5 +43,12 @@ public class SysLoginLogServiceImpl implements SysLoginLogService {
     @Transactional
     public void clearAll() {
         loginLogRepository.clearAll();
+    }
+
+    @Override
+    public long countSuccessfulSince(LocalDateTime since) {
+        return loginLogRepository.count((root, query, cb) -> cb.and(
+                cb.equal(root.get("status"), 1),
+                cb.greaterThanOrEqualTo(root.get("loginTime"), since)));
     }
 }

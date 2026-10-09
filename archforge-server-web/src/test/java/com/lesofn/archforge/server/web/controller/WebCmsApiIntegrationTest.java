@@ -4,8 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.lesofn.archforge.cms.api.dao.CmsArticleRepository;
-import com.lesofn.archforge.cms.api.dao.CmsCategoryRepository;
+import com.lesofn.archforge.cms.internal.dao.CmsArticleRepository;
+import com.lesofn.archforge.cms.internal.dao.CmsCategoryRepository;
 import com.lesofn.archforge.cms.api.domain.CmsArticle;
 import com.lesofn.archforge.cms.api.domain.CmsCategory;
 import com.lesofn.archforge.cms.testing.ArticleTestBuilder;

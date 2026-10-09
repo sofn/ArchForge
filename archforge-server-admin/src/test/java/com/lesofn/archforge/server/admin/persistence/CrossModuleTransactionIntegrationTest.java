@@ -3,10 +3,10 @@ package com.lesofn.archforge.server.admin.persistence;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.lesofn.archforge.common.persistence.testsupport.AbstractIntegrationTest;
-import com.lesofn.archforge.meta.table.api.dao.MetaTableRepository;
+import com.lesofn.archforge.meta.table.internal.dao.MetaTableRepository;
 import com.lesofn.archforge.meta.table.api.domain.MetaTable;
 import com.lesofn.archforge.server.admin.Application;
-import com.lesofn.archforge.user.api.dao.SysConfigRepository;
+import com.lesofn.archforge.user.internal.dao.SysConfigRepository;
 import com.lesofn.archforge.user.api.domain.SysConfig;
 import jakarta.persistence.EntityManagerFactory;
 import java.util.Map;

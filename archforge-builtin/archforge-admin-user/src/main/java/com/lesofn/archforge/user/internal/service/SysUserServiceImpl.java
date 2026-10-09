@@ -2,7 +2,7 @@ package com.lesofn.archforge.user.internal.service;
 
 import com.lesofn.archforge.common.enums.common.GenderEnum;
 import com.lesofn.archforge.common.enums.common.UserStatusEnum;
-import com.lesofn.archforge.user.api.dao.SysUserRepository;
+import com.lesofn.archforge.user.internal.dao.SysUserRepository;
 import com.lesofn.archforge.user.api.domain.SysUser;
 import com.lesofn.archforge.user.api.domain.query.SysUserQuery;
 import com.lesofn.archforge.user.api.service.SysUserService;
@@ -355,4 +355,13 @@ public class SysUserServiceImpl implements SysUserService {
                 .replace("_", escape + "_");
     }
 
+    @Override
+    public long countNotDeleted() {
+        return userRepository.countByDeletedFalse();
+    }
+
+    @Override
+    public long countNotDeletedWithStatus(Integer status) {
+        return userRepository.countByDeletedFalseAndStatus(status);
+    }
 }

@@ -1,6 +1,6 @@
 package com.lesofn.archforge.user.internal.service;
 
-import com.lesofn.archforge.user.api.dao.SysRoleRepository;
+import com.lesofn.archforge.user.internal.dao.SysRoleRepository;
 import com.lesofn.archforge.user.api.domain.SysMenu;
 import com.lesofn.archforge.user.api.domain.SysRole;
 import com.lesofn.archforge.user.api.service.SysRoleService;

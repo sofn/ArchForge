@@ -2,7 +2,7 @@ package com.lesofn.archforge.server.admin.service.scheduler;
 
 import com.github.kagkarlsson.scheduler.ScheduledExecution;
 import com.github.kagkarlsson.scheduler.SchedulerClient;
-import com.lesofn.archforge.user.api.dao.SysScheduledJobRepository;
+import com.lesofn.archforge.user.api.service.SysScheduledJobService;
 import com.lesofn.archforge.user.api.scheduler.SchedulerJobRuntime;
 import com.lesofn.archforge.user.api.domain.SysScheduledJob;
 import java.util.List;
@@ -26,15 +26,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class SchedulerStartupSync {
 
-    private final SysScheduledJobRepository jobRepository;
+    private final SysScheduledJobService jobService;
     private final SchedulerClient schedulerClient;
     private final SchedulerJobRuntime jobRuntime;
 
     public SchedulerStartupSync(
-            SysScheduledJobRepository jobRepository,
+            SysScheduledJobService jobService,
             SchedulerClient schedulerClient,
             SchedulerJobRuntime jobRuntime) {
-        this.jobRepository = jobRepository;
+        this.jobService = jobService;
         this.schedulerClient = schedulerClient;
         this.jobRuntime = jobRuntime;
     }
@@ -42,7 +42,7 @@ public class SchedulerStartupSync {
     @EventListener(ApplicationReadyEvent.class)
     public void syncAll() {
         int synced = 0;
-        for (SysScheduledJob job : jobRepository.findAll()) {
+        for (SysScheduledJob job : jobService.listAll()) {
             if (Boolean.TRUE.equals(job.getDeleted())) {
                 continue;
             }
@@ -55,9 +55,7 @@ public class SchedulerStartupSync {
         int cancelled = 0;
         for (ScheduledExecution<Object> execution : instances) {
             Long jobId = JobInvocationData.parseJobId(execution.getTaskInstance());
-            boolean known = jobId != null && jobRepository.findById(jobId)
-                    .map(j -> !Boolean.TRUE.equals(j.getDeleted()))
-                    .orElse(false);
+            boolean known = jobId != null && jobService.existsActive(jobId);
             if (!known) {
                 schedulerClient.cancel(execution.getTaskInstance());
                 cancelled++;

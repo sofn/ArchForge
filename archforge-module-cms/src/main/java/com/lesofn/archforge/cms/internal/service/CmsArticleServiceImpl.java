@@ -1,7 +1,7 @@
 package com.lesofn.archforge.cms.internal.service;
 
-import com.lesofn.archforge.cms.api.dao.CmsArticleRepository;
-import com.lesofn.archforge.cms.api.dao.CmsCategoryRepository;
+import com.lesofn.archforge.cms.internal.dao.CmsArticleRepository;
+import com.lesofn.archforge.cms.internal.dao.CmsCategoryRepository;
 import com.lesofn.archforge.cms.api.domain.CmsArticle;
 import com.lesofn.archforge.cms.api.enums.CmsArticleStatus;
 import com.lesofn.archforge.cms.api.errors.CmsErrorCode;
@@ -18,6 +18,9 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+import java.util.List;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 @Service
 @RequiredArgsConstructor
@@ -160,5 +163,15 @@ public class CmsArticleServiceImpl implements CmsArticleService {
                 .ifPresent(a -> {
                     throw new CmsException(CmsErrorCode.SLUG_EXISTS);
                 });
+    }
+
+    @Override
+    public long countNotDeleted() {
+        return articleRepository.countByDeletedFalse();
+    }
+
+    @Override
+    public List<CmsArticle> latest(int limit) {
+        return articleRepository.findAll(PageRequest.of(0, limit, Sort.by(Sort.Direction.DESC, "id"))).getContent();
     }
 }

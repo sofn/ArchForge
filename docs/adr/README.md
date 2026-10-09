@@ -40,3 +40,4 @@ test additions.
 | 0007 | [Meta definitions: file-first write authority via startup materialization](0007-meta-definition-file-first-write-authority.md) | accepted |
 | 0008 | [Meta runtime: definition registry + `tableCode` as the public identity](0008-meta-runtime-registry-tablecode-identity.md) | accepted |
 | 0009 | [Staging/prod actuator on a management port; meta-table SQL and secrets hardening](0009-actuator-management-port-and-sql-hardening.md) | accepted |
+| 0010 | [Repositories are internal; other modules read through api services](0010-repositories-are-internal.md) | accepted |

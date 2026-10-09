@@ -7,8 +7,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.lesofn.archforge.common.persistence.testsupport.AbstractIntegrationTest;
 import org.jspecify.annotations.Nullable;
-import com.lesofn.archforge.meta.table.api.dao.MetaColumnRepository;
-import com.lesofn.archforge.meta.table.api.dao.MetaTableRepository;
+import com.lesofn.archforge.meta.table.internal.dao.MetaColumnRepository;
+import com.lesofn.archforge.meta.table.internal.dao.MetaTableRepository;
 import com.lesofn.archforge.meta.table.api.domain.MetaColumn;
 import com.lesofn.archforge.meta.table.api.domain.MetaColumnType;
 import com.lesofn.archforge.meta.table.api.domain.MetaTable;

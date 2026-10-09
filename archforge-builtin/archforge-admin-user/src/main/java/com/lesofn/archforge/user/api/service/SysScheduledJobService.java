@@ -6,6 +6,7 @@ import com.lesofn.archforge.user.api.domain.query.SysScheduledJobQuery;
 import org.jspecify.annotations.Nullable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import java.util.List;
 
 /**
  * Admin CRUD for scheduled jobs: metadata rows in {@code sys_scheduled_job} kept in lockstep with
@@ -47,4 +48,10 @@ public interface SysScheduledJobService {
     void runOnce(Long id);
 
     Page<SysJobLog> logPage(Long jobId, Pageable pageable);
+
+    /** Every job row, deleted ones included (startup reconciliation decides per row). */
+    List<SysScheduledJob> listAll();
+
+    /** Whether {@code id} is a job that exists and is not soft-deleted. */
+    boolean existsActive(Long id);
 }

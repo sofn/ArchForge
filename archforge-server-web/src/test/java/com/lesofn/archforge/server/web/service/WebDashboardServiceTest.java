@@ -7,41 +7,36 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 import com.lesofn.archforge.server.web.dto.WebDashboardMetricsResponse;
-import com.lesofn.archforge.user.api.dao.SysLoginLogRepository;
-import com.lesofn.archforge.user.api.dao.SysOperLogRepository;
-import com.lesofn.archforge.user.api.dao.SysUserRepository;
-import com.lesofn.archforge.user.api.domain.SysLoginLog;
-import com.lesofn.archforge.user.api.domain.SysOperLog;
+import com.lesofn.archforge.user.api.service.SysLoginLogService;
+import com.lesofn.archforge.user.api.service.SysOperLogService;
+import com.lesofn.archforge.user.api.service.SysUserService;
+import java.time.LocalDateTime;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.jpa.domain.Specification;
 
 @ExtendWith(MockitoExtension.class)
 class WebDashboardServiceTest {
 
     @Mock
-    private SysUserRepository userRepository;
+    private SysUserService userService;
 
     @Mock
-    private SysLoginLogRepository sysLoginLogRepository;
+    private SysLoginLogService loginLogService;
 
     @Mock
-    private SysOperLogRepository sysOperLogRepository;
+    private SysOperLogService operLogService;
 
     @InjectMocks
     private WebDashboardService service;
 
     @Test
-    void metricsAggregatesRepositoryCounts() {
-        when(userRepository.countByDeletedFalseAndStatus(any(Integer.class))).thenReturn(42L);
-        when(sysLoginLogRepository.count(ArgumentMatchers.<Specification<SysLoginLog>> any()))
-                .thenReturn(5L);
-        when(sysOperLogRepository.count(ArgumentMatchers.<Specification<SysOperLog>> any()))
-                .thenReturn(9L);
+    void metricsAggregatesModuleCounts() {
+        when(userService.countNotDeletedWithStatus(any(Integer.class))).thenReturn(42L);
+        when(loginLogService.countSuccessfulSince(any(LocalDateTime.class))).thenReturn(5L);
+        when(operLogService.countSince(any(LocalDateTime.class))).thenReturn(9L);
 
         WebDashboardService spied = spy(service);
         doReturn(7L).when(spied).onlineSessions();

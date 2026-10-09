@@ -2,8 +2,8 @@ package com.lesofn.archforge.meta.table.internal.validator;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.lesofn.archforge.meta.table.api.dao.MetaColumnRepository;
-import com.lesofn.archforge.meta.table.api.dao.MetaTableRepository;
+import com.lesofn.archforge.meta.table.internal.dao.MetaColumnRepository;
+import com.lesofn.archforge.meta.table.internal.dao.MetaTableRepository;
 import com.lesofn.archforge.meta.table.api.domain.MetaColumn;
 import com.lesofn.archforge.meta.table.api.domain.MetaColumnType;
 import com.lesofn.archforge.meta.table.api.domain.MetaTable;

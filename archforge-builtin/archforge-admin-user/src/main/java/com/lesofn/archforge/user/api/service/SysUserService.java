@@ -60,4 +60,10 @@ public interface SysUserService {
 
     @Nullable
     SysUser getUserByUserName(String username);
+
+    /** Users that are not soft-deleted (admin dashboard). */
+    long countNotDeleted();
+
+    /** Users that are not soft-deleted and have the given status (C-end dashboard). */
+    long countNotDeletedWithStatus(Integer status);
 }

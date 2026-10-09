@@ -71,7 +71,8 @@ class DeploymentArtifactsConsistencyTest {
             Map<String, Object> compose = new Yaml().load(Files.readString(REPO.resolve("docker/" + file)));
             Map<String, Object> services = (Map<String, Object>) Objects.requireNonNull(compose.get("services"), "services");
             Map<String, Object> redis = (Map<String, Object>) Objects.requireNonNull(services.get("redis"), file);
-            assertTrue(String.valueOf(redis.get("command")).contains("--requirepass"), file + " starts Redis without a password");
+            assertTrue(String.valueOf(redis.get("command")).contains("--requirepass"), file +
+                    " starts Redis without a password");
         }
     }
 

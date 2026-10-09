@@ -1,7 +1,7 @@
 package com.lesofn.archforge.meta.table.internal.service;
 
-import com.lesofn.archforge.meta.table.api.dao.MetaColumnRepository;
-import com.lesofn.archforge.meta.table.api.dao.MetaTableRepository;
+import com.lesofn.archforge.meta.table.internal.dao.MetaColumnRepository;
+import com.lesofn.archforge.meta.table.internal.dao.MetaTableRepository;
 import com.lesofn.archforge.meta.table.api.definition.ColumnDefinition;
 import com.lesofn.archforge.meta.table.api.definition.DefinitionSource;
 import com.lesofn.archforge.meta.table.api.definition.FsDefinitionSource;

@@ -1,7 +1,7 @@
 package com.lesofn.archforge.user.internal.service;
 
 import com.lesofn.archforge.user.api.service.SysDeptService;
-import com.lesofn.archforge.user.api.dao.SysDeptRepository;
+import com.lesofn.archforge.user.internal.dao.SysDeptRepository;
 import com.lesofn.archforge.user.api.domain.SysDept;
 import java.util.List;
 import java.util.Optional;

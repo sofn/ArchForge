@@ -12,8 +12,8 @@ import static org.mockito.Mockito.when;
 
 import com.github.kagkarlsson.scheduler.SchedulerClient;
 import com.lesofn.archforge.common.error.system.SystemException;
-import com.lesofn.archforge.user.api.dao.SysJobLogRepository;
-import com.lesofn.archforge.user.api.dao.SysScheduledJobRepository;
+import com.lesofn.archforge.user.internal.dao.SysJobLogRepository;
+import com.lesofn.archforge.user.internal.dao.SysScheduledJobRepository;
 import com.lesofn.archforge.user.api.domain.SysScheduledJob;
 import com.lesofn.archforge.user.api.scheduler.SchedulerJobRuntime;
 import com.lesofn.archforge.user.internal.service.SysScheduledJobServiceImpl;

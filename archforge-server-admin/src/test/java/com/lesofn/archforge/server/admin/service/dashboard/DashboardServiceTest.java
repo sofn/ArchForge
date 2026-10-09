@@ -3,11 +3,11 @@ package com.lesofn.archforge.server.admin.service.dashboard;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
-import com.lesofn.archforge.cms.api.dao.CmsArticleRepository;
+import com.lesofn.archforge.cms.api.service.CmsArticleService;
 import com.lesofn.archforge.cms.api.domain.CmsArticle;
 import com.lesofn.archforge.cms.testing.ArticleTestBuilder;
 import com.lesofn.archforge.meta.table.api.service.MetaDefinitionRegistry;
-import com.lesofn.archforge.user.api.dao.SysUserRepository;
+import com.lesofn.archforge.user.api.service.SysUserService;
 import java.util.List;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -15,8 +15,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 
 /** Unit tests for {@link DashboardService}. */
 @Tag("P1")
@@ -24,9 +22,9 @@ import org.springframework.data.domain.PageRequest;
 class DashboardServiceTest {
 
     @Mock
-    private SysUserRepository userRepository;
+    private SysUserService userService;
     @Mock
-    private CmsArticleRepository articleRepository;
+    private CmsArticleService articleService;
     @Mock
     private MetaDefinitionRegistry metaDefinitionRegistry;
 
@@ -35,8 +33,8 @@ class DashboardServiceTest {
 
     @Test
     void metricsCountsLiveRowsOnly() {
-        when(userRepository.countByDeletedFalse()).thenReturn(11L);
-        when(articleRepository.countByDeletedFalse()).thenReturn(22L);
+        when(userService.countNotDeleted()).thenReturn(11L);
+        when(articleService.countNotDeleted()).thenReturn(22L);
         when(metaDefinitionRegistry.count()).thenReturn(33L);
 
         DashboardMetricsResponse metrics = service.metrics();
@@ -49,8 +47,8 @@ class DashboardServiceTest {
 
     @Test
     void trendsDefaultsToSevenDaysAndRepeatsCurrentTotals() {
-        when(userRepository.countByDeletedFalse()).thenReturn(5L);
-        when(articleRepository.countByDeletedFalse()).thenReturn(6L);
+        when(userService.countNotDeleted()).thenReturn(5L);
+        when(articleService.countNotDeleted()).thenReturn(6L);
 
         List<DashboardTrendPoint> points = service.trends(0);
 
@@ -74,8 +72,7 @@ class DashboardServiceTest {
         // Builders default the title; clear it to exercise the service fallback.
         CmsArticle untitled = ArticleTestBuilder.anArticle().withId(2L).build();
         untitled.setTitle(null);
-        when(articleRepository.findAll(org.mockito.ArgumentMatchers.any(PageRequest.class)))
-                .thenReturn(new PageImpl<>(List.of(titled, untitled)));
+        when(articleService.latest(8)).thenReturn(List.of(titled, untitled));
 
         List<DashboardActivity> activities = service.recentActivities();
 
@@ -87,8 +84,8 @@ class DashboardServiceTest {
 
     @Test
     void todoListsAllCountersWithLinks() {
-        when(userRepository.countByDeletedFalse()).thenReturn(1L);
-        when(articleRepository.countByDeletedFalse()).thenReturn(2L);
+        when(userService.countNotDeleted()).thenReturn(1L);
+        when(articleService.countNotDeleted()).thenReturn(2L);
         when(metaDefinitionRegistry.count()).thenReturn(3L);
 
         List<DashboardTodo> todos = service.todo();

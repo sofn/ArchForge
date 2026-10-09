@@ -2,13 +2,11 @@ package com.lesofn.archforge.server.web.service;
 
 import com.lesofn.archforge.server.web.dto.WebNoticeResponse;
 import com.lesofn.archforge.server.web.dto.WebOperationLogResponse;
-import com.lesofn.archforge.user.api.dao.SysNoticeRepository;
-import com.lesofn.archforge.user.api.dao.SysOperLogRepository;
+import com.lesofn.archforge.user.api.service.SysNoticeService;
+import com.lesofn.archforge.user.api.service.SysOperLogService;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 /** Latest notices and operation logs shown on the C-end dashboard. */
@@ -18,17 +16,12 @@ public class WebNoticeService {
 
     private static final int LATEST_LIMIT = 20;
 
-    private final SysNoticeRepository sysNoticeRepository;
-    private final SysOperLogRepository sysOperLogRepository;
+    private final SysNoticeService noticeService;
+    private final SysOperLogService operLogService;
 
     public List<WebNoticeResponse> latestNotices() {
-        return sysNoticeRepository
-                .findAll(
-                        (root, query, cb) -> cb.and(
-                                cb.equal(root.get("status"), 1),
-                                cb.equal(root.get("deleted"), false)),
-                        PageRequest.of(0, LATEST_LIMIT, Sort.by("createTime").descending()))
-                .getContent()
+        return noticeService
+                .latestPublished(LATEST_LIMIT)
                 .stream()
                 .map(
                         n -> WebNoticeResponse.builder()
@@ -42,9 +35,8 @@ public class WebNoticeService {
     }
 
     public List<WebOperationLogResponse> latestOperationLogs() {
-        return sysOperLogRepository
-                .findAll(PageRequest.of(0, LATEST_LIMIT, Sort.by("operatingTime").descending()))
-                .getContent()
+        return operLogService
+                .latest(LATEST_LIMIT)
                 .stream()
                 .map(
                         l -> WebOperationLogResponse.builder()

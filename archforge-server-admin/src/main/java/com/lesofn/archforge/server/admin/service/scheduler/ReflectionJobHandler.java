@@ -1,6 +1,6 @@
 package com.lesofn.archforge.server.admin.service.scheduler;
 
-import com.lesofn.archforge.user.api.dao.SysJobLogRepository;
+import com.lesofn.archforge.user.api.service.SysJobLogService;
 import com.lesofn.archforge.user.api.domain.SysJobLog;
 import com.lesofn.archforge.user.api.domain.SysScheduledJob;
 import java.lang.reflect.InvocationTargetException;
@@ -27,11 +27,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class ReflectionJobHandler {
 
-    private final SysJobLogRepository logRepository;
+    private final SysJobLogService jobLogService;
     private final ApplicationContext applicationContext;
 
-    public ReflectionJobHandler(SysJobLogRepository logRepository, ApplicationContext applicationContext) {
-        this.logRepository = logRepository;
+    public ReflectionJobHandler(SysJobLogService jobLogService, ApplicationContext applicationContext) {
+        this.jobLogService = jobLogService;
         this.applicationContext = applicationContext;
     }
 
@@ -56,7 +56,7 @@ public class ReflectionJobHandler {
             Method method = findMethod(bean.getClass(), methodName, args.length);
             method.invoke(bean, args);
             long duration = System.currentTimeMillis() - startMs;
-            logRepository.save(
+            jobLogService.record(
                     SysJobLog.success(snapshot, methodParams, duration, startedAt, LocalDateTime.now(ZoneId.systemDefault())));
         } catch (InvocationTargetException e) {
             long duration = System.currentTimeMillis() - startMs;
@@ -67,7 +67,7 @@ public class ReflectionJobHandler {
                     methodName,
                     methodParams,
                     cause);
-            logRepository.save(
+            jobLogService.record(
                     SysJobLog.failure(
                             snapshot,
                             methodParams,
@@ -83,7 +83,7 @@ public class ReflectionJobHandler {
                     methodName,
                     methodParams,
                     e);
-            logRepository.save(
+            jobLogService.record(
                     SysJobLog.failure(
                             snapshot,
                             methodParams,

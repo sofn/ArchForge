@@ -40,7 +40,9 @@ class ArchitectureTest {
             "com.lesofn.archforge.meta.table.api.service.MetaTableDefinitionService",
             "com.lesofn.archforge.meta.table.internal.service.MetaTableAdminServiceImpl",
             "com.lesofn.archforge.meta.table.internal.service.MetaTableImportServiceImpl",
-            "com.lesofn.archforge.meta.table.internal.service.MetaTableDefinitionServiceImpl");
+            "com.lesofn.archforge.meta.table.internal.service.MetaTableDefinitionServiceImpl",
+            "com.lesofn.archforge.meta.table.internal.service.MetaTableMigrationServiceImpl",
+            "com.lesofn.archforge.meta.table.internal.service.MetaTableMigrationExporterImpl");
 
     private static JavaClasses classes;
 
@@ -96,6 +98,25 @@ class ArchitectureTest {
                 .dependOnClassesThat()
                 .areAssignableTo(JpaRepository.class)
                 .because("ARCH-004: controllers must go through service, never touch repositories")
+                .check(classes);
+    }
+
+    /**
+     * ARCH-015 (ADR-0010): a repository is a module's persistence detail. Spring Data repositories and their custom
+     * fragments live in the module's {@code internal} packages; other modules read through {@code api} services.
+     */
+    @Test
+    void repositoriesLiveInInternalPackages() {
+        classes()
+                .that()
+                .resideInAnyPackage("..archforge.user..", "..archforge.meta..", "..archforge.cms..", "..archforge.task..")
+                .and(DescribedPredicate.describe("are Spring Data repositories or their custom fragments",
+                        (JavaClass javaClass) -> javaClass.isAssignableTo(
+                                org.springframework.data.repository.Repository.class) || javaClass.getSimpleName().endsWith(
+                                        "RepositoryImpl") || javaClass.getSimpleName().endsWith("RepositoryCustom")))
+                .should()
+                .resideInAPackage("..internal..")
+                .because("ARCH-015: repositories are internal; cross-module reads go through api services (ADR-0010)")
                 .check(classes);
     }
 

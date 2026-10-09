@@ -1,7 +1,7 @@
 package com.lesofn.archforge.cms.internal.service;
 
-import com.lesofn.archforge.cms.api.dao.CmsArticleRepository;
-import com.lesofn.archforge.cms.api.dao.CmsCategoryRepository;
+import com.lesofn.archforge.cms.internal.dao.CmsArticleRepository;
+import com.lesofn.archforge.cms.internal.dao.CmsCategoryRepository;
 import com.lesofn.archforge.cms.api.domain.CmsCategory;
 import com.lesofn.archforge.cms.api.enums.CmsArticleStatus;
 import com.lesofn.archforge.cms.api.errors.CmsErrorCode;

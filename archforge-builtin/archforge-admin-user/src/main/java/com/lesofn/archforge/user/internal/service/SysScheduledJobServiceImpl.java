@@ -3,8 +3,8 @@ package com.lesofn.archforge.user.internal.service;
 import com.lesofn.archforge.common.error.system.SystemException;
 import com.lesofn.archforge.common.utils.jackson.JsonUtil;
 import com.lesofn.archforge.common.utils.query.QueryHelp;
-import com.lesofn.archforge.user.api.dao.SysJobLogRepository;
-import com.lesofn.archforge.user.api.dao.SysScheduledJobRepository;
+import com.lesofn.archforge.user.internal.dao.SysJobLogRepository;
+import com.lesofn.archforge.user.internal.dao.SysScheduledJobRepository;
 import com.lesofn.archforge.user.api.domain.SysJobLog;
 import com.lesofn.archforge.user.api.domain.SysScheduledJob;
 import com.lesofn.archforge.user.api.domain.query.SysScheduledJobQuery;
@@ -222,5 +222,17 @@ public class SysScheduledJobServiceImpl implements SysScheduledJobService {
             }
         }
         return null;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<SysScheduledJob> listAll() {
+        return jobRepository.findAll();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public boolean existsActive(Long id) {
+        return jobRepository.findById(id).map(job -> !Boolean.TRUE.equals(job.getDeleted())).orElse(false);
     }
 }

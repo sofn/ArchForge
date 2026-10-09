@@ -1,6 +1,6 @@
 package com.lesofn.archforge.user.internal.service;
 
-import com.lesofn.archforge.user.api.dao.SysFileRepository;
+import com.lesofn.archforge.user.internal.dao.SysFileRepository;
 import com.lesofn.archforge.user.api.domain.SysFile;
 import com.lesofn.archforge.user.api.service.SysFileService;
 import jakarta.persistence.criteria.Predicate;

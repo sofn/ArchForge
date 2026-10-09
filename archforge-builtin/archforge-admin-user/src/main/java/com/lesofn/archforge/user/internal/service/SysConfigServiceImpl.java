@@ -1,7 +1,7 @@
 package com.lesofn.archforge.user.internal.service;
 
 import com.lesofn.archforge.user.api.service.SysConfigService;
-import com.lesofn.archforge.user.api.dao.SysConfigRepository;
+import com.lesofn.archforge.user.internal.dao.SysConfigRepository;
 import com.lesofn.archforge.user.api.domain.SysConfig;
 import java.util.List;
 import java.util.Optional;

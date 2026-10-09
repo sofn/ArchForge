@@ -37,6 +37,20 @@ class ArchitectureTest {
                 .check(classes);
     }
 
+    /** ARCH-102 (ADR-0010): server-web reads module data through api services, never a module's internals. */
+    @Test
+    void serverWebShouldNotReachIntoModuleInternals() {
+        noClasses()
+                .that()
+                .resideInAPackage("..archforge.server.web..")
+                .should()
+                .dependOnClassesThat()
+                .resideInAnyPackage("..archforge.user.internal..", "..archforge.meta.table.internal..",
+                        "..archforge.cms.internal..", "..archforge.task.internal..")
+                .because("ARCH-102: modules are reached via api services; repositories are internal (ADR-0010)")
+                .check(classes);
+    }
+
     @Test
     void controllersShouldNotDirectlyAccessRepositories() {
         noClasses()

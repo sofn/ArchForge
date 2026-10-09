@@ -1,35 +1,33 @@
 package com.lesofn.archforge.server.admin.service.dashboard;
 
-import com.lesofn.archforge.cms.api.dao.CmsArticleRepository;
+import com.lesofn.archforge.cms.api.service.CmsArticleService;
 import com.lesofn.archforge.meta.table.api.service.MetaDefinitionRegistry;
-import com.lesofn.archforge.user.api.dao.SysUserRepository;
+import com.lesofn.archforge.user.api.service.SysUserService;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class DashboardService {
 
-    private final SysUserRepository userRepository;
-    private final CmsArticleRepository articleRepository;
+    private final SysUserService userService;
+    private final CmsArticleService articleService;
     private final MetaDefinitionRegistry metaDefinitionRegistry;
 
     public DashboardMetricsResponse metrics() {
-        return new DashboardMetricsResponse(userRepository.countByDeletedFalse(), articleRepository
-                .countByDeletedFalse(), metaDefinitionRegistry.count(), 0L);
+        return new DashboardMetricsResponse(userService.countNotDeleted(), articleService
+                .countNotDeleted(), metaDefinitionRegistry.count(), 0L);
     }
 
     public List<DashboardTrendPoint> trends(int days) {
         int window = days > 0 ? days : 7;
         List<DashboardTrendPoint> points = new ArrayList<>();
-        long users = userRepository.countByDeletedFalse();
-        long articles = articleRepository.countByDeletedFalse();
+        long users = userService.countNotDeleted();
+        long articles = articleService.countNotDeleted();
         for (int i = window - 1; i >= 0; i--) {
             LocalDate date = LocalDate.now(ZoneId.systemDefault()).minusDays(i);
             points.add(new DashboardTrendPoint(date.toString(), users, articles));
@@ -38,8 +36,8 @@ public class DashboardService {
     }
 
     public List<DashboardActivity> recentActivities() {
-        return articleRepository
-                .findAll(PageRequest.of(0, 8, Sort.by(Sort.Direction.DESC, "id")))
+        return articleService
+                .latest(8)
                 .stream()
                 .map(article -> new DashboardActivity("article", article.getTitle() != null ? article.getTitle()
                         : "article-" + article.getId(), article.getUpdateTime() != null ? article.getUpdateTime().toString()
@@ -49,8 +47,8 @@ public class DashboardService {
 
     public List<DashboardTodo> todo() {
         return List.of(
-                new DashboardTodo("Users", userRepository.countByDeletedFalse(), "/welcome"),
-                new DashboardTodo("Articles", articleRepository.countByDeletedFalse(), "/cms/article/index"),
+                new DashboardTodo("Users", userService.countNotDeleted(), "/welcome"),
+                new DashboardTodo("Articles", articleService.countNotDeleted(), "/cms/article/index"),
                 new DashboardTodo("Meta tables", metaDefinitionRegistry.count(), "/metatable"));
     }
 }

@@ -4,6 +4,7 @@ import com.lesofn.archforge.user.api.domain.SysLoginLog;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import java.time.LocalDateTime;
 
 public interface SysLoginLogService {
     Optional<SysLoginLog> findById(Long infoId);
@@ -15,4 +16,7 @@ public interface SysLoginLogService {
     void deleteById(Long infoId);
 
     void clearAll();
+
+    /** Successful logins (status 1) at or after {@code since}. */
+    long countSuccessfulSince(LocalDateTime since);
 }

@@ -1,7 +1,7 @@
 package com.lesofn.archforge.user.internal.service;
 
 import com.lesofn.archforge.user.api.service.SysRoleMenuService;
-import com.lesofn.archforge.user.api.dao.SysRoleMenuRepository;
+import com.lesofn.archforge.user.internal.dao.SysRoleMenuRepository;
 import com.lesofn.archforge.user.api.domain.SysRoleMenu;
 import java.util.List;
 import lombok.RequiredArgsConstructor;

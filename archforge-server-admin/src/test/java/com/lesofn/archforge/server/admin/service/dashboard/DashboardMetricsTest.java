@@ -3,9 +3,9 @@ package com.lesofn.archforge.server.admin.service.dashboard;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
-import com.lesofn.archforge.cms.api.dao.CmsArticleRepository;
+import com.lesofn.archforge.cms.api.service.CmsArticleService;
 import com.lesofn.archforge.meta.table.api.service.MetaDefinitionRegistry;
-import com.lesofn.archforge.user.api.dao.SysUserRepository;
+import com.lesofn.archforge.user.api.service.SysUserService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -16,10 +16,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class DashboardMetricsTest {
 
     @Mock
-    private SysUserRepository userRepository;
+    private SysUserService userService;
 
     @Mock
-    private CmsArticleRepository articleRepository;
+    private CmsArticleService articleService;
 
     @Mock
     private MetaDefinitionRegistry metaDefinitionRegistry;
@@ -29,8 +29,8 @@ class DashboardMetricsTest {
 
     @Test
     void metricsAggregatesExistingCounts() {
-        when(userRepository.countByDeletedFalse()).thenReturn(12L);
-        when(articleRepository.countByDeletedFalse()).thenReturn(4L);
+        when(userService.countNotDeleted()).thenReturn(12L);
+        when(articleService.countNotDeleted()).thenReturn(4L);
         when(metaDefinitionRegistry.count()).thenReturn(3L);
 
         DashboardMetricsResponse metrics = dashboardService.metrics();

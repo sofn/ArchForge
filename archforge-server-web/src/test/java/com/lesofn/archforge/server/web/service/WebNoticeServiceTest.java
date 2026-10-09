@@ -1,35 +1,30 @@
 package com.lesofn.archforge.server.web.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import com.lesofn.archforge.server.web.dto.WebNoticeResponse;
 import com.lesofn.archforge.server.web.dto.WebOperationLogResponse;
-import com.lesofn.archforge.user.api.dao.SysNoticeRepository;
-import com.lesofn.archforge.user.api.dao.SysOperLogRepository;
+import com.lesofn.archforge.user.api.service.SysNoticeService;
+import com.lesofn.archforge.user.api.service.SysOperLogService;
 import com.lesofn.archforge.user.api.domain.SysNotice;
 import com.lesofn.archforge.user.api.domain.SysOperLog;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 
 @ExtendWith(MockitoExtension.class)
 class WebNoticeServiceTest {
 
     @Mock
-    private SysNoticeRepository sysNoticeRepository;
+    private SysNoticeService noticeService;
 
     @Mock
-    private SysOperLogRepository sysOperLogRepository;
+    private SysOperLogService operLogService;
 
     @InjectMocks
     private WebNoticeService service;
@@ -42,9 +37,7 @@ class WebNoticeServiceTest {
         notice.setNoticeContent("今晚升级");
         notice.setNoticeType(2);
         notice.setCreateTime(LocalDateTime.of(2026, 9, 12, 10, 0));
-        when(sysNoticeRepository.findAll(
-                ArgumentMatchers.<Specification<SysNotice>> any(), any(Pageable.class)))
-                        .thenReturn(new PageImpl<>(List.of(notice)));
+        when(noticeService.latestPublished(20)).thenReturn(List.of(notice));
 
         List<WebNoticeResponse> notices = service.latestNotices();
 
@@ -63,7 +56,7 @@ class WebNoticeServiceTest {
         log.setModule("文章");
         log.setSummary("发布文章");
         log.setOperatingTime(LocalDateTime.of(2026, 9, 12, 11, 0));
-        when(sysOperLogRepository.findAll(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(log)));
+        when(operLogService.latest(20)).thenReturn(List.of(log));
 
         List<WebOperationLogResponse> logs = service.latestOperationLogs();
 
