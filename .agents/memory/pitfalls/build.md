@@ -16,3 +16,11 @@
   — server-admin's `test` task lists them under `deploymentArtifacts`.
 - **`@ConfigurationProperties` binding keeps an unresolved `${VAR}` as literal text** instead of failing: a missing
   `CORS_ALLOWED_ORIGINS` bound the origin `"${CORS_ALLOWED_ORIGINS}"`. Fail-fast checks must reject values containing `${`.
+- **Java regex recurses per repetition of a group with alternation** (`"(?:[^"\\]|\\.)*"`): a long value overflows the
+  stack (2026-10: the request-log masker turned `GET /admin/auth/captchaImage` — a 30 KB base64 field whose key contains
+  "captcha" — into a 500 and appended an error page to the response; an escape-heavy login body did the same). Scan
+  untrusted text with a linear loop; never put `(?:a|b)*` over attacker-sized input. A logging filter must also never
+  let its own failure reach the response (catch in the `finally`).
+- **A one-shot CLI process that boots the app is a full node** unless told otherwise: `meta check/export/import` used to
+  start db-scheduler (picking up due jobs, waiting up to 2×30 min for them on shutdown). Pass
+  `--spring.main.web-application-type=none --arch-forge.scheduler.enabled=false`.

@@ -11,3 +11,9 @@
 - **A REFERENCE column could join any physical table** (fixed 2026-10): pointing `referenceColumn` at `id` skipped every
   check, so `referenceTable: sys_user` + `ref.password` listed password hashes. The target must be the table itself or a
   registered meta table (design time), and `ReferenceDisplayBuilder` never joins a platform table (runtime, for legacy rows).
+- **Row values are not strings**: `convertValue` used `value.toString()` for JSON/GEO, so a JSON array/object from the API
+  reached PostgreSQL as `[a, b]` / `{k=v}` (500). Serialize with Jackson (`toJsonString`).
+- **Validation must fail closed when its reference data is missing**: an ENUM column whose dictionary did not exist
+  accepted any value. Same rule as the data scope — no allow-list means nothing is allowed.
+- **Unique violations are input errors**: translate `DuplicateKeyException` (index `uq_<physical table>_<key>`) into
+  `META_COLUMN_VALUE_INVALID` naming the column — never a 500 carrying the constraint, key value and SQL state.
