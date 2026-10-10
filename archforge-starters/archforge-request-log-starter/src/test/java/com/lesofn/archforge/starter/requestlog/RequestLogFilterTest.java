@@ -32,7 +32,7 @@ class RequestLogFilterTest {
         captured = new ArrayList<>();
         @SuppressWarnings("unchecked")
         ObjectProvider<RequestLogEnricher> enrichers = mock(ObjectProvider.class);
-        when(enrichers.orderedStream()).thenReturn(Stream.empty());
+        when(enrichers.orderedStream()).thenAnswer(invocation -> Stream.empty());
         filter = new RequestLogFilter(properties, enrichers, captured::add);
     }
 
@@ -66,6 +66,76 @@ class RequestLogFilterTest {
 
         // 6.6.6.6 was sent by the client itself; 198.51.100.9 is what the trusted proxy saw
         assertEquals("198.51.100.9", captured.get(0).getIp());
+    }
+
+    /**
+     * The value regex recursed once per character: a 30 KB base64 captcha image (key contains "captcha") overflowed the
+     * stack, turned GET /admin/auth/captchaImage into a 500 and appended an error page to the response.
+     */
+    @Test
+    void longSensitiveValuesAreMaskedWithoutBlowingTheStack() throws Exception {
+        String image = "data:image/png;base64," + "A".repeat(40_000);
+        String body = "{\"code\":0,\"data\":{\"captchaCodeImg\":\"" + image + "\",\"uuid\":\"k\"}}";
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        filter.doFilter(new MockHttpServletRequest("GET", "/admin/auth/captchaImage"), response, (req, res) -> {
+            res.setContentType("application/json");
+            res.getWriter().write(body);
+        });
+
+        assertEquals(body, response.getContentAsString());
+        String logged = java.util.Objects.requireNonNull(captured.get(0).getResponse());
+        assertTrue(logged.contains("\"captchaCodeImg\":\"***\""), logged.substring(0, Math.min(200, logged.length())));
+        assertFalse(logged.contains("AAAA"));
+    }
+
+    /** An unauthenticated login body made of escape sequences was enough to overflow the stack (DoS, also in prod). */
+    @Test
+    void escapeHeavyRequestBodiesAreMaskedWithoutBlowingTheStack() throws Exception {
+        MockHttpServletRequest request = new MockHttpServletRequest("POST", "/admin/auth/login");
+        request.setContentType("application/json");
+        String body = "{\"password\":\"" + "\\\\".repeat(4500) + "A\",\"username\":\"x\"}";
+        request.setContent(body.getBytes(StandardCharsets.UTF_8));
+
+        filter.doFilter(request, new MockHttpServletResponse(), (req, res) -> {
+        });
+
+        String payload = java.util.Objects.requireNonNull(captured.get(0).getPayload());
+        assertEquals("{\"password\":\"***\",\"username\":\"x\"}", payload);
+    }
+
+    /** One record per request: the /error dispatch that follows a recorded request does not log it again. */
+    @Test
+    void anErrorDispatchAfterARecordedRequestIsNotRecordedTwice() throws Exception {
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/missing");
+        filter.doFilter(request, new MockHttpServletResponse(), (req, res) -> ((HttpServletResponse) res).sendError(404));
+
+        request.setDispatcherType(jakarta.servlet.DispatcherType.ERROR);
+        request.setAttribute("jakarta.servlet.error.request_uri", "/missing");
+        filter.doFilter(request, new MockHttpServletResponse(), (req, res) -> {
+        });
+
+        assertEquals(1, captured.size());
+        assertEquals(404, captured.get(0).getResponseStatus());
+    }
+
+    /** An exception escaping the chain is rendered by the /error dispatch, which records the final status once. */
+    @Test
+    void anExceptionEscapingTheChainIsRecordedOnceByTheErrorDispatch() throws Exception {
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/boom");
+        org.junit.jupiter.api.Assertions.assertThrows(jakarta.servlet.ServletException.class, () -> filter.doFilter(request,
+                new MockHttpServletResponse(), (req, res) -> {
+                    throw new jakarta.servlet.ServletException("boom");
+                }));
+        assertTrue(captured.isEmpty());
+
+        request.setDispatcherType(jakarta.servlet.DispatcherType.ERROR);
+        request.setAttribute("jakarta.servlet.error.request_uri", "/boom");
+        filter.doFilter(request, new MockHttpServletResponse(), (req, res) -> ((HttpServletResponse) res).setStatus(500));
+
+        assertEquals(1, captured.size());
+        assertEquals("/boom", captured.get(0).getApi());
+        assertEquals(500, captured.get(0).getResponseStatus());
     }
 
     @Test

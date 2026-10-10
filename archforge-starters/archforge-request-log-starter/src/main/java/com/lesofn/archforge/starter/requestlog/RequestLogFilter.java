@@ -1,12 +1,12 @@
 package com.lesofn.archforge.starter.requestlog;
 
+import jakarta.servlet.DispatcherType;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -14,8 +14,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.Strings;
 import org.jspecify.annotations.Nullable;
@@ -41,6 +39,9 @@ public class RequestLogFilter extends OncePerRequestFilter {
     /** 脱敏的载荷长度下限（字符）；更大的载荷整体省略。 */
     private static final int MIN_MASK_LIMIT = 64 * 1024;
     private static final String ERROR_URI_ATTRIBUTE = "jakarta.servlet.error.request_uri";
+    /** Set once a request has been recorded, so the /error dispatch that may follow does not record it again. */
+    private static final String RECORDED_ATTRIBUTE = RequestLogFilter.class.getName() + ".RECORDED";
+    private static final List<String> JSON_LITERALS = List.of("true", "false", "null");
 
     private final RequestLogProperties properties;
     private final ObjectProvider<RequestLogEnricher> enrichers;
@@ -48,8 +49,6 @@ public class RequestLogFilter extends OncePerRequestFilter {
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
     /** 归一化（小写、去 _ -）后的敏感片段；字段名包含任一片段即脱敏。 */
     private final Set<String> maskFragments;
-    private final List<Pattern> jsonMaskPatterns = new ArrayList<>();
-    private final List<Pattern> formMaskPatterns = new ArrayList<>();
 
     /** Proxies whose X-Forwarded-For entries are believed ({@code arch-forge.security.trusted-proxies}). */
     private final List<String> trustedProxies;
@@ -66,19 +65,12 @@ public class RequestLogFilter extends OncePerRequestFilter {
         this.enrichers = enrichers;
         this.sink = sink;
         this.maskFragments = new HashSet<>();
+        // 键名归一化（小写、去 _ -）后包含任一片段即脱敏：api_key / apiKey / API-KEY / x_apikey_v2 都命中
         for (String field : properties.getMaskFields()) {
             String fragment = normalizeKey(field);
-            if (fragment.isEmpty() || !maskFragments.add(fragment)) {
-                continue;
+            if (!fragment.isEmpty()) {
+                maskFragments.add(fragment);
             }
-            // 片段的相邻字符间允许出现 _ 或 -，且前后可带任意键名字符：api_key / apiKey / API-KEY / x_apikey_v2 都命中
-            String keyPattern = fragment.chars().mapToObj(c -> Pattern.quote(String.valueOf((char) c)))
-                    .collect(Collectors.joining("[_-]*"));
-            jsonMaskPatterns.add(Pattern.compile(
-                    "(\"[^\"\\\\]*" + keyPattern + "[^\"\\\\]*\"\\s*:\\s*)(\"(?:[^\"\\\\]|\\\\.)*\"|-?[\\d.]+|true|false|null)",
-                    Pattern.CASE_INSENSITIVE));
-            formMaskPatterns.add(Pattern.compile("((?:^|[&?\\s])[\\w.\\-]*" + keyPattern + "[\\w.\\-]*=)[^&\\s]*",
-                    Pattern.CASE_INSENSITIVE));
         }
     }
 
@@ -101,11 +93,27 @@ public class RequestLogFilter extends OncePerRequestFilter {
         HttpServletResponse responseToUse = properties.isIncludeResponsePayload()
                 ? new RequestLogResponseWrapper(response)
                 : response;
+        if (request.getDispatcherType() == DispatcherType.ERROR && request.getAttribute(RECORDED_ATTRIBUTE) != null) {
+            filterChain.doFilter(request, response);
+            return;
+        }
         long startTime = System.currentTimeMillis();
+        boolean completed = false;
         try {
             filterChain.doFilter(requestToUse, responseToUse);
+            completed = true;
         } finally {
-            writeRecord(request, requestToUse, responseToUse, path, startTime);
+            // An exception escaping the chain is rendered by the /error dispatch, which records the final status;
+            // recording here as well would log the request twice, the first time with the wrong status.
+            if (completed || request.getDispatcherType() == DispatcherType.ERROR) {
+                request.setAttribute(RECORDED_ATTRIBUTE, true);
+                try {
+                    writeRecord(request, requestToUse, responseToUse, path, startTime);
+                } catch (RuntimeException e) {
+                    // logging must never change the response the client gets
+                    log.warn("request log record for {} dropped", path, e);
+                }
+            }
         }
     }
 
@@ -206,16 +214,127 @@ public class RequestLogFilter extends OncePerRequestFilter {
         if (payload.length() > limit) {
             return "[" + payload.length() + " chars omitted]";
         }
-        String masked = payload;
-        for (Pattern json : jsonMaskPatterns) {
-            // JSON 字段值："key":"v" / "key":123 / "key":true
-            masked = json.matcher(masked).replaceAll("$1\"" + MASK + "\"");
+        return maskForm(maskJson(payload));
+    }
+
+    /**
+     * Masks the scalar value of every JSON member whose key is sensitive ({@code "key":"v"} / {@code 123} / {@code true}),
+     * in one linear pass. The regex it replaces recursed once per character of a quoted value: a long value (a 30 KB
+     * captcha image, an escape-heavy login body) overflowed the stack.
+     */
+    private String maskJson(String s) {
+        int n = s.length();
+        StringBuilder out = null;
+        int copied = 0;
+        int i = 0;
+        while (i < n) {
+            if (s.charAt(i) != '"') {
+                i++;
+                continue;
+            }
+            int keyEnd = stringEnd(s, i);
+            int colon = skipWhitespace(s, keyEnd);
+            if (colon >= n || s.charAt(colon) != ':') {
+                i = keyEnd; // a string value, not a member name
+                continue;
+            }
+            int valueStart = skipWhitespace(s, colon + 1);
+            int valueEnd = isSensitiveKey(s.substring(i + 1, keyEnd - 1)) ? scalarEnd(s, valueStart) : -1;
+            if (valueEnd > valueStart) {
+                if (out == null) {
+                    out = new StringBuilder(n);
+                }
+                out.append(s, copied, valueStart).append('"').append(MASK).append('"');
+                copied = valueEnd;
+                i = valueEnd;
+            } else {
+                i = valueStart;
+            }
         }
-        for (Pattern form : formMaskPatterns) {
-            // 表单字段值：key=v&
-            masked = form.matcher(masked).replaceAll("$1" + MASK);
+        return out == null ? s : out.append(s, copied, n).toString();
+    }
+
+    /** Masks {@code key=value} pairs (form bodies, query strings) whose key is sensitive, in one linear pass. */
+    private String maskForm(String s) {
+        int n = s.length();
+        StringBuilder out = null;
+        int copied = 0;
+        int i = 0;
+        while (i < n) {
+            boolean keyStart = i == 0 || s.charAt(i - 1) == '&' || s.charAt(i - 1) == '?' || Character.isWhitespace(s
+                    .charAt(i - 1));
+            int keyEnd = i;
+            while (keyEnd < n && isFormKeyChar(s.charAt(keyEnd))) {
+                keyEnd++;
+            }
+            if (!keyStart || keyEnd == i || keyEnd >= n || s.charAt(keyEnd) != '=') {
+                i = Math.max(i + 1, keyEnd);
+                continue;
+            }
+            int valueEnd = keyEnd + 1;
+            while (valueEnd < n && s.charAt(valueEnd) != '&' && !Character.isWhitespace(s.charAt(valueEnd))) {
+                valueEnd++;
+            }
+            if (isSensitiveKey(s.substring(i, keyEnd))) {
+                if (out == null) {
+                    out = new StringBuilder(n);
+                }
+                out.append(s, copied, keyEnd + 1).append(MASK);
+                copied = valueEnd;
+            }
+            i = valueEnd;
         }
-        return masked;
+        return out == null ? s : out.append(s, copied, n).toString();
+    }
+
+    /** Index just past the closing quote of the string starting at {@code start}; the end for an unterminated one. */
+    private static int stringEnd(String s, int start) {
+        for (int j = start + 1; j < s.length(); j++) {
+            char c = s.charAt(j);
+            if (c == '\\') {
+                j++;
+            } else if (c == '"') {
+                return j + 1;
+            }
+        }
+        return s.length();
+    }
+
+    /** End of the JSON scalar at {@code start}, or -1 for an object, an array or nothing at all. */
+    private static int scalarEnd(String s, int start) {
+        if (start >= s.length()) {
+            return -1;
+        }
+        char c = s.charAt(start);
+        if (c == '"') {
+            return stringEnd(s, start); // an unterminated sensitive string is masked to the end
+        }
+        if (c == '-' || (c >= '0' && c <= '9')) {
+            int j = start + 1;
+            while (j < s.length() && "0123456789.eE+-".indexOf(s.charAt(j)) >= 0) {
+                j++;
+            }
+            return j;
+        }
+        for (String literal : JSON_LITERALS) {
+            if (s.regionMatches(true, start, literal, 0, literal.length())) {
+                return start + literal.length();
+            }
+        }
+        return -1;
+    }
+
+    private static int skipWhitespace(String s, int start) {
+        int j = start;
+        while (j < s.length() && Character.isWhitespace(s.charAt(j))) {
+            j++;
+        }
+        return j;
+    }
+
+    private static boolean isFormKeyChar(char c) {
+        return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '_' || c == '.' ||
+                c == '-';
     }
 
     /** TSV 单列约束：载荷里的制表/换行会破坏日志列对齐，折叠为空格。 */
