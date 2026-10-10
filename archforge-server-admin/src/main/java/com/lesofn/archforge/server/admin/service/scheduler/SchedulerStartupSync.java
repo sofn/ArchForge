@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 /**
  * Reconciles {@code scheduled_tasks} with {@code sys_scheduled_job} after startup: every
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Component;
  * @author sofn
  */
 @Slf4j
+@ConditionalOnProperty(prefix = "arch-forge.scheduler", name = "enabled", havingValue = "true", matchIfMissing = true)
 @Component
 public class SchedulerStartupSync {
 

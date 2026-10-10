@@ -102,6 +102,26 @@ public class MetaCommand implements Callable<Integer> {
         }
     }
 
+    /** Application arguments of the one-shot sync process (package-private for tests). */
+    static List<String> syncArgs(String mode, Path dir, SyncOptions options, boolean apply) {
+        // source=db: a one-shot sync process must neither shadow-verify nor
+        // file-materialize before the requested mode runs (that would mask drift).
+        List<String> args = new ArrayList<>(List.of(
+                "--spring.main.web-application-type=none",
+                "--arch-forge.meta.source=db",
+                // not a db-scheduler node: it would pick up due jobs and wait for them on shutdown
+                "--arch-forge.scheduler.enabled=false",
+                "--arch-forge.meta.sync.mode=" + mode,
+                "--arch-forge.meta.sync.dir=" + dir));
+        if (options.table != null) {
+            args.add("--arch-forge.meta.sync.table=" + options.table);
+        }
+        if (apply) {
+            args.add("--arch-forge.meta.sync.apply=true");
+        }
+        return args;
+    }
+
     private static int runSync(String mode, SyncOptions options, boolean apply) {
         Path root = ProjectPaths.repoRoot();
         // bootRun's cwd is the module dir — resolve the definition dir against
@@ -119,19 +139,7 @@ public class MetaCommand implements Callable<Integer> {
             return 1;
         }
 
-        // source=db: a one-shot sync process must neither shadow-verify nor
-        // file-materialize before the requested mode runs (that would mask drift).
-        List<String> args = new ArrayList<>(List.of(
-                "--spring.main.web-application-type=none",
-                "--arch-forge.meta.source=db",
-                "--arch-forge.meta.sync.mode=" + mode,
-                "--arch-forge.meta.sync.dir=" + dir));
-        if (options.table != null) {
-            args.add("--arch-forge.meta.sync.table=" + options.table);
-        }
-        if (apply) {
-            args.add("--arch-forge.meta.sync.apply=true");
-        }
+        List<String> args = syncArgs(mode, dir, options, apply);
 
         // bootRun connects to the dev datasource — resolve DB_PASSWORD the same
         // way `db init` does (env → .env).

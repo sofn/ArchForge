@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 /**
  * db-scheduler runtime wiring (replaces the former Quartz SchedulerFactoryBean).
@@ -32,6 +33,7 @@ import org.springframework.context.annotation.Configuration;
  * @author sofn
  */
 @Slf4j
+@ConditionalOnProperty(prefix = "arch-forge.scheduler", name = "enabled", havingValue = "true", matchIfMissing = true)
 @Configuration
 public class SchedulerConfig {
 

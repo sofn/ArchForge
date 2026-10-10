@@ -107,6 +107,8 @@ arch-forge:
     # db-scheduler runtime（调度状态存 scheduled_tasks 表，反射调用仅允许此名单内的 bean）
     allowed-job-beans: demoSchedulerJob
     threads: 5
+    # false = this process is not a scheduler node (CLI one-shot processes pass it); job management APIs then refuse
+    enabled: true
   ip-region:
     # xdb 数据文件运行时下载并缓存到 ./data（已 gitignore）；{version} 由构建时注入的
     # ip2region-xdb.properties（gradle 的 ip2regionXdbVersion 常量）自动填充。

@@ -12,6 +12,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 /**
  * db-scheduler adapter of the {@link SchedulerJobRuntime} port: {@code scheduleIfNotExists} for
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Component;
  * @author sofn
  */
 @Slf4j
+@ConditionalOnProperty(prefix = "arch-forge.scheduler", name = "enabled", havingValue = "true", matchIfMissing = true)
 @Component
 @RequiredArgsConstructor
 public class DbSchedulerJobRuntime implements SchedulerJobRuntime {
