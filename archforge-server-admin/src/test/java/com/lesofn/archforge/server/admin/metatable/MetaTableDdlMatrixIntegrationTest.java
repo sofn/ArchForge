@@ -69,6 +69,9 @@ class MetaTableDdlMatrixIntegrationTest extends AbstractIntegrationTest {
     @Autowired
     private MetaTableCrudService crudService;
 
+    @Autowired
+    private com.lesofn.archforge.user.api.service.dict.SysDictService dictService;
+
     private final List<Long> createdTables = new ArrayList<>();
     private @Nullable Long referenceTargetTableId;
     private @Nullable Long referenceTargetRowId;
@@ -315,6 +318,8 @@ class MetaTableDdlMatrixIntegrationTest extends AbstractIntegrationTest {
         switch (type) {
             case ARRAY -> column.setArrayElementType("STRING");
             case ENUM -> {
+                // ENUM values are validated against their dictionary (fail-closed), so the dictionary must exist
+                ensureDictionary("ddlmtx_dict", "A");
                 column.setDictCode("ddlmtx_dict");
                 column.setLength(255);
             }
@@ -332,6 +337,23 @@ class MetaTableDdlMatrixIntegrationTest extends AbstractIntegrationTest {
             default -> {
             }
         }
+    }
+
+    private void ensureDictionary(String dictCode, String itemCode) {
+        if (dictService.findTypeByCode(dictCode).isPresent()) {
+            return;
+        }
+        com.lesofn.archforge.user.api.domain.dict.SysDictType type = new com.lesofn.archforge.user.api.domain.dict.SysDictType();
+        type.setDictCode(dictCode);
+        type.setDictName(dictCode);
+        type.setStatus(1);
+        type.setSort(0);
+        com.lesofn.archforge.user.api.domain.dict.SysDictItem item = new com.lesofn.archforge.user.api.domain.dict.SysDictItem();
+        item.setItemCode(itemCode);
+        item.setItemLabel(itemCode);
+        item.setSort(0);
+        item.setStatus(1);
+        dictService.saveTypeWithItems(type, List.of(item));
     }
 
     private MetaTable createTable(String code, String name, MetaColumn... cols) {

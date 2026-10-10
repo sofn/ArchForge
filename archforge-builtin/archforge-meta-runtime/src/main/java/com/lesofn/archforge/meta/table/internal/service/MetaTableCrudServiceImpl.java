@@ -38,6 +38,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.Nullable;
 import org.postgresql.util.PGobject;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -66,7 +67,11 @@ public class MetaTableCrudServiceImpl implements MetaTableCrudService {
         List<MetaColumn> columns = definition.columns();
         validator.validateValues(row, columns, true);
         dataScopeFilter.checkRowInScope(columns, row);
-        return inserter.insert(table, columns, row, currentUid);
+        try {
+            return inserter.insert(table, columns, row, currentUid);
+        } catch (DuplicateKeyException e) {
+            throw UniqueViolations.toValidationError(e, table.physicalTableName(), columns);
+        }
     }
 
     @Override
@@ -96,8 +101,11 @@ public class MetaTableCrudServiceImpl implements MetaTableCrudService {
                 String.join(", ", sets),
                 dataScopeFilter.buildClause(columns, "main", params));
 
-        int rows = jdbcTemplate.update(sql, params);
-        return rows > 0;
+        try {
+            return jdbcTemplate.update(sql, params) > 0;
+        } catch (DuplicateKeyException e) {
+            throw UniqueViolations.toValidationError(e, table.physicalTableName(), columns);
+        }
     }
 
     @Override

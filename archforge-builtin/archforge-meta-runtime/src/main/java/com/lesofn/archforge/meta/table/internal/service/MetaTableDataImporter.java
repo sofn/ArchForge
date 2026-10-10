@@ -41,6 +41,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.dao.DuplicateKeyException;
 
 /**
  * 元表格数据导入器。
@@ -232,7 +233,11 @@ public class MetaTableDataImporter {
             for (int index = start; index < end; index++) {
                 batch[index - start] = buildParams(ctx, ctx.pending.get(index), codes);
             }
-            jdbcTemplate.batchUpdate(sql, batch);
+            try {
+                jdbcTemplate.batchUpdate(sql, batch);
+            } catch (DuplicateKeyException e) {
+                throw UniqueViolations.toValidationError(e, ctx.table.physicalTableName(), ctx.columns);
+            }
         }
     }
 

@@ -391,7 +391,9 @@ public class MetaTableValidator {
     private void validateEnum(MetaColumn column, Object value) {
         List<OptionItem> items = findDictItems(column);
         if (items == null || items.isEmpty()) {
-            return;
+            // fail closed: a missing or empty dictionary must not turn the column into free text
+            throw new MetaTableException(MetaTableErrorCode.META_COLUMN_VALUE_INVALID, column.getColumnName() + " 的字典 " +
+                    column.getDictCode() + " 不存在或没有可选值");
         }
         Set<Object> optionValues = items.stream()
                 .map(OptionItem::getValue)
@@ -428,7 +430,9 @@ public class MetaTableValidator {
         if (dictionaryProvider == null) {
             return column.getOptions();
         }
-        return dictionaryProvider.findItems(column.getDictCode());
+        List<OptionItem> items = dictionaryProvider.findItems(column.getDictCode());
+        // legacy inline options still count when the dictionary has not been created (they are an allow-list too)
+        return items.isEmpty() && column.getOptions() != null ? column.getOptions() : items;
     }
 
     private void validateJson(Object value) {
@@ -564,7 +568,8 @@ public class MetaTableValidator {
             case DATETIME -> java.sql.Timestamp.valueOf(LocalDateTime.parse(value.toString().replace(' ', 'T')));
             case TIMESTAMPTZ -> parseTimestampTz(value.toString());
             case UUID -> UUID.fromString(value.toString());
-            case JSON, GEO -> toPgJsonb(value.toString());
+            // a List / Map must become JSON text — toString() gave "[a, b]" / "{k=v}", rejected by PostgreSQL
+            case JSON, GEO -> toPgJsonb(toJsonString(value));
             case ARRAY -> toPgArray(column, value);
         };
     }
