@@ -43,6 +43,11 @@ Read before touching the affected area; each entry links the record.
   `MetaTableMigrationService` / `MetaTableMigrationExporter` are interfaces now (impls in `internal.service`).
 - **`common.constant.Constants` is gone** (it was unused); `archforge-module-task` depends on infrastructure with
   `implementation`.
+- **The admin login password is RSA-OAEP / SHA-256** (WebCrypto `RSA-OAEP`), not PKCS#1 v1.5; clients take the key
+  from `GET /admin/auth/getConfig` → `rsaPublicKey`. In prod an undecryptable password is a wrong password (10101).
+- **`IpUtil.getRealIpAddr` is gone** — the request filter resolves the client IP once (trusted proxies only); read it
+  with `ScopedValueContext.getClientIp()`. Clearing an audit log needs `monitor:operlog:remove` /
+  `monitor:logininfor:remove`.
 
 ## AI Asset Map
 

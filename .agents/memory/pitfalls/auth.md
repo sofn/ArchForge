@@ -16,3 +16,10 @@
 - **An interceptor that needs the cached body must walk the wrapper chain** (`WebUtils.getNativeRequest(request,
   RepeatableRequestWrapper.class)`): the request-log filter wraps the caching wrapper again, so `instanceof` misses it
   (broke API signatures and the repeat-submit fingerprint).
+- **Test the assembled chain, not one filter**: the 10-08 request-log IP fix passed its unit test while
+  `RequestContextEnricher` overwrote the result with the naive header value in the running app (a forged
+  `X-Forwarded-For` was still logged). Resolve such values once and test through the application
+  (`ClientIpIntegrationTest`).
+- **A "cannot decrypt" error code is an oracle**: with PKCS#1 v1.5 it enables padding attacks. The login answered
+  10106 for undecryptable passwords; it now answers like a wrong password (and uses RSA-OAEP). The server must also
+  publish the public key — it did not, so no client could log in to prod.

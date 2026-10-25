@@ -156,6 +156,20 @@ with `AESEncrypter.of(...)`. The old key must not come back into the code.
 `arch-forge.request-log.mask-fields` are key *fragments* — a key containing one is masked (`token` ⇒ `accessToken`,
 `refresh_token`, …). `staging` / `prod` do not log request or response bodies at all.
 
-The logged client IP follows the rate limiter's rule (`IpUtil.getClientIp`): forwarding headers count only when the
-peer is listed in `arch-forge.security.trusted-proxies`, and then the client is the right-most `X-Forwarded-For`
-entry that is not a trusted proxy. Without trusted proxies the peer address is logged.
+## Client IP
+
+The client IP is resolved once per request, by the request filter, with the rate limiter's rule
+(`IpUtil.getClientIp`): forwarding headers count only when the peer is listed in `arch-forge.security.trusted-proxies`,
+and then the client is the right-most `X-Forwarded-For` entry that is not a trusted proxy; otherwise it is the peer
+address. The request log, the operation and login logs and the online-user list all read that value
+(`ScopedValueContext.getClientIp()`) — never the headers. `ClientIpIntegrationTest` checks it through the assembled
+application with a forged header. Clearing an audit log needs `monitor:operlog:remove` / `monitor:logininfor:remove`.
+
+## Login password
+
+The admin login form encrypts the password with RSA-OAEP / SHA-256 (browser WebCrypto) for the public key that
+`GET /admin/auth/getConfig` returns as `rsaPublicKey` — derived from `arch-forge.rsa-private-key`. In prod a password
+the server cannot decrypt is answered as a wrong password (10101) and counts towards the lockout, so the response does
+not reveal which ciphertexts are well-formed. Other profiles fall back to the password as sent. Without a secure
+context (plain HTTP on a non-localhost host) the browser has no WebCrypto and sends the password as typed — prod must be
+served over HTTPS.
