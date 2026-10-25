@@ -37,6 +37,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import org.jspecify.annotations.Nullable;
 
 /**
  * 登录服务
@@ -78,7 +79,14 @@ public class LoginService {
             // 验证码校验
             validateCaptcha(loginCommand.getCaptchaCodeKey(), loginCommand.getCaptchaCode());
 
-            String decryptedPassword = decryptPassword(loginCommand.getPassword());
+            String decryptedPassword;
+            try {
+                decryptedPassword = decryptPassword(loginCommand.getPassword());
+            } catch (AdminAuthException undecryptable) {
+                // counted like a wrong password, so the two cannot be told apart by the lockout either
+                loginAttemptService.recordFailure(loginCommand.getUsername());
+                throw undecryptable;
+            }
             SystemLoginUser loginUser = adminLoginUserFactory.load(loginCommand.getUsername());
             if (!passwordEncoder.matches(decryptedPassword, loginUser.getPassword())) {
                 loginAttemptService.recordFailure(loginCommand.getUsername());
@@ -244,11 +252,27 @@ public class LoginService {
         boolean isCaptchaOn = appForgeConfig.getCaptcha().isEnabled();
         configDTO.setIsCaptchaOn(isCaptchaOn);
         configDTO.setDictionary(enumDictionaryRegistry.asDictionaryDataMap());
+        configDTO.setRsaPublicKey(rsaPublicKey());
         return configDTO;
     }
 
+    /** Public key of the configured private key, for login clients; null when none is configured or it is unusable. */
+    private @Nullable String rsaPublicKey() {
+        String privateKey = appForgeConfig.getRsaPrivateKey();
+        if (privateKey == null || privateKey.isBlank()) {
+            return null;
+        }
+        try {
+            return RsaEncrypter.publicKeyOf(privateKey);
+        } catch (Exception e) {
+            log.warn("arch-forge.rsa-private-key is not a usable RSA private key: {}", e.getMessage());
+            return null;
+        }
+    }
+
     /**
-     * 解密密码。生产环境 RSA 解密失败直接拒绝；非生产环境保留明文回退用于开发/测试。
+     * 解密密码（RSA-OAEP / SHA-256，与浏览器 WebCrypto 的 RSA-OAEP 一致）。生产环境解不开即按"用户名或密码错误"拒绝——
+     * 单独的"解密失败"错误码会告诉攻击者哪些密文格式正确；非生产环境保留明文回退用于开发/测试。
      *
      * @param encryptedPassword RSA 加密后的密码或明文密码
      * @return 解密后的密码
@@ -260,7 +284,7 @@ public class LoginService {
         } catch (Exception e) {
             if (environment.matchesProfiles("prod")) {
                 log.warn("RSA密码解密失败，拒绝明文回退: {}", e.getMessage());
-                throw new AdminAuthException(DECODE_PASS_ERROR);
+                throw new AdminAuthException(USERNAME_PASSWORD_ERROR);
             }
             log.warn("RSA密码解密失败，尝试作为明文密码处理: {}", e.getMessage());
             return encryptedPassword;

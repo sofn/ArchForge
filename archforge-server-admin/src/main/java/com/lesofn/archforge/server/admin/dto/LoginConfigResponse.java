@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.jspecify.annotations.Nullable;
 import lombok.NoArgsConstructor;
 
 /**
@@ -22,4 +23,10 @@ public class LoginConfigResponse {
     private Boolean isCaptchaOn = true;
 
     private Map<String, List<DictionaryData>> dictionary;
+
+    /**
+     * RSA public key (X.509 SPKI, Base64) to encrypt the login password with: RSA-OAEP with SHA-256, as in WebCrypto.
+     * Null when the server has no private key configured; the client then sends the password as typed.
+     */
+    private @Nullable String rsaPublicKey;
 }

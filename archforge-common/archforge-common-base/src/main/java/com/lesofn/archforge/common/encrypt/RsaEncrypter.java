@@ -7,11 +7,16 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.interfaces.RSAPrivateCrtKey;
+import java.security.spec.MGF1ParameterSpec;
 import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.RSAPublicKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.HashMap;
 import java.util.Map;
 import javax.crypto.Cipher;
+import javax.crypto.spec.OAEPParameterSpec;
+import javax.crypto.spec.PSource;
 import org.apache.commons.codec.binary.Base64;
 
 /**
@@ -20,6 +25,14 @@ import org.apache.commons.codec.binary.Base64;
  * @author sofn
  */
 public class RsaEncrypter {
+
+    /**
+     * RSA-OAEP with SHA-256 for both the label hash and MGF1 — what browsers' WebCrypto calls {@code RSA-OAEP} with
+     * {@code hash: "SHA-256"}. (Java's "OAEPWithSHA-256AndMGF1Padding" alone would use MGF1-SHA-1.) PKCS#1 v1.5, used
+     * before, is no longer accepted: it needs no client library but is exposed to padding-oracle attacks.
+     */
+    private static final String TRANSFORMATION = "RSA/ECB/OAEPPadding";
+    private static final OAEPParameterSpec OAEP_SHA256 = new OAEPParameterSpec("SHA-256", "MGF1", MGF1ParameterSpec.SHA256, PSource.PSpecified.DEFAULT);
 
     /**
      * 生成RSA密钥对
@@ -80,6 +93,20 @@ public class RsaEncrypter {
     }
 
     /**
+     * The X.509 (SPKI) public key, Base64, that belongs to a PKCS#8 private key — what the server offers login
+     * clients so they can encrypt the password for the private key it is configured with.
+     */
+    public static String publicKeyOf(String privateKeyStr) throws Exception {
+        PrivateKey privateKey = getPrivateKey(privateKeyStr);
+        if (!(privateKey instanceof RSAPrivateCrtKey crt)) {
+            throw new IllegalArgumentException("not an RSA private key with CRT parameters");
+        }
+        PublicKey publicKey = KeyFactory.getInstance("RSA").generatePublic(new RSAPublicKeySpec(crt.getModulus(), crt
+                .getPublicExponent()));
+        return Base64.encodeBase64String(publicKey.getEncoded());
+    }
+
+    /**
      * 使用公钥加密数据
      *
      * @param data 待加密数据
@@ -89,8 +116,8 @@ public class RsaEncrypter {
      */
     public static String encrypt(String data, String publicKeyStr) throws Exception {
         PublicKey publicKey = getPublicKey(publicKeyStr);
-        Cipher cipher = Cipher.getInstance("RSA");
-        cipher.init(Cipher.ENCRYPT_MODE, publicKey);
+        Cipher cipher = Cipher.getInstance(TRANSFORMATION);
+        cipher.init(Cipher.ENCRYPT_MODE, publicKey, OAEP_SHA256);
         byte[] encryptedData = cipher.doFinal(data.getBytes(UTF_8));
         return Base64.encodeBase64String(encryptedData);
     }
@@ -105,8 +132,8 @@ public class RsaEncrypter {
      */
     public static String decrypt(String encryptedDataStr, String privateKeyStr) throws Exception {
         PrivateKey privateKey = getPrivateKey(privateKeyStr);
-        Cipher cipher = Cipher.getInstance("RSA");
-        cipher.init(Cipher.DECRYPT_MODE, privateKey);
+        Cipher cipher = Cipher.getInstance(TRANSFORMATION);
+        cipher.init(Cipher.DECRYPT_MODE, privateKey, OAEP_SHA256);
         byte[] decryptedData = cipher.doFinal(Base64.decodeBase64(encryptedDataStr));
         return new String(decryptedData, UTF_8);
     }

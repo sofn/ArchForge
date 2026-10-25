@@ -1179,6 +1179,8 @@ components:
           type: "object"
         isCaptchaOn:
           type: "boolean"
+        rsaPublicKey:
+          type: "string"
       type: "object"
     LoginLogResponse:
       properties:

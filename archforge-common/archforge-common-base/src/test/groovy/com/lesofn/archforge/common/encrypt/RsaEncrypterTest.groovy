@@ -164,7 +164,7 @@ class RsaEncrypterTest extends Specification {
         thrown(Exception)
     }
 
-    def "should encrypt and decrypt data correctly2"() {
+    def "round-trips with a fixed key and no longer accepts a PKCS#1 v1.5 ciphertext"() {
         given:
         def publicKeyStr = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCR4OIktTR8yHJpe4iirt/x8mfL0hIaePKaSCi1rKZtUWouyW9vnsSAyjerQ2xiDm9ba+syVbw57Huuw0c+SZDj24N+oMIrswkStGMmfEkwS9y/FphXoccTnqAA+DbpgoccaX9HKf3cXvge/aPy/P/mJqiJVyBrerSnsnCEpb2+SwIDAQAB"
         def privateKeyStr = "MIICeAIBADANBgkqhkiG9w0BAQEFAASCAmIwggJeAgEAAoGBAJHg4iS1NHzIcml7iKKu3/HyZ8vSEhp48ppIKLWspm1Rai7Jb2+exIDKN6tDbGIOb1tr6zJVvDnse67DRz5JkOPbg36gwiuzCRK0YyZ8STBL3L8WmFehxxOeoAD4NumChxxpf0cp/dxe+B79o/L8/+YmqIlXIGt6tKeycISlvb5LAgMBAAECgYAJ8zsJl5szvbUMG9h8huK7N+EQ5ncZ+3ufaWJEI2QbWxfGht0v0bZZNdx+iolHK5vjMk+8bbD6icuqkSL4DSrcPYfJ21NO2gA0X3ngRBYqvVgduULQmqx6bcqbQuTKddfrenOWkFTCM6Mt6HQQZJVkwO3Lh81CZiyLwTD3HK1yZQJBAMG01uI+Nq2irEYuCnb2GPPU93IWO3gxoNdIMnINGdMgsQ8tnlfwTu8zBid9vw7aYcGIHyugECfvj9FaXHkhnK8CQQDAyonTC91Gb02Vrgv6azOf1ZbxV2LGdOxpRI+9FyZrlPXTdQ9iMtKpQVkc5YbdowVfvZcyUZ+mBb54LVLjb7clAkEAsJKD/p/vf7/1gdOePmp+vGW5WgniE+JJV3S8ZzKCA+6c99UBre+kRG8igQUjEAsJaT0IDOBPWdgKJTBVcyWsiQJBAKqd1DF5K3+dGw1fNWyOGObX8LhvPJQjf+F9crPGXBMThiZ4T3/5OGPf2ExxeNSG5EehksBOajpUlQboHZX4FR0CQQCBZEnp+S/4ZC6xdbGHDYaNXZ8jeEZQTXGrjySLILXeHuaPF8i8ghARVB8FLSmbpheVSdTEoo70j1hgF5d7BHc+"
@@ -177,13 +177,17 @@ class RsaEncrypterTest extends Specification {
 
         def decryptedData = RsaEncrypter.decrypt(encryptedData, privateKeyStr)
         println decryptedData
-        def decryptedData2 = RsaEncrypter.decrypt(encryptedData1, privateKeyStr)
-        println decryptedData2
 
         then:
         encryptedData != null
         !encryptedData.isEmpty()
         encryptedData != originalData
         decryptedData == originalData
+
+        when: "a ciphertext of the old PKCS#1 v1.5 scheme (encryptedData1) — the login now uses RSA-OAEP"
+        RsaEncrypter.decrypt(encryptedData1, privateKeyStr)
+
+        then:
+        thrown(javax.crypto.BadPaddingException)
     }
 }

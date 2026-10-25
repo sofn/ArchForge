@@ -3,6 +3,7 @@ package com.lesofn.archforge.server.admin.service.login;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -262,6 +263,37 @@ class LoginServiceTest {
         String result = loginService.decryptPassword(encrypted);
 
         assertEquals("secret", result);
+    }
+
+    /**
+     * A password the server cannot decrypt is answered exactly like a wrong password. A distinct "cannot decrypt" code
+     * tells an attacker which ciphertexts are well-formed — the oracle behind padding attacks.
+     */
+    @Test
+    void decryptPassword_ProdUndecryptable_IsAWrongPassword() throws Exception {
+        when(environment.matchesProfiles("prod")).thenReturn(true);
+        appForgeConfig.setRsaPrivateKey(RsaEncrypter.generateKeyPair().get("privateKey"));
+
+        AdminAuthException e = assertThrows(AdminAuthException.class, () -> loginService.decryptPassword("bm90LWEtY2lwaGVy"));
+
+        assertEquals(com.lesofn.archforge.infrastructure.auth.errors.AdminAuthErrorCode.USERNAME_PASSWORD_ERROR.getCode(), e
+                .getErrorInfo().getCode());
+    }
+
+    /** Login clients get the public key of the configured private key, so they can encrypt for it. */
+    @Test
+    void getConfig_OffersThePublicKeyOfTheConfiguredPrivateKey() throws Exception {
+        Map<String, String> keys = RsaEncrypter.generateKeyPair();
+        appForgeConfig.setRsaPrivateKey(keys.get("privateKey"));
+
+        assertEquals(keys.get("publicKey"), loginService.getConfig().getRsaPublicKey());
+    }
+
+    @Test
+    void getConfig_WithoutAPrivateKeyOffersNoKey() {
+        appForgeConfig.setRsaPrivateKey(null);
+
+        assertNull(loginService.getConfig().getRsaPublicKey());
     }
 
     @Test
