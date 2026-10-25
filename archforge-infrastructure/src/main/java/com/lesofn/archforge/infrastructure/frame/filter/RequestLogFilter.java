@@ -23,18 +23,27 @@ import org.apache.commons.lang3.Strings;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.MDC;
 import jakarta.servlet.ServletException;
+import java.util.List;
 
 @Slf4j
 public class RequestLogFilter implements Filter {
 
     public RequestLogFilter(ObservationRegistry observationRegistry, @Nullable Tracer tracer) {
+        this(observationRegistry, tracer, List.of());
+    }
+
+    public RequestLogFilter(ObservationRegistry observationRegistry, @Nullable Tracer tracer,
+            List<String> trustedProxies) {
         this.observationRegistry = observationRegistry;
         this.tracer = tracer;
+        this.trustedProxies = List.copyOf(trustedProxies);
     }
 
     private static final RequestIDGenerator REQUEST_ID_GENERATOR = RequestIDGenerator.getInstance();
     private final ObservationRegistry observationRegistry;
     private final @Nullable Tracer tracer;
+    /** {@code arch-forge.security.trusted-proxies}: only these peers may set the client IP via X-Forwarded-For. */
+    private final List<String> trustedProxies;
 
     @Override
     public void doFilter(
@@ -47,7 +56,8 @@ public class RequestLogFilter implements Filter {
         // Always bind RequestContext so downstream filters/loggers can access requestId.
         RequestContext context = new RequestContext(REQUEST_ID_GENERATOR.nextId());
         context.setOriginRequest(request);
-        context.setIp(IpUtil.getRealIpAddr(request));
+        // the one place the client IP is resolved — audit logs, login info and the request log all read it
+        context.setIp(IpUtil.getClientIp(request, trustedProxies));
         MDC.put("requestId", context.getRequestId());
 
         // ScopedValue: entire filter chain runs within context scope, auto-cleanup on exit

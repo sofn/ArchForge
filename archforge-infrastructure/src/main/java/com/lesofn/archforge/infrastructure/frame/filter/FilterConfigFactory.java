@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import com.lesofn.archforge.infrastructure.config.ArchForgeProperties;
 
 /** Authors: sofn Version: 1.0 Created at 15-6-8 23:15. */
 @Configuration
@@ -20,11 +21,13 @@ public class FilterConfigFactory implements WebMvcConfigurer {
 
     private final ObservationRegistry observationRegistry;
     private final ObjectProvider<Tracer> tracer;
+    private final ArchForgeProperties properties;
 
     @Bean
     public FilterRegistrationBean<Filter> requestLogChain() {
         FilterRegistrationBean<Filter> registration = new FilterRegistrationBean<>();
-        Filter headerFilter = new RequestLogFilter(observationRegistry, tracer.getIfAvailable());
+        Filter headerFilter = new RequestLogFilter(observationRegistry, tracer.getIfAvailable(), properties.getSecurity()
+                .getTrustedProxies());
         registration.setFilter(headerFilter);
         registration.setOrder(Ordered.HIGHEST_PRECEDENCE);
         // 拦截错误转发

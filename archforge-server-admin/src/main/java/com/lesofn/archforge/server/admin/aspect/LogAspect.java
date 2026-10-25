@@ -2,7 +2,6 @@ package com.lesofn.archforge.server.admin.aspect;
 
 import com.lesofn.archforge.common.utils.UserAgentUtil;
 import com.lesofn.archforge.common.utils.ip.IpRegionUtil;
-import com.lesofn.archforge.common.utils.ip.IpUtil;
 import com.lesofn.archforge.infrastructure.annotation.Log;
 import com.lesofn.archforge.infrastructure.auth.LoginContext;
 import com.lesofn.archforge.infrastructure.frame.context.ScopedValueContext;
@@ -43,7 +42,7 @@ public class LogAspect {
         HttpServletRequest request = ScopedValueContext.getServletRequest();
         String userAgentHeader = request == null ? "" : request.getHeader("User-Agent");
         UserAgentUtil.AgentInfo userAgent = UserAgentUtil.parse(userAgentHeader);
-        String ip = request == null ? "" : IpUtil.getRealIpAddr(request);
+        String ip = ScopedValueContext.getClientIp();
 
         SysOperLog operLog = new SysOperLog();
         operLog.setUsername(getCurrentUsername());

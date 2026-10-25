@@ -9,7 +9,6 @@ import com.lesofn.archforge.common.dictionary.EnumDictionaryRegistry;
 import com.lesofn.archforge.common.encrypt.RsaEncrypter;
 import com.lesofn.archforge.common.utils.UserAgentUtil;
 import com.lesofn.archforge.common.utils.ip.IpRegionUtil;
-import com.lesofn.archforge.common.utils.ip.IpUtil;
 import com.lesofn.archforge.infrastructure.auth.errors.AdminAuthException;
 import com.lesofn.archforge.infrastructure.auth.service.LoginAttemptService;
 import com.lesofn.archforge.infrastructure.config.ArchForgeProperties;
@@ -155,7 +154,7 @@ public class LoginService {
 
     private void fillLoginLogFromRequest(SysLoginLog loginLog) {
         HttpServletRequest request = ScopedValueContext.getServletRequest();
-        String ip = request == null ? "" : IpUtil.getRealIpAddr(request);
+        String ip = ScopedValueContext.getClientIp();
         UserAgentUtil.AgentInfo userAgent = UserAgentUtil.parse(request == null ? "" : request.getHeader("User-Agent"));
         loginLog.setIp(ip);
         loginLog.setAddress(IpRegionUtil.getBriefLocationByIp(ip));

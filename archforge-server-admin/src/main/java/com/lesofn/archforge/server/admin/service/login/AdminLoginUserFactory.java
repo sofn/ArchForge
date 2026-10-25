@@ -25,6 +25,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
+import com.lesofn.archforge.infrastructure.frame.context.ScopedValueContext;
 
 @Service
 @Slf4j
@@ -74,7 +75,7 @@ public class AdminLoginUserFactory {
             loginUser.grantAppPermission("ROLE_ADMIN");
         }
         loginUser.grantAppPermission("ROLE_USER");
-        loginUser.fillLoginInfo();
+        loginUser.fillLoginInfo(ScopedValueContext.getClientIp());
         loginUser.setAutoRefreshCacheTime(
                 loginUser.getLoginInfo().getLoginTime() + TimeUnit.MINUTES.toMillis(appForgeConfig.getToken()
                         .getAutoRefreshTime()));

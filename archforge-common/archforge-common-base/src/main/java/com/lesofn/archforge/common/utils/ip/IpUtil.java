@@ -200,35 +200,6 @@ public class IpUtil {
         return false;
     }
 
-    public static String getRealIpAddr(HttpServletRequest request) {
-        // just for test.
-        if (request == null) {
-            return "127.0.0.1";
-        }
-        String ip = request.getHeader("x-forwarded-for");
-        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("Proxy-Client-IP");
-        }
-        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("WL-Proxy-Client-IP");
-        }
-
-        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getRemoteAddr();
-        }
-        log.debug(
-                "x-forwarded-for:" + request.getHeader("x-forwarded-for") + ",Proxy-Client-IP:" + request.getHeader(
-                        "Proxy-Client-IP") + ",WL-Proxy-Client-IP:" + request.getHeader("WL-Proxy-Client-IP") + ",ip:" + ip);
-        if (ip != null) {
-            // 为了解决移动网关的问题。移动网关过来的请求，第二个ip是真实ip
-            int idx = ip.indexOf(",");
-            if (idx > 0 && idx < ip.length()) {
-                ip = ip.substring(ip.indexOf(",") + 1).trim();
-            }
-        }
-        return ip != null ? ip.trim() : "127.0.0.1";
-    }
-
     /**
      * 获取客户端真实 IP，仅信任配置的反向代理列表中的 X-Forwarded-For。
      *

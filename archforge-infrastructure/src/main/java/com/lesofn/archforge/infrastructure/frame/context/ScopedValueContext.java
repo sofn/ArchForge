@@ -46,6 +46,20 @@ public final class ScopedValueContext {
     /** Check if a request context is currently bound. */
     public static boolean isBound() { return CONTEXT.isBound(); }
 
+    /**
+     * The client IP resolved once per request by the request filter (trusted proxies only); the peer address when no
+     * request context is bound; "" outside a request.
+     */
+    public static String getClientIp() {
+        RequestContext context = getRequestContext();
+        if (context != null && context.getIp() != null) {
+            return java.util.Objects.requireNonNull(context.getIp());
+        }
+        HttpServletRequest request = getServletRequest();
+        String remote = request == null ? null : request.getRemoteAddr();
+        return remote == null ? "" : remote;
+    }
+
     /** Functional interface that allows checked exceptions. */
     @FunctionalInterface
     public interface ThrowingRunnable {

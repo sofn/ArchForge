@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.jspecify.annotations.Nullable;
 import com.lesofn.archforge.common.utils.ServletHolderUtil;
 import com.lesofn.archforge.common.utils.ip.IpRegionUtil;
-import com.lesofn.archforge.common.utils.ip.IpUtil;
 import com.lesofn.archforge.common.utils.UserAgentUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
@@ -45,8 +44,17 @@ public class BaseLoginUser implements java.io.Serializable {
         this.password = password;
     }
 
-    /** 设置用户代理信息 */
+    /** 设置用户代理信息；IP 取请求的对端地址（不信任转发头——调用方应传入按可信代理解析过的 IP）。 */
     public void fillLoginInfo() {
+        fillLoginInfo(null);
+    }
+
+    /**
+     * 设置用户代理信息。
+     *
+     * @param clientIp 已按可信代理解析的客户端 IP；为空时取请求的对端地址
+     */
+    public void fillLoginInfo(@Nullable String clientIp) {
         HttpServletRequest request;
         try {
             request = ServletHolderUtil.getRequest();
@@ -69,7 +77,7 @@ public class BaseLoginUser implements java.io.Serializable {
             }
 
             UserAgentUtil.AgentInfo userAgent = UserAgentUtil.parse(userAgentHeader);
-            String ip = IpUtil.getRealIpAddr(request);
+            String ip = clientIp != null && !clientIp.isEmpty() ? clientIp : request.getRemoteAddr();
 
             this.getLoginInfo().setIpAddress(ip);
             this.getLoginInfo().setLocation(IpRegionUtil.getBriefLocationByIp(ip));
