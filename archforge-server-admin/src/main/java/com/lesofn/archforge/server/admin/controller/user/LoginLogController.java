@@ -59,7 +59,7 @@ public class LoginLogController {
     }
 
     @Operation(summary = "清空登录日志")
-    @SaCheckPermission(value = "monitor:logininfor:list", type = StpAdminUtil.TYPE)
+    @SaCheckPermission(value = "monitor:logininfor:remove", type = StpAdminUtil.TYPE)
     @PostMapping("/clear")
     public Boolean clearLoginLogs() {
         loginLogService.clearAll();

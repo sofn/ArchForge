@@ -60,7 +60,7 @@ public class OperationLogController {
     }
 
     @Operation(summary = "清空操作日志")
-    @SaCheckPermission(value = "monitor:operlog:list", type = StpAdminUtil.TYPE)
+    @SaCheckPermission(value = "monitor:operlog:remove", type = StpAdminUtil.TYPE)
     @PostMapping("/clear")
     public Boolean clearOperLogs() {
         operLogService.clearAll();
